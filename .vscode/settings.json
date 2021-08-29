@@ -1,0 +1,7 @@
+{
+    "files.exclude": {
+        "external": true,
+        "bazel-*": false,
+        "compile_commands.json": false
+    }
+}
