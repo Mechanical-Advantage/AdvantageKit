@@ -18,7 +18,7 @@ extract_native_header_jar = rule(
     output_to_genfiles = True,
 )
 
-def jni_header_library(name, java_lib, outs, **kwargs):
+def jni_header_library(name, java_lib, jni_dep, outs, **kwargs):
     extract_native_header_jar(
         name = name + "-extract",
         lib = java_lib,
@@ -29,5 +29,6 @@ def jni_header_library(name, java_lib, outs, **kwargs):
         name = name,
         hdrs = outs,
         includes = ["."],
+        deps = [jni_dep],
         **kwargs
     )
