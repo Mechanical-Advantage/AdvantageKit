@@ -33,11 +33,20 @@ load(
 
 CompilationAspect = provider()
 
+_cpp_header_extensions = [
+    "hh",
+    "hxx",
+    "ipp",
+    "hpp",
+]
+
+_c_or_cpp_header_extensions = ["h"] + _cpp_header_extensions
+
 _cpp_extensions = [
     "cc",
     "cpp",
     "cxx",
-]
+] + _cpp_header_extensions
 
 _cc_rules = [
     "cc_library",
@@ -61,6 +70,8 @@ def _compilation_db_json(compilation_db):
     return ",\n".join(entries)
 
 def _is_cpp_target(srcs):
+    if all([src.extension in _c_or_cpp_header_extensions for src in srcs]):
+        return True  # assume header-only lib is c++
     return any([src.extension in _cpp_extensions for src in srcs])
 
 def _is_objcpp_target(srcs):
@@ -267,14 +278,7 @@ def _compilation_database_aspect_impl(target, ctx):
     else:
         compiler_info = _objc_compiler_info(ctx, target, srcs, feature_configuration, cc_toolchain)
 
-    compile_flags = compiler_info.compile_flags
-    compile_flags += [
-        # Use -I to indicate that we want to keep the normal position in the system include chain.
-        # See https://github.com/grailbio/bazel-compilation-database/issues/36#issuecomment-531971361.
-        "-I " + str(d)
-        for d in cc_toolchain.built_in_include_directories
-    ]
-    compile_command = compiler_info.compiler + " " + " ".join(compile_flags) + compiler_info.force_language_mode_option
+    compile_command = compiler_info.compiler + " " + " ".join(compiler_info.compile_flags) + compiler_info.force_language_mode_option
 
     for src in srcs:
         command_for_file = compile_command + " -c " + src.path
@@ -333,15 +337,6 @@ def _compilation_database_impl(ctx):
         ctx.actions.write(output = ctx.outputs.filename, content = "[]\n")
         return
 
-    # We make this rule a no-op on Windows because it is not supported.
-    # We use the exposed host path separator as a hack to detect Windows.
-    # The ideal solution here would be to use toolchains.
-    # https://github.com/bazelbuild/bazel/issues/2045
-    if ctx.configuration.host_path_separator != ":":
-        print("Windows is not supported in compilation_database rule")
-        ctx.actions.write(output = ctx.outputs.filename, content = "[]\n")
-        return
-
     compilation_db = []
     all_headers = []
     for target in ctx.attr.targets:
@@ -362,7 +357,7 @@ def _compilation_database_impl(ctx):
         ),
     ]
 
-compilation_database = rule(
+_compilation_database = rule(
     attrs = {
         "targets": attr.label_list(
             aspects = [compilation_database_aspect],
@@ -376,12 +371,17 @@ compilation_database = rule(
             default = False,
             doc = ("Makes this operation a no-op; useful in combination with a 'select' " +
                    "for platforms where the internals of this rule are not properly " +
-                   "supported. For known unsupported platforms (e.g. Windows), the " +
-                   "rule is always a no-op."),
+                   "supported."),
         ),
-    },
-    outputs = {
-        "filename": "compile_commands.json",
+        "filename": attr.output(
+            doc = "Name of the generated compilation database.",
+        ),
     },
     implementation = _compilation_database_impl,
 )
+
+def compilation_database(**kwargs):
+    _compilation_database(
+        filename = kwargs.pop("filename", "compile_commands.json"),
+        **kwargs,
+    )

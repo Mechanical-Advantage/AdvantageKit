@@ -37,6 +37,7 @@ while getopts "sh" opt; do
     *) >&2 echo "invalid option ${opt}"; exit 1;;
   esac
 done
+shift $((OPTIND-1))
 
 # This function is copied from https://source.bazel.build/bazel/+/master:scripts/packages/bazel.sh.
 # `readlink -f` that works on OSX too.
@@ -110,7 +111,7 @@ fi
   $("${QUERY_CMD[@]}") > /dev/null
 
 echo "[" > "${COMPDB_FILE}"
-find "${EXEC_ROOT}" -name '*.compile_commands.json' -exec bash -c 'cat "$1" && echo ,' _ {} \; \
+find "${EXEC_ROOT}" -name '*.compile_commands.json' -not -empty -exec bash -c 'cat "$1" && echo ,' _ {} \; \
   >> "${COMPDB_FILE}"
 echo "]" >> "${COMPDB_FILE}"
 
