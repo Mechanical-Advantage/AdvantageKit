@@ -3,5 +3,11 @@
         "external": true,
         "bazel-*": false,
         "compile_commands.json": false
-    }
+    },
+    "java.project.referencedLibraries": [
+        "bazel-AdvantageKit/external/maven/**/*.jar"
+    ],
+    "java.project.sourcePaths": [
+        "example_java_project/src"
+    ]
 }
