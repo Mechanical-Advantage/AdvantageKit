@@ -9,5 +9,8 @@
     ],
     "java.project.sourcePaths": [
         "example_java_project/src"
+    ],
+    "bsv.cc.compdb.targets": [
+        "//example_java_project:native"
     ]
 }

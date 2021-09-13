@@ -1,7 +1,8 @@
 {
     "recommendations": [
         "stackbuild.bazel-stack-vscode",
+        "stackbuild.bazel-stack-vscode-cc",
         "llvm-vs-code-extensions.vscode-clangd",
-        "vscjava.vscode-java-pack"
+        "vscjava.vscode-java-pack",
     ]
 }

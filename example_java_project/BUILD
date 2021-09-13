@@ -21,3 +21,9 @@ java_export(
     maven_coordinates = "org.littletonrobotics.akit:example:0.0.1",
     runtime_deps = [":example"]
 )
+
+cc_binary(
+    name = "native",
+    srcs = ["test.c"],
+    linkshared = True
+)
