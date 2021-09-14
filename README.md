@@ -2,6 +2,8 @@
 
 ## Getting Started
 
+AdvantageKit uses [Bazel](https://bazel.build/) as its primary build system.  To start working on AdvantageKit, you must first install it and its dependencies.  This should only have to be done once.  Below are instructions for Windows, Linux, and MacOS.  Advanced users who already use Bazel can probably skip these steps, but we still advise reading through them as there are some project specific requirements (sandboxfs and `user.bazelrc`) that need to be applied to make the build work correctly.
+
 ### Windows
 
 We **strongly** recommend using WSL2 (or WSL1 as a fallback) to develop AdvantageKit on Windows.  While we do our best to support Windows as a build environment, many Bazel features do not work well on Windows and managing C/C++ compilers on Windows is quite tedious.  Microsoft provides detailed instructions on setting up WSL2, and it is natively supported in VSCode as well.
@@ -27,9 +29,14 @@ Finally, Bazel itself must be installed.  We recommend installing it using Choco
 
 This procedure will use the command line to install Bazel.  If you don't have time to read, just execute each of the commands listed in the boxes below to get up and running.
 
+Update apt cache and install Git if it's not installed already:
+```console
+sudo apt update
+sudo apt install git
+```
+
 We recommend making a directory where you can download and extract the files listed below without making a mess in your home folder:
 ```console
-cd ~/
 mdkir bazel_install
 cd bazel_install
 ```
@@ -68,3 +75,7 @@ cd ..
 rm -rf bazel_install
 ```
 
+Create a file called `user.bazelrc` in the project root directory with the following content:
+```
+build --experimental_use_sandboxfs
+```
