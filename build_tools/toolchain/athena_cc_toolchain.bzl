@@ -1,5 +1,59 @@
-load("@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl", "feature", "flag_group", "flag_set", "tool_path", "with_feature_set")
+load("@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl", "feature", "flag_group", "flag_set", "tool_path")
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
+
+all_compile_actions = [
+    ACTION_NAMES.c_compile,
+    ACTION_NAMES.cpp_compile,
+    ACTION_NAMES.linkstamp_compile,
+    ACTION_NAMES.assemble,
+    ACTION_NAMES.preprocess_assemble,
+    ACTION_NAMES.cpp_header_parsing,
+    ACTION_NAMES.cpp_module_compile,
+    ACTION_NAMES.cpp_module_codegen,
+    ACTION_NAMES.clif_match,
+    ACTION_NAMES.lto_backend,
+]
+
+all_cpp_compile_actions = [
+    ACTION_NAMES.cpp_compile,
+    ACTION_NAMES.linkstamp_compile,
+    ACTION_NAMES.cpp_header_parsing,
+    ACTION_NAMES.cpp_module_compile,
+    ACTION_NAMES.cpp_module_codegen,
+    ACTION_NAMES.clif_match,
+]
+
+preprocessor_compile_actions = [
+    ACTION_NAMES.c_compile,
+    ACTION_NAMES.cpp_compile,
+    ACTION_NAMES.linkstamp_compile,
+    ACTION_NAMES.preprocess_assemble,
+    ACTION_NAMES.cpp_header_parsing,
+    ACTION_NAMES.cpp_module_compile,
+    ACTION_NAMES.clif_match,
+]
+
+codegen_compile_actions = [
+    ACTION_NAMES.c_compile,
+    ACTION_NAMES.cpp_compile,
+    ACTION_NAMES.linkstamp_compile,
+    ACTION_NAMES.assemble,
+    ACTION_NAMES.preprocess_assemble,
+    ACTION_NAMES.cpp_module_codegen,
+    ACTION_NAMES.lto_backend,
+]
+
+all_link_actions = [
+    ACTION_NAMES.cpp_link_executable,
+    ACTION_NAMES.cpp_link_dynamic_library,
+    ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+]
+
+lto_index_actions = [
+    ACTION_NAMES.lto_index_for_executable,
+    ACTION_NAMES.lto_index_for_dynamic_library,
+    ACTION_NAMES.lto_index_for_nodeps_dynamic_library,
+]
 
 def _impl(ctx):
     tool_paths = [
@@ -37,35 +91,37 @@ def _impl(ctx):
         ),
     ]
     features = [
-        feature(name = "dbg"),  # For some reason we have to redefine dbg and opt modes here?? not really sure why
-        feature(name = "opt"),
         feature(
-            name = "athena_default_compiler_flags",
+            name = "roborio_toolchain_feature",
             enabled = True,
             flag_sets = [
                 flag_set(
-                    actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile, ACTION_NAMES.assemble, ACTION_NAMES.preprocess_assemble, ACTION_NAMES.linkstamp_compile, ACTION_NAMES.cpp_header_parsing],
+                    actions = [
+                        ACTION_NAMES.c_compile,
+                        ACTION_NAMES.cpp_compile,
+                    ],
                     flag_groups = [
                         flag_group(
-                            flags = ["-O0", "-ggdb", "-gdwarf-2", "-g3"],
+                            flags = [
+                                "-no-canonical-prefixes",
+                                "-std=c++17",
+                            ],
                         ),
                     ],
-                    with_features = [with_feature_set(features = ["dbg"])],
                 ),
                 flag_set(
-                    actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                    flag_groups = [
-                        flag_group(
-                            flags = ["-Os"],
-                        ),
+                    actions = [
+                        ACTION_NAMES.cpp_link_executable,
+                        ACTION_NAMES.cpp_link_dynamic_library,
+                        ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+                        ACTION_NAMES.cpp_link_static_library,
                     ],
-                    with_features = [with_feature_set(features = ["opt"])],
-                ),
-                flag_set(
-                    actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                     flag_groups = [
                         flag_group(
-                            flags = ["-no-canonical-prefixes", "-fno-canonical-system-headers"],
+                            flags = [
+                                "-lstdc++",
+                                "-lpthread",
+                            ],
                         ),
                     ],
                 ),
@@ -75,23 +131,24 @@ def _impl(ctx):
 
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
-        builtin_sysroot = "external/athena_toolchain_%s_files/frc2021/roborio/arm-frc2021-linux-gnueabi" % ctx.attr.toolchain_host,
-        toolchain_identifier = "athena_cc_toolchain_%s" % ctx.attr.toolchain_host,
+        toolchain_identifier = "roborio_toolchain",
         host_system_name = "local",
-        target_system_name = "linux-gnueabi",
-        target_cpu = "arm",
+        target_system_name = "arm-frc2021-linux-gnueabi",
+        target_cpu = "armv7",
         target_libc = "glibc-2.24",
-        compiler = "arm-frc2021-linux-gnueabi-gcc-7.3.0",
-        abi_version = "unknown",
-        abi_libc_version = "unknown",
+        cc_target_os = "linux",
+        compiler = "gcc-7.3.0",
+        abi_version = "gcc-7.3.0",
+        abi_libc_version = "glibc-2.24",
         tool_paths = tool_paths,
+        builtin_sysroot = "external/athena_toolchain_%s_files/frc2021/roborio/arm-frc2021-linux-gnueabi" % ctx.attr.toolchain_host,
         features = features,
     )
 
 athena_cc_toolchain_config = rule(
     implementation = _impl,
     attrs = {
-        "toolchain_host": attr.string()
+        "toolchain_host": attr.string(),
     },
     provides = [CcToolchainConfigInfo],
 )

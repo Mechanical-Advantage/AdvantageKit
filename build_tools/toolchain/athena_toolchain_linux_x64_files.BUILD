@@ -11,7 +11,7 @@ athena_cc_toolchain_config(
 )
 
 cc_toolchain(
-    name = "toolchain-def",
+    name = "athena-cc-toolchain-def",
     all_files = ":toolchain-files",
     ar_files = ":toolchain-files",
     compiler_files = ":toolchain-files",

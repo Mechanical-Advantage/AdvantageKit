@@ -6,7 +6,7 @@ toolchain(
         "@platforms//cpu:arm",
         "//build_tools/platforms:roborio",
     ],
-    toolchain = "@athena_toolchain_linux64_files//:toolchain-def",
+    toolchain = "@athena_toolchain_linux_x64_files//:athena-cc-toolchain-def",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
 
@@ -18,7 +18,7 @@ toolchain(
         "@platforms//cpu:arm",
         "//build_tools/platforms:roborio",
     ],
-    toolchain = "@athena_toolchain_win32_files//:toolchain-def",
+    toolchain = "@athena_toolchain_windows_x64_files//:athena-cc-toolchain-def",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
 
@@ -30,6 +30,6 @@ toolchain(
         "@platforms//cpu:arm",
         "//build_tools/platforms:roborio",
     ],
-    toolchain = "@athena_toolchain_macos64_files//:toolchain-def",
+    toolchain = "@athena_toolchain_macos_x64_files//:athena-cc-toolchain-def",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
