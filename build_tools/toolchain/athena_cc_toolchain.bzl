@@ -56,40 +56,24 @@ lto_index_actions = [
 ]
 
 def _impl(ctx):
+    exec_extension = ".exe" if "windows" in ctx.attr.toolchain_host else ""
+
     tool_paths = [
         tool_path(
-            name = "gcc",
-            path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-gcc",
-        ),
-        tool_path(
-            name = "ld",
-            path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-ld",
-        ),
-        tool_path(
-            name = "ar",
-            path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-ar",
-        ),
-        tool_path(
-            name = "cpp",
-            path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-cpp",
-        ),
-        tool_path(
-            name = "gcov",
-            path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-gcov",
-        ),
-        tool_path(
-            name = "nm",
-            path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-nm",
-        ),
-        tool_path(
-            name = "objdump",
-            path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-objdump",
-        ),
-        tool_path(
-            name = "strip",
-            path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-strip",
-        ),
+            name = name,
+            path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-{}{}".format(name, exec_extension),
+        ) for name in [
+            "ar",
+            "cpp",
+            "gcc",
+            "gcov",
+            "ld",
+            "nm",
+            "objdump",
+            "strip",
+        ]
     ]
+
     features = [
         feature(
             name = "roborio_toolchain_feature",
