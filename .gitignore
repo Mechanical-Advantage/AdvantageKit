@@ -2,3 +2,4 @@
 /external
 /compile_commands.json
 /.cache
+user.bazelrc
