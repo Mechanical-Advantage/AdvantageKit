@@ -17,8 +17,11 @@ http_archive(
 
 # This installs additional dependencies of "rules_jvm_external" that are needed for it to work properly
 load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
 rules_jvm_external_deps()
+
 load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
 rules_jvm_external_setup()
 
 # This loads the "maven_install" rule from the file that we just told Bazel how to download above.  We then use
@@ -34,7 +37,7 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 # From the Bazel docs: "All non-alphanumeric characters are substituted with underscores."
 maven_install(
     artifacts = [
-        "com.google.guava:guava:30.1.1-jre", # This is just an example dependency to demonstrate how it works
+        "com.google.guava:guava:30.1.1-jre",  # This is just an example dependency to demonstrate how it works
     ],
     repositories = [
         "https://repo1.maven.org/maven2",  # Maven central
@@ -71,4 +74,110 @@ register_toolchains(
     "//build_tools/toolchain:athena-cc-toolchain-linux_x64",
     "//build_tools/toolchain:athena-cc-toolchain-windows_x64",
     "//build_tools/toolchain:athena-cc-toolchain-macos_x64",
+)
+
+# Below are a bunch of http_archive rules to make various WPILib components available
+
+# HAL components
+NI_VERSION = "2020.9.2"
+
+NI_VISA_HEADERS_SHA = "e35e16b13416b2ea389a7abe444d9a60f5315f52661fb84225658780bb938e00"
+
+NI_VISA_ATHENA_SHA = "2cf83ce761145ee57b1b88d817cbadcbf1b34cf1759a813fae1cd135c23e6588"
+
+NI_NETCOMM_HEADERS_SHA = "4baf46aacc5e8587a17f5a27173ec51b017102705932da42a55d6ad1f57f0f93"
+
+NI_NETCOMM_ATHENA_SHA = "6a3dac9d74fe20358812924cc3c2bfaafde189e2b07dc444ba5d38e46ca02b06"
+
+NI_CHIPOBJECT_HEADERS_SHA = "9c196eea0acc1e90545044138818a94b2e3eccfde1ee798e16dfa775a06f09b8"
+
+NI_CHIPOBJECT_ATHENA_SHA = "036060af780bc4d3b852d389a5210ef73df3041b9399762e7be8ea8291bb16e3"
+
+NI_RUNTIME_ATHENA_SHA = "a0aeff05908590b1c63071e02d635010bde54c3abb6dc016c78d5617a72c555a"
+
+WPILIB_VERSION = "2021.3.1"
+
+WPILIB_HAL_HEADERS_SHA = "81b4d98d7ae4f92b2887180aea29ef1e780c5570e3fdbe08e02183e54952bd62"
+
+WPILIB_HAL_ATHENA_SHA = "e9de32abe3739697a3a92963c9eca4bf8755edfb0f11ac95e22d0190a3185f56"
+
+WPILIB_WPIUTIL_HEADERS_SHA = "b2a96f7ce07198b139face9dc341c6550d5044fa32f48435b50d986ea5c8ee55"
+
+WPILIB_WPIUTIL_ATHENA_SHA = "ad48bae20f42850938a1758c9f82e54c5cb5e286ad0b09adb701d700bd7f8ec8"
+
+http_archive(
+    name = "ni_visa_headers",
+    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
+    sha256 = NI_VISA_HEADERS_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/visa/%s/visa-%s-headers.zip" % (NI_VERSION, NI_VERSION)],
+)
+
+http_archive(
+    name = "ni_visa_athena",
+    build_file = "@//build_tools/repo:binary_zip_repo.BUILD",
+    sha256 = NI_VISA_ATHENA_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/visa/%s/visa-%s-linuxathena.zip" % (NI_VERSION, NI_VERSION)],
+)
+
+http_archive(
+    name = "ni_netcomm_headers",
+    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
+    sha256 = NI_NETCOMM_HEADERS_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/netcomm/%s/netcomm-%s-headers.zip" % (NI_VERSION, NI_VERSION)],
+)
+
+http_archive(
+    name = "ni_netcomm_athena",
+    build_file = "@//build_tools/repo:binary_zip_repo.BUILD",
+    sha256 = NI_NETCOMM_ATHENA_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/netcomm/%s/netcomm-%s-linuxathena.zip" % (NI_VERSION, NI_VERSION)],
+)
+
+http_archive(
+    name = "ni_chipobject_headers",
+    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
+    sha256 = NI_CHIPOBJECT_HEADERS_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/chipobject/%s/chipobject-%s-headers.zip" % (NI_VERSION, NI_VERSION)],
+)
+
+http_archive(
+    name = "ni_chipobject_athena",
+    build_file = "@//build_tools/repo:binary_zip_repo.BUILD",
+    sha256 = NI_CHIPOBJECT_ATHENA_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/chipobject/%s/chipobject-%s-linuxathena.zip" % (NI_VERSION, NI_VERSION)],
+)
+
+http_archive(
+    name = "ni_runtime_athena",
+    build_file = "@//third_party/ni:ni_runtime_athena.BUILD",
+    sha256 = NI_RUNTIME_ATHENA_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/runtime/%s/runtime-%s-linuxathena.zip" % (NI_VERSION, NI_VERSION)],
+)
+
+http_archive(
+    name = "wpilib_hal_headers",
+    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
+    sha256 = WPILIB_HAL_HEADERS_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/%s/hal-cpp-%s-headers.zip" % (WPILIB_VERSION, WPILIB_VERSION)],
+)
+
+http_archive(
+    name = "wpilib_hal_athena",
+    build_file = "@//third_party/wpilib:wpilib_hal_athena.BUILD",
+    sha256 = WPILIB_HAL_ATHENA_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/%s/hal-cpp-%s-linuxathena.zip" % (WPILIB_VERSION, WPILIB_VERSION)],
+)
+
+http_archive(
+    name = "wpilib_wpiutil_headers",
+    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
+    sha256 = WPILIB_WPIUTIL_HEADERS_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/%s/wpiutil-cpp-%s-headers.zip" % (WPILIB_VERSION, WPILIB_VERSION)],
+)
+
+http_archive(
+    name = "wpilib_wpiutil_athena",
+    build_file = "@//third_party/wpilib:wpilib_wpiutil_athena.BUILD",
+    sha256 = WPILIB_WPIUTIL_ATHENA_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/%s/wpiutil-cpp-%s-linuxathena.zip" % (WPILIB_VERSION, WPILIB_VERSION)],
 )
