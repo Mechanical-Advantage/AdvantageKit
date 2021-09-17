@@ -101,9 +101,13 @@ WPILIB_HAL_HEADERS_SHA = "81b4d98d7ae4f92b2887180aea29ef1e780c5570e3fdbe08e02183
 
 WPILIB_HAL_ATHENA_SHA = "e9de32abe3739697a3a92963c9eca4bf8755edfb0f11ac95e22d0190a3185f56"
 
+WPILIB_HAL_LINUX_X64_SHA = "48ca6f22deb800170c801944531557c8d109be4501418c719349519405ae6cc2"
+
 WPILIB_WPIUTIL_HEADERS_SHA = "b2a96f7ce07198b139face9dc341c6550d5044fa32f48435b50d986ea5c8ee55"
 
 WPILIB_WPIUTIL_ATHENA_SHA = "ad48bae20f42850938a1758c9f82e54c5cb5e286ad0b09adb701d700bd7f8ec8"
+
+WPILIB_WPIUTIL_LINUX_X64_SHA = "4a20ec638981025c0e41678ac7cea691d5a40121987b1309e6907255636d02cf"
 
 http_archive(
     name = "ni_visa_headers",
@@ -169,6 +173,13 @@ http_archive(
 )
 
 http_archive(
+    name = "wpilib_hal_linux_x64",
+    build_file = "@//third_party/wpilib:wpilib_hal_linux_x64.BUILD",
+    sha256 = WPILIB_HAL_LINUX_X64_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/%s/hal-cpp-%s-linuxx86-64.zip" % (WPILIB_VERSION, WPILIB_VERSION)]
+)
+
+http_archive(
     name = "wpilib_wpiutil_headers",
     build_file = "@//build_tools/repo:header_zip_repo.BUILD",
     sha256 = WPILIB_WPIUTIL_HEADERS_SHA,
@@ -180,4 +191,11 @@ http_archive(
     build_file = "@//third_party/wpilib:wpilib_wpiutil_athena.BUILD",
     sha256 = WPILIB_WPIUTIL_ATHENA_SHA,
     urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/%s/wpiutil-cpp-%s-linuxathena.zip" % (WPILIB_VERSION, WPILIB_VERSION)],
+)
+
+http_archive(
+    name = "wpilib_wpiutil_linux_x64",
+    build_file = "@//third_party/wpilib:wpilib_wpiutil_linux_x64.BUILD",
+    sha256 = WPILIB_WPIUTIL_LINUX_X64_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/%s/wpiutil-cpp-%s-linuxx86-64.zip" % (WPILIB_VERSION, WPILIB_VERSION)]
 )
