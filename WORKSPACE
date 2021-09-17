@@ -1,6 +1,7 @@
 # This loads the rule "http_archive", which is used to download zip files from the web
 # and make them available to other rules in our workspace.
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("//build_tools/repo:wpilib_nativezip_utils.bzl", "wpilib_binary_config", "wpilib_nativezip")
 
 # This code loads the "rules_jvm_external" repository into our Bazel workspace.  This is copied in from
 # https://github.com/bazelbuild/rules_jvm_external/releases/tag/4.1
@@ -109,93 +110,116 @@ WPILIB_WPIUTIL_ATHENA_SHA = "ad48bae20f42850938a1758c9f82e54c5cb5e286ad0b09adb70
 
 WPILIB_WPIUTIL_LINUX_X64_SHA = "4a20ec638981025c0e41678ac7cea691d5a40121987b1309e6907255636d02cf"
 
-http_archive(
-    name = "ni_visa_headers",
-    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
-    sha256 = NI_VISA_HEADERS_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/visa/%s/visa-%s-headers.zip" % (NI_VERSION, NI_VERSION)],
+wpilib_nativezip(
+    name = "ni_visa",
+    binary_configs = [
+        wpilib_binary_config(
+            libs = ["libvisa.so"],
+            platform = "athena",
+            sha256 = NI_VISA_ATHENA_SHA,
+        ),
+    ],
+    headers_sha256 = NI_VISA_HEADERS_SHA,
+    package = "ni-libraries",
+    remote_name = "visa",
+    version = NI_VERSION,
+    visibility = "@//third_party/ni:__pkg__",
 )
 
-http_archive(
-    name = "ni_visa_athena",
-    build_file = "@//build_tools/repo:binary_zip_repo.BUILD",
-    sha256 = NI_VISA_ATHENA_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/visa/%s/visa-%s-linuxathena.zip" % (NI_VERSION, NI_VERSION)],
+wpilib_nativezip(
+    name = "ni_netcomm",
+    binary_configs = [
+        wpilib_binary_config(
+            libs = ["libFRC_NetworkCommunication.so.20.0.0"],
+            platform = "athena",
+            sha256 = NI_NETCOMM_ATHENA_SHA,
+        ),
+    ],
+    headers_sha256 = NI_NETCOMM_HEADERS_SHA,
+    package = "ni-libraries",
+    remote_name = "netcomm",
+    version = NI_VERSION,
+    visibility = "@//third_party/ni:__pkg__",
 )
 
-http_archive(
-    name = "ni_netcomm_headers",
-    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
-    sha256 = NI_NETCOMM_HEADERS_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/netcomm/%s/netcomm-%s-headers.zip" % (NI_VERSION, NI_VERSION)],
+wpilib_nativezip(
+    name = "ni_chipobject",
+    binary_configs = [
+        wpilib_binary_config(
+            libs = ["libRoboRIO_FRC_ChipObject.so.20.0.0"],
+            platform = "athena",
+            sha256 = NI_CHIPOBJECT_ATHENA_SHA,
+        ),
+    ],
+    headers_sha256 = NI_CHIPOBJECT_HEADERS_SHA,
+    package = "ni-libraries",
+    remote_name = "chipobject",
+    version = NI_VERSION,
+    visibility = "@//third_party/ni:__pkg__",
 )
 
-http_archive(
-    name = "ni_netcomm_athena",
-    build_file = "@//build_tools/repo:binary_zip_repo.BUILD",
-    sha256 = NI_NETCOMM_ATHENA_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/netcomm/%s/netcomm-%s-linuxathena.zip" % (NI_VERSION, NI_VERSION)],
+wpilib_nativezip(
+    name = "ni_runtime",
+    binary_configs = [
+        wpilib_binary_config(
+            libs = [
+                "libni_emb.so.12.0.0",
+                "libni_rtlog.so.2.8.0",
+                "libNiFpga.so.19.0.0",
+                "libNiFpgaLv.so.19.0.0",
+                "libnirio_emb_can.so.16.0.0",
+                "libniriodevenum.so.19.0.0",
+                "libniriosession.so.18.0.0",
+                "libNiRioSrv.so.19.0.0",
+            ],
+            platform = "athena",
+            sha256 = NI_RUNTIME_ATHENA_SHA,
+        ),
+    ],
+    package = "ni-libraries",
+    remote_name = "runtime",
+    version = NI_VERSION,
+    visibility = "@//third_party/ni:__pkg__",
 )
 
-http_archive(
-    name = "ni_chipobject_headers",
-    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
-    sha256 = NI_CHIPOBJECT_HEADERS_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/chipobject/%s/chipobject-%s-headers.zip" % (NI_VERSION, NI_VERSION)],
+wpilib_nativezip(
+    name = "wpilib_wpiutil",
+    binary_configs = [
+        wpilib_binary_config(
+            libs = ["libwpiutil.so"],
+            platform = "athena",
+            sha256 = WPILIB_WPIUTIL_ATHENA_SHA,
+        ),
+        wpilib_binary_config(
+            libs = ["libwpiutil.so"],
+            platform = "linux_x64",
+            sha256 = WPILIB_WPIUTIL_LINUX_X64_SHA
+        )
+    ],
+    headers_sha256 = WPILIB_WPIUTIL_HEADERS_SHA,
+    package = "wpiutil",
+    remote_name = "wpiutil-cpp",
+    version = WPILIB_VERSION,
+    visibility = "@//third_party/wpilib:__pkg__",
 )
 
-http_archive(
-    name = "ni_chipobject_athena",
-    build_file = "@//build_tools/repo:binary_zip_repo.BUILD",
-    sha256 = NI_CHIPOBJECT_ATHENA_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/chipobject/%s/chipobject-%s-linuxathena.zip" % (NI_VERSION, NI_VERSION)],
-)
-
-http_archive(
-    name = "ni_runtime_athena",
-    build_file = "@//third_party/ni:ni_runtime_athena.BUILD",
-    sha256 = NI_RUNTIME_ATHENA_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/runtime/%s/runtime-%s-linuxathena.zip" % (NI_VERSION, NI_VERSION)],
-)
-
-http_archive(
-    name = "wpilib_hal_headers",
-    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
-    sha256 = WPILIB_HAL_HEADERS_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/%s/hal-cpp-%s-headers.zip" % (WPILIB_VERSION, WPILIB_VERSION)],
-)
-
-http_archive(
-    name = "wpilib_hal_athena",
-    build_file = "@//third_party/wpilib:wpilib_hal_athena.BUILD",
-    sha256 = WPILIB_HAL_ATHENA_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/%s/hal-cpp-%s-linuxathena.zip" % (WPILIB_VERSION, WPILIB_VERSION)],
-)
-
-http_archive(
-    name = "wpilib_hal_linux_x64",
-    build_file = "@//third_party/wpilib:wpilib_hal_linux_x64.BUILD",
-    sha256 = WPILIB_HAL_LINUX_X64_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/%s/hal-cpp-%s-linuxx86-64.zip" % (WPILIB_VERSION, WPILIB_VERSION)]
-)
-
-http_archive(
-    name = "wpilib_wpiutil_headers",
-    build_file = "@//build_tools/repo:header_zip_repo.BUILD",
-    sha256 = WPILIB_WPIUTIL_HEADERS_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/%s/wpiutil-cpp-%s-headers.zip" % (WPILIB_VERSION, WPILIB_VERSION)],
-)
-
-http_archive(
-    name = "wpilib_wpiutil_athena",
-    build_file = "@//third_party/wpilib:wpilib_wpiutil_athena.BUILD",
-    sha256 = WPILIB_WPIUTIL_ATHENA_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/%s/wpiutil-cpp-%s-linuxathena.zip" % (WPILIB_VERSION, WPILIB_VERSION)],
-)
-
-http_archive(
-    name = "wpilib_wpiutil_linux_x64",
-    build_file = "@//third_party/wpilib:wpilib_wpiutil_linux_x64.BUILD",
-    sha256 = WPILIB_WPIUTIL_LINUX_X64_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/%s/wpiutil-cpp-%s-linuxx86-64.zip" % (WPILIB_VERSION, WPILIB_VERSION)]
+wpilib_nativezip(
+    name = "wpilib_hal",
+    binary_configs = [
+        wpilib_binary_config(
+            libs = ["libwpiHal.so"],
+            platform = "athena",
+            sha256 = WPILIB_HAL_ATHENA_SHA,
+        ),
+        wpilib_binary_config(
+            libs = ["libwpiHal.so"],
+            platform = "linux_x64",
+            sha256 = WPILIB_HAL_LINUX_X64_SHA,
+        )
+    ],
+    headers_sha256 = WPILIB_HAL_HEADERS_SHA,
+    package = "hal",
+    remote_name = "hal-cpp",
+    version = WPILIB_VERSION,
+    visibility = "@//third_party/wpilib:__pkg__"
 )
