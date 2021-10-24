@@ -8,9 +8,11 @@
         "bazel-AdvantageKit/external/maven/**/*.jar"
     ],
     "java.project.sourcePaths": [
-        "example_java_project/src"
+        "example_java_project/src",
+        "junction/core/src",
+        "conduit/api/src"
     ],
     "bsv.cc.compdb.targets": [
-        "//example_java_project:native"
+        "//conduit/wpilibio"
     ]
 }
