@@ -8,12 +8,17 @@
         "**/.settings": true,
         "**/.factorypath": true
     },
-    "java.project.referencedLibraries": [
-        "bazel-bin/external/maven/**/*.jar",
-        "bazel-bin/external/frcmaven/**/*.jar",
-        "bazel-AdvantageKit/external/wpilibj_jar_file/**/*.jar",
-        "bazel-AdvantageKit/external/wpilibj_sources_jar_file/**/*.jar"
-    ],
+    "java.project.referencedLibraries": {
+        "include": [
+            "bazel-bin/external/maven/**/*.jar",
+            "bazel-bin/external/frcmaven/**/*.jar",
+            "bazel-AdvantageKit/external/wpilibj_jar_file/file/wpilibj.jar",
+        ],
+        "exclude": [],
+        "sources": {
+            "bazel-AdvantageKit/external/wpilibj_jar_file/file/wpilibj.jar": "bazel-AdvantageKit/external/wpilibj_sources_jar_file/file/wpilibj_sources.jar"
+        }
+    },
     "java.project.sourcePaths": [
         "build_tools/jpatch/sigcheck",
         "example_java_project/src",
@@ -23,5 +28,10 @@
     ],
     "bsv.cc.compdb.targets": [
         "//conduit/wpilibio"
-    ]
+    ],
+    "files.associations": {
+        "BUILD": "bazel",
+        "WORKSPACE": "bazel",
+        "test.h": "c"
+    }
 }
