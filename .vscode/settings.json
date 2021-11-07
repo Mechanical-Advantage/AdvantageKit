@@ -5,12 +5,17 @@
         "compile_commands.json": false
     },
     "java.project.referencedLibraries": [
-        "bazel-AdvantageKit/external/maven/**/*.jar"
+        "bazel-bin/external/maven/**/*.jar",
+        "bazel-bin/external/frcmaven/**/*.jar",
+        "bazel-AdvantageKit/external/wpilibj_jar_file/**/*.jar",
+        "bazel-AdvantageKit/external/wpilibj_sources_jar_file/**/*.jar"
     ],
     "java.project.sourcePaths": [
+        "build_tools/jpatch/sigcheck",
         "example_java_project/src",
         "junction/core/src",
-        "conduit/api/src"
+        "junction/shims/wpilib/src"
+        //"conduit/api/src"
     ],
     "bsv.cc.compdb.targets": [
         "//conduit/wpilibio"

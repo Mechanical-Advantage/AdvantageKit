@@ -1,13 +1,27 @@
 # This loads the rule "http_archive", which is used to download zip files from the web
 # and make them available to other rules in our workspace.
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("//build_tools/repo:wpilib_nativezip_utils.bzl", "wpilib_binary_config", "wpilib_nativezip")
+
+http_archive(
+    name = "bazel_skylib",
+    sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
+    urls = [
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+    ],
+)
+
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
+bazel_skylib_workspace()
 
 # This code loads the "rules_jvm_external" repository into our Bazel workspace.  This is copied in from
 # https://github.com/bazelbuild/rules_jvm_external/releases/tag/4.1
-RULES_JVM_EXTERNAL_TAG = "4.1"
 
-RULES_JVM_EXTERNAL_SHA = "f36441aa876c4f6427bfb2d1f2d723b48e9d930b62662bf723ddfb8fc80f0140"
+RULES_JVM_EXTERNAL_TAG = "4.0"
+
+RULES_JVM_EXTERNAL_SHA = "31701ad93dbfe544d597dbe62c9a1fdd76d81d8a9150c2bf1ecf928ecdf97169"
 
 http_archive(
     name = "rules_jvm_external",
@@ -38,12 +52,53 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 # From the Bazel docs: "All non-alphanumeric characters are substituted with underscores."
 maven_install(
     artifacts = [
-        "com.google.guava:guava:30.1.1-jre",  # This is just an example dependency to demonstrate how it works
+        "io.github.classgraph:classgraph:4.8.128",
+        "com.fasterxml.jackson.core:jackson-annotations:2.10.0",
+        "com.fasterxml.jackson.core:jackson-core:2.10.0",
+        "com.fasterxml.jackson.core:jackson-databind:2.10.0",
+        "org.ejml:ejml-simple:0.38",
     ],
+    fetch_sources = True,
+    maven_install_json = "//:maven_install.json",
     repositories = [
         "https://repo1.maven.org/maven2",  # Maven central
     ],
 )
+
+maven_install(
+    name = "frcmaven",
+    artifacts = [
+        "edu.wpi.first.hal:hal-java:2021.3.1",
+        "edu.wpi.first.wpiutil:wpiutil-java:2021.3.1",
+        "edu.wpi.first.wpimath:wpimath-java:2021.3.1",
+        "edu.wpi.first.ntcore:ntcore-java:2021.3.1",
+        "edu.wpi.first.thirdparty.frc2021.opencv:opencv-java:3.4.7-5",
+        "edu.wpi.first.cscore:cscore-java:2021.3.1",
+        "edu.wpi.first.cameraserver:cameraserver-java:2021.3.1",
+    ],
+    fetch_sources = True,
+    maven_install_json = "//:frcmaven_install.json",
+    repositories = [
+        "https://frcmaven.wpi.edu/artifactory/release",
+    ],
+)
+
+load("@maven//:defs.bzl", "pinned_maven_install")
+
+pinned_maven_install()
+
+load("@frcmaven//:defs.bzl", frcmaven_pinned_maven_install = "pinned_maven_install")
+
+frcmaven_pinned_maven_install()
+
+# This makes WPILib's source repo (allwpilib) available as a repository within our Bazel workspace.
+#new_git_repository(
+#    name = "allwpilib",
+#    commit = "936d3b9f838dfbe0db5332e5bd2038eeac2dbe0b", # v2020.3.1
+#    shallow_since = "1619320959 -0700",
+#    build_file = "@//:third_party/wpilib/BUILD.allwpilib",
+#    remote = "https://github.com/wpilibsuite/allwpilib"
+#)
 
 # This tells Bazel how to download the athena (roborio) toolchain for cross compiling
 # on 64 bit linux.
@@ -98,6 +153,10 @@ NI_RUNTIME_ATHENA_SHA = "a0aeff05908590b1c63071e02d635010bde54c3abb6dc016c78d561
 
 WPILIB_VERSION = "2021.3.1"
 
+WPILIBJ_JAR_SHA = "85f41c78832a9b14367e76d2f8ee24b9b7162ac8eca15c123d9b8a15550b3e5a"
+
+WPILIBJ_SOURCES_JAR_SHA = "a83fc80d734033f80d91356ffa4fdbabeab2e659f5fde9b101ee5192eef22470"
+
 WPILIB_HAL_HEADERS_SHA = "81b4d98d7ae4f92b2887180aea29ef1e780c5570e3fdbe08e02183e54952bd62"
 
 WPILIB_HAL_ATHENA_SHA = "e9de32abe3739697a3a92963c9eca4bf8755edfb0f11ac95e22d0190a3185f56"
@@ -109,6 +168,20 @@ WPILIB_WPIUTIL_HEADERS_SHA = "b2a96f7ce07198b139face9dc341c6550d5044fa32f48435b5
 WPILIB_WPIUTIL_ATHENA_SHA = "ad48bae20f42850938a1758c9f82e54c5cb5e286ad0b09adb701d700bd7f8ec8"
 
 WPILIB_WPIUTIL_LINUX_X64_SHA = "4a20ec638981025c0e41678ac7cea691d5a40121987b1309e6907255636d02cf"
+
+http_file(
+    name = "wpilibj_jar_file",
+    downloaded_file_path = "wpilibj.jar",  # java_import needs the filename to contain .jar
+    sha256 = WPILIBJ_JAR_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/wpilibj-java/%s/wpilibj-java-%s.jar" % (WPILIB_VERSION, WPILIB_VERSION)],
+)
+
+http_file(
+    name = "wpilibj_sources_jar_file",
+    downloaded_file_path = "wpilibj_sources.jar",
+    sha256 = WPILIBJ_SOURCES_JAR_SHA,
+    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/wpilibj-java/%s/wpilibj-java-%s-sources.jar" % (WPILIB_VERSION, WPILIB_VERSION)],
+)
 
 wpilib_nativezip(
     name = "ni_visa",
@@ -193,8 +266,8 @@ wpilib_nativezip(
         wpilib_binary_config(
             libs = ["libwpiutil.so"],
             platform = "linux_x64",
-            sha256 = WPILIB_WPIUTIL_LINUX_X64_SHA
-        )
+            sha256 = WPILIB_WPIUTIL_LINUX_X64_SHA,
+        ),
     ],
     headers_sha256 = WPILIB_WPIUTIL_HEADERS_SHA,
     package = "wpiutil",
@@ -215,11 +288,11 @@ wpilib_nativezip(
             libs = ["libwpiHal.so"],
             platform = "linux_x64",
             sha256 = WPILIB_HAL_LINUX_X64_SHA,
-        )
+        ),
     ],
     headers_sha256 = WPILIB_HAL_HEADERS_SHA,
     package = "hal",
     remote_name = "hal-cpp",
     version = WPILIB_VERSION,
-    visibility = "@//third_party/wpilib:__pkg__"
+    visibility = "@//third_party/wpilib:__pkg__",
 )
