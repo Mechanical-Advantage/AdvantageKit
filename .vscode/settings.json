@@ -2,7 +2,11 @@
     "files.exclude": {
         "external": true,
         "bazel-*": false,
-        "compile_commands.json": false
+        "compile_commands.json": false,
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
     },
     "java.project.referencedLibraries": [
         "bazel-bin/external/maven/**/*.jar",
