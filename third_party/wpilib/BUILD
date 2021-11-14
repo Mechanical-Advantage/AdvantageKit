@@ -1,3 +1,19 @@
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+
+copy_file(
+    name = "wpilibj_jar_genfile",
+    src = "@wpilibj_jar_file//file:wpilibj.jar",
+    out = "downloaded/wpilibj.jar",
+    visibility = ["//visibility:public"]
+)
+
+copy_file(
+    name = "wpilibj_sources_jar_genfile",
+    src = "@wpilibj_sources_jar_file//file:wpilibj_sources.jar",
+    out = "downloaded/wpilibj-sources.jar",
+    visibility = ["//visibility:public"]
+)
+
 java_import(
     name = "wpilibj",
     jars = ["@wpilibj_jar_file//file:wpilibj.jar"],

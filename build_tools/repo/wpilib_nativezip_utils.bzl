@@ -21,12 +21,26 @@ platform_mappings = {
 }
 
 header_build_template = """
-cc_library(
-    name = "headers",
-    hdrs = glob([
+load("@//build_tools/repo:copy_filegroup.bzl", "copy_filegroup")
+
+filegroup(
+    name = "headers_files",
+    srcs = glob([
         "**/*.h",
         "**/*.hpp",
     ]),
+    visibility = ["//visibility:public"]
+)
+
+copy_filegroup(
+    name = "headers_genfiles",
+    target_filegroups = [":headers_files"],
+    visibility = ["//visibility:public"]
+)
+
+cc_library(
+    name = "headers",
+    hdrs = [":headers_files"],
     includes = ["."],
     visibility = ["{0}"],
 )
@@ -59,7 +73,7 @@ def wpilib_nativezip(name, remote_name, package, version, visibility, headers_sh
     if headers_sha256 != None:
         http_archive(
             name = name + "_headers_files",
-            build_file_content = header_build_template.format(visibility),
+            build_file_content = header_build_template.format("//visibility:public"),
             sha256 = headers_sha256,
             urls = [url_template.format(package, remote_name, version, "headers")],
         )
