@@ -1,4 +1,19 @@
 def _copy_filegroup_impl(ctx):
+    """Copies all files in a filegroup to the genfiles (bazel-out) directory
+
+    The copied files maintain the folder structure they had relative to the repository root of where they came from.
+    Example:
+        inputs: "@repo1//some/folder:file1.txt"
+                "@repo2//some/other/folder:file2.txt"
+                "//some/other/other/folder:file3.txt"
+        outputs:
+                "bazel-bin/external/repo1/some/folder/file1.txt"
+                "bazel-bin/external/repo2/some/other/folder/file2.txt"
+                "bazel-bin/some/other/other/folder/file3.txt"
+
+    This rule uses run_shell, which uses the same shell priorties as genrules.  This means it should work on any system
+    with Bash or PowerShell.
+    """
     all_input_files = [
         f
         for t in ctx.attr.target_filegroups

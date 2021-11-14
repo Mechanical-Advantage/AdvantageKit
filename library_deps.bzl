@@ -1,3 +1,15 @@
+"""
+Lists of maven artifact strings that AdvantageKit uses.  They are defined here for two reasons:
+    
+    1. If another project wished to depend on AdvantageKit, this is the recommended way to share maven_install
+       dependencies with the consuming project.
+    2. We use this list to extract the list of genrules which copy the downloaded files (since we use pinning)
+       from the build root (bazel-AdvantageKit) to the genfiles directory (bazel-out and bazel-bin).
+       We need to do this so VSCode can see all of the jar files in one place, and so that they don't get removed
+       from view when we run a build on a target that doesn't use them (Bazel clears the bazel-AdvantageKit directory
+       on every build).  See the BUILD file at the root of the workspace for more info on this.
+"""
+
 MAVEN_ARTIFACTS = [
     "io.github.classgraph:classgraph:4.8.128",
     "com.fasterxml.jackson.core:jackson-annotations:2.10.0",

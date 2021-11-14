@@ -51,6 +51,10 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 # Artifact ID = org.littletonrobotics:somelib:1.0.0  ->  Bazel target = @maven//:org_littletonrobotics_somelib
 # From the Bazel docs: "All non-alphanumeric characters are substituted with underscores."
 
+# Maven artifact lists are stored in library_deps.bzl.  To add artifacts, go there.
+# After adding artifacts, make sure to "repin" the maven dependencies by running "bazel run @unpinned_maven//:pin"
+# (or "bazel run @unpinned_frcmaven//:pin" for the frcmaven repo).
+# Newly added maven dependencies will NOT be downloaded until the appropriate command is run!
 load(":library_deps.bzl", "MAVEN_ARTIFACTS", "FRCMAVEN_ARTIFACTS")
 
 maven_install(

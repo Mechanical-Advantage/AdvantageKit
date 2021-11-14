@@ -20,6 +20,17 @@ platform_mappings = {
     "macos_x64": ("osx", "x86-64"),
 }
 
+
+# The filegroup and copy_filegroup rules are needed to put the headers in the genfiles directory (bazel-bin)
+# so that they don't get deleted when running a new build operation, preventing VSCode from seeing them anymore.
+# If we had clangd reference the files in the build root (bazel-AdvantageKit), which is a symlink to a hidden directory
+# in the user's home folder, they would disappear as soon as a target that didn't require them was built, meaning
+# VSCode could no longer provide code completion.  Additionally, if for some reason we couldn't run a successful build,
+# the symlinks would never be created, so there would be no code completion while trying to fix the bug that broke the
+# build (very bad!).  Creating these copy rules allows the required headers to be copied to the genfiles directory
+# which isn't erased unless a clean is run, and allows a rule which invokes the copy rules without building any
+# (potentially failing) source files to be created.
+# TODO When we find better tooling for Bazel C/C++ targets in VSCode, we can remove this.
 header_build_template = """
 load("@//build_tools/repo:copy_filegroup.bzl", "copy_filegroup")
 
