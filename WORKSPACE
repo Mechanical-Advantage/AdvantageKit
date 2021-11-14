@@ -50,14 +50,11 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 # Bazel will place all libraries downloaded by this into the "@maven" repository.  Example:
 # Artifact ID = org.littletonrobotics:somelib:1.0.0  ->  Bazel target = @maven//:org_littletonrobotics_somelib
 # From the Bazel docs: "All non-alphanumeric characters are substituted with underscores."
+
+load(":library_deps.bzl", "MAVEN_ARTIFACTS", "FRCMAVEN_ARTIFACTS")
+
 maven_install(
-    artifacts = [
-        "io.github.classgraph:classgraph:4.8.128",
-        "com.fasterxml.jackson.core:jackson-annotations:2.10.0",
-        "com.fasterxml.jackson.core:jackson-core:2.10.0",
-        "com.fasterxml.jackson.core:jackson-databind:2.10.0",
-        "org.ejml:ejml-simple:0.38",
-    ],
+    artifacts = MAVEN_ARTIFACTS,
     fetch_sources = True,
     maven_install_json = "//:maven_install.json",
     repositories = [
@@ -67,15 +64,7 @@ maven_install(
 
 maven_install(
     name = "frcmaven",
-    artifacts = [
-        "edu.wpi.first.hal:hal-java:2021.3.1",
-        "edu.wpi.first.wpiutil:wpiutil-java:2021.3.1",
-        "edu.wpi.first.wpimath:wpimath-java:2021.3.1",
-        "edu.wpi.first.ntcore:ntcore-java:2021.3.1",
-        "edu.wpi.first.thirdparty.frc2021.opencv:opencv-java:3.4.7-5",
-        "edu.wpi.first.cscore:cscore-java:2021.3.1",
-        "edu.wpi.first.cameraserver:cameraserver-java:2021.3.1",
-    ],
+    artifacts = FRCMAVEN_ARTIFACTS,
     fetch_sources = True,
     maven_install_json = "//:frcmaven_install.json",
     repositories = [
