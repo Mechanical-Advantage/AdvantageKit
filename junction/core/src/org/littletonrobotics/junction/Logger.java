@@ -9,7 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.wpilibj.Timer;
+
+import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.inputs.*;
 import org.littletonrobotics.junction.io.ByteEncoder;
 import org.littletonrobotics.junction.io.LogDataReceiver;
@@ -88,6 +91,13 @@ public class Logger {
   }
 
   /**
+   * Returns whether a replay source is currently being used.
+   */
+  public boolean hasReplaySource() {
+    return replaySource != null;
+  }
+
+  /**
    * Starts running the logging system, including any data receivers or the replay
    * source.
    */
@@ -156,7 +166,7 @@ public class Logger {
    */
   public void periodic() {
     if (running) {
-      double periodicStart = Timer.getFPGATimestamp();
+      double periodicStart = getRealTimestamp();
 
       // Send data to receivers
       if (entry != null) {
@@ -173,7 +183,7 @@ public class Logger {
 
       // Get next entry
       if (replaySource == null) {
-        entry = new LogTable(Timer.getFPGATimestamp());
+        entry = new LogTable(ConduitApi.getInstance().getTimestamp() / 1000000.0);
         outputTable = entry.getSubtable("RealOutputs");
       } else {
         entry = replaySource.getEntry();
@@ -185,13 +195,13 @@ public class Logger {
       }
 
       // Update default inputs
-      double driverStationStart = Timer.getFPGATimestamp();
+      double driverStationStart = getRealTimestamp();
       LoggedDriverStation.getInstance().periodic();
-      double systemStatsStart = Timer.getFPGATimestamp();
+      double systemStatsStart = getRealTimestamp();
       processInputs("SystemStats", LoggedSystemStats.getInstance());
-      double networkTablesStart = Timer.getFPGATimestamp();
+      double networkTablesStart = getRealTimestamp();
       processInputs("NetworkTables", LoggedNetworkTables.getInstance());
-      double periodicEnd = Timer.getFPGATimestamp();
+      double periodicEnd = getRealTimestamp();
 
       // Print timing data
       if (printTimer.advanceIfElapsed(0.5) && debugTiming) {
@@ -209,11 +219,20 @@ public class Logger {
   }
 
   /**
-   * Returns the current FPGA timestamp or replayed time. Use this or
-   * LoggedTimer.getFPGATimestamp() instead of Timer.getFPGATimestamp().
+   * Returns the current FPGA timestamp or replayed time based on the current log
+   * entry.
    */
   public double getTimestamp() {
     return entry.getTimestamp();
+  }
+
+  /**
+   * Returns the true FPGA timestamp, regardless of the timestamp used for
+   * logging. Useful for analyzing performance. DO NOT USE this method for any
+   * logic which might need to be replayed.
+   */
+  public double getRealTimestamp() {
+    return HALUtil.getFPGATime() / 1000000.0;
   }
 
   /**

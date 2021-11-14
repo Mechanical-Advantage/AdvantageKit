@@ -69,7 +69,7 @@ public class LoggedRobot extends IterativeRobotBase {
     HAL.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
-    nextCycle = Timer.getFPGATimestamp();
+    nextCycle = Logger.getInstance().getRealTimestamp();
     while (true) {
       if (useTiming) {
         NotifierJNI.updateNotifierAlarm(notifier, (long) (nextCycle * 1e6));
@@ -80,11 +80,11 @@ public class LoggedRobot extends IterativeRobotBase {
         nextCycle += m_period;
       }
 
-      double loopCycleStart = Timer.getFPGATimestamp();
+      double loopCycleStart = Logger.getInstance().getRealTimestamp();
       Logger.getInstance().periodic();
-      double userCodeStart = Timer.getFPGATimestamp();
+      double userCodeStart = Logger.getInstance().getRealTimestamp();
       loopFunc();
-      double loopCycleEnd = Timer.getFPGATimestamp();
+      double loopCycleEnd = Logger.getInstance().getRealTimestamp();
       Logger.getInstance().recordOutput("FullCycleMS", (loopCycleEnd - loopCycleStart) * 1000);
       Logger.getInstance().recordOutput("UserCodeMS", (loopCycleEnd - userCodeStart) * 1000);
     }
