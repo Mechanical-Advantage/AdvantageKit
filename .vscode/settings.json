@@ -17,8 +17,9 @@
         "build_tools/jpatch/sigcheck",
         "example_java_project/src",
         "junction/core/src",
-        "junction/shims/wpilib/src"
-        //"conduit/api/src"
+        "junction/shims/wpilib/src",
+        "conduit/api/src",
+        "conduit/wpilibio/src/java"
     ],
     "bsv.cc.compdb.targets": [
         "//conduit/wpilibio"
@@ -26,6 +27,5 @@
     "files.associations": {
         "BUILD": "bazel",
         "WORKSPACE": "bazel",
-        "test.h": "c"
     }
 }
