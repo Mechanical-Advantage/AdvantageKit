@@ -215,6 +215,9 @@ public class Logger {
         System.out.println("U=" + updateLength + ", DS=" + driverStationLength + ", SS=" + systemStatsLength + ", NT="
             + networkTablesLength);
       }
+    } else {
+      // Retrieve new driver station data even if logger is disabled
+      LoggedDriverStation.getInstance().periodic();
     }
   }
 

@@ -35,7 +35,7 @@ public class LoggedDriverStation {
   /**
    * General driver station data that needs to be updated throughout the match.
    */
-  private static class DriverStationInputs implements LoggableInputs {
+  public static class DriverStationInputs implements LoggableInputs {
     public int allianceStation = 0;
     public String eventName = "";
     public String gameSpecificMessage = "";
@@ -89,33 +89,36 @@ public class LoggedDriverStation {
   /**
    * All of the required inputs for a single joystick.
    */
-  private static class JoystickInputs implements LoggableInputs {
+  public static class JoystickInputs implements LoggableInputs {
     public String name = "";
     public int type = 0;
     public boolean xbox = false;
-    public boolean[] buttons = {};
+    public int buttonCount = 0;
+    public int buttonValues = 0;
+    public int[] povs = {};
     public double[] axisValues = {};
     public int[] axisTypes = {};
-    public int[] povs = {};
 
     public void toLog(LogTable table) {
       table.put("Name", name);
       table.put("Type", type);
       table.put("Xbox", xbox);
-      table.put("Buttons", buttons);
+      table.put("ButtonCount", buttonCount);
+      table.put("ButtonValues", buttonValues);
+      table.put("POVs", povs);
       table.put("AxisValues", axisValues);
       table.put("AxisTypes", axisTypes);
-      table.put("POVs", povs);
     }
 
     public void fromLog(LogTable table) {
       name = table.getString("Name", name);
       type = table.getInteger("Type", type);
       xbox = table.getBoolean("Xbox", xbox);
-      buttons = table.getBooleanArray("Buttons", buttons);
+      buttonCount = table.getInteger("ButtonCount", buttonCount);
+      buttonValues = table.getInteger("ButtonValues", buttonValues);
+      povs = table.getIntegerArray("POVs", povs);
       axisValues = table.getDoubleArray("AxisValues", axisValues);
       axisTypes = table.getIntegerArray("AxisTypes", axisTypes);
-      povs = table.getIntegerArray("POVs", povs);
     }
   }
 
@@ -126,8 +129,9 @@ public class LoggedDriverStation {
     // Update inputs from conduit
     if (!logger.hasReplaySource()) {
       dsInputs.allianceStation = conduit.getAllianceStation();
-      dsInputs.eventName = conduit.getEventName();
-      dsInputs.gameSpecificMessage = conduit.getGameSpecificMessage();
+      dsInputs.eventName = conduit.getEventName().trim();
+      dsInputs.gameSpecificMessage = conduit.getGameSpecificMessage().substring(0,
+          conduit.getGameSpecificMessageSize());
       dsInputs.matchNumber = conduit.getMatchNumber();
       dsInputs.replayNumber = conduit.getReplayNumber();
       dsInputs.matchType = conduit.getMatchType();
@@ -143,23 +147,29 @@ public class LoggedDriverStation {
 
       for (int id = 0; id < joystickInputs.length; id++) {
         JoystickInputs joystick = joystickInputs[id];
-        joystick.name = conduit.getJoystickName(id);
+        joystick.name = conduit.getJoystickName(id).trim();
         joystick.type = conduit.getJoystickType(id);
         joystick.xbox = conduit.isXbox(id);
-        joystick.axisTypes = conduit.getAxisTypes(id);
-        joystick.povs = conduit.getPovValues(id);
+        joystick.buttonCount = conduit.getButtonCount(id);
+        joystick.buttonValues = conduit.getButtonValues(id);
 
-        float[] axisValues = conduit.getAxisValues(id);
-        joystick.axisValues = new double[axisValues.length];
-        for (int i = 0; i < axisValues.length; i++) {
-          joystick.axisValues[i] = axisValues[i];
+        // POVs
+        int povCount = conduit.getPovCount(id);
+        int[] povValues = conduit.getPovValues(id);
+        joystick.povs = new int[povCount];
+        for (int i = 0; i < povCount; i++) {
+          joystick.povs[i] = povValues[i];
         }
 
-        int buttons = conduit.getButtonValues(id);
-        int buttonCount = conduit.getButtonCount(id);
-        joystick.buttons = new boolean[buttonCount];
-        for (int i = 0; i < buttonCount; i++) {
-          joystick.buttons[i] = ((buttons >> i) & 1) != 0;
+        // Axes
+        int axisCount = conduit.getAxisCount(id);
+        float[] axisValues = conduit.getAxisValues(id);
+        int[] axisTypes = conduit.getAxisTypes(id);
+        joystick.axisValues = new double[axisCount];
+        joystick.axisTypes = new int[axisCount];
+        for (int i = 0; i < axisCount; i++) {
+          joystick.axisValues[i] = axisValues[i];
+          joystick.axisTypes[i] = axisTypes[i];
         }
       }
     }
@@ -169,5 +179,22 @@ public class LoggedDriverStation {
     for (int id = 0; id < joystickInputs.length; id++) {
       logger.processInputs("DriverStation/Joystick" + Integer.toString(id), joystickInputs[id]);
     }
+  }
+
+  /**
+   * Returns a reference to an object containing all driver station data other
+   * than joysticks.
+   */
+  public DriverStationInputs getDSData() {
+    return dsInputs;
+  }
+
+  /**
+   * Returns a reference to an object containing data for a single joystick.
+   * 
+   * @param id ID of the joystick to read(0-6)
+   */
+  public JoystickInputs getJoystickData(int id) {
+    return joystickInputs[id];
   }
 }
