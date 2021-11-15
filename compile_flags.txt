@@ -2,14 +2,22 @@
 # Ideally we would generate a compile_commands.json, but Bazel/VSCode don't have great tooling for that currently.
 # When new include paths are added in Bazel targets, they need to be defined here. 
 
+-xc++
+
 -I
 .
+
+-I
+bazel-bin
 
 -isystem
 third_party/jni/include
 
 -isystem
 third_party/jni/platform/linux_x64
+
+-isystem
+third_party/flatbuffers/include
 
 -isystem
 bazel-bin/external/ni_chipobject_headers_files

@@ -14,12 +14,12 @@
         "bazel-bin/third_party/wpilib/downloaded/wpilibj.jar",
     ],
     "java.project.sourcePaths": [
-        "build_tools/jpatch/sigcheck",
-        "example_java_project/src",
-        "junction/core/src",
         "junction/shims/wpilib/src",
+        "junction/core/src",
+        "example_java_project/src",
         "conduit/api/src",
-        "conduit/wpilibio/src/java"
+        "build_tools/jpatch/sigcheck",
+        "third_party/flatbuffers/java"
     ],
     "bsv.cc.compdb.targets": [
         "//conduit/wpilibio"

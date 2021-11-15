@@ -55,7 +55,7 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 # After adding artifacts, make sure to "repin" the maven dependencies by running "bazel run @unpinned_maven//:pin"
 # (or "bazel run @unpinned_frcmaven//:pin" for the frcmaven repo).
 # Newly added maven dependencies will NOT be downloaded until the appropriate command is run!
-load(":library_deps.bzl", "MAVEN_ARTIFACTS", "FRCMAVEN_ARTIFACTS")
+load(":library_deps.bzl", "FRCMAVEN_ARTIFACTS", "MAVEN_ARTIFACTS")
 
 maven_install(
     artifacts = MAVEN_ARTIFACTS,
@@ -118,11 +118,36 @@ http_archive(
     urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2021-2/FRC-2021-Mac-Toolchain-7.3.0.tar.gz"],
 )
 
+# Toolchains for compiling flatbuffers (.fbs) to generated source files
+http_archive(
+    name = "flatc_toolchain_linux_x64_files",
+    build_file = "@//:build_tools/toolchain/flatc/flatc_toolchain_linux_x64_files.BUILD",
+    sha256 = "d7a4a866b7380e175f820c5f8d93d1f777c4ab48beccfa8366a45c597af60af7",
+    urls = ["https://github.com/google/flatbuffers/releases/download/v2.0.0/Linux.flatc.binary.clang++-9.zip"],
+)
+
+http_archive(
+    name = "flatc_toolchain_windows_x64_files",
+    build_file = "@//:build_tools/toolchain/flatc/flatc_toolchain_windows_x64_files.BUILD",
+    sha256 = "dff388932d14c2d4b66a94c3fc6b4f5663041d098620e942cc1e59ddb1eda572",
+    urls = ["https://github.com/google/flatbuffers/releases/download/v2.0.0/Windows.flatc.binary.zip"],
+)
+
+http_archive(
+    name = "flatc_toolchain_macos_x64_files",
+    build_file = "@//:build_tools/toolchain/flatc/flatc_toolchain_macos_x64_files.BUILD",
+    sha256 = "1b40cb2e08b6fbcfd7398fecdf4dcb52835d197d93f8116f9a18b270e0a55ae8",
+    urls = ["https://github.com/google/flatbuffers/releases/download/v2.0.0/Mac.flatc.binary.zip"],
+)
+
 # This tells Bazel to add our toolchains to the list of options
 register_toolchains(
     "//build_tools/toolchain:athena-cc-toolchain-linux_x64",
     "//build_tools/toolchain:athena-cc-toolchain-windows_x64",
     "//build_tools/toolchain:athena-cc-toolchain-macos_x64",
+    "//build_tools/toolchain/flatc:flatc_toolchain_linux_x64",
+    "//build_tools/toolchain/flatc:flatc_toolchain_windows_x64",
+    "//build_tools/toolchain/flatc:flatc_toolchain_macos_x64",
 )
 
 # Below are a bunch of http_archive rules to make various WPILib components available
