@@ -12,7 +12,10 @@ import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
 
-/** Contains functions for roboRIO functionality. */
+/**
+ * Contains functions for roboRIO functionality. Patched by AdvantageKit to
+ * support logging.
+ */
 public final class RobotController {
   private RobotController() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -42,6 +45,10 @@ public final class RobotController {
 
   /**
    * Read the microsecond timer from the FPGA.
+   * 
+   * Patched by AdvantageKit to read the syncronized timestamp. To access the real
+   * FPGA time for performance analysis, call
+   * {@code Logger.getInstance().getRealTimestamp()} instead.
    *
    * @return The current time in microseconds according to the FPGA.
    */
