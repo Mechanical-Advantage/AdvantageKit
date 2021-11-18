@@ -22,6 +22,20 @@ java_export(
     runtime_deps = [":example"]
 )
 
+filegroup(
+    name = "test_srcs",
+    srcs = glob(["test/**/*.java"])
+)
+
+java_test(
+    name = "jtest",
+    srcs = [":test_srcs"],
+    test_class = "org.littletonrobotics.test.ExampleTest",
+    deps = [
+        "@maven//:junit_junit"
+    ]
+)
+
 cc_binary(
     name = "native",
     srcs = ["test.c"],

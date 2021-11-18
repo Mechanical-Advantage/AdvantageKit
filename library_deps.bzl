@@ -16,6 +16,7 @@ MAVEN_ARTIFACTS = [
     "com.fasterxml.jackson.core:jackson-core:2.10.0",
     "com.fasterxml.jackson.core:jackson-databind:2.10.0",
     "org.ejml:ejml-simple:0.38",
+    "junit:junit:4.13.2"
 ]
 
 FRCMAVEN_ARTIFACTS = [
