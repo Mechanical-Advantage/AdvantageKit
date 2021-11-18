@@ -10,7 +10,7 @@ import edu.wpi.first.hal.HAL;
 
 /**
  * Provide access to the network communication data to / from the Driver
- * Station.
+ * Station. Patched by AdvantageKit to support logging.
  */
 @SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.ExcessiveClassLength", "PMD.ExcessivePublicCount", "PMD.GodClass",
     "PMD.TooManyFields" })
@@ -184,7 +184,7 @@ public class DriverStation {
     }
 
     if (button <= logDS.getJoystickData(stick).buttonCount) {
-      return (logDS.getJoystickData(stick).buttonValues & 1 << (button - 1)) != 0;
+      return (logDS.getJoystickData(stick).buttonValues & (1 << (button - 1))) != 0;
     }
 
     reportJoystickUnpluggedWarning(
