@@ -1,3 +1,33 @@
+def _copy_cc_headers_impl(ctx):
+    inputs = ctx.attr.cc_target[CcInfo].compilation_context.direct_headers
+    all_outputs = []
+    for f in inputs:
+        out = ctx.actions.declare_file(f.path)
+        all_outputs.append(out)
+        ctx.actions.run_shell(
+            outputs = [out],
+            inputs = depset([f]),
+            arguments = [f.path, out.path],
+            command = "cp $1 $2",
+        )
+
+    if len(inputs) != len(all_outputs):
+        fail("Output count should be 1-to-1 with input count.")
+
+    return [
+        DefaultInfo(
+            files = depset(all_outputs),
+            runfiles = ctx.runfiles(files = all_outputs),
+        ),
+    ]
+
+copy_cc_headers = rule(
+    implementation = _copy_cc_headers_impl,
+    attrs = {
+        "cc_target": attr.label(),
+    },
+)
+
 def _copy_filegroup_impl(ctx):
     """Copies all files in a filegroup to the genfiles (bazel-out) directory
 
@@ -45,5 +75,5 @@ copy_filegroup = rule(
     implementation = _copy_filegroup_impl,
     attrs = {
         "target_filegroups": attr.label_list(),
-    }
+    },
 )

@@ -20,6 +20,12 @@ third_party/jni/platform/linux_x64
 third_party/flatbuffers/include
 
 -isystem
+bazel-bin/external/com_google_googletest/googletest/include
+
+-isystem
+bazel-bin/external/com_google_googletest/googlemock/include
+
+-isystem
 bazel-bin/external/ni_chipobject_headers_files
 
 -isystem

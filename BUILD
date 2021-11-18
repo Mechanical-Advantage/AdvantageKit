@@ -12,6 +12,13 @@
 # For more info about this, see the comments in both of the files that are loaded below.
 load("//build_tools/repo:maven.bzl", "artifact_list_to_genfile_targets")
 load(":library_deps.bzl", "FRCMAVEN_ARTIFACTS", "MAVEN_ARTIFACTS")
+load("//build_tools/repo:copy_filegroup.bzl", "copy_cc_headers")
+
+# Copies the headers for googletest into the bazel-bin directory for VSCode to use
+copy_cc_headers(
+    name = "copy_gtest_headers",
+    cc_target = "@com_google_googletest//:gtest"
+)
 
 # Get a list of genfile target names which provide the files in the bazel-bin directory that VSCode can see.
 maven_genfile_targets = artifact_list_to_genfile_targets("maven", MAVEN_ARTIFACTS) + artifact_list_to_genfile_targets("frcmaven", FRCMAVEN_ARTIFACTS)
@@ -29,5 +36,8 @@ filegroup(
         "@ni_chipobject_headers_files//:headers_genfiles",
         "@wpilib_wpiutil_headers_files//:headers_genfiles",
         "@wpilib_hal_headers_files//:headers_genfiles",
+
+        # Copied C/C++ headers
+        ":copy_gtest_headers"
     ] + maven_genfile_targets,
 )

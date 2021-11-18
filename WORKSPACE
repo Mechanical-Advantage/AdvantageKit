@@ -84,6 +84,30 @@ load("@frcmaven//:defs.bzl", frcmaven_pinned_maven_install = "pinned_maven_insta
 
 frcmaven_pinned_maven_install()
 
+# Googletest - The C++ testing framework we use.  This http_archive rule pulls that in:
+
+# Googletest depends on rules_python
+http_archive(
+    name = "rules_python",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.5.0/rules_python-0.5.0.tar.gz",
+    sha256 = "cd6730ed53a002c56ce4e2f396ba3b3be262fd7cb68339f0377a45e8227fe332",
+)
+
+# Googletest depends on abseil - Google's C++ standard library
+http_archive(
+  name = "com_google_absl",
+  urls = ["https://github.com/abseil/abseil-cpp/archive/215105818dfde3174fe799600bb0f3cae233d0bf.zip"],
+  strip_prefix = "abseil-cpp-215105818dfde3174fe799600bb0f3cae233d0bf",
+  sha256 = "b4e20d9e752a75c10636675691b1e9c2698e0764cb404987d0ffa77223041c19"
+)
+
+http_archive(
+    name = "com_google_googletest",
+    sha256 = "8daa1a71395892f7c1ec5f7cb5b099a02e606be720d62f1a6a98f8f8898ec826",
+    strip_prefix = "googletest-e2239ee6043f73722e7aa812a459f54a28552929",
+    urls = ["https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip"],
+)
+
 # This makes WPILib's source repo (allwpilib) available as a repository within our Bazel workspace.
 #new_git_repository(
 #    name = "allwpilib",

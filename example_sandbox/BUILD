@@ -36,6 +36,13 @@ java_test(
     ]
 )
 
+cc_test(
+  name = "example_cc_test",
+  size = "small",
+  srcs = ["example_test.cc"],
+  deps = ["@com_google_googletest//:gtest_main"],
+)
+
 cc_binary(
     name = "native",
     srcs = ["test.c"],
