@@ -48,5 +48,14 @@ Next, install the downloaded package.  From the command line:
 sudo apt install ./bazel_4.1.0-linux-x86_64.deb
 ```
 
-### MacOS
-Coming soon
+### macOS
+
+As with Windows, make sure you have the JDK installed (preferably version 11). A supported version of JDK 11 can be downloaded from [here](https://adoptium.net/?variant=openjdk11&jvmVariant=hotspot).
+> If you already have JDK 11 installed, or wish to install it a different way, you can skip this step.
+
+Bazel can be installed multiple ways on macOS. We recommand using [these instructions](https://docs.bazel.build/versions/main/install-os-x.html#install-with-installer-mac-os-x) to set up Bazel as a standalone install. For users on Apple Silicon (ARM) based Macs, the `arm64` version of Bazel is fully supported.
+
+Alternatively, if you've already set up [Homebrew](https://docs.bazel.build/versions/main/install-os-x.html#install-with-installer-mac-os-x), the Bazel package can be installed using the following command:
+```
+brew install bazel
+```
