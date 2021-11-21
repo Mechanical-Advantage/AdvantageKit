@@ -49,7 +49,7 @@ public class Logger {
 
   /**
    * Sets the source to use for replaying data. Use null to disable replay. This
-   * method only work during setup before starting to log.
+   * method only works during setup before starting to log.
    */
   public void setReplaySource(LogReplaySource replaySource) {
     if (!running) {
@@ -59,7 +59,7 @@ public class Logger {
 
   /**
    * Adds a new data receiver to process real or replayed data. This method only
-   * work during setup before starting to log.
+   * works during setup before starting to log.
    */
   public void addDataReceiver(LogDataReceiver dataReceiver) {
     if (!running) {
@@ -69,7 +69,7 @@ public class Logger {
 
   /**
    * Adds a new raw data receiver to process real or replayed data. This method
-   * only work during setup before starting to log.
+   * only works during setup before starting to log.
    */
   public void addDataReceiver(LogRawDataReceiver dataReceiver) {
     if (!running) {
