@@ -1,20 +1,18 @@
 package org.littletonrobotics.conduit;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
+import org.littletonrobotics.conduit.schema.CoreInputs;
+import org.littletonrobotics.conduit.schema.Joystick;
 
 public class ConduitApi {
-  public static final int EVENT_NAME_MAX_SIZE = 64;
-  public static final int GAME_SPECIFIC_MESSAGE_MAX_SIZE = 64;
-
-  public static final int JOYSTICK_NAME_MAX_SIZE = 256;
-  public static final int JOYSTICK_NUM_AXES = 12;
-  public static final int JOYSTICK_NUM_POVS = 12;
-  public static final int NUM_JOYSTICKS = 6;
-  // Name(256 char), type(uint8), axisCount(uint16), buttonCount(uint8),
-  // povCount(uint16), isXbox(uint8), axisTypes(uint8[12]),
-  // axisValues(float32[12]), buttons(uint32), povCount(int16[12])
-  public static final int JOYSTICK_DATA_SIZE = JOYSTICK_NAME_MAX_SIZE + 1 + 2 + 1 + 2 + 1 + (JOYSTICK_NUM_AXES * 1)
-      + (JOYSTICK_NUM_AXES * 4) + 4 + (JOYSTICK_NUM_POVS * 2);
+  // Length constants
+  private static final int NUM_JOYSTICK_AXES = 12;
+  private static final int NUM_JOYSTICK_POVS = 12;
+  private static final int JOYSTICK_NAME_LEN = 256;
+  private static final int EVENT_NAME_LEN = 64;
+  private static final int GAME_SPECIFIC_MESSAGE_LEN = 64;
 
   private static ConduitApi instance = null;
 
@@ -25,126 +23,151 @@ public class ConduitApi {
     return instance;
   }
 
-  private ByteBuffer buf;
+  private final CoreInputs inputs = new CoreInputs();
 
   private ConduitApi() {
-    buf = ConduitJni.getBuffer();
+    ByteBuffer buffer = ConduitJni.getBuffer();
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+    inputs.__init(0, buffer);
+  }
+
+  public void captureData() {
+    ConduitJni.capture();
   }
 
   public long getTimestamp() {
-    return Integer.toUnsignedLong(buf.getInt(0));
+    return inputs.timestamp();
   }
 
   public int getAllianceStation() {
-    return Byte.toUnsignedInt(buf.get(4));
+    return inputs.allianceStation();
   }
 
   public String getEventName() {
-    byte[] eventNameBuf = new byte[EVENT_NAME_MAX_SIZE];
-
-    buf.get(eventNameBuf, 5, EVENT_NAME_MAX_SIZE);
-    return new String(eventNameBuf);
+    byte[] bytes = new byte[EVENT_NAME_LEN];
+    for (int i = 0; i < EVENT_NAME_LEN; i++) {
+      bytes[i] = (byte) inputs.eventName(i);
+    }
+    return new String(bytes);
   }
 
   public String getGameSpecificMessage() {
-    byte[] gameSpecificMessageBuf = new byte[GAME_SPECIFIC_MESSAGE_MAX_SIZE];
-
-    buf.get(gameSpecificMessageBuf, 69, GAME_SPECIFIC_MESSAGE_MAX_SIZE);
-    return new String(gameSpecificMessageBuf);
+    byte[] bytes = new byte[GAME_SPECIFIC_MESSAGE_LEN];
+    for (int i = 0; i < GAME_SPECIFIC_MESSAGE_LEN; i++) {
+      bytes[i] = (byte) inputs.gameSpecificMessage(i);
+    }
+    return new String(bytes);
   }
 
   public int getGameSpecificMessageSize() {
-    return Short.toUnsignedInt(buf.getShort(133));
+    return inputs.gameSpecificMessageSize();
   }
 
   public int getMatchNumber() {
-    return Short.toUnsignedInt(buf.getShort(135));
+    return inputs.matchNumber();
   }
 
   public int getReplayNumber() {
-    return Byte.toUnsignedInt(buf.get(136));
+    return inputs.replayNumber();
   }
 
   public int getMatchType() {
-    return buf.getInt(137);
+    return inputs.matchType();
   }
 
   public int getControlWord() {
-    return buf.getInt(141);
+    return inputs.controlWord();
   }
 
   public double getMatchTime() {
-    return buf.getDouble(145);
+    return inputs.matchTime();
   }
 
   public String getJoystickName(int joystickId) {
-    byte[] joystickNameBuf = new byte[JOYSTICK_NAME_MAX_SIZE];
-    int offset = 153 + joystickId * JOYSTICK_DATA_SIZE;
-    buf.get(joystickNameBuf, offset, JOYSTICK_NAME_MAX_SIZE);
-    return new String(joystickNameBuf);
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
+
+    byte[] bytes = new byte[JOYSTICK_NAME_LEN];
+    for (int i = 0; i < JOYSTICK_NAME_LEN; i++) {
+      bytes[i] = (byte) j.name(i);
+    }
+
+    return new String(bytes);
   }
 
   public int getJoystickType(int joystickId) {
-    int offset = 409 + joystickId * JOYSTICK_DATA_SIZE;
-    return Byte.toUnsignedInt(buf.get(offset));
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
+
+    return j.type();
   }
 
   public int getButtonCount(int joystickId) {
-    int offset = 410 + joystickId * JOYSTICK_DATA_SIZE;
-    return Byte.toUnsignedInt(buf.get(offset));
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
+
+    return j.buttonCount();
   }
 
   public int getButtonValues(int joystickId) {
-    int offset = 411 + joystickId * JOYSTICK_DATA_SIZE;
-    return buf.getInt(offset);
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
+
+    return j.buttons();
   }
 
   public int getAxisCount(int joystickId) {
-    int offset = 415 + joystickId * JOYSTICK_DATA_SIZE;
-    return buf.getShort(offset);
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
+
+    return j.axisCount();
   }
 
   public int[] getAxisTypes(int joystickId) {
-    int[] axisTypeBuf = new int[JOYSTICK_NUM_AXES];
-    int offset = 417 + joystickId * JOYSTICK_DATA_SIZE;
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
 
-    for (int i = 0; i < JOYSTICK_NUM_AXES; i++) {
-      axisTypeBuf[i] = Byte.toUnsignedInt(buf.get(offset + i));
+    int[] ret = new int[NUM_JOYSTICK_AXES];
+    for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
+      ret[i] = j.axisTypes(i);
     }
-    return axisTypeBuf;
+    return ret;
   }
 
   public float[] getAxisValues(int joystickId) {
-    float[] axisValueBuf = new float[JOYSTICK_NUM_AXES];
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
 
-    // Base offset + axisTypes(uint8[12])
-    int offset = 417 + (JOYSTICK_NUM_AXES * 1) + joystickId * JOYSTICK_DATA_SIZE;
-
-    for (int i = 0; i < JOYSTICK_NUM_AXES; i++) {
-      axisValueBuf[i] = buf.getFloat(offset + i * 4);
+    float[] ret = new float[NUM_JOYSTICK_AXES];
+    for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
+      ret[i] = j.axisValues(i);
     }
-    return axisValueBuf;
+    return ret;
   }
 
   public int getPovCount(int joystickId) {
-    int offset = 417 + (JOYSTICK_NUM_AXES * 1) + (JOYSTICK_NUM_AXES * 4) + joystickId * JOYSTICK_DATA_SIZE;
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
 
-    return buf.getShort(offset);
+    return j.povCount();
   }
 
   public int[] getPovValues(int joystickId) {
-    int[] povCountBuf = new int[JOYSTICK_NUM_AXES];
-    int offset = 419 + (JOYSTICK_NUM_AXES * 1) + (JOYSTICK_NUM_AXES * 4) + joystickId * JOYSTICK_DATA_SIZE;
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
 
-    for (int i = 0; i < JOYSTICK_NUM_POVS; i++) {
-      povCountBuf[i] = buf.getShort(offset + i * 2);
+    int[] ret = new int[NUM_JOYSTICK_POVS];
+    for (int i = 0; i < NUM_JOYSTICK_POVS; i++) {
+      ret[i] = j.povValues(i);
     }
-    return povCountBuf;
+    return ret;
   }
 
   public boolean isXbox(int joystickId) {
-    int offset = 419 + (JOYSTICK_NUM_AXES * 1) + (JOYSTICK_NUM_AXES * 4) + (JOYSTICK_NUM_POVS * 2)
-        + joystickId * JOYSTICK_DATA_SIZE;
-    return buf.get(offset) != 0;
+    Joystick j = new Joystick();
+    inputs.joysticks(j, joystickId);
+
+    return j.isXbox();
   }
 }

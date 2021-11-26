@@ -1,0 +1,38 @@
+namespace org.littletonrobotics.conduit.schema;
+
+// Constants in this file:
+// 6 Joysticks
+// 12 axes per joystick
+// 12 POVs per joystick
+// Joystick name: 256 chars
+// Event name: 64 chars
+// Game specific message: 64 chars
+
+// If you change any of these numbers, you MUST update the corresponding constants in api and io implementations!
+
+struct Joystick {
+    name:[uint8:256];
+    type:uint8;
+    axis_count:int16;
+    axis_types:[uint8:12];
+    axis_values:[float32:12];
+    button_count:uint8;
+    buttons:int32;
+    pov_count:int16;
+    pov_values:[int16:12];
+    is_xbox:bool;
+}
+
+struct CoreInputs {
+    timestamp:int64;
+    alliance_station:uint8;
+    event_name:[uint8:64];
+    game_specific_message_size:uint16;
+    game_specific_message:[uint8:64];
+    match_number:uint16;
+    replay_number:uint8;
+    match_type:int32;
+    control_word:int32;
+    match_time:float64;
+    joysticks:[Joystick:6];
+}

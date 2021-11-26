@@ -1,6 +1,6 @@
 {
     "files.exclude": {
-        "external": true,
+        "external": false,
         "bazel-*": false,
         "compile_commands.json": false,
         "**/.classpath": true,
@@ -17,10 +17,11 @@
         "third_party/flatbuffers/java",
         "junction/shims/wpilib/src",
         "junction/core/src",
+        "example_java_project/test",
         "example_java_project/src",
         "conduit/api/src",
         "build_tools/jpatch/sigcheck",
-        "example_java_project/test"
+        "bazel-bin/conduit"
     ],
     "bsv.cc.compdb.targets": [
         "//conduit/wpilibio"

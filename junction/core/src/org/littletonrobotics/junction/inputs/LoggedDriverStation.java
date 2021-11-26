@@ -128,6 +128,8 @@ public class LoggedDriverStation {
   public void periodic() {
     // Update inputs from conduit
     if (!logger.hasReplaySource()) {
+      conduit.captureData();
+
       dsInputs.allianceStation = conduit.getAllianceStation();
       dsInputs.eventName = conduit.getEventName().trim();
       dsInputs.gameSpecificMessage = conduit.getGameSpecificMessage().substring(0,
