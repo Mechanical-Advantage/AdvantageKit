@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.littletonrobotics.junction.io;
 
 import java.io.IOException;
@@ -12,8 +8,8 @@ import java.util.List;
 
 /** Sends log data over a socket connection. */
 public class LogSocketServer implements LogRawDataReceiver {
-  final int port;
-  ServerThread thread;
+  private final int port;
+  private ServerThread thread;
 
   public LogSocketServer(int port) {
     this.port = port;

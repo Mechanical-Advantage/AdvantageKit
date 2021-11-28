@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.littletonrobotics.junction.inputs;
 
 import java.util.ArrayList;
@@ -53,28 +49,28 @@ public class LoggedNetworkTables implements LoggableInputs {
         NetworkTableEntry entry = entries[entryId];
         String key = entry.getName().substring(1);
         switch (entry.getType()) {
-        case kBoolean:
-          table.put(key, entry.getBoolean(false));
-          break;
-        case kBooleanArray:
-          table.put(key, entry.getBooleanArray(new boolean[0]));
-          break;
-        case kDouble:
-          table.put(key, entry.getDouble(0.0));
-          break;
-        case kDoubleArray:
-          table.put(key, entry.getDoubleArray(new double[0]));
-          break;
-        case kString:
-          table.put(key, entry.getString(""));
-          break;
-        case kStringArray:
-          table.put(key, entry.getStringArray(new String[0]));
-          break;
-        case kRaw:
-          table.put(key, entry.getRaw(new byte[0]));
-        default:
-          break;
+          case kBoolean:
+            table.put(key, entry.getBoolean(false));
+            break;
+          case kBooleanArray:
+            table.put(key, entry.getBooleanArray(new boolean[0]));
+            break;
+          case kDouble:
+            table.put(key, entry.getDouble(0.0));
+            break;
+          case kDoubleArray:
+            table.put(key, entry.getDoubleArray(new double[0]));
+            break;
+          case kString:
+            table.put(key, entry.getString(""));
+            break;
+          case kStringArray:
+            table.put(key, entry.getStringArray(new String[0]));
+            break;
+          case kRaw:
+            table.put(key, entry.getRaw(new byte[0]));
+          default:
+            break;
         }
       }
     }
@@ -87,35 +83,35 @@ public class LoggedNetworkTables implements LoggableInputs {
       NetworkTableEntry tableEntry = netTable.getEntry(mapEntry.getKey());
 
       switch (mapEntry.getValue().type) {
-      case Boolean:
-        tableEntry.setBoolean(mapEntry.getValue().getBoolean());
-        break;
-      case BooleanArray:
-        tableEntry.setBooleanArray(mapEntry.getValue().getBooleanArray());
-        break;
-      case Integer:
-        tableEntry.setDouble(mapEntry.getValue().getInteger());
-        break;
-      case IntegerArray:
-        tableEntry.setDoubleArray(Arrays.stream(mapEntry.getValue().getIntegerArray()).asDoubleStream().toArray());
-        break;
-      case Double:
-        tableEntry.setDouble(mapEntry.getValue().getDouble());
-        break;
-      case DoubleArray:
-        tableEntry.setDoubleArray(mapEntry.getValue().getDoubleArray());
-        break;
-      case String:
-        tableEntry.setString(mapEntry.getValue().getString());
-        break;
-      case StringArray:
-        tableEntry.setStringArray(mapEntry.getValue().getStringArray());
-        break;
-      case ByteArray:
-        tableEntry.setRaw(mapEntry.getValue().getByteArray());
-        break;
-      default:
-        break;
+        case Boolean:
+          tableEntry.setBoolean(mapEntry.getValue().getBoolean());
+          break;
+        case BooleanArray:
+          tableEntry.setBooleanArray(mapEntry.getValue().getBooleanArray());
+          break;
+        case Integer:
+          tableEntry.setDouble(mapEntry.getValue().getInteger());
+          break;
+        case IntegerArray:
+          tableEntry.setDoubleArray(Arrays.stream(mapEntry.getValue().getIntegerArray()).asDoubleStream().toArray());
+          break;
+        case Double:
+          tableEntry.setDouble(mapEntry.getValue().getDouble());
+          break;
+        case DoubleArray:
+          tableEntry.setDoubleArray(mapEntry.getValue().getDoubleArray());
+          break;
+        case String:
+          tableEntry.setString(mapEntry.getValue().getString());
+          break;
+        case StringArray:
+          tableEntry.setStringArray(mapEntry.getValue().getStringArray());
+          break;
+        case ByteArray:
+          tableEntry.setRaw(mapEntry.getValue().getByteArray());
+          break;
+        default:
+          break;
       }
     }
   }

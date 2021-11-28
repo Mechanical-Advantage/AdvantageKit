@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.littletonrobotics.junction;
 
 import java.util.Arrays;
@@ -243,42 +239,42 @@ public class LogTable {
       output += "\t" + field.getKey() + "=";
       LogValue value = field.getValue();
       switch (value.type) {
-      case Boolean:
-        output += value.getBoolean() ? "true" : "false";
-        break;
-      case BooleanArray:
-        output += Arrays.toString(value.getBooleanArray());
-        break;
-      case Integer:
-        output += Integer.toString(value.getInteger());
-        break;
-      case IntegerArray:
-        output += Arrays.toString(value.getIntegerArray());
-        break;
-      case Double:
-        output += Double.toString(value.getDouble());
-        break;
-      case DoubleArray:
-        output += Arrays.toString(value.getDoubleArray());
-        break;
-      case String:
-        output += "\"" + value.getString() + "\"";
-        break;
-      case StringArray:
-        output += "[";
-        String[] stringArray = value.getStringArray();
-        for (int i = 0; i < stringArray.length; i++) {
-          output += "\"" + stringArray[i] + "\"";
-          output += i < stringArray.length - 1 ? "," : "";
-        }
-        output += "]";
-        break;
-      case Byte:
-        output += Byte.toString(value.getByte());
-        break;
-      case ByteArray:
-        output += Arrays.toString(value.getByteArray());
-        break;
+        case Boolean:
+          output += value.getBoolean() ? "true" : "false";
+          break;
+        case BooleanArray:
+          output += Arrays.toString(value.getBooleanArray());
+          break;
+        case Integer:
+          output += Integer.toString(value.getInteger());
+          break;
+        case IntegerArray:
+          output += Arrays.toString(value.getIntegerArray());
+          break;
+        case Double:
+          output += Double.toString(value.getDouble());
+          break;
+        case DoubleArray:
+          output += Arrays.toString(value.getDoubleArray());
+          break;
+        case String:
+          output += "\"" + value.getString() + "\"";
+          break;
+        case StringArray:
+          output += "[";
+          String[] stringArray = value.getStringArray();
+          for (int i = 0; i < stringArray.length; i++) {
+            output += "\"" + stringArray[i] + "\"";
+            output += i < stringArray.length - 1 ? "," : "";
+          }
+          output += "]";
+          break;
+        case Byte:
+          output += Byte.toString(value.getByte());
+          break;
+        case ByteArray:
+          output += Arrays.toString(value.getByteArray());
+          break;
       }
       output += "\n";
     }
@@ -432,40 +428,40 @@ public class LogTable {
         return true;
       } else {
         switch (type) {
-        case Boolean:
-        case Integer:
-        case Double:
-        case String:
-        case Byte:
-          if (value.equals(oldValue.value)) {
-            return false;
-          }
-          break;
-        case BooleanArray:
-          if (Arrays.equals(getBooleanArray(), oldValue.getBooleanArray())) {
-            return false;
-          }
-          break;
-        case IntegerArray:
-          if (Arrays.equals(getIntegerArray(), oldValue.getIntegerArray())) {
-            return false;
-          }
-          break;
-        case DoubleArray:
-          if (Arrays.equals(getDoubleArray(), oldValue.getDoubleArray())) {
-            return false;
-          }
-          break;
-        case StringArray:
-          if (Arrays.equals(getStringArray(), oldValue.getStringArray())) {
-            return false;
-          }
-          break;
-        case ByteArray:
-          if (Arrays.equals(getByteArray(), oldValue.getByteArray())) {
-            return false;
-          }
-          break;
+          case Boolean:
+          case Integer:
+          case Double:
+          case String:
+          case Byte:
+            if (value.equals(oldValue.value)) {
+              return false;
+            }
+            break;
+          case BooleanArray:
+            if (Arrays.equals(getBooleanArray(), oldValue.getBooleanArray())) {
+              return false;
+            }
+            break;
+          case IntegerArray:
+            if (Arrays.equals(getIntegerArray(), oldValue.getIntegerArray())) {
+              return false;
+            }
+            break;
+          case DoubleArray:
+            if (Arrays.equals(getDoubleArray(), oldValue.getDoubleArray())) {
+              return false;
+            }
+            break;
+          case StringArray:
+            if (Arrays.equals(getStringArray(), oldValue.getStringArray())) {
+              return false;
+            }
+            break;
+          case ByteArray:
+            if (Arrays.equals(getByteArray(), oldValue.getByteArray())) {
+              return false;
+            }
+            break;
         }
         return true;
       }

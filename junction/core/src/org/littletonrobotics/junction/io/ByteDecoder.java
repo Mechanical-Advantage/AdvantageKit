@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.littletonrobotics.junction.io;
 
 import java.io.DataInputStream;
@@ -18,9 +14,9 @@ import org.littletonrobotics.junction.LogTable.LoggableType;
 public class ByteDecoder {
   public static final List<Byte> supportedLogRevisions = List.of((byte) 1);
 
-  Byte logRevision = null;
-  LogTable table = new LogTable(0.0);
-  Map<Short, String> keyIDs = new HashMap<>();
+  private Byte logRevision = null;
+  private LogTable table = new LogTable(0.0);
+  private Map<Short, String> keyIDs = new HashMap<>();
 
   public LogTable decodeTable(DataInputStream input) {
     readTable: try {
@@ -45,14 +41,14 @@ public class ByteDecoder {
 
         byte type = input.readByte();
         switch (type) {
-        case 0: // Next timestamp
-          break readLoop;
-        case 1: // New key ID
-          decodeKey(input);
-          break;
-        case 2: // Updated field
-          decodeValue(input);
-          break;
+          case 0: // Next timestamp
+            break readLoop;
+          case 1: // New key ID
+            decodeKey(input);
+            break;
+          case 2: // Updated field
+            decodeValue(input);
+            break;
         }
       }
 
@@ -85,63 +81,63 @@ public class ByteDecoder {
     LoggableType type = LoggableType.values()[typeInt - 1];
     short length;
     switch (type) {
-    case Boolean:
-      table.put(key, input.readBoolean());
-      break;
-    case Byte:
-      table.put(key, input.readByte());
-      break;
-    case Integer:
-      table.put(key, input.readInt());
-      break;
-    case Double:
-      table.put(key, input.readDouble());
-      break;
-    case String:
-      length = input.readShort();
-      table.put(key, new String(input.readNBytes(length), "UTF-8"));
-      break;
-    case BooleanArray:
-      length = input.readShort();
-      boolean[] booleanArray = new boolean[length];
-      for (int i = 0; i < length; i++) {
-        booleanArray[i] = input.readBoolean();
-      }
-      table.put(key, booleanArray);
-      break;
-    case ByteArray:
-      length = input.readShort();
-      byte[] byteArray = new byte[length];
-      for (int i = 0; i < length; i++) {
-        byteArray[i] = input.readByte();
-      }
-      table.put(key, byteArray);
-      break;
-    case IntegerArray:
-      length = input.readShort();
-      int[] intArray = new int[length];
-      for (int i = 0; i < length; i++) {
-        intArray[i] = input.readInt();
-      }
-      table.put(key, intArray);
-      break;
-    case DoubleArray:
-      length = input.readShort();
-      double[] doubleArray = new double[length];
-      for (int i = 0; i < length; i++) {
-        doubleArray[i] = input.readDouble();
-      }
-      table.put(key, doubleArray);
-      break;
-    case StringArray:
-      length = input.readShort();
-      String[] stringArray = new String[length];
-      for (int i = 0; i < length; i++) {
-        short stringLength = input.readShort();
-        stringArray[i] = new String(input.readNBytes(stringLength), "UTF-8");
-      }
-      table.put(key, stringArray);
-      break;
+      case Boolean:
+        table.put(key, input.readBoolean());
+        break;
+      case Byte:
+        table.put(key, input.readByte());
+        break;
+      case Integer:
+        table.put(key, input.readInt());
+        break;
+      case Double:
+        table.put(key, input.readDouble());
+        break;
+      case String:
+        length = input.readShort();
+        table.put(key, new String(input.readNBytes(length), "UTF-8"));
+        break;
+      case BooleanArray:
+        length = input.readShort();
+        boolean[] booleanArray = new boolean[length];
+        for (int i = 0; i < length; i++) {
+          booleanArray[i] = input.readBoolean();
+        }
+        table.put(key, booleanArray);
+        break;
+      case ByteArray:
+        length = input.readShort();
+        byte[] byteArray = new byte[length];
+        for (int i = 0; i < length; i++) {
+          byteArray[i] = input.readByte();
+        }
+        table.put(key, byteArray);
+        break;
+      case IntegerArray:
+        length = input.readShort();
+        int[] intArray = new int[length];
+        for (int i = 0; i < length; i++) {
+          intArray[i] = input.readInt();
+        }
+        table.put(key, intArray);
+        break;
+      case DoubleArray:
+        length = input.readShort();
+        double[] doubleArray = new double[length];
+        for (int i = 0; i < length; i++) {
+          doubleArray[i] = input.readDouble();
+        }
+        table.put(key, doubleArray);
+        break;
+      case StringArray:
+        length = input.readShort();
+        String[] stringArray = new String[length];
+        for (int i = 0; i < length; i++) {
+          short stringLength = input.readShort();
+          stringArray[i] = new String(input.readNBytes(stringLength), "UTF-8");
+        }
+        table.put(key, stringArray);
+        break;
     }
   }
 }

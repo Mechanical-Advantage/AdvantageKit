@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.littletonrobotics.junction.io;
 
 import java.io.UnsupportedEncodingException;
@@ -18,11 +14,11 @@ import org.littletonrobotics.junction.LogTable.LogValue;
 public class ByteEncoder {
   public static final byte logRevision = (byte) 1;
 
-  ByteBuffer nextOutput;
-  boolean isFirstTable = true;
-  LogTable lastTable = new LogTable(0.0);
-  Map<String, Short> keyIDs = new HashMap<>();
-  short nextKeyID = 0;
+  private ByteBuffer nextOutput;
+  private boolean isFirstTable = true;
+  private LogTable lastTable = new LogTable(0.0);
+  private Map<String, Short> keyIDs = new HashMap<>();
+  private short nextKeyID = 0;
 
   /** Reads the encoded output of the last encoded table. */
   public ByteBuffer getOutput() {
@@ -165,69 +161,69 @@ public class ByteEncoder {
         valueBuffer = ByteBuffer.allocate(0);
       } else {
         switch (value.type) {
-        case Boolean:
-          valueBuffer = ByteBuffer.allocate(1).put(value.getBoolean() ? (byte) 1 : (byte) 0);
-          break;
-        case Byte:
-          valueBuffer = ByteBuffer.allocate(1).put(value.getByte());
-          break;
-        case Integer:
-          valueBuffer = ByteBuffer.allocate(Integer.BYTES).putInt(value.getInteger());
-          break;
-        case Double:
-          valueBuffer = ByteBuffer.allocate(Double.BYTES).putDouble(value.getDouble());
-          break;
-        case String:
-          String stringValue = value.getString();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + stringValue.length());
-          valueBuffer.putShort((short) stringValue.length());
-          valueBuffer.put(stringValue.getBytes("UTF-8"));
-          break;
-        case BooleanArray:
-          boolean[] booleanArray = value.getBooleanArray();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + booleanArray.length);
-          valueBuffer.putShort((short) booleanArray.length);
-          for (boolean i : booleanArray) {
-            valueBuffer.put(i ? (byte) 1 : (byte) 0);
-          }
-          break;
-        case ByteArray:
-          byte[] byteArray = value.getByteArray();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + byteArray.length);
-          valueBuffer.putShort((short) byteArray.length);
-          valueBuffer.put(byteArray);
-          break;
-        case IntegerArray:
-          int[] intArray = value.getIntegerArray();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + (intArray.length * Integer.BYTES));
-          valueBuffer.putShort((short) intArray.length);
-          for (int i : intArray) {
-            valueBuffer.putInt(i);
-          }
-          break;
-        case DoubleArray:
-          double[] doubleArray = value.getDoubleArray();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + (doubleArray.length * Double.BYTES));
-          valueBuffer.putShort((short) doubleArray.length);
-          for (double i : doubleArray) {
-            valueBuffer.putDouble(i);
-          }
-          break;
-        case StringArray:
-          String[] stringArray = value.getStringArray();
-          int capacity = Short.BYTES;
-          for (String i : stringArray) {
-            capacity += Short.BYTES + i.length();
-          }
-          valueBuffer = ByteBuffer.allocate(capacity);
-          valueBuffer.putShort((short) stringArray.length);
-          for (String i : stringArray) {
-            valueBuffer.putShort((short) i.length());
-            valueBuffer.put(i.getBytes("UTF-8"));
-          }
-          break;
-        default:
-          valueBuffer = ByteBuffer.allocate(0);
+          case Boolean:
+            valueBuffer = ByteBuffer.allocate(1).put(value.getBoolean() ? (byte) 1 : (byte) 0);
+            break;
+          case Byte:
+            valueBuffer = ByteBuffer.allocate(1).put(value.getByte());
+            break;
+          case Integer:
+            valueBuffer = ByteBuffer.allocate(Integer.BYTES).putInt(value.getInteger());
+            break;
+          case Double:
+            valueBuffer = ByteBuffer.allocate(Double.BYTES).putDouble(value.getDouble());
+            break;
+          case String:
+            String stringValue = value.getString();
+            valueBuffer = ByteBuffer.allocate(Short.BYTES + stringValue.length());
+            valueBuffer.putShort((short) stringValue.length());
+            valueBuffer.put(stringValue.getBytes("UTF-8"));
+            break;
+          case BooleanArray:
+            boolean[] booleanArray = value.getBooleanArray();
+            valueBuffer = ByteBuffer.allocate(Short.BYTES + booleanArray.length);
+            valueBuffer.putShort((short) booleanArray.length);
+            for (boolean i : booleanArray) {
+              valueBuffer.put(i ? (byte) 1 : (byte) 0);
+            }
+            break;
+          case ByteArray:
+            byte[] byteArray = value.getByteArray();
+            valueBuffer = ByteBuffer.allocate(Short.BYTES + byteArray.length);
+            valueBuffer.putShort((short) byteArray.length);
+            valueBuffer.put(byteArray);
+            break;
+          case IntegerArray:
+            int[] intArray = value.getIntegerArray();
+            valueBuffer = ByteBuffer.allocate(Short.BYTES + (intArray.length * Integer.BYTES));
+            valueBuffer.putShort((short) intArray.length);
+            for (int i : intArray) {
+              valueBuffer.putInt(i);
+            }
+            break;
+          case DoubleArray:
+            double[] doubleArray = value.getDoubleArray();
+            valueBuffer = ByteBuffer.allocate(Short.BYTES + (doubleArray.length * Double.BYTES));
+            valueBuffer.putShort((short) doubleArray.length);
+            for (double i : doubleArray) {
+              valueBuffer.putDouble(i);
+            }
+            break;
+          case StringArray:
+            String[] stringArray = value.getStringArray();
+            int capacity = Short.BYTES;
+            for (String i : stringArray) {
+              capacity += Short.BYTES + i.length();
+            }
+            valueBuffer = ByteBuffer.allocate(capacity);
+            valueBuffer.putShort((short) stringArray.length);
+            for (String i : stringArray) {
+              valueBuffer.putShort((short) i.length());
+              valueBuffer.put(i.getBytes("UTF-8"));
+            }
+            break;
+          default:
+            valueBuffer = ByteBuffer.allocate(0);
         }
       }
 
