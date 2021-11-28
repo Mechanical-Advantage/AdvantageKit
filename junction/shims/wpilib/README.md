@@ -2,8 +2,8 @@
 
 Replaces existing WPILib classes to read data from Junction instead of the HAL:
 
-* [`DriverStation.java`](/junction/shims/wpilib/src/edut/wpi/first/wpilibj/DriverStation.java) - Reads joystick data from "junction/core", all other functions are unmodified. This allows of synronization of data within each cycle and guarantees that data read on the robot and in the simulator are identical.
-* [`RobotController.java`](/junction/shims/wpilib/src/edut/wpi/first/wpilibj/RobotController.java) - Reads the FPGA timestamp from "junction/core", all other functions are unmodified. This means that the timestamp is constant within each cycle and can be replayed accurately even when running faster than real time.
+* [`DriverStation.java`](/junction/shims/wpilib/src/edu/wpi/first/wpilibj/DriverStation.java) - Reads joystick data from "junction/core", all other functions are unmodified. This allows of synronization of data within each cycle and guarantees that data read on the robot and in the simulator are identical.
+* [`RobotController.java`](/junction/shims/wpilib/src/edu/wpi/first/wpilibj/RobotController.java) - Reads the FPGA timestamp from "junction/core", all other functions are unmodified. This means that the timestamp is constant within each cycle and can be replayed accurately even when running faster than real time.
 
 ## Interface
 
