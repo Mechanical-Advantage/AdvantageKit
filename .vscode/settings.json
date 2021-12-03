@@ -1,6 +1,6 @@
 {
     "files.exclude": {
-        "external": false,
+        "external": true,
         "bazel-*": false,
         "compile_commands.json": false,
         "**/.classpath": true,
