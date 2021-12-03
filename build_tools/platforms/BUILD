@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 # All platforms have an operating system and a CPU type, but we often wish to
 # define additional properties of a platform to more completely specify it.
 # In this case, we create a category called "device" to differentiate between
-# different physical device types.  There can be many devices running Linux 
+# different physical device types.  There can be many devices running Linux
 # and using an ARMv7 CPU, but the roboRIO for example is a very specific device
 # within that set.  Since the roboRIO has a specific compiler, we need a way
 # to differentiate it from other Linux ARM devices.
@@ -28,4 +28,28 @@ platform(
         "@platforms//cpu:arm",
         ":roborio",
     ],
+)
+
+config_setting(
+    name = "is_athena",
+    constraint_values = [":roborio"],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "is_linux",
+    constraint_values = ["@platforms//os:linux"],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "is_windows",
+    constraint_values = ["@platforms//os:windows"],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "is_macos",
+    constraint_values = ["@platforms//os:macos"],
+    visibility = ["//visibility:public"],
 )

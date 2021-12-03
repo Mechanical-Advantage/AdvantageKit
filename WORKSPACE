@@ -89,16 +89,16 @@ frcmaven_pinned_maven_install()
 # Googletest depends on rules_python
 http_archive(
     name = "rules_python",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.5.0/rules_python-0.5.0.tar.gz",
     sha256 = "cd6730ed53a002c56ce4e2f396ba3b3be262fd7cb68339f0377a45e8227fe332",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.5.0/rules_python-0.5.0.tar.gz",
 )
 
 # Googletest depends on abseil - Google's C++ standard library
 http_archive(
-  name = "com_google_absl",
-  urls = ["https://github.com/abseil/abseil-cpp/archive/215105818dfde3174fe799600bb0f3cae233d0bf.zip"],
-  strip_prefix = "abseil-cpp-215105818dfde3174fe799600bb0f3cae233d0bf",
-  sha256 = "b4e20d9e752a75c10636675691b1e9c2698e0764cb404987d0ffa77223041c19"
+    name = "com_google_absl",
+    sha256 = "b4e20d9e752a75c10636675691b1e9c2698e0764cb404987d0ffa77223041c19",
+    strip_prefix = "abseil-cpp-215105818dfde3174fe799600bb0f3cae233d0bf",
+    urls = ["https://github.com/abseil/abseil-cpp/archive/215105818dfde3174fe799600bb0f3cae233d0bf.zip"],
 )
 
 http_archive(
@@ -205,11 +205,19 @@ WPILIB_HAL_ATHENA_SHA = "e9de32abe3739697a3a92963c9eca4bf8755edfb0f11ac95e22d019
 
 WPILIB_HAL_LINUX_X64_SHA = "48ca6f22deb800170c801944531557c8d109be4501418c719349519405ae6cc2"
 
+WPILIB_HAL_WINDOWS_X64_SHA = "18d860d1be5dfcf104f9609f9bb2af666fda13e8d3608ef9b9e890b5c4c56785"
+
+WPILIB_HAL_MACOS_X64_SHA = "46f76a6ba82f395e19ba48c12c56b1d864b03f46498a0f42b6a15fe12d3aaa6a"
+
 WPILIB_WPIUTIL_HEADERS_SHA = "b2a96f7ce07198b139face9dc341c6550d5044fa32f48435b50d986ea5c8ee55"
 
 WPILIB_WPIUTIL_ATHENA_SHA = "ad48bae20f42850938a1758c9f82e54c5cb5e286ad0b09adb701d700bd7f8ec8"
 
 WPILIB_WPIUTIL_LINUX_X64_SHA = "4a20ec638981025c0e41678ac7cea691d5a40121987b1309e6907255636d02cf"
+
+WPILIB_WPIUTIL_WINDOWS_X64_SHA = "5e85e0a32ed520c1ea075087b3701769f2007fe8a9385831b1d947f70179cf8f"
+
+WPILIB_WPIUTIL_MACOS_x64_SHA = "09c7914e5fcf4b26967e0bddb501c79d054de276a5724a9089b0e04d9e13e640"
 
 http_file(
     name = "wpilibj_jar_file",
@@ -310,6 +318,16 @@ wpilib_nativezip(
             platform = "linux_x64",
             sha256 = WPILIB_WPIUTIL_LINUX_X64_SHA,
         ),
+        wpilib_binary_config(
+            libs = ["wpiutil.dll"],
+            platform = "windows_x64",
+            sha256 = WPILIB_WPIUTIL_WINDOWS_X64_SHA,
+        ),
+        wpilib_binary_config(
+            libs = ["libwpiutil.dylib"],
+            platform = "macos_x64",
+            sha256 = WPILIB_WPIUTIL_MACOS_x64_SHA,
+        )
     ],
     headers_sha256 = WPILIB_WPIUTIL_HEADERS_SHA,
     package = "wpiutil",
@@ -330,6 +348,16 @@ wpilib_nativezip(
             libs = ["libwpiHal.so"],
             platform = "linux_x64",
             sha256 = WPILIB_HAL_LINUX_X64_SHA,
+        ),
+        wpilib_binary_config(
+            libs = ["wpiHal.dll"],
+            platform = "windows_x64",
+            sha256 = WPILIB_HAL_WINDOWS_X64_SHA,
+        ),
+        wpilib_binary_config(
+            libs = ["libwpiHal.dylib"],
+            platform = "macos_x64",
+            sha256 = WPILIB_HAL_MACOS_X64_SHA,
         ),
     ],
     headers_sha256 = WPILIB_HAL_HEADERS_SHA,
