@@ -18,11 +18,12 @@ extract_native_header_jar = rule(
     output_to_genfiles = True,
 )
 
-def jni_header_library(name, java_lib, jni_dep, outs, **kwargs):
+def jni_header_library(name, java_lib, jni_dep, outs, extract_visibility = ["//visibility:public"], **kwargs):
     extract_native_header_jar(
-        name = name + "-extract",
+        name = name + "_headers",
         lib = java_lib,
         outs = outs,
+        visibility = extract_visibility,
     )
 
     native.cc_library(

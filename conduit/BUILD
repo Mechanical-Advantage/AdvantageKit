@@ -1,5 +1,10 @@
 load("//third_party/flatbuffers:build_defs.bzl", "flatbuffer_cc_library", "flatbuffer_java_library")
 
+filegroup(
+    name = "vscode",
+    srcs = [":conduit-schema-java_java_srcs", ":conduit-schema-cc_cc_srcs", "//conduit/api:api-jni-athena_headers"]
+)
+
 flatbuffer_java_library(
     name = "conduit-schema-java",
     srcs = ["conduit_schema.fbs"],
