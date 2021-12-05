@@ -5,7 +5,7 @@ java_library(
     srcs = glob(["src/**/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//conduit/api",
+        "//conduit/api:api-export",
         "//third_party/wpilib:wpilibj-compileonly",
     ],
 )
