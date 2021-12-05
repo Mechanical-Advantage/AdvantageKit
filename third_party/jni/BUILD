@@ -5,6 +5,22 @@ package(default_visibility = ["//visibility:public"])
 # this repository.  JNI uses a main header, "jni.h", for all platforms, and a "machine dependent" header,
 # called "jni_md.h", which has different contents for different platforms.
 
+cc_library(
+    name = "jni",
+    hdrs = ["include/jni.h"] + select({
+        "//build_tools/platforms:is_athena": ["platform/linux_arm32/jni_md.h"],
+        "//build_tools/platforms:is_linux": ["platform/linux_x64/jni_md.h"],
+        "//build_tools/platforms:is_windows": ["platform/windows_x64/jni_md.h"],
+        "//build_tools/platforms:is_macos": ["platform/macos_x64/jni_md.h"],
+    }),
+    includes = ["include"] + select({
+        "//build_tools/platforms:is_athena": ["platform/linux_arm32"],
+        "//build_tools/platforms:is_linux": ["platform/linux_x64"],
+        "//build_tools/platforms:is_windows": ["platform/windows_x64"],
+        "//build_tools/platforms:is_macos": ["platform/macos_x64"],
+    }),
+)
+
 # For reference, the headers here are pulled from AdoptOpenJDK builds, JDK version 11
 # for various
 cc_library(

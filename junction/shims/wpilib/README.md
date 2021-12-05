@@ -14,7 +14,7 @@ The interfaces of each shim match the origin WPILib classes, replacing only the 
 Two rules are provided for building the WPILib shims:
 
 * wpilib - Builds the shim classes independently.
-* wpilibj_shimmed - Exports stock WPILib with the shimmed classes. When building, classes with matching identifiers are replaced.
+* wpilibj-shimmed - Exports stock WPILib with the shimmed classes. When building, classes with matching identifiers are replaced.
 
 ## Testing (REVIEW)
 

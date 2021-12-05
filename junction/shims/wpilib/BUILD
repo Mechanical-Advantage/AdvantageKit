@@ -1,16 +1,19 @@
 load("@rules_jvm_external//:defs.bzl", "java_export")
 
 java_library(
-    name = "wpilib",
+    name = "wpilib-shims",
     srcs = glob(["src/**/*.java"]),
-    deps = ["//third_party/wpilib:wpilibj"],
+    deps = [
+        "//third_party/wpilib:wpilibj",
+        "//junction/core:core-compile"
+    ],
 )
 
 java_export(
-    name = "wpilibj_shimmed",
-    maven_coordinates = "org.littletonrobotics.junction:wpilib-shim:0.0.1",
-    runtime_deps = ["//third_party/wpilib:wpilibj", ":wpilib"]
-    #deps = ["//third_party/wpilib:wpilibj"],
+    name = "wpilib",
+    maven_coordinates = "org.littletonrobotics.akit.junction:wpilib-shim:0.0.1",
+
+    runtime_deps = ["//third_party/wpilib:wpilibj",":wpilib-shims",  "//junction/core:core-compile"],
 )
 
 java_test(

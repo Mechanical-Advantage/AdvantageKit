@@ -38,7 +38,7 @@ config_setting(
 
 config_setting(
     name = "is_linux",
-    constraint_values = ["@platforms//os:linux"],
+    constraint_values = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
     visibility = ["//visibility:public"],
 )
 

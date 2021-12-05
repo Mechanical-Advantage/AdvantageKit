@@ -43,6 +43,13 @@ java_import(
     ],
 )
 
+java_library(
+    name = "wpilibj-compileonly",
+    neverlink = True,
+    visibility = ["//visibility:public"],
+    exports = [":wpilibj"],
+)
+
 cc_library(
     name = "wpiutil",
     visibility = ["//visibility:public"],

@@ -62,7 +62,8 @@ def _impl(ctx):
         tool_path(
             name = name,
             path = "frc2021/roborio/bin/arm-frc2021-linux-gnueabi-{}{}".format(name, exec_extension),
-        ) for name in [
+        )
+        for name in [
             "ar",
             "cpp",
             "gcc",
@@ -98,18 +99,21 @@ def _impl(ctx):
                         ACTION_NAMES.cpp_link_executable,
                         ACTION_NAMES.cpp_link_dynamic_library,
                         ACTION_NAMES.cpp_link_nodeps_dynamic_library,
-                        ACTION_NAMES.cpp_link_static_library,
                     ],
                     flag_groups = [
                         flag_group(
                             flags = [
                                 "-lstdc++",
                                 "-lpthread",
+                                "-lm",
                             ],
                         ),
                     ],
                 ),
             ],
+        ),
+        feature(
+            name = "compiler_param_file",
         ),
     ]
 

@@ -12,7 +12,6 @@ public class LoggedDriverStation {
 
   private static LoggedDriverStation instance;
   private static final Logger logger = Logger.getInstance();
-  private static final ConduitApi conduit = ConduitApi.getInstance();
 
   private final DriverStationInputs dsInputs = new DriverStationInputs();
   private final JoystickInputs[] joystickInputs = { new JoystickInputs(), new JoystickInputs(), new JoystickInputs(),
@@ -124,6 +123,7 @@ public class LoggedDriverStation {
   public void periodic() {
     // Update inputs from conduit
     if (!logger.hasReplaySource()) {
+      ConduitApi conduit = ConduitApi.getInstance();
       conduit.captureData();
 
       dsInputs.allianceStation = conduit.getAllianceStation();
