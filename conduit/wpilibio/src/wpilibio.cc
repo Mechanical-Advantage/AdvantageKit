@@ -15,7 +15,7 @@ namespace wpilibio {
 
 using namespace org::littletonrobotics::conduit;
 
-void* shared_buf;
+void* shared_buf = 0;
 schema::CoreInputs* corein_view;
 
 void make_buffer() {

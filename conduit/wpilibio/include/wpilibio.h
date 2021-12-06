@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdint>
 
 namespace akit {
@@ -15,8 +16,6 @@ void make_buffer(void);
 
 // Captures data into the shared buffer
 void capture_data(void);
-
-
 
 }  // namespace wpilibio
 }  // namespace conduit

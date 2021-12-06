@@ -6,6 +6,9 @@
 JNIEXPORT jobject JNICALL
 Java_org_littletonrobotics_conduit_ConduitJni_getBuffer(JNIEnv* env,
                                                         jclass clazz) {
+  if (akit::conduit::wpilibio::shared_buf == 0) {
+    akit::conduit::wpilibio::make_buffer();
+  }
   return env->NewDirectByteBuffer(akit::conduit::wpilibio::shared_buf,
                                   akit::conduit::wpilibio::BUF_SIZE);
 }
