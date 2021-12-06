@@ -1,0 +1,64 @@
+apply plugin: 'maven-publish'
+
+def baseArtifactId = pluginName
+def artifactGroupId = 'edu.wpi.first.halsim'
+def zipBaseName = "_GROUP_edu_wpi_first_halsim_ID_${pluginName}_CLS"
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+task cppSourcesZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
+    classifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/cpp') {
+        into '/'
+    }
+}
+
+task cppHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
+    classifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
+}
+
+build.dependsOn cppSourcesZip
+build.dependsOn cppHeadersZip
+
+addTaskToCopyAllOutputs(cppSourcesZip)
+addTaskToCopyAllOutputs(cppHeadersZip)
+
+
+model {
+    publishing {
+        def pluginTaskList = createComponentZipTasks($.components, [pluginName], zipBaseName, Zip, project, includeStandardZipFormat)
+
+        publications {
+            cpp(MavenPublication) {
+                pluginTaskList.each {
+                    artifact it
+                }
+
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+
+                artifactId = baseArtifactId
+                groupId artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+        }
+    }
+}

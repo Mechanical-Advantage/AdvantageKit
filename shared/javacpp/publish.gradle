@@ -1,0 +1,71 @@
+apply plugin: 'maven-publish'
+
+def outputsFolder = file("$buildDir/outputs")
+
+def baseArtifactId = nativeName
+def artifactGroupId = "edu.wpi.first.${nativeName}"
+def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
+
+def licenseFile = file("$rootDir/license.md")
+
+task cppSourcesZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
+    classifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/cpp') {
+        into '/'
+    }
+}
+
+task cppHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
+    classifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    ext.includeDirs = [
+        project.file('src/main/native/include')
+    ]
+
+    ext.includeDirs.each {
+        from(it) {
+            into '/'
+        }
+    }
+}
+
+artifacts {
+    archives cppHeadersZip
+    archives cppSourcesZip
+}
+
+addTaskToCopyAllOutputs(cppSourcesZip)
+addTaskToCopyAllOutputs(cppHeadersZip)
+
+model {
+    publishing {
+        def taskList = createComponentZipTasks($.components, [nativeName], zipBaseName, Zip, project, includeStandardZipFormat)
+
+        publications {
+            cpp(MavenPublication) {
+                taskList.each {
+                    artifact it
+                }
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+                artifactId = "${baseArtifactId}-cpp"
+                groupId artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+        }
+    }
+}
