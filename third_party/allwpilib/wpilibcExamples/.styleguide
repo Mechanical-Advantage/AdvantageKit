@@ -1,0 +1,24 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+includeOtherLibs {
+  ^cameraserver/
+  ^cscore
+  ^frc/
+  ^frc2/
+  ^hal/
+  ^networktables/
+  ^ntcore
+  ^opencv2/
+  ^support/
+  ^units/
+  ^vision/
+  ^wpi/
+}
