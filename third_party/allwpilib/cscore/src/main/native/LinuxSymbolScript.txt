@@ -1,4 +1,0 @@
-cscorejnicvstatic {
-  global: CS_*; JNI_*; Java_*; # explicitly list symbols to be exported
-  local: *;         # hide everything else
-};

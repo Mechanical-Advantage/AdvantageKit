@@ -340,22 +340,22 @@ wpilib_nativezip(
     name = "wpilib_hal",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libwpiHal.so"],
+            libs = ["libwpiHal.so", "libwpiHaljni.so"],
             platform = "athena",
             sha256 = WPILIB_HAL_ATHENA_SHA,
         ),
         wpilib_binary_config(
-            libs = ["libwpiHal.so"],
+            libs = ["libwpiHal.so", "libwpiHaljni.so"],
             platform = "linux_x64",
             sha256 = WPILIB_HAL_LINUX_X64_SHA,
         ),
         wpilib_binary_config(
-            libs = ["wpiHal.dll"],
+            libs = ["wpiHal.dll", "wpiHaljni.dll"],
             platform = "windows_x64",
             sha256 = WPILIB_HAL_WINDOWS_X64_SHA,
         ),
         wpilib_binary_config(
-            libs = ["libwpiHal.dylib"],
+            libs = ["libwpiHal.dylib", "libwpiHaljni.dylib"],
             platform = "macos_x64",
             sha256 = WPILIB_HAL_MACOS_X64_SHA,
         ),

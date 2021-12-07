@@ -1,3 +1,0 @@
-tasks.register('testDesktopJava') {
-    dependsOn test
-}

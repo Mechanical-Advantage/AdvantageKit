@@ -23,7 +23,7 @@ public class Logger {
   private static Logger instance;
 
   private boolean running = false;
-  private final Timer printTimer = new Timer();
+  //private final Timer printTimer = new Timer();
   private LogTable entry;
   private LogTable outputTable;
   private Map<String, String> metadata = new HashMap<>();
@@ -122,8 +122,8 @@ public class Logger {
         }
       }
 
-      printTimer.reset();
-      printTimer.start();
+      //printTimer.reset();
+      //printTimer.start();
       periodic();
 
       // Record metadata
@@ -200,17 +200,17 @@ public class Logger {
       double periodicEnd = getRealTimestamp();
 
       // Print timing data
-      if (printTimer.advanceIfElapsed(0.5) && debugTiming) {
-        String updateLength = Double.toString((double) Math.round((driverStationStart - periodicStart) * 100000) / 100);
-        String driverStationLength = Double
-            .toString((double) Math.round((systemStatsStart - driverStationStart) * 100000) / 100);
-        String systemStatsLength = Double
-            .toString((double) Math.round((networkTablesStart - systemStatsStart) * 100000) / 100);
-        String networkTablesLength = Double
-            .toString((double) Math.round((periodicEnd - networkTablesStart) * 100000) / 100);
-        System.out.println("U=" + updateLength + ", DS=" + driverStationLength + ", SS=" + systemStatsLength + ", NT="
-            + networkTablesLength);
-      }
+      // if (printTimer.advanceIfElapsed(0.5) && debugTiming) {
+      //   String updateLength = Double.toString((double) Math.round((driverStationStart - periodicStart) * 100000) / 100);
+      //   String driverStationLength = Double
+      //       .toString((double) Math.round((systemStatsStart - driverStationStart) * 100000) / 100);
+      //   String systemStatsLength = Double
+      //       .toString((double) Math.round((networkTablesStart - systemStatsStart) * 100000) / 100);
+      //   String networkTablesLength = Double
+      //       .toString((double) Math.round((periodicEnd - networkTablesStart) * 100000) / 100);
+      //   System.out.println("U=" + updateLength + ", DS=" + driverStationLength + ", SS=" + systemStatsLength + ", NT="
+      //       + networkTablesLength);
+      // }
     } else {
       // Retrieve new driver station data even if logger is disabled
       LoggedDriverStation.getInstance().periodic();

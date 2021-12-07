@@ -2,18 +2,23 @@ load("@rules_jvm_external//:defs.bzl", "java_export")
 
 java_library(
     name = "wpilib",
-    srcs = glob(["src/**/*.java"]), # Having shims in the srcs will take priority over the duplicate copies in deps when using this target within bazel.
+    srcs = glob(["src/**/*.java"]),  # Having shims in the srcs will take priority over the duplicate copies in deps when using this target within bazel.
+    visibility = ["//visibility:public"],
+    exports = ["//third_party/wpilib:wpilibj"],
     deps = [
-        "//third_party/allwpilib/wpilibj",
-        "//junction/core"
+        "//junction/core",
+        "//third_party/wpilib:wpilibj",
     ],
 )
+
 java_export(
     name = "wpilib-export",
+    deploy_env = ["//junction/core"],  # Don't include //junction/core classes in the output jar
     maven_coordinates = "org.littletonrobotics.akit.junction:wpilib-shim:0.0.1",
-    deploy_env = ["//junction/core"],
-
-    runtime_deps = ["//third_party/allwpilib/wpilibj", ":wpilib"], # This needs to explicitly depend on wpilibj before our shim target because of how java_export handles duplicate class files when building.
+    runtime_deps = [
+        ":wpilib",
+        "//third_party/wpilib:wpilibj",
+    ],  # This needs to explicitly depend on wpilibj before our shim target because of how java_export handles duplicate class files when building.
 )
 
 java_test(

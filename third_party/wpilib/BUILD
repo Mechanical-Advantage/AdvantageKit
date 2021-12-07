@@ -86,6 +86,17 @@ cc_library(
     }),
 )
 
+# Special binary target which links in the hal binaries.
+# WPILibJ tries to load a specific library with this name, so we need to
+# match it instead of using Bazel's built in JNI loading system.
+# This target can be used by java targets to bu
+cc_binary(
+    name = "wpiHaljni",
+    deps = [":hal"],
+    linkshared = True,
+    visibility = ["//visibility:public"],
+)
+
 cc_library(
     name = "wpiutil-athena",
     deprecation = "Use //third_party/wpilib:wpiutil instead (platform is auto detected).",
