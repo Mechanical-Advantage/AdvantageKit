@@ -19,9 +19,9 @@ bazel_skylib_workspace()
 # This code loads the "rules_jvm_external" repository into our Bazel workspace.  This is copied in from
 # https://github.com/bazelbuild/rules_jvm_external/releases/tag/4.1
 
-RULES_JVM_EXTERNAL_TAG = "4.0"
+RULES_JVM_EXTERNAL_TAG = "4.2"
 
-RULES_JVM_EXTERNAL_SHA = "31701ad93dbfe544d597dbe62c9a1fdd76d81d8a9150c2bf1ecf928ecdf97169"
+RULES_JVM_EXTERNAL_SHA = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca"
 
 http_archive(
     name = "rules_jvm_external",
@@ -327,7 +327,7 @@ wpilib_nativezip(
             libs = ["libwpiutil.dylib"],
             platform = "macos_x64",
             sha256 = WPILIB_WPIUTIL_MACOS_x64_SHA,
-        )
+        ),
     ],
     headers_sha256 = WPILIB_WPIUTIL_HEADERS_SHA,
     package = "wpiutil",
