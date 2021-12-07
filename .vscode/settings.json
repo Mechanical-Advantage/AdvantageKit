@@ -11,10 +11,10 @@
     "java.project.referencedLibraries": [
         "bazel-bin/external/maven/**/*.jar",
         "bazel-bin/external/frcmaven/**/*.jar",
-        "bazel-bin/third_party/wpilib/downloaded/wpilibj.jar",
     ],
     "java.project.sourcePaths": [
         "third_party/flatbuffers/java",
+        "third_party/allwpilib/wpilibj/src/main/java",
         "junction/shims/wpilib/src",
         "junction/core/src",
         "example_java_project/test",
@@ -23,6 +23,8 @@
         "build_tools/jpatch/sigcheck",
         "bazel-bin/conduit"
     ],
+    "java.import.gradle.enabled": false,
+    "java.import.maven.enabled": false,
     "bsv.cc.compdb.targets": [
         "//conduit/wpilibio"
     ],
