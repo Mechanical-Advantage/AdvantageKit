@@ -62,6 +62,26 @@ cc_library(
 )
 
 cc_library(
+    name = "ntcore",
+    visibility = ["//visibility:public"],
+    deps = select({
+        "//build_tools/platforms:is_linux": ["@wpilib_ntcore_linux_x64_files//:binaries"],
+        "//build_tools/platforms:is_windows": ["@wpilib_ntcore_windows_x64_files//:binaries"],
+        "//build_tools/platforms:is_macos": ["@wpilib_ntcore_macos_x64_files//:binaries"],
+    }),
+)
+
+cc_library(
+    name = "wpimath",
+    visibility = ["//visibility:public"],
+    deps = select({
+        "//build_tools/platforms:is_linux": ["@wpilib_wpimath_linux_x64_files//:binaries"],
+        "//build_tools/platforms:is_windows": ["@wpilib_wpimath_windows_x64_files//:binaries"],
+        "//build_tools/platforms:is_macos": ["@wpilib_wpimath_macos_x64_files//:binaries"],
+    }),
+)
+
+cc_library(
     name = "hal",
     visibility = ["//visibility:public"],
     deps = [
@@ -92,9 +112,25 @@ cc_library(
 # This target can be used by java targets to bu
 cc_binary(
     name = "wpiHaljni",
-    deps = [":hal"],
     linkshared = True,
     visibility = ["//visibility:public"],
+    deps = [":hal"],
+)
+
+cc_binary(
+    name = "halsim_gui",
+    linkshared = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpimath",
+        ":ntcore",
+        ":wpiutil",
+        ":hal",
+    ] + select({
+        "//build_tools/platforms:is_linux": ["@wpilib_halsim_gui_linux_x64_files//:binaries"],
+        "//build_tools/platforms:is_windows": ["@wpilib_halsim_gui_windows_x64_files//:binaries"],
+        "//build_tools/platforms:is_macos": ["@wpilib_halsim_gui_macos_x64_files//:binaries"],
+    }),
 )
 
 cc_library(

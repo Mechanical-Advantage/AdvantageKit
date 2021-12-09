@@ -60,7 +60,7 @@ cc_library(
 cc_import_template = """
 cc_import(
     name = "{0}",
-    shared_library = "{1}/{2}/shared/{0}"
+    {3}_library = "{1}/{2}/{3}/{0}"
 )
 """
 
@@ -73,10 +73,10 @@ cc_library(
 """
 
 # base_url + package + "/%s/%s/%s-%s-headers.zip" % (name, version, name, version)
-url_template = "https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/{0}/{1}/{2}/{1}-{2}-{3}.zip"
+url_template = "https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/{0}/{1}/{2}/{1}-{2}-{3}{4}.zip"
 
-def wpilib_binary_config(platform, libs, sha256):
-    return (platform, libs, sha256)
+def wpilib_binary_config(platform, libs, sha256, is_static = False):
+    return (platform, libs, sha256, is_static)
 
 def wpilib_nativezip(name, remote_name, package, version, visibility, headers_sha256 = None, binary_configs = None):
     # Create the http_archive for the headers
@@ -86,7 +86,7 @@ def wpilib_nativezip(name, remote_name, package, version, visibility, headers_sh
             name = name + "_headers_files",
             build_file_content = header_build_template.format("//visibility:public"),
             sha256 = headers_sha256,
-            urls = [url_template.format(package, remote_name, version, "headers")],
+            urls = [url_template.format(package, remote_name, version, "headers", "")],
         )
 
     if binary_configs != None:
@@ -94,13 +94,14 @@ def wpilib_nativezip(name, remote_name, package, version, visibility, headers_sh
             # Get the WPILib os and arch names from our platform name
             platform_os = platform_mappings[config[0]][0]
             platform_arch = platform_mappings[config[0]][1]
+            is_static = config[3]
 
             # Generate the build file contents
             build_content = ""
             binary_targets = ""
             for lib in config[1]:
                 # Generate the cc_import rule for each library file
-                build_content += cc_import_template.format(lib, platform_os, platform_arch)
+                build_content += cc_import_template.format(lib, platform_os, platform_arch, "static" if is_static else "shared")
 
                 # Add the cc_import target to the string
                 binary_targets += "\":%s\"," % lib
@@ -113,5 +114,5 @@ def wpilib_nativezip(name, remote_name, package, version, visibility, headers_sh
                 name = name + "_%s_files" % config[0],
                 build_file_content = build_content,
                 sha256 = config[2],
-                urls = [url_template.format(package, remote_name, version, platform_os + platform_arch)],
+                urls = [url_template.format(package, remote_name, version, platform_os + platform_arch, "static" if is_static else "")],
             )
