@@ -1,4 +1,4 @@
-load("@rules_jvm_external//:defs.bzl", "java_export")
+load("//build_tools/repo:java_export.bzl", "java_export")
 
 java_library(
     name = "core",
@@ -20,7 +20,7 @@ java_library(
 java_export(
     name = "core-export",
     deploy_env = ["//third_party/wpilib:wpilibj"],
-    maven_coordinates = "org.littletonrobotics.akit.junction:junction-core:0.0.2",
+    maven_coordinates = "org.littletonrobotics.akit.junction:junction-core:{publishing_version}",
     visibility = ["//visibility:public"],
     runtime_deps = [":core"],
 )

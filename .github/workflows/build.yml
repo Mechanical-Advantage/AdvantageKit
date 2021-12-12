@@ -1,6 +1,9 @@
 name: Build
 
-on: [push]
+on:
+  push:
+  release:
+    types: [released]
 
 jobs:
   athena:
@@ -17,12 +20,19 @@ jobs:
         run: bazel build //junction/core
       - name: Build "junction/shims/wpilib"
         run: bazel build //junction/shims/wpilib
+      - name: Get version number
+        id: get_version
+        if: github.event_name == "release"
+        run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3)
       - name: Upload "conduit/api"
-        run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" //conduit/api:api-export.publish
+        if: github.event_name == "release"
+        run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/api:api-export.publish
       - name: Upload "junction/core"
-        run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" //junction/core:core-export.publish
+        if: github.event_name == "release"
+        run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //junction/core:core-export.publish
       - name: Upload "junction/shims/wpilib"
-        run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" //junction/shims/wpilib:wpilib-export.publish
+        if: github.event_name == "release"
+        run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //junction/shims/wpilib:wpilib-export.publish
      
   desktop:
     strategy:
@@ -46,3 +56,7 @@ jobs:
       run: bazel build //junction/core
     - name: Build "junction/shims/wpilib"
       run: bazel build //junction/shims/wpilib
+    - name: Get version number
+      id: get_version
+      if: github.event_name == "release"
+      run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3)
