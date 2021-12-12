@@ -6,23 +6,21 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//conduit/api:api-export",
-        "//third_party/wpilib:wpilibj-compileonly",
+        "//third_party/wpilib:wpilibj",
     ],
 )
+
 java_library(
     name = "core-compile",
-    exports = [":core"],
     neverlink = True,
     visibility = ["//visibility:public"],
+    exports = [":core"],
 )
 
 java_export(
     name = "core-export",
-    srcs = glob(["src/**/*.java"]),
+    deploy_env = ["//third_party/wpilib:wpilibj"],
     maven_coordinates = "org.littletonrobotics.akit.junction:junction-core:0.0.1",
-    deps = [
-        "//conduit/api",
-        "//third_party/wpilib:wpilibj-compileonly",
-    ],
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
+    runtime_deps = [":core"],
 )
