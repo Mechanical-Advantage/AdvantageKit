@@ -10,9 +10,9 @@ java_library(
 
 java_export(
     name = "api-export",
-    maven_coordinates = "org.littletonrobotics.akit.conduit:conduit-api:0.0.1",
+    maven_coordinates = "org.littletonrobotics.akit.conduit:conduit-api:0.0.2",
     visibility = ["//visibility:public"],
-    runtime_deps = [":api"]
+    runtime_deps = [":api"],
 )
 
 jni_header_library(
