@@ -6,7 +6,7 @@ java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//conduit/api:api-export",
-        "//third_party/wpilib:wpilibj",
+        "//third_party/wpilib:wpilibj-compileonly",
     ],
 )
 
