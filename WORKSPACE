@@ -338,6 +338,7 @@ wpilib_nativezip(
         ),
         wpilib_binary_config(
             libs = ["wpiutil.dll"],
+            windows_libs = {"wpiutil.dll": "wpiutil.lib"},
             platform = "windows_x64",
             sha256 = WPILIB_WPIUTIL_WINDOWS_X64_SHA,
         ),
@@ -364,6 +365,7 @@ wpilib_nativezip(
         ),
         wpilib_binary_config(
             libs = ["wpimath.dll"],
+            windows_libs = {"wpimath.dll": "wpimath.lib"},
             platform = "windows_x64",
             sha256 = WPILIB_WPIMATH_WINDOWS_X64_SHA,
         ),
@@ -395,6 +397,7 @@ wpilib_nativezip(
                 "ntcore.dll",
                 "ntcorejni.dll",
             ],
+            windows_libs = {"ntcore.dll": "ntcore.lib", "ntcorejni.dll": "ntcorejni.lib"},
             platform = "windows_x64",
             sha256 = WPILIB_NTCORE_WINDOWS_X64_SHA,
         ),
@@ -437,6 +440,8 @@ wpilib_nativezip(
                 "wpiHal.dll",
                 "wpiHaljni.dll",
             ],
+            windows_libs = {"wpiHal.dll": "wpiHal.lib", "wpiHaljni.dll": "wpiHaljni.lib"},
+            #renames = {"wpiHaljni.dll": "wpiHaljniCOPY.dll"},
             platform = "windows_x64",
             sha256 = WPILIB_HAL_WINDOWS_X64_SHA,
         ),
@@ -466,6 +471,7 @@ wpilib_nativezip(
         ),
         wpilib_binary_config(
             libs = ["halsim_gui.dll"],
+            windows_libs = {"halsim_gui.dll": "halsim_gui.lib"},
             platform = "windows_x64",
             sha256 = WPILIB_HALSIM_WINDOWS_X64_SHA,
         ),

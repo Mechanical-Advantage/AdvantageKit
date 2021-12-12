@@ -31,6 +31,10 @@ platform_mappings = {
 # which isn't erased unless a clean is run, and allows a rule which invokes the copy rules without building any
 # (potentially failing) source files to be created.
 # TODO When we find better tooling for Bazel C/C++ targets in VSCode, we can remove this.
+initial_build_template = """
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+"""
+
 header_build_template = """
 load("@//build_tools/repo:copy_filegroup.bzl", "copy_filegroup")
 
@@ -57,10 +61,19 @@ cc_library(
 )
 """
 
+rename_template = """
+copy_file(
+    name = "{0}-copy",
+    src = "{1}/{2}/{3}/{0}",
+    out = "{1}/{2}/{3}/{4}",
+)
+"""
+
 cc_import_template = """
 cc_import(
     name = "{0}",
-    {3}_library = "{1}/{2}/{3}/{0}"
+    {3}_library = "{1}/{2}/{3}/{0}",
+    {4}
 )
 """
 
@@ -69,14 +82,15 @@ cc_library(
     name = "binaries",
     visibility = ["{0}"],
     deps = [{1}],
+    alwayslink = True,
 )
 """
 
 # base_url + package + "/%s/%s/%s-%s-headers.zip" % (name, version, name, version)
 url_template = "https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/{0}/{1}/{2}/{1}-{2}-{3}{4}.zip"
 
-def wpilib_binary_config(platform, libs, sha256, is_static = False):
-    return (platform, libs, sha256, is_static)
+def wpilib_binary_config(platform, libs, sha256, is_static = False, windows_libs = {}, renames = {}):
+    return (platform, libs, sha256, is_static, windows_libs, renames)
 
 def wpilib_nativezip(name, remote_name, package, version, visibility, headers_sha256 = None, binary_configs = None):
     # Create the http_archive for the headers
@@ -95,16 +109,35 @@ def wpilib_nativezip(name, remote_name, package, version, visibility, headers_sh
             platform_os = platform_mappings[config[0]][0]
             platform_arch = platform_mappings[config[0]][1]
             is_static = config[3]
+            windows_libs = config[4]
+            renames = config[5]
 
             # Generate the build file contents
-            build_content = ""
+            build_content = initial_build_template
             binary_targets = ""
             for lib in config[1]:
+                if lib in renames:
+                    lib_maybe_renamed = renames[lib]
+                    build_content += rename_template.format(lib, platform_os, platform_arch, "static" if is_static else "shared", lib_maybe_renamed)
+                else:
+                    lib_maybe_renamed = lib
+                
                 # Generate the cc_import rule for each library file
-                build_content += cc_import_template.format(lib, platform_os, platform_arch, "static" if is_static else "shared")
+                if lib in windows_libs:
+                    if windows_libs[lib] in renames:
+                        windows_lib_maybe_renamed = renames[windows_libs[lib]]
+                        build_content += rename_template.format(windows_libs[lib], platform_os, platform_arch, "shared", windows_lib_maybe_renamed)
+                    else:
+                        windows_lib_maybe_renamed = windows_libs[lib]
+
+                    interface_lib = "interface_library = \"{1}/{2}/shared/{0}\"".format(windows_lib_maybe_renamed, platform_os, platform_arch)
+                else:
+                    interface_lib = ""
+
+                build_content += cc_import_template.format(lib_maybe_renamed, platform_os, platform_arch, "static" if is_static else "shared", interface_lib)
 
                 # Add the cc_import target to the string
-                binary_targets += "\":%s\"," % lib
+                binary_targets += "\":%s\"," % lib_maybe_renamed
 
             # Generate the final cc_library target
             build_content += binary_library_template.format(visibility, binary_targets)
