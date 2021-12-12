@@ -43,6 +43,12 @@ config_setting(
 )
 
 config_setting(
+    name = "is_linux_any",
+    constraint_values = ["@platforms//os:linux"],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
     name = "is_windows",
     constraint_values = ["@platforms//os:windows"],
     visibility = ["//visibility:public"],
