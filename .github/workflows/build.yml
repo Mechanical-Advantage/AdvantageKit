@@ -1,0 +1,46 @@
+name: Build
+
+on: [push]
+
+jobs:
+  athena:
+    name: Build for Athena
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Build "conduit/wpilibio"
+        run: bazel build --config=athena //conduit/wpilibio:wpilibio-shared
+      - name: Build "conduit/api"
+        run: bazel build //conduit/api
+      - name: Build "junction/core"
+        run: bazel build //junction/core
+      - name: Build "junction/shims/wpilib"
+        run: bazel build //junction/shims/wpilib
+     
+  desktop:
+    strategy:
+      matrix:
+        host:
+          - {os: macos-latest, displayName: "macOS"}
+          - {os: ubuntu-latest, displayName: "Linux"}
+          - {os: windows-latest, displayName: "Windows"}
+
+    name: Build for ${{ matrix.host.displayName }}
+    runs-on: ${{ matrix.host.os }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Build "conduit/wpilibio" (macOS/Linux)
+      if: matrix.host.os != 'windows-latest'
+      run: bazel build //conduit/wpilibio:wpilibio-shared
+    - name: Build "conduit/wpilibio" (Windows)
+      if: matrix.host.os == 'windows-latest'
+      run: bazel build --config=for-windows //conduit/wpilibio:wpilibio-shared
+    - name: Build "conduit/api"
+      run: bazel build //conduit/api
+    - name: Build "junction/core"
+      run: bazel build //junction/core
+    - name: Build "junction/shims/wpilib"
+      run: bazel build //junction/shims/wpilib
