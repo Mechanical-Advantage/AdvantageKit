@@ -32,12 +32,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-    - name: Build "conduit/wpilibio" (macOS/Linux)
-      if: matrix.host.os != 'windows-latest'
+    - name: Build "conduit/wpilibio"
       run: bazel build //conduit/wpilibio:wpilibio-shared
-    - name: Build "conduit/wpilibio" (Windows)
-      if: matrix.host.os == 'windows-latest'
-      run: bazel build --config=for-windows //conduit/wpilibio:wpilibio-shared
     - name: Build "conduit/api"
       run: bazel build //conduit/api
     - name: Build "junction/core"
