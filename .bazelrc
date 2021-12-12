@@ -5,9 +5,9 @@ build --enable_runfiles
 build --java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 # This makes sure Java 11 features are enabled ("var", etc.)
 build --spawn_strategy=local # This disables sandboxing, which is a stopgap instead of using SandboxFS (we'd like to do this eventually, WPILib toolchain doesn't like the symlink tree)
 build --incompatible_enable_cc_toolchain_resolution # Enables the new toolchain identification feature which uses platforms to find the right cc toolchain
-build --force_pic
 
 build:athena --platforms=//build_tools/platforms:athena # Creates a "--config athena" CLI shortcut instead of having to type the whole platform string
+build:athena --force_pic
 build:athena --cxxopt='-std=c++17'
 build:linux --cxxopt='-std=c++17'
 build:macos --cxxopt='-std=c++17'
