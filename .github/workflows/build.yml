@@ -23,7 +23,7 @@ jobs:
       - name: Get version number
         id: get_version
         if: github.event_name == 'release'
-        run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3)
+        run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3 | cut -c 2-)
       - name: Upload "conduit/api"
         if: github.event_name == 'release'
         run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/api:api-export.publish
@@ -59,4 +59,4 @@ jobs:
     - name: Get version number
       id: get_version
       if: github.event_name == 'release'
-      run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3)
+      run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3 | cut -c 2-)
