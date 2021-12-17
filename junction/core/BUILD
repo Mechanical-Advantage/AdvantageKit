@@ -20,7 +20,7 @@ java_library(
 java_export(
     name = "core-export",
     deploy_env = ["//third_party/wpilib:wpilibj"],
-    maven_coordinates = "org.littletonrobotics.akit.junction:junction-core:dev",
+    maven_coordinates = "org.littletonrobotics.akit.junction:junction-core:{publishing_version}",
     visibility = ["//visibility:public"],
     runtime_deps = [":core"],
 )
