@@ -573,14 +573,14 @@ public class DriverStation {
   public MatchType getMatchType() {
     int matchType = logDS.getDSData().matchType;
     switch (matchType) {
-    case 1:
-      return MatchType.Practice;
-    case 2:
-      return MatchType.Qualification;
-    case 3:
-      return MatchType.Elimination;
-    default:
-      return MatchType.None;
+      case 1:
+        return MatchType.Practice;
+      case 2:
+        return MatchType.Qualification;
+      case 3:
+        return MatchType.Elimination;
+      default:
+        return MatchType.None;
     }
   }
 
@@ -609,18 +609,18 @@ public class DriverStation {
    */
   public Alliance getAlliance() {
     switch (logDS.getDSData().allianceStation) {
-    case 0:
-    case 1:
-    case 2:
-      return Alliance.Red;
+      case 0:
+      case 1:
+      case 2:
+        return Alliance.Red;
 
-    case 3:
-    case 4:
-    case 5:
-      return Alliance.Blue;
+      case 3:
+      case 4:
+      case 5:
+        return Alliance.Blue;
 
-    default:
-      return Alliance.Invalid;
+      default:
+        return Alliance.Invalid;
     }
   }
 
@@ -631,20 +631,20 @@ public class DriverStation {
    */
   public int getLocation() {
     switch (logDS.getDSData().allianceStation) {
-    case 0:
-    case 3:
-      return 1;
+      case 0:
+      case 3:
+        return 1;
 
-    case 1:
-    case 4:
-      return 2;
+      case 1:
+      case 4:
+        return 2;
 
-    case 2:
-    case 5:
-      return 3;
+      case 2:
+      case 5:
+        return 3;
 
-    default:
-      return 0;
+      default:
+        return 0;
     }
   }
 

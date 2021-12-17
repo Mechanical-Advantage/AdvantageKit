@@ -206,7 +206,7 @@ public class Logger {
             .toString((double) Math.round((networkTablesStart - systemStatsStart) * 100000) / 100);
         String networkTablesLength = Double
             .toString((double) Math.round((periodicEnd - networkTablesStart) * 100000) / 100);
-        System.out.println("U=" + updateLength + ", DS=" + driverStationLength + ",SS=" + systemStatsLength + ", NT="
+        System.out.println("U=" + updateLength + ", DS=" + driverStationLength + ", SS=" + systemStatsLength + ", NT="
             + networkTablesLength);
       }
     } else {
@@ -220,7 +220,11 @@ public class Logger {
    * entry.
    */
   public double getTimestamp() {
-    return entry.getTimestamp();
+    if (entry == null) {
+      return 0.0;
+    } else {
+      return entry.getTimestamp();
+    }
   }
 
   /**
