@@ -43,6 +43,20 @@ rules_jvm_external_setup()
 # this rule below to tell Bazel what Maven artifacts we want to install.
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
+# rules_pkg, used to create zip files for our nativezip deployment
+http_archive(
+    name = "rules_pkg",
+    sha256 = "a89e203d3cf264e564fcb96b6e06dd70bc0557356eb48400ce4b5d97c2c3720d",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
+    ],
+)
+
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+
+rules_pkg_dependencies()
+
 # All Maven artifacts that we use go here.  The philosophy is that we only ever have one version of any external
 # maven library in use across the entire codebase at any time.  If we update it, we make the changes everywhere
 # to keep things working.  This eliminates the problem of version conflicts between libraries.
@@ -338,9 +352,9 @@ wpilib_nativezip(
         ),
         wpilib_binary_config(
             libs = ["wpiutil.dll"],
-            windows_libs = {"wpiutil.dll": "wpiutil.lib"},
             platform = "windows_x64",
             sha256 = WPILIB_WPIUTIL_WINDOWS_X64_SHA,
+            windows_libs = {"wpiutil.dll": "wpiutil.lib"},
         ),
         wpilib_binary_config(
             libs = ["libwpiutil.dylib"],
@@ -365,9 +379,9 @@ wpilib_nativezip(
         ),
         wpilib_binary_config(
             libs = ["wpimath.dll"],
-            windows_libs = {"wpimath.dll": "wpimath.lib"},
             platform = "windows_x64",
             sha256 = WPILIB_WPIMATH_WINDOWS_X64_SHA,
+            windows_libs = {"wpimath.dll": "wpimath.lib"},
         ),
         wpilib_binary_config(
             libs = ["libwpimath.dylib"],
@@ -397,9 +411,12 @@ wpilib_nativezip(
                 "ntcore.dll",
                 "ntcorejni.dll",
             ],
-            windows_libs = {"ntcore.dll": "ntcore.lib", "ntcorejni.dll": "ntcorejni.lib"},
             platform = "windows_x64",
             sha256 = WPILIB_NTCORE_WINDOWS_X64_SHA,
+            windows_libs = {
+                "ntcore.dll": "ntcore.lib",
+                "ntcorejni.dll": "ntcorejni.lib",
+            },
         ),
         wpilib_binary_config(
             libs = [
@@ -440,10 +457,13 @@ wpilib_nativezip(
                 "wpiHal.dll",
                 "wpiHaljni.dll",
             ],
-            windows_libs = {"wpiHal.dll": "wpiHal.lib", "wpiHaljni.dll": "wpiHaljni.lib"},
             #renames = {"wpiHaljni.dll": "wpiHaljniCOPY.dll"},
             platform = "windows_x64",
             sha256 = WPILIB_HAL_WINDOWS_X64_SHA,
+            windows_libs = {
+                "wpiHal.dll": "wpiHal.lib",
+                "wpiHaljni.dll": "wpiHaljni.lib",
+            },
         ),
         wpilib_binary_config(
             libs = [
@@ -471,9 +491,9 @@ wpilib_nativezip(
         ),
         wpilib_binary_config(
             libs = ["halsim_gui.dll"],
-            windows_libs = {"halsim_gui.dll": "halsim_gui.lib"},
             platform = "windows_x64",
             sha256 = WPILIB_HALSIM_WINDOWS_X64_SHA,
+            windows_libs = {"halsim_gui.dll": "halsim_gui.lib"},
         ),
         wpilib_binary_config(
             libs = ["libhalsim_gui.dylib"],

@@ -132,11 +132,12 @@ public class ByteEncoder {
 
   private static ByteBuffer encodeKey(short keyID, String key) {
     try {
-      ByteBuffer buffer = ByteBuffer.allocate(1 + Short.BYTES + Short.BYTES + key.length());
+      byte[] keyBytes = key.getBytes("UTF-8");
+      ByteBuffer buffer = ByteBuffer.allocate(1 + Short.BYTES + Short.BYTES + keyBytes.length);
       buffer.put((byte) 1);
       buffer.putShort(keyID);
-      buffer.putShort((short) key.length());
-      buffer.put(key.getBytes("UTF-8"));
+      buffer.putShort((short) keyBytes.length);
+      buffer.put(keyBytes);
       return buffer;
     } catch (UnsupportedEncodingException e) {
       return ByteBuffer.allocate(0);
@@ -175,9 +176,10 @@ public class ByteEncoder {
             break;
           case String:
             String stringValue = value.getString();
-            valueBuffer = ByteBuffer.allocate(Short.BYTES + stringValue.length());
-            valueBuffer.putShort((short) stringValue.length());
-            valueBuffer.put(stringValue.getBytes("UTF-8"));
+            byte[] stringBytes = stringValue.getBytes("UTF-8");
+            valueBuffer = ByteBuffer.allocate(Short.BYTES + stringBytes.length);
+            valueBuffer.putShort((short) stringBytes.length);
+            valueBuffer.put(stringBytes);
             break;
           case BooleanArray:
             boolean[] booleanArray = value.getBooleanArray();
@@ -213,13 +215,14 @@ public class ByteEncoder {
             String[] stringArray = value.getStringArray();
             int capacity = Short.BYTES;
             for (String i : stringArray) {
-              capacity += Short.BYTES + i.length();
+              capacity += Short.BYTES + i.getBytes("UTF-8").length;
             }
             valueBuffer = ByteBuffer.allocate(capacity);
             valueBuffer.putShort((short) stringArray.length);
             for (String i : stringArray) {
-              valueBuffer.putShort((short) i.length());
-              valueBuffer.put(i.getBytes("UTF-8"));
+              byte[] bytes = i.getBytes("UTF-8");
+              valueBuffer.putShort((short) bytes.length);
+              valueBuffer.put(bytes);
             }
             break;
           default:

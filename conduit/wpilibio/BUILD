@@ -1,4 +1,5 @@
 load("//build_tools/cc:platform_dynamic_library.bzl", "cc_platform_dynamic_library")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 cc_library(
     name = "wpilibio-lib",
@@ -19,4 +20,22 @@ cc_platform_dynamic_library(
     libname = "wpilibio",
     visibility = ["//visibility:public"],
     deps = [":wpilibio-lib"],
+)
+
+pkg_zip(
+    name = "wpilibio-nativezip",
+    srcs = [":wpilibio-shared"],
+    package_dir = select({
+        "//build_tools/platforms:is_athena": "/linux/athena/shared",
+        "//build_tools/platforms:is_linux": "/linux/x86-64/shared",
+        "//build_tools/platforms:is_windows": "/windows/x86-64/shared",
+        "//build_tools/platforms:is_macos": "/osx/x86-64/shared",
+    }),
+    package_file_name = select({
+        "//build_tools/platforms:is_athena": "wpilibio-{publishing_version}-athena.zip",
+        "//build_tools/platforms:is_linux": "wpilibio-{publishing_version}-linuxx86-64.zip",
+        "//build_tools/platforms:is_windows": "wpilibio-{publishing_version}-windowsx86-64.zip",
+        "//build_tools/platforms:is_macos": "wpilibio-{publishing_version}-osxx86-64.zip",
+    }),
+    package_variables = "//build_tools/zip:version",
 )

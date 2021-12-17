@@ -1,5 +1,5 @@
 load("//third_party/jni:java_native_headers.bzl", "jni_header_library")
-load("@rules_jvm_external//:defs.bzl", "java_export")
+load("//build_tools/repo:java_export.bzl", "java_export")
 
 java_library(
     name = "api",
@@ -10,9 +10,9 @@ java_library(
 
 java_export(
     name = "api-export",
-    maven_coordinates = "org.littletonrobotics.akit.conduit:conduit-api:0.0.1",
+    maven_coordinates = "org.littletonrobotics.akit.conduit:conduit-api:{publishing_version}",
     visibility = ["//visibility:public"],
-    runtime_deps = [":api"]
+    runtime_deps = [":api"],
 )
 
 jni_header_library(

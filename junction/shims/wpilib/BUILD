@@ -1,4 +1,4 @@
-load("@rules_jvm_external//:defs.bzl", "java_export")
+load("//build_tools/repo:java_export.bzl", "java_export")
 
 java_library(
     name = "wpilib",
@@ -14,7 +14,7 @@ java_library(
 java_export(
     name = "wpilib-export",
     deploy_env = ["//junction/core"],  # Don't include //junction/core classes in the output jar
-    maven_coordinates = "org.littletonrobotics.akit.junction:wpilib-shim:0.0.1",
+    maven_coordinates = "org.littletonrobotics.akit.junction:wpilib-shim:{publishing_version}",
     # Prevent the formatter from re-ordering the runtime_deps list, as this would break the shim output
     # buildifier: leave-alone
     runtime_deps = [
