@@ -1,6 +1,6 @@
 # `junction/shims`
 
-> Replaces components of other libraries (WPILib) to interact directly with junction.
+> Replaces components of other libraries (WPILib) to interact directly with `junction`.
 
 Currently, only shim classes for WPILib are included. See [shims/wpilib](/junction/shims/wpilib).
 
