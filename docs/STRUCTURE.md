@@ -6,11 +6,11 @@ AdvantageKit contains a variety of projects and tools, listed below.
 
 * [junction](/junction) - Primary component of logging, manages the flow of data between user code, WPILib, log files, network clients, etc. *Written in Java.*
 
-  * [junction/core](/junctionc/core) - Central system for managing data, including reading and writing from log files and user code.
+  * [junction/core](/junction/core) - Central system for managing data, including reading and writing from log files and user code.
 
-  * [junction/shims](/junctionc/shims) - Replaces components of other libraries (WPILib) to interact directly with `junction`.
+  * [junction/shims](/junction/shims) - Replaces components of other libraries (WPILib) to interact directly with `junction`.
 
-    * [junction/shims/wpilib](/junctionc/shims/wpilib) - Replaces WPILib components to read data from `junction` instead of the HAL.
+    * [junction/shims/wpilib](/junction/shims/wpilib) - Replaces WPILib components to read data from `junction` instead of the HAL.
 
 * [conduit](/conduit) - Transfers data between junction and the WPILib HAL efficiently. *Written in C++ and Java.*
 

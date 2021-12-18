@@ -1,5 +1,7 @@
 # `third_party`
 
+> Tools for integrating third party libraries like WPILib.
+
 TODO.
 
 ## Components

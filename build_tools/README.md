@@ -1,5 +1,7 @@
 # `build_tools`
 
+> Utilities to assist with building in Bazel and interfacing with WPILib and the roboRIO.
+
 TODO.
 
 ## Components
