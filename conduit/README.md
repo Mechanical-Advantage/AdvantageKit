@@ -1,11 +1,11 @@
-# conduit
+# `conduit`
 
 TODO.
 
 ## Components
 
-* [api](/conduit/api)
-* [wpilibio](/conduit/wpilibio)
+* [`api`](/conduit/api)
+* [`wpilibio`](/conduit/wpilibio)
 
 ## Interface
 

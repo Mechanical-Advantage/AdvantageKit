@@ -1,4 +1,4 @@
-# example_logs
+# `example_logs`
 
 This folder contains various example RLOG log files for testing:
 
