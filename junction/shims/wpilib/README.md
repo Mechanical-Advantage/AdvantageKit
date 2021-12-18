@@ -10,8 +10,8 @@ The interfaces of each shim match the origin WPILib classes, replacing only the 
 
 * [`DriverStation.java`](src/edu/wpi/first/wpilibj/DriverStation.java) - Reads joystick data from [`junction/core`](/junction/core), all other functions are unmodified. This allows of synronization of data within each cycle and guarantees that data read on the robot and in the simulator are identical.
 * [`RobotController.java`](src/edu/wpi/first/wpilibj/RobotController.java) - Reads the FPGA timestamp from [`junction/core`](/junction/core), all other functions are unmodified. This means that the timestamp is constant within each cycle and can be replayed accurately even when running faster than real time.
-* [`Watchdog.java`](src/edu/wpi/first/wpilibj/Watchdog.java) - Reads the real FPGA from the HAL through [`junction/core`](/junction/core) instead of relying on the modified `RobotController` class. This class needs to read the true timestamp to correctly detect performance issues.
-* [`Tracer.java`](src/edu/wpi/first/wpilibj/Tracer.java) - Reads the real FPGA from the HAL through [`junction/core`](/junction/core) instead of relying on the modified `RobotController` class. This class needs to read the true timestamp to accurately record epoch times.
+* [`Watchdog.java`](src/edu/wpi/first/wpilibj/Watchdog.java) - Reads the real FPGA timestamp from the HAL through [`junction/core`](/junction/core) instead of relying on the modified `RobotController` class. This class needs to read the true timestamp to correctly detect performance issues.
+* [`Tracer.java`](src/edu/wpi/first/wpilibj/Tracer.java) - Reads the real FPGA timestamp from the HAL through [`junction/core`](/junction/core) instead of relying on the modified `RobotController` class. This class needs to read the true timestamp to accurately record epoch times.
 
 ## Building
 
