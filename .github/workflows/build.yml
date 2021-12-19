@@ -12,6 +12,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          server-id: remote-repository
+          server-username: 'Mechanical-Advantage'
+          server-password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build "conduit/wpilibio"
         run: bazel build --config=athena //conduit/wpilibio:wpilibio-shared
       - name: Build "conduit/api"
@@ -26,7 +34,7 @@ jobs:
         uses: battila7/get-version-action@v2
       - name: Upload "conduit/wpilibio"
         if: github.event_name == 'release'
-        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" --define "publishing_nativezip_generate_pom=true" //conduit/wpilibio:wpilibio-nativezip-publish
+        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" --define "publishing_nativezip_generate_pom=true" //conduit/wpilibio:wpilibio-nativezip-publish
       - name: Upload "conduit/api"
         if: github.event_name == 'release'
         run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/api:api-export.publish
@@ -51,6 +59,14 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+    - name: Setup Java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        server-id: remote-repository
+        server-username: 'Mechanical-Advantage'
+        server-password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build "conduit/wpilibio"
       run: bazel build //conduit/wpilibio:wpilibio-shared
     - name: Build "conduit/api"
@@ -65,4 +81,4 @@ jobs:
       uses: battila7/get-version-action@v2
     - name: Upload "conduit/wpilibio"
       if: github.event_name == 'release'
-      run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:wpilibio-nativezip-publish
+      run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:wpilibio-nativezip-publish

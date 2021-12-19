@@ -10,6 +10,7 @@ def _maven_publish_impl(ctx):
 
     coordinates_substituted = ctx.attr.coordinates.format(publishing_version = ctx.var["publishing_version"])
 
+    # Not currently used but may use in the future
     maven_repo = ctx.var.get("maven_repo", "''")
     user = ctx.var.get("maven_user", "''")
     password = ctx.var.get("maven_password", "''")
