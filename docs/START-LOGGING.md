@@ -22,14 +22,13 @@ You can download the latest version of Advantage Scope [here](https://github.com
 
 AdvantageKit is available through GitHub Packages. To make our Maven repository available through Gradle, add the following block to the `build.gradle` file:
 
-**(TODO: UPDATE USERNAME AND TOKEN)**
 ```groovy
 repositories {
     maven {
         url = uri("https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit")
         credentials {
-            username = "XXXXXXXXXX"
-            password = "XXXXXXXXXX"
+            username = "Mechanical-Advantage-Bot"
+            password = "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"
         }
     }
 }
