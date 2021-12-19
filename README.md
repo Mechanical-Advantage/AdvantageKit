@@ -5,4 +5,5 @@ AdvantageKit is a collection of frameworks, tools, and utilities by Team 6328 fo
 * [Repository Structure](/docs/STRUCTURE.md)
 * [Getting Started: Logging](/docs/START-LOGGING.md)
 * [Getting Started: Developing AdvantageKit](/docs/START-DEVELOPING.md)
+* [Conduit & WPILib Shims](/docs/CONDUIT-SHIMS.md)
 * [RLOG Specification](/docs/RLOG-SPEC.md)

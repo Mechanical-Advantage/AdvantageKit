@@ -2,7 +2,7 @@
 
 > Primary component of logging, manages the flow of data between user code, WPILib, log files, network clients, etc.
 
-Junction is the primary component of the logging framework. It's the piece that user code interacts with, and interfaces with a variety of other components to manage data. Most code written to utilize the logging framework will interact with [`junction/core`](/junction/core).
+`junction` is the primary component of the logging framework. It's the piece that user code interacts with, and interfaces with a variety of other components to manage data. Most code written to utilize the logging framework will interact with [`junction/core`](/junction/core).
 
 ## Components
 
@@ -12,4 +12,4 @@ Junction is the primary component of the logging framework. It's the piece that 
 
 ## Interface
 
-Junction interacts directly with user code. Classes in [`core`](/junction/core) are used explicitly to set up and use the logging framework. Classes in [`shims`](/junction/shims) replace existing classes in other frameworks and so are used indirectly by user code. See the descriptions of each component for more details.
+`junction` interacts directly with user code. Classes in [`core`](/junction/core) are used explicitly to set up and use the logging framework. Classes in [`shims`](/junction/shims) replace existing classes in other frameworks and so are used indirectly by user code. See the descriptions of each component for more details.

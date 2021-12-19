@@ -1,6 +1,6 @@
 # `conduit/api`
 
-TODO.
+> Java interface for `wpilibio`, transfers data from the shared memory buffer.
 
 ## Interface
 

@@ -1,6 +1,6 @@
 # `conduit/wpilibio`
 
-TODO.
+> Reads data from the HAL and manages the shared memory buffer.
 
 ## Interface
 

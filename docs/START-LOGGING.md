@@ -44,7 +44,7 @@ implementation "org.littletonrobotics.akit.conduit:conduit-api:X.X.X"
 nativeZip "org.littletonrobotics.akit.conduit:conduit-wpilibio:X.X.X"
 ```
 
-AdvantageKit modifies some components of `wpilibj`. See [here](/junction/shims/wpilib) for details on what is changed. Add the following block to `build.gradle` to replace the default implementation. **This is required for the framework to function**
+AdvantageKit modifies some components of `wpilibj` (see [our explanation](/junction/shims/wpilib) for the purpose of these shims or the [list of modified classes](junction/shims/wpilib#interface)). Add the following block to `build.gradle` to replace the default implementation. **This is required for the framework to function**
 
 ```groovy
 configurations.all {
@@ -52,7 +52,7 @@ configurations.all {
 }
 ```
 
-## Defining Data Flow
+## Robot Configuration
 
 TODO.
 
@@ -60,7 +60,7 @@ TODO.
 
 TODO.
 
-## Output Fields
+## Logging Outputs
 
 TODO.
 

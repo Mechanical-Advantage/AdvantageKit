@@ -12,7 +12,7 @@ AdvantageKit contains a variety of projects and tools, listed below.
 
     * [junction/shims/wpilib](/junction/shims/wpilib) - Replaces WPILib components to read data from `junction` instead of the HAL.
 
-* [conduit](/conduit) - Transfers data between junction and the WPILib HAL efficiently. *Written in C++ and Java.*
+* [conduit](/conduit) - Transfers data between `junction` and the WPILib HAL efficiently. *Written in C++ and Java.*
 
 * [example_logs](/example_logs) - Example RLOG files for testing.
 
