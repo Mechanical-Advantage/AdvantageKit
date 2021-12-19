@@ -11,7 +11,7 @@ def _maven_publish_impl(ctx):
     coordinates_substituted = ctx.attr.coordinates.format(publishing_version = ctx.var["publishing_version"])
 
     maven_repo = ctx.var.get("maven_repo", "''")
-    maven_repo_id = ctx.var.get("maven_repo_id", "'github'")
+    maven_repo_id = ctx.var.get("maven_repo_id", "github")
     generate_pom = ctx.var.get("publishing_nativezip_generate_pom", "false")
 
     coordinates_split = coordinates_substituted.split(":")
