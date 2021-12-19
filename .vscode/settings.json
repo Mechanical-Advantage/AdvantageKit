@@ -21,6 +21,7 @@
         "example_java_project/src",
         "conduit/api/src",
         "build_tools/jpatch/sigcheck",
+        "build_tools/repo",
         "bazel-bin/conduit"
     ],
     "java.import.gradle.enabled": false,

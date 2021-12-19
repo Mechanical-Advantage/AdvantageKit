@@ -24,15 +24,18 @@ jobs:
         id: get_version
         if: github.event_name == 'release'
         run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3 | cut -c 2-)
+      - name: Upload "conduit/wpilibio"
+        if: github.event_name == 'release'
+        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/wpilibio:wpilibio-nativezip-publish
       - name: Upload "conduit/api"
         if: github.event_name == 'release'
-        run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/api:api-export.publish
+        run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/api:api-export.publish
       - name: Upload "junction/core"
         if: github.event_name == 'release'
-        run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //junction/core:core-export.publish
+        run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //junction/core:core-export.publish
       - name: Upload "junction/shims/wpilib"
         if: github.event_name == 'release'
-        run: bazel run --define "maven_repo=https://maven.pkg.github.com/jonahb55/AdvantageKit" --define "maven_user=jonahb55" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //junction/shims/wpilib:wpilib-export.publish
+        run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //junction/shims/wpilib:wpilib-export.publish
      
   desktop:
     strategy:
@@ -60,3 +63,6 @@ jobs:
       id: get_version
       if: github.event_name == 'release'
       run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3 | cut -c 2-)
+    - name: Upload "conduit/wpilibio"
+      if: github.event_name == 'release'
+      run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/wpilibio:wpilibio-nativezip-publish

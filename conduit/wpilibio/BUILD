@@ -1,4 +1,5 @@
 load("//build_tools/cc:platform_dynamic_library.bzl", "cc_platform_dynamic_library")
+load("//build_tools/repo:maven_publish_zip.bzl", "maven_publish_zip")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 cc_library(
@@ -38,4 +39,16 @@ pkg_zip(
         "//build_tools/platforms:is_macos": "wpilibio-{publishing_version}-osxx86-64.zip",
     }),
     package_variables = "//build_tools/zip:version",
+)
+
+maven_publish_zip(
+    name = "wpilibio-nativezip-publish",
+    coordinates = "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
+    zip_file = ":wpilibio-nativezip",
+    classifier = select({
+        "//build_tools/platforms:is_athena": "athena",
+        "//build_tools/platforms:is_linux": "linuxx86-64",
+        "//build_tools/platforms:is_windows": "windowsx86-64",
+        "//build_tools/platforms:is_macos": "osxx86-64"
+    })
 )
