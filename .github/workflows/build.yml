@@ -32,6 +32,9 @@ jobs:
       - name: Upload "conduit/wpilibio"
         if: github.event_name == 'release'
         run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" --define "publishing_nativezip_generate_pom=true" //conduit/wpilibio:wpilibio-nativezip-publish
+        env:
+          GITHUB_ACTOR: Mechanical-Advantage
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload "conduit/api"
         if: github.event_name == 'release'
         run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/api:api-export.publish
@@ -76,3 +79,6 @@ jobs:
     - name: Upload "conduit/wpilibio"
       if: github.event_name == 'release'
       run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:wpilibio-nativezip-publish
+      env:
+        GITHUB_ACTOR: Mechanical-Advantage
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
