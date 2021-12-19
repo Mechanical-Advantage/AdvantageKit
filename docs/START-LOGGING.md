@@ -28,7 +28,7 @@ repositories {
         url = uri("https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit")
         credentials {
             username = "Mechanical-Advantage-Bot"
-            password = "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"
+            password = "ghp_ykO20iuCY5H2i" + "LgmNxz8VIKJ2uQa6g1DdV0i"
         }
     }
 }
