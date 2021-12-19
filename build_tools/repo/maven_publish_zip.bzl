@@ -1,5 +1,5 @@
 _TEMPLATE = """
-mvn deploy:deploy-file -DgroupId={group_id} -DartifactId={artifact_id} -Dversion={version} -Dpackaging=zip -Dfile={zip_file} -Durl={url} -Dclassifier={classifier} -DgeneratePom={generate_pom}
+mvn deploy:deploy-file -DgroupId={group_id} -DartifactId={artifact_id} -Dversion={version} -DrepositoryId={repo_id} -Dpackaging=zip -Dfile={zip_file} -Durl={url} -Dclassifier={classifier} -DgeneratePom={generate_pom}
 """
 
 def _maven_publish_impl(ctx):
@@ -10,10 +10,8 @@ def _maven_publish_impl(ctx):
 
     coordinates_substituted = ctx.attr.coordinates.format(publishing_version = ctx.var["publishing_version"])
 
-    # Not currently used but may use in the future
     maven_repo = ctx.var.get("maven_repo", "''")
-    user = ctx.var.get("maven_user", "''")
-    password = ctx.var.get("maven_password", "''")
+    maven_repo_id = ctx.var.get("maven_repo_id", "'github'")
     generate_pom = ctx.var.get("publishing_nativezip_generate_pom", "false")
 
     coordinates_split = coordinates_substituted.split(":")
@@ -31,7 +29,8 @@ def _maven_publish_impl(ctx):
             zip_file = ctx.file.zip_file.short_path,
             url = maven_repo,
             classifier = ctx.attr.classifier,
-            generate_pom = generate_pom
+            generate_pom = generate_pom,
+            repo_id = maven_repo_id
         ),
     )
 

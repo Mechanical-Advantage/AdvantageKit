@@ -17,9 +17,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-          server-id: remote-repository
-          server-username: 'Mechanical-Advantage'
-          server-password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build "conduit/wpilibio"
         run: bazel build --config=athena //conduit/wpilibio:wpilibio-shared
       - name: Build "conduit/api"
@@ -64,9 +61,6 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
-        server-id: remote-repository
-        server-username: 'Mechanical-Advantage'
-        server-password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build "conduit/wpilibio"
       run: bazel build //conduit/wpilibio:wpilibio-shared
     - name: Build "conduit/api"
