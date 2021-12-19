@@ -13,4 +13,4 @@ The format of the shared buffer is defined using [flatbuffers](https://google.gi
 
 ## Interface
 
-`junction` interacts with [`api`](/conduit/api) to read data from `conduit`. User code does not use c`onduit` directly.
+`junction` interacts with [`api`](/conduit/api) to read data from `conduit`. User code does not use `conduit` directly.
