@@ -4,6 +4,10 @@ import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTable;
+
 /**
  * Manages logging and replaying data from the driver station (robot state,
  * joysticks, etc.)
@@ -16,6 +20,7 @@ public class LoggedDriverStation {
   private final DriverStationInputs dsInputs = new DriverStationInputs();
   private final JoystickInputs[] joystickInputs = { new JoystickInputs(), new JoystickInputs(), new JoystickInputs(),
       new JoystickInputs(), new JoystickInputs(), new JoystickInputs() };
+  private final MatchDataSender matchDataSender = new MatchDataSender();
 
   private LoggedDriverStation() {
   }
@@ -177,6 +182,9 @@ public class LoggedDriverStation {
     for (int id = 0; id < joystickInputs.length; id++) {
       logger.processInputs("DriverStation/Joystick" + Integer.toString(id), joystickInputs[id]);
     }
+
+    // Update FMSInfo table
+    matchDataSender.sendMatchData(dsInputs);
   }
 
   /**
@@ -194,5 +202,129 @@ public class LoggedDriverStation {
    */
   public JoystickInputs getJoystickData(int id) {
     return joystickInputs[id];
+  }
+
+  /**
+   * Class for updating the "FMSInfo" table in NetworkTables, modified from the
+   * original DriverStation.
+   */
+  private static class MatchDataSender {
+    NetworkTable table;
+    NetworkTableEntry typeMetadata;
+    NetworkTableEntry gameSpecificMessage;
+    NetworkTableEntry eventName;
+    NetworkTableEntry matchNumber;
+    NetworkTableEntry replayNumber;
+    NetworkTableEntry matchType;
+    NetworkTableEntry alliance;
+    NetworkTableEntry station;
+    NetworkTableEntry controlWord;
+    boolean oldIsRedAlliance = true;
+    int oldStationNumber = 1;
+    String oldEventName = "";
+    String oldGameSpecificMessage = "";
+    int oldMatchNumber;
+    int oldReplayNumber;
+    int oldMatchType;
+    int oldControlWord;
+
+    MatchDataSender() {
+      table = NetworkTableInstance.getDefault().getTable("FMSInfo");
+      typeMetadata = table.getEntry(".type");
+      typeMetadata.forceSetString("FMSInfo");
+      gameSpecificMessage = table.getEntry("GameSpecificMessage");
+      gameSpecificMessage.forceSetString("");
+      eventName = table.getEntry("EventName");
+      eventName.forceSetString("");
+      matchNumber = table.getEntry("MatchNumber");
+      matchNumber.forceSetDouble(0);
+      replayNumber = table.getEntry("ReplayNumber");
+      replayNumber.forceSetDouble(0);
+      matchType = table.getEntry("MatchType");
+      matchType.forceSetDouble(0);
+      alliance = table.getEntry("IsRedAlliance");
+      alliance.forceSetBoolean(true);
+      station = table.getEntry("StationNumber");
+      station.forceSetDouble(1);
+      controlWord = table.getEntry("FMSControlData");
+      controlWord.forceSetDouble(0);
+    }
+
+    private void sendMatchData(DriverStationInputs dsInputs) {
+      boolean isRedAlliance = false;
+      int stationNumber = 1;
+      switch (dsInputs.allianceStation) {
+        case 0:
+          isRedAlliance = true;
+          stationNumber = 1;
+          break;
+        case 1:
+          isRedAlliance = true;
+          stationNumber = 2;
+          break;
+        case 2:
+          isRedAlliance = true;
+          stationNumber = 3;
+          break;
+        case 3:
+          isRedAlliance = false;
+          stationNumber = 1;
+          break;
+        case 4:
+          isRedAlliance = false;
+          stationNumber = 2;
+          break;
+        case 5:
+          isRedAlliance = false;
+          stationNumber = 3;
+          break;
+      }
+
+      String currentEventName = dsInputs.eventName;
+      String currentGameSpecificMessage = dsInputs.gameSpecificMessage;
+      int currentMatchNumber = dsInputs.matchNumber;
+      int currentReplayNumber = dsInputs.replayNumber;
+      int currentMatchType = dsInputs.matchType;
+      int currentControlWord = 0;
+      currentControlWord += dsInputs.enabled ? 1 : 0;
+      currentControlWord += dsInputs.autonomous ? 2 : 0;
+      currentControlWord += dsInputs.test ? 4 : 0;
+      currentControlWord += dsInputs.emergencyStop ? 8 : 0;
+      currentControlWord += dsInputs.fmsAttached ? 16 : 0;
+      currentControlWord += dsInputs.dsAttached ? 32 : 0;
+
+      if (oldIsRedAlliance != isRedAlliance) {
+        alliance.setBoolean(isRedAlliance);
+        oldIsRedAlliance = isRedAlliance;
+      }
+      if (oldStationNumber != stationNumber) {
+        station.setDouble(stationNumber);
+        oldStationNumber = stationNumber;
+      }
+      if (!oldEventName.equals(currentEventName)) {
+        eventName.setString(currentEventName);
+        oldEventName = currentEventName;
+      }
+      if (!oldGameSpecificMessage.equals(currentGameSpecificMessage)) {
+        gameSpecificMessage.setString(currentGameSpecificMessage);
+        oldGameSpecificMessage = currentGameSpecificMessage;
+      }
+      if (currentMatchNumber != oldMatchNumber) {
+        matchNumber.setDouble(currentMatchNumber);
+        oldMatchNumber = currentMatchNumber;
+      }
+      if (currentReplayNumber != oldReplayNumber) {
+        replayNumber.setDouble(currentReplayNumber);
+        oldReplayNumber = currentReplayNumber;
+      }
+      if (currentMatchType != oldMatchType) {
+        matchType.setDouble(currentMatchType);
+        oldMatchType = currentMatchType;
+      }
+      if (currentControlWord != oldControlWord) {
+        controlWord.setDouble(currentControlWord);
+        oldControlWord = currentControlWord;
+      }
+    }
   }
 }
