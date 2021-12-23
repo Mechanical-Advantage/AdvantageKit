@@ -1,8 +1,7 @@
 package org.littletonrobotics.junction.inputs;
 
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.SensorUtil;
 import org.littletonrobotics.junction.LogTable;
 
 /**
@@ -11,7 +10,7 @@ import org.littletonrobotics.junction.LogTable;
 public class LoggedSystemStats implements LoggableInputs {
 
   private static LoggedSystemStats instance;
-  private static final PowerDistributionPanel pdp = new PowerDistributionPanel();
+  private static final PowerDistribution pdp = new PowerDistribution();
 
   private LoggedSystemStats() {
   }
@@ -27,7 +26,7 @@ public class LoggedSystemStats implements LoggableInputs {
     table.put("BatteryVoltage", RobotController.getBatteryVoltage());
     table.put("BrownedOut", RobotController.isBrownedOut());
     table.put("CANBusUtilization", RobotController.getCANStatus().percentBusUtilization);
-    int channelCount = SensorUtil.kPDPChannels;
+    int channelCount = pdp.getNumChannels();
     double[] pdpCurrents = new double[channelCount];
     for (int channel = 0; channel < channelCount; channel++) {
       pdpCurrents[channel] = pdp.getCurrent(channel);

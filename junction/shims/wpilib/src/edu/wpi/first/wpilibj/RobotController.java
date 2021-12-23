@@ -233,7 +233,7 @@ public final class RobotController {
    */
   public static CANStatus getCANStatus() {
     CANStatus status = new CANStatus();
-    CANJNI.GetCANStatus(status);
+    CANJNI.getCANStatus(status);
     return status;
   }
 }

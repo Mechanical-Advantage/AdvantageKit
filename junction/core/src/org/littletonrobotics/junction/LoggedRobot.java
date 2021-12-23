@@ -23,6 +23,8 @@ public class LoggedRobot extends IterativeRobotBase {
 
   private final int notifier = NotifierJNI.initializeNotifier();
 
+  private final double period;
+
   private double nextCycle;
   private boolean useTiming = true;
 
@@ -38,6 +40,7 @@ public class LoggedRobot extends IterativeRobotBase {
    */
   protected LoggedRobot(double period) {
     super(period);
+    this.period = period;
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
@@ -72,7 +75,7 @@ public class LoggedRobot extends IterativeRobotBase {
         if (curTime == 0) {
           break;
         }
-        nextCycle += m_period;
+        nextCycle += period;
       }
 
       double loopCycleStart = Logger.getInstance().getRealTimestamp();
@@ -93,7 +96,7 @@ public class LoggedRobot extends IterativeRobotBase {
 
   /** Get time period between calls to Periodic() functions. */
   public double getPeriod() {
-    return m_period;
+    return period;
   }
 
   /** Sets whether to use standard timing or run as fast as possible. */
