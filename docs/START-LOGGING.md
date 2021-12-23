@@ -76,7 +76,38 @@ Data is stored based on string keys where slashes are used to denote subtables (
 
 ## Robot Configuration
 
-TODO.
+The main `Robot` class must inherit from `LoggedRobot` (see below). `LoggedRobot` performs the same functions as `TimedRobot`, with some exceptions:
+
+* It does not support adding extra periodic functions.
+* The method `setUseTiming` allows the user code to disable periodic timing and run cycles as fast as possible during replay. The timestamp read by methods like `Timer.getFPGATimstamp()` will still match the timestamp from the real robot.
+
+```java
+public class Robot extends LoggedRobot {
+    ...
+}
+```
+
+The user program is responsible for configuring and intializing the logging framework. This setup should be placed in `robotInit()` *before any other initialization*. An example configuration is provided below:
+
+```java
+setUseTiming(isReal()); // Run as fast as possible during replay
+LoggedNetworkTables.getInstance().addTable("/LiveWindow"); // Log & replay "LiveWindow" values (only "SmartDashboard" is logged by default).
+Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+
+if (isReal()) {
+    Logger.getInstance().addDataReceiver(new ByteLogReceiver("/media/sda1/")); // Log to USB stick (name will be selected automatically)
+    Logger.getInstance().addDataReceiver(new LogSocketServer(5800)); // Provide log data over the network, viewable in Advantage Scope.
+} else {
+    Logger.getInstance().setReplaySource(new ByteLogReplay("/path/to/input.rlog")); // Read log file for replay
+    Logger.getInstance().addDataReceiver(new ByteLogReceiver("/path/to/output.rlog")); // Save replay results to a new log
+}
+
+Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+```
+
+This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required. You could also prompt the user for the path to a replay log during runtime rather than using a hardcoded path.
+
+Metadata can be a valuable tool for ensuring that a log is replayed on the same version of code which produced it. We use this [Gradle plugin](https://github.com/lessthanoptimal/gversion-plugin) to produce a constants file with information like the Git SHA and build date. These values can then be stored as metadata during setup.
 
 ## Subsystems
 
