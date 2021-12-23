@@ -76,6 +76,22 @@ def _impl(ctx):
     ]
 
     features = [
+        feature(name = "supports_pic", enabled = True),
+        feature(name = "supports_dynamic_linker", enabled = True),
+        feature(
+            name = "opt",
+            flag_sets = [
+                flag_set(
+                    actions = all_compile_actions,
+                    flag_groups = [
+                        flag_group(
+                            flags = ["-O3"],
+                        ),
+                    ],
+                ),
+            ],
+        ),
+        feature(name = "dbg"),  # TODO add debug compile flags
         feature(
             name = "roborio_toolchain_feature",
             enabled = True,
@@ -89,7 +105,6 @@ def _impl(ctx):
                         flag_group(
                             flags = [
                                 "-no-canonical-prefixes",
-                                "-std=c++17",
                             ],
                         ),
                     ],

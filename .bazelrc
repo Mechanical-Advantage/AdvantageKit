@@ -9,10 +9,9 @@ build --incompatible_enable_cc_toolchain_resolution # Enables the new toolchain 
 build --define "publishing_version=dev"
 
 build:athena --platforms=//build_tools/platforms:athena # Creates a "--config athena" CLI shortcut instead of having to type the whole platform string
-build:athena --force_pic
-build:athena --cxxopt='-std=c++17'
-build:linux --cxxopt='-std=c++17'
-build:macos --cxxopt='-std=c++17'
+build:athena --cxxopt=-std=c++17
+build:linux --cxxopt=-std=c++17
+build:macos --cxxopt=-std=c++17
 build:windows --cxxopt=/std:c++17
 
 test --test_output=errors # Show stdout for any tests that do not pass
