@@ -69,7 +69,7 @@ rules_pkg_dependencies()
 # After adding artifacts, make sure to "repin" the maven dependencies by running "bazel run @unpinned_maven//:pin"
 # (or "bazel run @unpinned_frcmaven//:pin" for the frcmaven repo).
 # Newly added maven dependencies will NOT be downloaded until the appropriate command is run!
-load(":library_deps.bzl", "FRCMAVEN_ARTIFACTS", "MAVEN_ARTIFACTS")
+load(":library_deps.bzl", "FRCMAVEN_ARTIFACTS", "MAVEN_ARTIFACTS", "WPILIB_VERSION")
 
 maven_install(
     artifacts = MAVEN_ARTIFACTS,
@@ -191,65 +191,63 @@ register_toolchains(
 # Below are a bunch of http_archive rules to make various WPILib components available
 
 # HAL components
-NI_VERSION = "2020.9.2"
+NI_VERSION = "2022.2.3"
 
-NI_VISA_HEADERS_SHA = "e35e16b13416b2ea389a7abe444d9a60f5315f52661fb84225658780bb938e00"
+NI_VISA_HEADERS_SHA = "7e428729d299cae5b0e1acd34f38609af6544c83095c3b4b5897d0183eb1a15f"
 
-NI_VISA_ATHENA_SHA = "2cf83ce761145ee57b1b88d817cbadcbf1b34cf1759a813fae1cd135c23e6588"
+NI_VISA_ATHENA_SHA = "014fff5a4684f3c443cbed8c52f19687733dd7053a98a1dad89941801e0b7930"
 
-NI_NETCOMM_HEADERS_SHA = "4baf46aacc5e8587a17f5a27173ec51b017102705932da42a55d6ad1f57f0f93"
+NI_NETCOMM_HEADERS_SHA = "fddb8924887bd46c1d51099327085e821f30c1b2feefd168f1211675c17937d8"
 
-NI_NETCOMM_ATHENA_SHA = "6a3dac9d74fe20358812924cc3c2bfaafde189e2b07dc444ba5d38e46ca02b06"
+NI_NETCOMM_ATHENA_SHA = "f56c2fc0943f27f174642664b37fb4529d6f2b6405fe41a639a4c9f31e175c73"
 
-NI_CHIPOBJECT_HEADERS_SHA = "9c196eea0acc1e90545044138818a94b2e3eccfde1ee798e16dfa775a06f09b8"
+NI_CHIPOBJECT_HEADERS_SHA = "c43e7e9eb7a48c1f97c6b21a0474ec7c8527fbeb3d6c5f62d4d9566771afe25e"
 
-NI_CHIPOBJECT_ATHENA_SHA = "036060af780bc4d3b852d389a5210ef73df3041b9399762e7be8ea8291bb16e3"
+NI_CHIPOBJECT_ATHENA_SHA = "fdf47ae5ce052edd82ba2b6e007faabf9286f87b079e3789afc3235733d5475c"
 
-NI_RUNTIME_ATHENA_SHA = "a0aeff05908590b1c63071e02d635010bde54c3abb6dc016c78d5617a72c555a"
+NI_RUNTIME_ATHENA_SHA = "186d1b41e96c5d761705221afe0b9f488d1ce86e8149a7b0afdc3abc93097266"
 
-WPILIB_VERSION = "2021.3.1"
+WPILIBJ_JAR_SHA = "4f1d73613dca343a963101368e255b2746f7363f3c0d403a661cef59c0a73f5f"
 
-WPILIBJ_JAR_SHA = "85f41c78832a9b14367e76d2f8ee24b9b7162ac8eca15c123d9b8a15550b3e5a"
+WPILIBJ_SOURCES_JAR_SHA = "696603b7b97ff6502c361a3c34195e4426e8ea09ae6f160e8301087ff05d4dc4"
 
-WPILIBJ_SOURCES_JAR_SHA = "a83fc80d734033f80d91356ffa4fdbabeab2e659f5fde9b101ee5192eef22470"
+WPILIB_HAL_HEADERS_SHA = "3b68b20848dbe2db9c6b733e68fa0a46346126ab7f75e64326a6f728560c9233"
 
-WPILIB_HAL_HEADERS_SHA = "81b4d98d7ae4f92b2887180aea29ef1e780c5570e3fdbe08e02183e54952bd62"
+WPILIB_HAL_ATHENA_SHA = "509713a4fe7be149d062c5e2fac5b45e9d77c4830977e6a15cd26b47e698cfe0"
 
-WPILIB_HAL_ATHENA_SHA = "e9de32abe3739697a3a92963c9eca4bf8755edfb0f11ac95e22d0190a3185f56"
+WPILIB_HAL_LINUX_X64_SHA = "9881e07c791bfe650b1d86153925095970028e5c9d327b66a10be16dd6165f75"
 
-WPILIB_HAL_LINUX_X64_SHA = "48ca6f22deb800170c801944531557c8d109be4501418c719349519405ae6cc2"
+WPILIB_HAL_WINDOWS_X64_SHA = "6019034d8330b6459b9da3d0ef19462b17ef5dea189aaaed99f522a51c486e3f"
 
-WPILIB_HAL_WINDOWS_X64_SHA = "18d860d1be5dfcf104f9609f9bb2af666fda13e8d3608ef9b9e890b5c4c56785"
+WPILIB_HAL_MACOS_X64_SHA = "4162062e2b2d547d289dc7400d58d682d2b101cfbb031b4ab3ddd7f5993df625"
 
-WPILIB_HAL_MACOS_X64_SHA = "46f76a6ba82f395e19ba48c12c56b1d864b03f46498a0f42b6a15fe12d3aaa6a"
+WPILIB_WPIUTIL_HEADERS_SHA = "143f415335d3477f9de728bc753da7f76bf951519bf54bb81aada7dafd66dc54"
 
-WPILIB_WPIUTIL_HEADERS_SHA = "b2a96f7ce07198b139face9dc341c6550d5044fa32f48435b50d986ea5c8ee55"
+WPILIB_WPIUTIL_ATHENA_SHA = "ede8763ecd1aea8d35d4e27db0500364e6b7e0aeb410fed4efd9848a1b7b16fe"
 
-WPILIB_WPIUTIL_ATHENA_SHA = "ad48bae20f42850938a1758c9f82e54c5cb5e286ad0b09adb701d700bd7f8ec8"
+WPILIB_WPIUTIL_LINUX_X64_SHA = "8cad1f53b958688afe516c892ea2a53b60934b2babc0772761adc0df42d6b4e0"
 
-WPILIB_WPIUTIL_LINUX_X64_SHA = "4a20ec638981025c0e41678ac7cea691d5a40121987b1309e6907255636d02cf"
+WPILIB_WPIUTIL_WINDOWS_X64_SHA = "0d9de2d7073dfbb045ef89e98c05917e64ac4e1e075b6239caa702a70d39498c"
 
-WPILIB_WPIUTIL_WINDOWS_X64_SHA = "5e85e0a32ed520c1ea075087b3701769f2007fe8a9385831b1d947f70179cf8f"
+WPILIB_WPIUTIL_MACOS_X64_SHA = "c87bdf68e3531ed44ef326d9ca498bf9303fcb313d6787ec80f474bac4df7e1d"
 
-WPILIB_WPIUTIL_MACOS_X64_SHA = "09c7914e5fcf4b26967e0bddb501c79d054de276a5724a9089b0e04d9e13e640"
+WPILIB_WPIMATH_LINUX_X64_SHA = "006cdb50c4d10e78439a6ca00ab7636d238855cb6a222655094cdbf0d5224844"
 
-WPILIB_WPIMATH_LINUX_X64_SHA = "d5edb77e3ed15df710c7895636190ee2f89e47429f2925e015bd7b0025af4612"
+WPILIB_WPIMATH_WINDOWS_X64_SHA = "4a8be8d9ad26fb09b536c61fe973ff6189b340dd67a2472b60c42b6b91bc5dc5"
 
-WPILIB_WPIMATH_WINDOWS_X64_SHA = "2ec3dcf69a2b0500aea1d5037aa79912a252c5c7f8aefd113c974e1559d88cf9"
+WPILIB_WPIMATH_MACOS_X64_SHA = "9a76767fdfaabaf406c8c0421e702ebff1f7cf1ac5940f1039bd0ec882c02fb6"
 
-WPILIB_WPIMATH_MACOS_X64_SHA = "4d61ca32079050b825d5ee543a8293f52fb0cfca0d71d7c4bdd3f58cc689b73d"
+WPILIB_NTCORE_LINUX_X64_SHA = "4292ae7a805a553d601bbbcf0f4cac374b7a6b21bc84d3b8bebba7d048fe96b0"
 
-WPILIB_NTCORE_LINUX_X64_SHA = "d6aedae1639db0fd538f7c519b97cf45441a6ec7c8220c3f564d7c3a7de71294"
+WPILIB_NTCORE_WINDOWS_X64_SHA = "51c3004006af77279bdce2d6c2eb106a465e64a2bc126ff8ffd964dc22f2e866"
 
-WPILIB_NTCORE_WINDOWS_X64_SHA = "cd69aba9cc0b16fda738dcde53b1c8c138c616fd4af2e2de1877f66973fcc6d3"
+WPILIB_NTCORE_MACOS_X64_SHA = "e6418a3faa50a0e14a420a7d330ac2a935b2fcdef6dca040c967bdcd883edf2c"
 
-WPILIB_NTCORE_MACOS_X64_SHA = "8daf5d2b4cf3e16db6b3ad3a309aade6315b9458abeb40b94d59cbb21ddac087"
+WPILIB_HALSIM_LINUX_X64_SHA = "c27ad874e911e8fb17b4a63ab8cce61ce56c25e8a2ff9a8ab5b266a34d075a3c"
 
-WPILIB_HALSIM_LINUX_X64_SHA = "d77274cc63b382163b7c24ea54ff2b54570d23e109f7d3488785d6b9c263023f"
+WPILIB_HALSIM_WINDOWS_X64_SHA = "7fc55879c1e9fbdbcb4621e35843f1f0577a22820d30e0bd71787405eb442a0f"
 
-WPILIB_HALSIM_WINDOWS_X64_SHA = "6f7c04b1f1a17fced091b9057579837ca82909e17565140be77ffbd9eb6db679"
-
-WPILIB_HALSIM_MACOS_X64_SHA = "e5da5864c4c75367e7627f074b3351a2031c1fc56f3a05f2ec42dc20e819aa4e"
+WPILIB_HALSIM_MACOS_X64_SHA = "f848dc434c10031b33155c554f3ec8336636ea271ec5288bdf404ee748fa4814"
 
 http_file(
     name = "wpilibj_jar_file",
@@ -269,7 +267,7 @@ wpilib_nativezip(
     name = "ni_visa",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libvisa.so"],
+            libs = ["libvisa.so.21.0.0"],
             platform = "athena",
             sha256 = NI_VISA_ATHENA_SHA,
         ),
@@ -285,7 +283,7 @@ wpilib_nativezip(
     name = "ni_netcomm",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libFRC_NetworkCommunication.so.20.0.0"],
+            libs = ["libFRC_NetworkCommunication.so.22.0.0"],
             platform = "athena",
             sha256 = NI_NETCOMM_ATHENA_SHA,
         ),
@@ -301,7 +299,7 @@ wpilib_nativezip(
     name = "ni_chipobject",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libRoboRIO_FRC_ChipObject.so.20.0.0"],
+            libs = ["libRoboRIO_FRC_ChipObject.so.22.0.0"],
             platform = "athena",
             sha256 = NI_CHIPOBJECT_ATHENA_SHA,
         ),
@@ -318,14 +316,8 @@ wpilib_nativezip(
     binary_configs = [
         wpilib_binary_config(
             libs = [
-                "libni_emb.so.12.0.0",
-                "libni_rtlog.so.2.8.0",
-                "libNiFpga.so.19.0.0",
-                "libNiFpgaLv.so.19.0.0",
-                "libnirio_emb_can.so.16.0.0",
-                "libniriodevenum.so.19.0.0",
-                "libniriosession.so.18.0.0",
-                "libNiRioSrv.so.19.0.0",
+                "libembcanshim.so",  # Runtime is now just a shim library
+                "libfpgalvshim.so",
             ],
             platform = "athena",
             sha256 = NI_RUNTIME_ATHENA_SHA,
