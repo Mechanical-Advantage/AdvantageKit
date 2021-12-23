@@ -136,24 +136,24 @@ http_archive(
 http_archive(
     name = "athena_toolchain_linux_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_linux_x64_files.BUILD",
-    sha256 = "00cc58bf0607d71e725919d28e22714ce1920692c4864bc86353fc8139cbf7b7",
-    urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2021-2/FRC-2021-Linux-Toolchain-7.3.0.tar.gz"],
+    sha256 = "b27cde302e46d11524aedf664129bc3ac7df02a78d0f9e4ab3f1feb40d667ab4",
+    urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2022-1/FRC-2022-Linux-Toolchain-7.3.0.tar.gz"],
 )
 
 # Same as above for win32 (also supports 64 bit)
 http_archive(
     name = "athena_toolchain_windows_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_windows_x64_files.BUILD",
-    sha256 = "f3e9ba32b63d3cd26e242feeb14e878fecbda86c19c12b98c3084c629e06acb3",
-    urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2021-2/FRC-2021-Windows-Toolchain-7.3.0.zip"],
+    sha256 = "3a8815d9c715e7f0f5d2106e4f16282863a3ff63121d259703b281881daea683",
+    urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2022-1/FRC-2022-Windows64-Toolchain-7.3.0.zip"],
 )
 
 # Same as above for macOS (currently only supports x86_64, native support for arm64 (M1) coming soon? for now use Rosetta 2)
 http_archive(
     name = "athena_toolchain_macos_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_macos_x64_files.BUILD",
-    sha256 = "0822ff945ff422b176571cebe7b2dfdc0ef6bf685d3b6f6833db8dc218d992ae",
-    urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2021-2/FRC-2021-Mac-Toolchain-7.3.0.tar.gz"],
+    sha256 = "47d29989d2618c0fc439b72e8d3d734b93952da4136dd05a7648af19662700b7",
+    urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2022-1/FRC-2022-Mac-Toolchain-7.3.0.tar.gz"],
 )
 
 # Toolchains for compiling flatbuffers (.fbs) to generated source files

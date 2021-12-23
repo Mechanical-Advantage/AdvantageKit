@@ -2,7 +2,7 @@ load("@//build_tools/toolchain:athena_cc_toolchain.bzl", "athena_cc_toolchain_co
 
 filegroup(
     name = "toolchain-files",
-    srcs = glob(["frc2021/roborio/**/*"]),
+    srcs = glob(["frc2022/roborio/**/*"]),
 )
 
 athena_cc_toolchain_config(
