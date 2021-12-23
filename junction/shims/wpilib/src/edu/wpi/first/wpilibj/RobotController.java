@@ -124,7 +124,7 @@ public final class RobotController {
   /**
    * Get the current output of the 3.3V rail.
    *
-   * @return The controller 3.3V rail output current value in Volts
+   * @return The controller 3.3V rail output current value in Amps
    */
   public static double getCurrent3V3() {
     return PowerJNI.getUserCurrent3V3();
@@ -224,6 +224,28 @@ public final class RobotController {
    */
   public static int getFaultCount6V() {
     return PowerJNI.getUserCurrentFaults6V();
+  }
+
+  /**
+   * Get the current brownout voltage setting.
+   *
+   * @return The brownout voltage
+   */
+  public static double getBrownoutVoltage() {
+    return PowerJNI.getBrownoutVoltage();
+  }
+
+  /**
+   * Set the voltage the roboRIO will brownout and disable all outputs.
+   *
+   * <p>
+   * Note that this only does anything on the roboRIO 2. On the roboRIO it is a
+   * no-op.
+   *
+   * @param brownoutVoltage The brownout voltage
+   */
+  public static void setBrownoutVoltage(double brownoutVoltage) {
+    PowerJNI.setBrownoutVoltage(brownoutVoltage);
   }
 
   /**
