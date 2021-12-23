@@ -17,15 +17,18 @@ MAVEN_ARTIFACTS = [
     "com.fasterxml.jackson.core:jackson-databind:2.10.0",
     "org.ejml:ejml-simple:0.38",
     "org.ejml:ejml-core:0.38",
-    "junit:junit:4.13.2"
+    "junit:junit:4.13.2",
 ]
 
-FRCMAVEN_ARTIFACTS = [
-    "edu.wpi.first.hal:hal-java:2021.3.1",
-    "edu.wpi.first.wpiutil:wpiutil-java:2021.3.1",
-    "edu.wpi.first.wpimath:wpimath-java:2021.3.1",
-    "edu.wpi.first.ntcore:ntcore-java:2021.3.1",
-    "edu.wpi.first.thirdparty.frc2021.opencv:opencv-java:3.4.7-5",
-    "edu.wpi.first.cscore:cscore-java:2021.3.1",
-    "edu.wpi.first.cameraserver:cameraserver-java:2021.3.1",
+WPILIB_VERSION = "2022.1.1-beta-4"
+
+FRCMAVEN_ARTIFACTS = ["%s:%s" % (x, WPILIB_VERSION) for x in [
+    "edu.wpi.first.hal:hal-java",
+    "edu.wpi.first.wpiutil:wpiutil-java",
+    "edu.wpi.first.wpimath:wpimath-java",
+    "edu.wpi.first.ntcore:ntcore-java",
+    "edu.wpi.first.cscore:cscore-java",
+    "edu.wpi.first.cameraserver:cameraserver-java",
+]] + [
+    "edu.wpi.first.thirdparty.frc2022.opencv:opencv-java:4.5.2-1",
 ]
