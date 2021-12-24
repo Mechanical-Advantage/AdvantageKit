@@ -6,6 +6,8 @@
 #include <cstring>
 #include <mutex>
 
+static const int NUM_JOYSTICKS = 6;
+
 DsReader::DsReader() : ds_thread(&DsReader::update_ds_data, this) {}
 
 void DsReader::update_ds_data() {
@@ -24,7 +26,7 @@ void DsReader::update_ds_data() {
 
     double match_time = HAL_GetMatchTime(&status);
 
-    schema::Joystick stick_bufs[internal_buf.joysticks()->size()];
+    schema::Joystick stick_bufs[NUM_JOYSTICKS];
 
     for (int joystickNum = 0; joystickNum < internal_buf.joysticks()->size();
          joystickNum++) {

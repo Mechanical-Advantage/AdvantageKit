@@ -10,9 +10,9 @@ build --define "publishing_version=dev"
 build --define "maven_repo=file://$HOME/.m2/repository" # Make default publishing location the home folder
 
 build:athena --platforms=//build_tools/platforms:athena # Creates a "--config athena" CLI shortcut instead of having to type the whole platform string
-build:athena --cxxopt=-std=c++17
-build:linux --cxxopt=-std=c++17
-build:macos --cxxopt=-std=c++17
+build:athena --cxxopt=-std=c++17 --cxxopt=-pedantic-errors
+build:linux --cxxopt=-std=c++17 --cxxopt=-pedantic-errors
+build:macos --cxxopt=-std=c++17 --cxxopt=-pedantic-errors
 build:windows --cxxopt=/std:c++17
 
 test --test_output=errors # Show stdout for any tests that do not pass
