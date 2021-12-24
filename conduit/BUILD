@@ -2,7 +2,11 @@ load("//third_party/flatbuffers:build_defs.bzl", "flatbuffer_cc_library", "flatb
 
 filegroup(
     name = "vscode",
-    srcs = [":conduit-schema-java_java_srcs", ":conduit-schema-cc_cc_srcs", "//conduit/api:api-jni_headers"]
+    srcs = [
+        ":conduit-schema-cc_cc_srcs",
+        ":conduit-schema-java_java_srcs",
+        "//conduit/api:api-jni_headers",
+    ],
 )
 
 flatbuffer_java_library(
@@ -10,6 +14,7 @@ flatbuffer_java_library(
     srcs = ["conduit_schema.fbs"],
     outs = [
         "org/littletonrobotics/conduit/schema/CoreInputs.java",
+        "org/littletonrobotics/conduit/schema/DSData.java",
         "org/littletonrobotics/conduit/schema/Joystick.java",
     ],
     visibility = ["//visibility:public"],

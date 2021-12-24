@@ -18,7 +18,7 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       - name: Build "conduit/wpilibio"
-        run: bazel build --config=athena //conduit/wpilibio:wpilibio-shared
+        run: bazel build --config=athena //conduit/wpilibio
       - name: Build "conduit/api"
         run: bazel build //conduit/api
       - name: Build "junction/core"
@@ -31,7 +31,7 @@ jobs:
         uses: battila7/get-version-action@v2
       - name: Upload "conduit/wpilibio"
         if: github.event_name == 'release'
-        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" --define "publishing_nativezip_generate_pom=true" //conduit/wpilibio:wpilibio-nativezip-publish
+        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" --define "publishing_nativezip_generate_pom=true" //conduit/wpilibio:nativezip.publish
         env:
           GITHUB_ACTOR: Mechanical-Advantage
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,7 +65,7 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
     - name: Build "conduit/wpilibio"
-      run: bazel build //conduit/wpilibio:wpilibio-shared
+      run: bazel build //conduit/wpilibio
     - name: Build "conduit/api"
       run: bazel build //conduit/api
     - name: Build "junction/core"
@@ -78,7 +78,7 @@ jobs:
       uses: battila7/get-version-action@v2
     - name: Upload "conduit/wpilibio"
       if: github.event_name == 'release'
-      run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:wpilibio-nativezip-publish
+      run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
       env:
         GITHUB_ACTOR: Mechanical-Advantage
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

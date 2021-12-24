@@ -3,7 +3,7 @@ load("//build_tools/repo:maven_publish_zip.bzl", "maven_publish_zip")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 cc_library(
-    name = "wpilibio-lib",
+    name = "wpilibio",
     srcs = glob(["src/**/*.cc"]),
     hdrs = glob(["include/**/*.h"]),
     linkstatic = True,  # Only statically link this library since we want it to statically link into the dynamic lib below
@@ -17,15 +17,15 @@ cc_library(
 )
 
 cc_platform_dynamic_library(
-    name = "wpilibio-shared",
+    name = "shared",
     libname = "wpilibio",
     visibility = ["//visibility:public"],
-    deps = [":wpilibio-lib"],
+    deps = [":wpilibio"],
 )
 
 pkg_zip(
-    name = "wpilibio-nativezip",
-    srcs = [":wpilibio-shared"],
+    name = "nativezip",
+    srcs = [":shared"],
     package_dir = select({
         "//build_tools/platforms:is_athena": "/linux/athena/shared",
         "//build_tools/platforms:is_linux": "/linux/x86-64/shared",
@@ -42,9 +42,9 @@ pkg_zip(
 )
 
 maven_publish_zip(
-    name = "wpilibio-nativezip-publish",
+    name = "nativezip.publish",
     coordinates = "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
-    zip_file = ":wpilibio-nativezip",
+    zip_file = ":nativezip",
     classifier = select({
         "//build_tools/platforms:is_athena": "athena",
         "//build_tools/platforms:is_linux": "linuxx86-64",

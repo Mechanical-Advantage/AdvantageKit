@@ -23,8 +23,7 @@ struct Joystick {
     is_xbox:bool;
 }
 
-struct CoreInputs {
-    timestamp:int64;
+struct DSData {
     alliance_station:uint8;
     event_name:[uint8:64];
     game_specific_message_size:uint16;
@@ -35,4 +34,9 @@ struct CoreInputs {
     control_word:int32;
     match_time:float64;
     joysticks:[Joystick:6];
+}
+
+struct CoreInputs {
+    timestamp:int64;
+    ds:DSData;
 }
