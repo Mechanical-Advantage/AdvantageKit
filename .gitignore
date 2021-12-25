@@ -3,6 +3,8 @@
 /.cache
 user.bazelrc
 
+/dev_sandbox
+
 ### macOS ###
 # General
 .DS_Store
