@@ -1,11 +1,17 @@
 load("//build_tools/cc:platform_dynamic_library.bzl", "cc_platform_dynamic_library")
 load("//build_tools/repo:maven_publish_zip.bzl", "maven_publish_zip")
+load("//build_tools/repo:maven_publish_pom.bzl", "maven_publish_pom")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 cc_library(
     name = "wpilibio",
     srcs = glob(["src/**/*.cc"]),
     hdrs = glob(["include/**/*.h"]),
+    linkopts = select({
+        "//build_tools/platforms:is_linux_any": ["-lpthread"],
+        "//build_tools/platforms:is_macos": ["-lpthread"],
+        "//conditions:default": [],
+    }),
     linkstatic = True,  # Only statically link this library since we want it to statically link into the dynamic lib below
     tags = ["ci_build"],
     visibility = ["//visibility:public"],
@@ -56,4 +62,10 @@ maven_publish_zip(
         "ci_publish_desktop",
     ],
     zip_file = ":nativezip",
+)
+
+maven_publish_pom(
+    name = "pom.publish",
+    coordinates = "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
+    tags = ["ci_publish"],
 )

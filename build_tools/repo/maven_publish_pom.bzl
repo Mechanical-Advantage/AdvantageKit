@@ -1,8 +1,8 @@
 _TEMPLATE = """
-mvn deploy:deploy-file -DgroupId={group_id} -DartifactId={artifact_id} -Dversion={version} -DrepositoryId={repo_id} -Dpackaging=zip -Dfile={zip_file} -Durl={url} -Dclassifier={classifier} -DgeneratePom=false
+mvn deploy:deploy-file -DgroupId={group_id} -DartifactId={artifact_id} -Dversion={version} -DrepositoryId={repo_id} -Dpackaging=pom -Dfile={pom_file} -Durl={url} -DgeneratePom=false
 """
 
-def _maven_publish_impl(ctx):
+def _pom_file_impl(ctx):
     if ctx.attr.is_windows:
         executable = ctx.actions.declare_file("%s-publisher.bat" % ctx.attr.name)
     else:
@@ -18,6 +18,19 @@ def _maven_publish_impl(ctx):
     artifact_id = coordinates_split[1]
     version = coordinates_split[2]
 
+    substitutions = {
+        "{groupId}": group_id,
+        "{artifactId}": artifact_id,
+        "{version}": version,
+    }
+
+    pom = ctx.actions.declare_file("%s.xml" % ctx.label.name)
+    ctx.actions.expand_template(
+        template = ctx.file.pom_template,
+        output = pom,
+        substitutions = substitutions,
+    )
+
     ctx.actions.write(
         output = executable,
         is_executable = True,
@@ -25,15 +38,14 @@ def _maven_publish_impl(ctx):
             group_id = group_id,
             artifact_id = artifact_id,
             version = version,
-            zip_file = ctx.file.zip_file.short_path,
             url = maven_repo,
-            classifier = ctx.attr.classifier,
+            pom_file = pom.short_path,
             repo_id = maven_repo_id,
         ),
     )
 
     files = [
-        ctx.file.zip_file,
+        pom,
     ]
 
     return [
@@ -47,34 +59,22 @@ def _maven_publish_impl(ctx):
         ),
     ]
 
-maven_publish_zip_def = rule(
-    _maven_publish_impl,
-    doc = """Publish artifacts to a maven repository.
-The maven repository may accessed locally using a `file://` URL, or
-remotely using an `https://` URL. The following flags may be set
-using `--define`:
-  gpg_sign: Whether to sign artifacts using GPG
-  maven_repo: A URL for the repo to use. May be "https" or "file".
-  maven_user: The user name to use when uploading to the maven repository.
-  maven_password: The password to use when uploading to the maven repository.
-When signing with GPG, the current default key is used.
-""",
+maven_publish_pom_def = rule(
+    _pom_file_impl,
     executable = True,
     attrs = {
-        "coordinates": attr.string(
-            mandatory = True,
-        ),
-        "zip_file": attr.label(
-            mandatory = True,
+        "pom_template": attr.label(
+            doc = "Template file to use for the pom.xml",
+            default = "//build_tools/repo:generic-pom-template",
             allow_single_file = True,
         ),
         "is_windows": attr.bool(mandatory = True),
-        "classifier": attr.string(mandatory = True),
+        "coordinates": attr.string(mandatory = True),
     },
 )
 
-def maven_publish_zip(name, **kwargs):
-    maven_publish_zip_def(
+def maven_publish_pom(name, **kwargs):
+    maven_publish_pom_def(
         name = name,
         is_windows = select({
             "//build_tools/platforms:is_windows": True,
