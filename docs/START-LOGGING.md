@@ -34,7 +34,7 @@ repositories {
 }
 ```
 
-To pull in the logging framework, add the following lines in `dependencies`. Replace "X.X.X" with the latest version of AdvantageKit (see [here](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest)).
+To pull in the logging framework, add the following lines in `dependencies`. Replace "X.X.X" with the version of AdvantageKit (latest [here](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest)). The changelog for each release includes the WPILib version on which it is based; we recommend using the same version in your robot project. You can check the selected version of WPILib at the top of the file to the right of "edu.wpi.first.GradleRIO".
 
 ```groovy
 implementation "org.littletonrobotics.akit.junction:wpilib-shim:X.X.X"
