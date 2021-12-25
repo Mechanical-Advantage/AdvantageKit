@@ -14,7 +14,7 @@ using namespace org::littletonrobotics::conduit;
 // operation since the two buffers are the same structure
 class DsReader {
  public:
-  DsReader();
+  void start();
   void read(schema::DSData* ds_buf);
 
  private:

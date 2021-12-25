@@ -11,6 +11,8 @@ static const int BUF_SIZE = 100000;
 // Shared buffer
 extern void* shared_buf;
 
+void start(void);
+
 // Allocates the shared buffer
 void make_buffer(void);
 

@@ -1,6 +1,7 @@
 #include "conduit/wpilibio/include/ds_reader.h"
 
 #include <hal/DriverStation.h>
+#include <hal/HALBase.h>
 
 #include <cstdint>
 #include <cstring>
@@ -8,7 +9,9 @@
 
 static const int NUM_JOYSTICKS = 6;
 
-DsReader::DsReader() : ds_thread(&DsReader::update_ds_data, this) {}
+void DsReader::start() {
+  ds_thread = std::thread(&DsReader::update_ds_data, this);
+}
 
 void DsReader::update_ds_data() {
   while (true) {
