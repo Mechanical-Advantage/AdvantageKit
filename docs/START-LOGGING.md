@@ -34,21 +34,18 @@ repositories {
 }
 ```
 
-To pull in the logging framework, add the following lines in `dependencies`. Replace "X.X.X" with the version of AdvantageKit (latest [here](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest)). The changelog for each release includes the WPILib version on which it is based; we recommend using the same version in your robot project. You can check the selected version of WPILib at the top of the file to the right of "edu.wpi.first.GradleRIO".
-
-```groovy
-implementation "org.littletonrobotics.akit.junction:wpilib-shim:X.X.X"
-implementation "org.littletonrobotics.akit.junction:junction-core:X.X.X"
-implementation "org.littletonrobotics.akit.conduit:conduit-api:X.X.X"
-// TODO: Add native dependencies
-```
-
 AdvantageKit modifies some components of `wpilibj` (see [our explanation](/docs/CONDUIT-SHIMS.md) for the purpose of these shims or the [list of modified classes](/junction/shims/wpilib#interface)). Add the following block to `build.gradle` to replace the default implementation. **This is required for the framework to function**
 
 ```groovy
 configurations.all {
     exclude group: "edu.wpi.first.wpilibj"
 }
+```
+
+To pull in the logging framework, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" and paste in the URL below. The changelog for the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest)) includes the WPILib version on which it is based; we recommend using the same version in your robot project. You can check the selected version of WPILib at the top of the file to the right of "edu.wpi.first.GradleRIO".
+
+```
+https://raw.githubusercontent.com/Mechanical-Advantage/AdvantageKit/main/AdvantageKit.json
 ```
 
 ## Understanding Data Flow
