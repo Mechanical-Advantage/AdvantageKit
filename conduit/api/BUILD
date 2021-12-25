@@ -4,6 +4,7 @@ load("//build_tools/repo:java_export.bzl", "java_export")
 java_library(
     name = "api",
     srcs = glob(["src/**/*.java"]),
+    tags = ["ci_build"],
     visibility = ["//visibility:public"],
     deps = ["//conduit:conduit-schema-java"],
 )

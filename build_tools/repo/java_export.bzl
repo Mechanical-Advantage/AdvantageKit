@@ -10,6 +10,7 @@ def java_export(
         pom_template = None,
         visibility = None,
         tags = [],
+        publish_tags = [],
         **kwargs):
     """Extends `java_library` to allow maven artifacts to be uploaded.
     This macro can be used as a drop-in replacement for `java_library`, but
@@ -48,6 +49,7 @@ def java_export(
       pom_template: The template to be used for the pom.xml file.
       deploy_env: A list of labels of java targets to exclude from the generated jar
       visibility: The visibility of the target
+      publish_tags: The tags to apply to the *.publish rule
       kwargs: These are passed to [`java_library`](https://docs.bazel.build/versions/master/be/java.html#java_library),
         and so may contain any valid parameter for that rule.
     """
@@ -112,6 +114,7 @@ def java_export(
         javadocs = docs_jar,
         artifact_jar = ":%s-maven-artifact" % name,
         source_jar = ":%s-maven-source" % name,
+        tags = publish_tags,
         visibility = visibility,
     )
 

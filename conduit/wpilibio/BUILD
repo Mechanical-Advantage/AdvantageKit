@@ -7,6 +7,7 @@ cc_library(
     srcs = glob(["src/**/*.cc"]),
     hdrs = glob(["include/**/*.h"]),
     linkstatic = True,  # Only statically link this library since we want it to statically link into the dynamic lib below
+    tags = ["ci_build"],
     visibility = ["//visibility:public"],
     deps = [
         "//conduit:conduit-schema-cc",
@@ -43,12 +44,16 @@ pkg_zip(
 
 maven_publish_zip(
     name = "nativezip.publish",
-    coordinates = "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
-    zip_file = ":nativezip",
     classifier = select({
         "//build_tools/platforms:is_athena": "athena",
         "//build_tools/platforms:is_linux": "linuxx86-64",
         "//build_tools/platforms:is_windows": "windowsx86-64",
-        "//build_tools/platforms:is_macos": "osxx86-64"
-    })
+        "//build_tools/platforms:is_macos": "osxx86-64",
+    }),
+    coordinates = "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
+    tags = [
+        "ci_publish",
+        "ci_publish_desktop",
+    ],
+    zip_file = ":nativezip",
 )
