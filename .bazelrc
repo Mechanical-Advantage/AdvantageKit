@@ -17,4 +17,4 @@ build:linux --cxxopt=-std=c++17 --cxxopt=-pedantic-errors
 build:macos --cxxopt=-std=c++17 --cxxopt=-pedantic-errors
 build:windows --cxxopt=/std:c++17
 
-test --test_output=errors # Show stdout for any tests that do not pass
+test --test_output=all # Show stdout for any tests that do not pass

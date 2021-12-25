@@ -25,21 +25,21 @@ java_export(
     ],  # This needs to explicitly depend on wpilibj before our shim target because of how java_export handles duplicate class files when building.
 )
 
-java_test(
-    name = "jtest",
-    args = [
-        "$(location :wpilib)",
-        "$(location @maven//:edu_wpi_first_wpilibj_wpilibj_java)",
-    ],
-    data = [
-        ":wpilib",
-        "@maven//:edu_wpi_first_wpilibj_wpilibj_java",
-    ],
-    main_class = "Sigcheck",
-    use_testrunner = False,
-    runtime_deps = [
-        ":wpilib",
-        "//build_tools/jpatch:sigcheck",
-        "@maven//:edu_wpi_first_wpilibj_wpilibj_java",
-    ],
-)
+# java_test(
+#     name = "jtest",
+#     args = [
+#         "$(location :wpilib)",
+#         "$(location @maven//:edu_wpi_first_wpilibj_wpilibj_java)",
+#     ],
+#     data = [
+#         ":wpilib",
+#         "@maven//:edu_wpi_first_wpilibj_wpilibj_java",
+#     ],
+#     main_class = "Sigcheck",
+#     use_testrunner = False,
+#     runtime_deps = [
+#         ":wpilib",
+#         "//build_tools/jpatch:sigcheck",
+#         "@maven//:edu_wpi_first_wpilibj_wpilibj_java",
+#     ],
+# )

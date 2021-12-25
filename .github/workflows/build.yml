@@ -66,6 +66,8 @@ jobs:
         java-version: '11'
     - name: Build All
       run: bazel build --build_tag_filters=ci_build --verbose_failures ...
+    - name: Test All
+      run: bazel test ...
     - name: Get version number
       id: get_version
       if: github.event_name == 'release'
