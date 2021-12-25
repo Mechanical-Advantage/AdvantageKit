@@ -22,6 +22,10 @@ schema::DSData* ds_view;
 
 DsReader ds_reader;
 
+void start() {
+  ds_reader.start();
+}
+
 void make_buffer() {
   // Allocate shared buffer
   shared_buf = malloc(BUF_SIZE);

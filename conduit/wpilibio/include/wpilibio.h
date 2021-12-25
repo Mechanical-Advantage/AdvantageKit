@@ -11,13 +11,13 @@ static const int BUF_SIZE = 100000;
 // Shared buffer
 extern void* shared_buf;
 
-void start(void);
+void start();
 
 // Allocates the shared buffer
-void make_buffer(void);
+void make_buffer();
 
 // Captures data into the shared buffer
-void capture_data(void);
+void capture_data();
 
 }  // namespace wpilibio
 }  // namespace conduit

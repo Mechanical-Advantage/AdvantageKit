@@ -1,7 +1,8 @@
 load("//third_party/flatbuffers:build_defs.bzl", "flatbuffer_cc_library", "flatbuffer_java_library")
 
+# All generated targets, to quickly regenerate them
 filegroup(
-    name = "vscode",
+    name = "generated",
     srcs = [
         ":conduit-schema-cc_cc_srcs",
         ":conduit-schema-java_java_srcs",
