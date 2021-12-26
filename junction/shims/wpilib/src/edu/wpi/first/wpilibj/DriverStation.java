@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import org.littletonrobotics.junction.inputs.LoggedDriverStation;
 
+import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.HAL;
 
 /**
@@ -864,4 +865,12 @@ public class DriverStation {
     }
   }
 
+  /**
+   * Forces a control word cache update, and update the passed in control word.
+   * This method has been patched by AdvantageKit and is nonfunctional.
+   *
+   * @param word Word to update.
+   */
+  public static void updateControlWordFromCache(ControlWord word) {
+  }
 }
