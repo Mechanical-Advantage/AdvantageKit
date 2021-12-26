@@ -41,6 +41,7 @@ public class LogSocketServer implements LogRawDataReceiver {
     List<Socket> sockets = new ArrayList<>();
 
     public ServerThread(int port, ByteEncoder encoder) {
+      super("LogSocketServer");
       this.encoder = encoder;
       try {
         server = new ServerSocket(port);
