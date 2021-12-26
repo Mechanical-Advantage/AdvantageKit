@@ -40,7 +40,7 @@ pkg_zip(
         "//build_tools/platforms:is_macos": "/osx/x86-64/shared",
     }),
     package_file_name = select({
-        "//build_tools/platforms:is_athena": "wpilibio-{publishing_version}-athena.zip",
+        "//build_tools/platforms:is_athena": "wpilibio-{publishing_version}-linuxathena.zip",
         "//build_tools/platforms:is_linux": "wpilibio-{publishing_version}-linuxx86-64.zip",
         "//build_tools/platforms:is_windows": "wpilibio-{publishing_version}-windowsx86-64.zip",
         "//build_tools/platforms:is_macos": "wpilibio-{publishing_version}-osxx86-64.zip",
@@ -51,7 +51,7 @@ pkg_zip(
 maven_publish_zip(
     name = "nativezip.publish",
     classifier = select({
-        "//build_tools/platforms:is_athena": "athena",
+        "//build_tools/platforms:is_athena": "linuxathena",
         "//build_tools/platforms:is_linux": "linuxx86-64",
         "//build_tools/platforms:is_windows": "windowsx86-64",
         "//build_tools/platforms:is_macos": "osxx86-64",
