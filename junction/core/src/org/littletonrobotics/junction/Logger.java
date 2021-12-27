@@ -1,22 +1,21 @@
 package org.littletonrobotics.junction;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import edu.wpi.first.hal.HALUtil;
 
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.inputs.*;
-import org.littletonrobotics.junction.io.ByteEncoder;
 import org.littletonrobotics.junction.io.LogDataReceiver;
 import org.littletonrobotics.junction.io.LogRawDataReceiver;
 import org.littletonrobotics.junction.io.LogReplaySource;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
-
+  private static final int receiverQueueCapcity = 500; // 10s at 50Hz
   private static final boolean debugTiming = false;
 
   private static Logger instance;
@@ -26,11 +25,10 @@ public class Logger {
   private LogTable entry;
   private LogTable outputTable;
   private Map<String, String> metadata = new HashMap<>();
-  private ByteEncoder encoder;
 
   private LogReplaySource replaySource;
-  private List<LogDataReceiver> dataReceivers = new ArrayList<>();
-  private List<LogRawDataReceiver> rawDataReceivers = new ArrayList<>();
+  private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
+  private final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
 
   private Logger() {
   }
@@ -58,7 +56,7 @@ public class Logger {
    */
   public void addDataReceiver(LogDataReceiver dataReceiver) {
     if (!running) {
-      dataReceivers.add(dataReceiver);
+      receiverThread.addDataReceiver(dataReceiver);
     }
   }
 
@@ -68,7 +66,7 @@ public class Logger {
    */
   public void addDataReceiver(LogRawDataReceiver dataReceiver) {
     if (!running) {
-      rawDataReceivers.add(dataReceiver);
+      receiverThread.addDataReceiver(dataReceiver);
     }
   }
 
@@ -101,26 +99,15 @@ public class Logger {
       running = true;
       entry = null;
 
-      if (rawDataReceivers.size() > 0) {
-        encoder = new ByteEncoder();
-      } else {
-        encoder = null;
-      }
-
+      // Start replay source
       if (replaySource != null) {
         replaySource.start();
       }
-      for (int i = 0; i < dataReceivers.size(); i++) {
-        if (dataReceivers.get(i) != replaySource) {
-          dataReceivers.get(i).start();
-        }
-      }
-      for (int i = 0; i < rawDataReceivers.size(); i++) {
-        if (rawDataReceivers.get(i) != replaySource) {
-          rawDataReceivers.get(i).start(encoder);
-        }
-      }
 
+      // Start receiver thread
+      receiverThread.start();
+
+      // Run first periodic cycle
       periodic();
 
       // Record metadata
@@ -140,16 +127,7 @@ public class Logger {
       if (replaySource != null) {
         replaySource.end();
       }
-      for (int i = 0; i < dataReceivers.size(); i++) {
-        if (dataReceivers.get(i) != replaySource) {
-          dataReceivers.get(i).end();
-        }
-      }
-      for (int i = 0; i < rawDataReceivers.size(); i++) {
-        if (rawDataReceivers.get(i) != replaySource) {
-          rawDataReceivers.get(i).end();
-        }
-      }
+      receiverThread.interrupt();
     }
   }
 
@@ -160,23 +138,20 @@ public class Logger {
   public void periodic() {
     if (running) {
       double periodicStart = getRealTimestamp();
-
-      // Send data to receivers
       if (entry != null) {
-        for (int i = 0; i < dataReceivers.size(); i++) {
-          dataReceivers.get(i).putEntry(entry);
-        }
-        if (rawDataReceivers.size() > 0) {
-          encoder.encodeTable(entry);
-        }
-        for (int i = 0; i < rawDataReceivers.size(); i++) {
-          rawDataReceivers.get(i).processEntry();
+        try {
+          receiverQueue.put(entry);
+        } catch (InterruptedException exception) {
+          return; // Main thread interrupted
         }
       }
 
       // Get next entry
+      double captureStart = getRealTimestamp();
+      ConduitApi conduit = ConduitApi.getInstance();
+      conduit.captureData();
       if (replaySource == null) {
-        entry = new LogTable(ConduitApi.getInstance().getTimestamp() / 1000000.0);
+        entry = new LogTable(conduit.getTimestamp() / 1000000.0);
         outputTable = entry.getSubtable("RealOutputs");
       } else {
         entry = replaySource.getEntry();
@@ -199,15 +174,17 @@ public class Logger {
       // Print timing data
       if (debugTiming && getRealTimestamp() > lastDebugPrint + 0.5) {
         lastDebugPrint = getRealTimestamp();
-        String updateLength = Double.toString((double) Math.round((driverStationStart - periodicStart) * 100000) / 100);
+        String receiveLength = Double.toString((double) Math.round((captureStart - periodicStart) * 100000) / 100);
+        String captureLength = Double.toString((double) Math.round((driverStationStart - captureStart) * 100000) / 100);
         String driverStationLength = Double
             .toString((double) Math.round((systemStatsStart - driverStationStart) * 100000) / 100);
         String systemStatsLength = Double
             .toString((double) Math.round((networkTablesStart - systemStatsStart) * 100000) / 100);
         String networkTablesLength = Double
             .toString((double) Math.round((periodicEnd - networkTablesStart) * 100000) / 100);
-        System.out.println("U=" + updateLength + ", DS=" + driverStationLength + ", SS=" + systemStatsLength + ", NT="
-            + networkTablesLength);
+        System.out.println("RE=" + receiveLength + ", CA=" + captureLength + ", DS="
+            + driverStationLength + ", SS=" + systemStatsLength + ", NT="
+            + networkTablesLength + ", #=" + Integer.toString(receiverQueue.size()));
       }
     } else {
       // Retrieve new driver station data even if logger is disabled

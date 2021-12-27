@@ -129,7 +129,6 @@ public class LoggedDriverStation {
     // Update inputs from conduit
     if (!logger.hasReplaySource()) {
       ConduitApi conduit = ConduitApi.getInstance();
-      conduit.captureData();
 
       dsInputs.allianceStation = conduit.getAllianceStation();
       dsInputs.eventName = conduit.getEventName().trim();

@@ -3,6 +3,7 @@ package org.littletonrobotics.junction.io;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,8 @@ public class LogSocketServer implements LogRawDataReceiver {
     List<Socket> sockets = new ArrayList<>();
 
     public ServerThread(int port, ByteEncoder encoder) {
+      super("LogSocketServer");
+      this.setDaemon(true);
       this.encoder = encoder;
       try {
         server = new ServerSocket(port);
@@ -57,7 +60,11 @@ public class LogSocketServer implements LogRawDataReceiver {
         try {
           Socket socket = server.accept();
           byte[] data = encoder.getNewcomerData().array();
-          socket.getOutputStream().write(data);
+          byte[] lengthBytes = ByteBuffer.allocate(Integer.BYTES).putInt(data.length).array();
+          byte[] fullData = new byte[lengthBytes.length + data.length];
+          System.arraycopy(lengthBytes, 0, fullData, 0, lengthBytes.length);
+          System.arraycopy(data, 0, fullData, lengthBytes.length, data.length);
+          socket.getOutputStream().write(fullData);
           sockets.add(socket);
           System.out.println("Connected to log client - " + socket.getInetAddress().getHostAddress());
 
@@ -72,6 +79,10 @@ public class LogSocketServer implements LogRawDataReceiver {
         return;
       }
       byte[] data = encoder.getOutput().array();
+      byte[] lengthBytes = ByteBuffer.allocate(Integer.BYTES).putInt(data.length).array();
+      byte[] fullData = new byte[lengthBytes.length + data.length];
+      System.arraycopy(lengthBytes, 0, fullData, 0, lengthBytes.length);
+      System.arraycopy(data, 0, fullData, lengthBytes.length, data.length);
       for (int i = 0; i < sockets.size(); i++) {
         Socket socket = sockets.get(i);
         if (socket.isClosed()) {
@@ -79,7 +90,7 @@ public class LogSocketServer implements LogRawDataReceiver {
         }
 
         try {
-          socket.getOutputStream().write(data);
+          socket.getOutputStream().write(fullData);
         } catch (IOException e) {
           try {
             socket.close();
