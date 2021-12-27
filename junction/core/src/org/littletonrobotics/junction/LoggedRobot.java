@@ -63,6 +63,9 @@ public class LoggedRobot extends IterativeRobotBase {
       simulationInit();
     }
 
+    // Save data from init cycle
+    Logger.getInstance().periodicAfterUser();
+
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
@@ -79,12 +82,15 @@ public class LoggedRobot extends IterativeRobotBase {
       }
 
       double loopCycleStart = Logger.getInstance().getRealTimestamp();
-      Logger.getInstance().periodic();
+      Logger.getInstance().periodicBeforeUser();
       double userCodeStart = Logger.getInstance().getRealTimestamp();
       loopFunc();
       double loopCycleEnd = Logger.getInstance().getRealTimestamp();
-      Logger.getInstance().recordOutput("FullCycleMS", (loopCycleEnd - loopCycleStart) * 1000);
-      Logger.getInstance().recordOutput("UserCodeMS", (loopCycleEnd - userCodeStart) * 1000);
+      Logger.getInstance().recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) * 1000);
+      Logger.getInstance().recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) * 1000);
+      Logger.getInstance().recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) * 1000);
+
+      Logger.getInstance().periodicAfterUser(); // Save data
     }
   }
 
