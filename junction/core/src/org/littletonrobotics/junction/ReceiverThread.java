@@ -18,6 +18,7 @@ public class ReceiverThread extends Thread {
 
   ReceiverThread(BlockingQueue<LogTable> queue) {
     super("LogReceiver");
+    this.setDaemon(true);
     this.queue = queue;
   }
 

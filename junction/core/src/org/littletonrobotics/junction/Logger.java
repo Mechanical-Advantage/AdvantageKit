@@ -128,7 +128,6 @@ public class Logger {
         replaySource.end();
       }
       receiverThread.interrupt();
-      ;
     }
   }
 
