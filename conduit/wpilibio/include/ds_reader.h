@@ -5,6 +5,7 @@ using namespace org::littletonrobotics::conduit;
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 // Reads data from the driver station.  The data is read in a thread and copied
 // into a schema::DSData internal buffer.  This copying is done under lock. When
@@ -14,12 +15,15 @@ using namespace org::littletonrobotics::conduit;
 // operation since the two buffers are the same structure
 class DsReader {
  public:
+  DsReader();
+  ~DsReader();
   void start();
   void read(schema::DSData* ds_buf);
 
  private:
   // Thread to read data from the driver station
   std::thread ds_thread;
+  std::atomic<bool> is_running;
 
   std::mutex copy_mutex;
 

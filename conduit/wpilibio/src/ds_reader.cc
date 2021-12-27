@@ -9,12 +9,19 @@
 
 static const int NUM_JOYSTICKS = 6;
 
+DsReader::DsReader() : is_running(false) {}
+
+DsReader::~DsReader() {
+  is_running = false;  // Stop the thread when we destruct this object
+}
+
 void DsReader::start() {
   ds_thread = std::thread(&DsReader::update_ds_data, this);
 }
 
 void DsReader::update_ds_data() {
-  while (true) {
+  is_running = true;
+  while (is_running) {
     HAL_WaitForDSData();
 
     std::int32_t status;
