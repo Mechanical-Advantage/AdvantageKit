@@ -167,13 +167,14 @@ public class Logger {
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
     } else {
       // Retrieve new driver station data even if logger is disabled
+      ConduitApi.getInstance().captureData();
       LoggedDriverStation.getInstance().periodic();
     }
   }
 
   /**
    * Periodic method to be called after robotInit and each loop cycle. Sends data
-   * to data receivers. Running this after user code means allows IO operations to
+   * to data receivers. Running this after user code allows IO operations to
    * occur between cycles rather than interferring with the main thread.
    */
   void periodicAfterUser() {
@@ -196,10 +197,10 @@ public class Logger {
    * entry.
    */
   public double getTimestamp() {
-    if (entry == null) {
-      return 0.0;
-    } else {
+    if (running) {
       return entry.getTimestamp();
+    } else {
+      return getRealTimestamp();
     }
   }
 
