@@ -1,4 +1,5 @@
 load("//build_tools/repo:java_export.bzl", "java_export")
+load("//build_tools/jpatch:java_patch.bzl", "java_sigcheck_test")
 
 java_library(
     name = "wpilib",
@@ -25,21 +26,8 @@ java_export(
     ],  # This needs to explicitly depend on wpilibj before our shim target because of how java_export handles duplicate class files when building.
 )
 
-# java_test(
-#     name = "jtest",
-#     args = [
-#         "$(location :wpilib)",
-#         "$(location @maven//:edu_wpi_first_wpilibj_wpilibj_java)",
-#     ],
-#     data = [
-#         ":wpilib",
-#         "@maven//:edu_wpi_first_wpilibj_wpilibj_java",
-#     ],
-#     main_class = "Sigcheck",
-#     use_testrunner = False,
-#     runtime_deps = [
-#         ":wpilib",
-#         "//build_tools/jpatch:sigcheck",
-#         "@maven//:edu_wpi_first_wpilibj_wpilibj_java",
-#     ],
-# )
+java_sigcheck_test(
+    name = "signature-test",
+    original_library = "//third_party/wpilib:wpilibj",
+    patch_library = ":wpilib",
+)
