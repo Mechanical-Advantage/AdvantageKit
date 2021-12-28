@@ -13,6 +13,7 @@ DsReader::DsReader() : is_running(false) {}
 
 DsReader::~DsReader() {
   is_running = false;  // Stop the thread when we destruct this object
+  ds_thread.join();
 }
 
 void DsReader::start() {
