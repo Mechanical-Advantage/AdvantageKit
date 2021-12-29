@@ -72,7 +72,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
     if (fileStream != null) {
       // Auto rename
       if (autoRename) {
-        if (System.currentTimeMillis() > 946702800000L) {
+        if (System.currentTimeMillis() > 1638334800000L) { // 12/1/2021, the RIO 2 defaults to 7/1/2021
           if (!updatedTime) {
             rename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.rlog'").format(new Date()));
             updatedTime = true;
@@ -107,6 +107,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
         DriverStation.reportError("Failed to write data to log file.", true);
       }
     }
+
   }
 
   private void rename(String newFilename) {
