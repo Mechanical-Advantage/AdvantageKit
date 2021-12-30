@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Scanner;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.LogTable;
@@ -52,5 +53,17 @@ public class ByteLogReplay implements LogReplaySource {
     } else {
       return null;
     }
+  }
+
+  /** Prompts the user to enter a path and returns the result. */
+  public static String promptForPath() {
+    Scanner scanner = new Scanner(System.in);
+    System.out.print("Enter path to log file: ");
+    String filename = scanner.nextLine();
+    scanner.close();
+    if (filename.charAt(0) == '\'' || filename.charAt(0) == '"') {
+      filename = filename.substring(1, filename.length() - 1);
+    }
+    return filename;
   }
 }
