@@ -78,9 +78,9 @@ public class ByteLogReceiver implements LogRawDataReceiver {
             updatedTime = true;
           }
 
-          if (DriverStation.getInstance().getMatchType() != MatchType.None && !updatedMatch) {
+          if (DriverStation.getMatchType() != MatchType.None && !updatedMatch) {
             String matchText = "";
-            switch (DriverStation.getInstance().getMatchType()) {
+            switch (DriverStation.getMatchType()) {
               case Practice:
                 matchText = "p";
                 break;
@@ -93,7 +93,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
               default:
                 break;
             }
-            matchText += Integer.toString(DriverStation.getInstance().getMatchNumber());
+            matchText += Integer.toString(DriverStation.getMatchNumber());
             rename(filename.substring(0, filename.length() - 5) + "_" + matchText + ".rlog");
             updatedMatch = true;
           }
