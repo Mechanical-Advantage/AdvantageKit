@@ -122,4 +122,12 @@ public class ByteLogReceiver implements LogRawDataReceiver {
       DriverStation.reportError("Failed to rename log file.", true);
     }
   }
+
+  /**
+   * Adds a suffix to the given path (e.g. "test.rlog" -> "test_simulated.rlog").
+   */
+  public static String addPathSuffix(String path, String suffix) {
+    String[] tokens = path.split("\\.");
+    return tokens[0] + suffix + "." + tokens[1];
+  }
 }
