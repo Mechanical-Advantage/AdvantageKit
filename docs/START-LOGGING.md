@@ -8,7 +8,7 @@ Logging in AdvantageKit is built around a different principle, often used in ind
 
 Logging in AdvantageKit is built with the following goals in mind:
 
-* Support a high level of logging in way that is **accessible**. This menas reducing the changes required to user code as much as possible, and building on top of existing frameworks (like command based WPILib).
+* Support a high level of logging in way that is **accessible**. This menas reducing the changes required to user code as much as possible, and building on top of existing frameworks (like command-based WPILib).
 
 * Provide **capable** and **easy-to-use** methods of viewing log data. The robot code saves logs in a custom binary format which is read by our viewer application [Advantage Scope](https://github.com/Mechanical-Advantage/AdvantageScope). Data can also be viewed live over the networkk.
 
@@ -95,25 +95,99 @@ if (isReal()) {
     Logger.getInstance().addDataReceiver(new ByteLogReceiver("/media/sda1/")); // Log to USB stick (name will be selected automatically)
     Logger.getInstance().addDataReceiver(new LogSocketServer(5800)); // Provide log data over the network, viewable in Advantage Scope.
 } else {
-    Logger.getInstance().setReplaySource(new ByteLogReplay("/path/to/input.rlog")); // Read log file for replay
-    Logger.getInstance().addDataReceiver(new ByteLogReceiver("/path/to/output.rlog")); // Save replay results to a new log
+    String path = ByteLogReplay.promptForPath(); // Prompt the user for a file path on the command line
+    Logger.getInstance().setReplaySource(new ByteLogReplay(path)); // Read log file for replay
+    Logger.getInstance().addDataReceiver(new ByteLogReceiver(ByteLogReceiver.addPathSuffix(path, "_sim"))); // Save replay results to a new log with the "_sim" suffix
 }
 
 Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 ```
 
-This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required. You could also prompt the user for the path to a replay log during runtime rather than using a hardcoded path.
+This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required.
 
 Metadata can be a valuable tool for ensuring that a log is replayed on the same version of code which produced it. We use this [Gradle plugin](https://github.com/lessthanoptimal/gversion-plugin) to produce a constants file with information like the Git SHA and build date. These values can then be stored as metadata during setup.
 
 ## Subsystems
 
-TODO.
+By necessity, any interaction with external hardware must be isolated such that all input data is logged and can be replayed in the simulator where that hardware it not present. For most robot code (such as command-based projects), hardware interaction occurs in multiple "subsystem" classes. Traditionally, a subsystem has three main components:
+
+![Diagram of traditional subsystem](resources/subsystem-1.png)
+
+* The **public interface** consists of methods used by the rest of the robot code to control the subsystem.
+
+* The **control logic** is the internal code used to follow those commands or analyze sensor data.
+
+* The **hardware interface** is the code used to read sensors and directly control hardware like motors or pneumatics.
+
+Data logging of inputs should occur between the control logic and hardware interface - this ensures that any control logic can be replayed in the simulator. We suggest restructuring the subsystem such that hardware interfacing occurs in a separate object (we call this the "IO" layer). The IO layer includes an interface defining all methods used for interacting with the hardware along with one or more implementations that make use of vendor libraries to carry out commands and read data.
+
+![Diagram of restructured subsystem](resources/subsystem-2.png)
+
+*Refer to [this folder](https://github.com/Mechanical-Advantage/LoggingDevelopment/tree/master/src/main/java/frc/robot/subsystems/template) for some example IO interfaces and implementations.*
+
+Outputs (setting voltage, setpoint, PID constants, etc.) make use of simple methods for each command. Input data is more controlled such that it can be logged and replayed. Each IO interface defines a class with public attributes for all input data ([example](https://github.com/Mechanical-Advantage/LoggingDevelopment/blob/master/src/main/java/frc/robot/subsystems/template/ClosedLoopIO.java#L13)), along with methods for saving and replaying that data from a log (`toLog` and `fromLog`). The IO layer then includes a single method (`updateInputs`) for updating all of that data. The subsystem class contains an instance of both the current IO implementation and the "inputs" object. Once per cycle, it updates the input data and sends it to the logging framework:
+
+```java
+io.updateInputs(inputs); // Update input data from the IO layer
+Logger.getInstance().processInputs("ExampleSubsystem", inputs); // Send input data to the logging framework (or update from the log during replay)
+```
+
+The rest of the subsystem then reads data from this inputs object rather than directly from the IO layer. This structure ensures that:
+
+* The logging framework has access to all of the data being logged and can insert data from the log during replay.
+
+* Throughout each cycle, all code making use of the input data reads the same values - the cache is never updated *during a cycle*. This means that the data replayed from the log appears identical to the data read on the real robot.
+
+All of the IO methods include a default implementation which is used during simulation. We suggest setting up each subsystem take the IO object as a constructor argument, so that the central robot class (like `RobotContainer`) can decide whether or not to use real hardware:
+
+```java
+public RobotContainer() {
+    if (isReal()) {
+        // Instantiate IO implementations to talk to real hardware
+        driveTrain = new DriveTrain(DriveTrainIOReal());
+        elevator = new Elevator(ElevatorIOReal());
+        intake = new Intake(IntakeIOReal());
+    } else {
+        // Use anonymous classes to create "dummy" IO implementations
+        driveTrain = new DriveTrain(DriveTrainIO() {});
+        elevator = new Elevator(ElevatorIO() {});
+        intake = new Intake(IntakeIO() {});
+    }
+}
+```
+
+> Note: We suggest use of an IO layer to minimize the chance of accidentally attempting to interact with hardware which doesn't exist. However, any structure will work where all input data flows through an inputs object implementing `LoggableInputs` and the two methods `fromLog` and `toLog`. Feel free to make use of whatever structure best fits your own requirements.
 
 ## Logging Outputs
 
-TODO.
+Output data consists of any calculated values which could be recreated in the simulator, including...
+
+* Odometry pose
+
+* Motor voltages
+
+* Pneumatics commands
+
+* Status data for drivers
+
+* Internal object state
+
+The logging framework supports recording this output data on the real robot and during replay. Essential data like the odometry pose are recorded on the real robot for convenience; even if it can be recreated in a simulator, that's often not a viable option in the rush to fix a problem between matches. During replay, recording extra output data is the primary method of debugging the code - logging calls can be added anywhere as they don't interfere with the replayed control logic. Any loggable data type (see above) can be saved as an output like so:
+
+```java
+Logger.getInstance().recordOutput("Odometry/XMeters", pose.getX());
+Logger.getInstance().recordOutput("Odometry/YMeters", pose.getX());
+Logger.getInstance().recordOutput("Odometry/RotationRadians", pose.getRotation().getRadians());
+```
+
+Remember that unlike Network Tables, **logged data is not persistent**. These fields must be logged every cycle in order to remain visible. This data is automatically saved to the `RealOutputs` or `ReplayOutputs` table, and it can be divided further into subtables using slashes (as seen above).
 
 ## Restrictions
 
-TODO.
+Unless otherwise specified, all normal WPILib and vendordep features will function correctly under the logging framework. See a list of exceptions below:
+
+* As explained in the "Subsystems" section, all hardware interaction must be isolated from the main control logic. This includes all motors, pneumatics, external sensors, vision processing, and robot status not controlled by the `DriverStation` class (including battery voltage, brownout status, and current draw from the PDP).
+
+* All user code must be single threaded. This is necessary to ensure that logged data is recorded and replayed predictably, and the timing of extra threads cannot be recreated in a simulator. 
+
+In addition, the logging framework typically increases the length of each loop cycle by 2-3ms. See [this page](CONDUIT-SHIMS.md) for more details. We recommend using the performance data automatically saved under `RealOutputs/LoggedRobot` to check if your code is at risk of causing loop overruns. In particular, recording Network Tables data is often performance intensive - you may need to reduce the number of logged NT subtables where possible.
