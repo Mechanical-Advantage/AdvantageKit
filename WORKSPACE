@@ -267,7 +267,6 @@ wpilib_nativezip(
     name = "ni_visa",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libvisa.so.21.0.0"],
             platform = "athena",
             sha256 = NI_VISA_ATHENA_SHA,
         ),
@@ -283,7 +282,6 @@ wpilib_nativezip(
     name = "ni_netcomm",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libFRC_NetworkCommunication.so.22.0.0"],
             platform = "athena",
             sha256 = NI_NETCOMM_ATHENA_SHA,
         ),
@@ -299,7 +297,6 @@ wpilib_nativezip(
     name = "ni_chipobject",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libRoboRIO_FRC_ChipObject.so.22.0.0"],
             platform = "athena",
             sha256 = NI_CHIPOBJECT_ATHENA_SHA,
         ),
@@ -315,10 +312,6 @@ wpilib_nativezip(
     name = "ni_runtime",
     binary_configs = [
         wpilib_binary_config(
-            libs = [
-                "libembcanshim.so",  # Runtime is now just a shim library
-                "libfpgalvshim.so",
-            ],
             platform = "athena",
             sha256 = NI_RUNTIME_ATHENA_SHA,
         ),
@@ -333,23 +326,18 @@ wpilib_nativezip(
     name = "wpilib_wpiutil",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libwpiutil.so"],
             platform = "athena",
             sha256 = WPILIB_WPIUTIL_ATHENA_SHA,
         ),
         wpilib_binary_config(
-            libs = ["libwpiutil.so"],
             platform = "linux_x64",
             sha256 = WPILIB_WPIUTIL_LINUX_X64_SHA,
         ),
         wpilib_binary_config(
-            libs = ["wpiutil.dll"],
             platform = "windows_x64",
             sha256 = WPILIB_WPIUTIL_WINDOWS_X64_SHA,
-            windows_libs = {"wpiutil.dll": "wpiutil.lib"},
         ),
         wpilib_binary_config(
-            libs = ["libwpiutil.dylib"],
             platform = "macos_x64",
             sha256 = WPILIB_WPIUTIL_MACOS_X64_SHA,
         ),
@@ -365,18 +353,14 @@ wpilib_nativezip(
     name = "wpilib_wpimath",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libwpimath.so"],
             platform = "linux_x64",
             sha256 = WPILIB_WPIMATH_LINUX_X64_SHA,
         ),
         wpilib_binary_config(
-            libs = ["wpimath.dll"],
             platform = "windows_x64",
             sha256 = WPILIB_WPIMATH_WINDOWS_X64_SHA,
-            windows_libs = {"wpimath.dll": "wpimath.lib"},
         ),
         wpilib_binary_config(
-            libs = ["libwpimath.dylib"],
             platform = "macos_x64",
             sha256 = WPILIB_WPIMATH_MACOS_X64_SHA,
         ),
@@ -391,30 +375,14 @@ wpilib_nativezip(
     name = "wpilib_ntcore",
     binary_configs = [
         wpilib_binary_config(
-            libs = [
-                "libntcore.so",
-                "libntcorejni.so",
-            ],
             platform = "linux_x64",
             sha256 = WPILIB_NTCORE_LINUX_X64_SHA,
         ),
         wpilib_binary_config(
-            libs = [
-                "ntcore.dll",
-                "ntcorejni.dll",
-            ],
             platform = "windows_x64",
             sha256 = WPILIB_NTCORE_WINDOWS_X64_SHA,
-            windows_libs = {
-                "ntcore.dll": "ntcore.lib",
-                "ntcorejni.dll": "ntcorejni.lib",
-            },
         ),
         wpilib_binary_config(
-            libs = [
-                "libntcore.dylib",
-                "libntcorejni.dylib",
-            ],
             platform = "macos_x64",
             sha256 = WPILIB_NTCORE_MACOS_X64_SHA,
         ),
@@ -429,39 +397,18 @@ wpilib_nativezip(
     name = "wpilib_hal",
     binary_configs = [
         wpilib_binary_config(
-            libs = [
-                "libwpiHal.so",
-                "libwpiHaljni.so",
-            ],
             platform = "athena",
             sha256 = WPILIB_HAL_ATHENA_SHA,
         ),
         wpilib_binary_config(
-            libs = [
-                "libwpiHal.so",
-                "libwpiHaljni.so",
-            ],
             platform = "linux_x64",
             sha256 = WPILIB_HAL_LINUX_X64_SHA,
         ),
         wpilib_binary_config(
-            libs = [
-                "wpiHal.dll",
-                "wpiHaljni.dll",
-            ],
-            #renames = {"wpiHaljni.dll": "wpiHaljniCOPY.dll"},
             platform = "windows_x64",
             sha256 = WPILIB_HAL_WINDOWS_X64_SHA,
-            windows_libs = {
-                "wpiHal.dll": "wpiHal.lib",
-                "wpiHaljni.dll": "wpiHaljni.lib",
-            },
         ),
         wpilib_binary_config(
-            libs = [
-                "libwpiHal.dylib",
-                "libwpiHaljni.dylib",
-            ],
             platform = "macos_x64",
             sha256 = WPILIB_HAL_MACOS_X64_SHA,
         ),
@@ -477,18 +424,14 @@ wpilib_nativezip(
     name = "wpilib_halsim_gui",
     binary_configs = [
         wpilib_binary_config(
-            libs = ["libhalsim_gui.so"],
             platform = "linux_x64",
             sha256 = WPILIB_HALSIM_LINUX_X64_SHA,
         ),
         wpilib_binary_config(
-            libs = ["halsim_gui.dll"],
             platform = "windows_x64",
             sha256 = WPILIB_HALSIM_WINDOWS_X64_SHA,
-            windows_libs = {"halsim_gui.dll": "halsim_gui.lib"},
         ),
         wpilib_binary_config(
-            libs = ["libhalsim_gui.dylib"],
             platform = "macos_x64",
             sha256 = WPILIB_HALSIM_MACOS_X64_SHA,
         ),

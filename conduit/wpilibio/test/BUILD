@@ -7,5 +7,4 @@ cc_test(
         "//third_party/wpilib:hal",
         "@com_google_googletest//:gtest_main",
     ],
-    target_compatible_with = ["@platforms//os:linux"], # TODO get this test working on macOS
 )
