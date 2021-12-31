@@ -15,11 +15,25 @@ def impl(ctx):
     for dynamic_lib in ctx.files.dynamic_libs:
         if dynamic_lib.basename.endswith("debug"):
             continue
+
+        # Find interface library matching this lib
+        # This is only used on Windows currently, other platforms don't use interface libraries
+        # An interface library is statically linked to the executable and essentially tells the 
+        # linker how to call functions in a DLL.
+        lib_name = dynamic_lib.basename.split(".")[0]
+        maybe_iface_lib = None
+        for iface_lib in ctx.files.interface_libs:
+            if iface_lib.basename.startswith(lib_name):
+                maybe_iface_lib = iface_lib
+                break
+        
+
         library_to_link = cc_common.create_library_to_link(
             actions = ctx.actions,
             feature_configuration = feature_config,
             cc_toolchain = cc_toolchain,
             dynamic_library = dynamic_lib,
+            interface_library = maybe_iface_lib,
             alwayslink = ctx.attr.alwayslink,
         )
         linker_input = cc_common.create_linker_input(
@@ -64,8 +78,8 @@ def impl(ctx):
 cc_superimport = rule(
     implementation = impl,
     attrs = {
-        "dynamic_libs": attr.label(mandatory = True, allow_files = True),
-        "interface_libs": attr.label(allow_files = True),
+        "dynamic_libs": attr.label_list(mandatory = True, allow_files = True),
+        "interface_libs": attr.label_list(allow_files = True),
         "deps": attr.label_list(),
         "alwayslink": attr.bool(default = False),
         # This is from the Bazel docs

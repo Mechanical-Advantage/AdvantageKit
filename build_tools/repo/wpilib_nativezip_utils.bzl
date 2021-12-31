@@ -69,6 +69,14 @@ filegroup(
     ]),
     visibility = ["{0}"],
 )
+
+filegroup(
+    name = "interface_binaries_files",
+    srcs = glob([
+        "**/*.lib",
+    ]),
+    visibility = ["{0}"],
+)
 """
 
 # base_url + package + "/%s/%s/%s-%s-headers.zip" % (name, version, name, version)

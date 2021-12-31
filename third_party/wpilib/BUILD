@@ -54,10 +54,14 @@ java_library(
 cc_superimport(
     name = "wpiutil",
     dynamic_libs = select({
-        "//build_tools/platforms:is_athena": "@wpilib_wpiutil_athena_files//:binaries_files",
-        "//build_tools/platforms:is_linux": "@wpilib_wpiutil_linux_x64_files//:binaries_files",
-        "//build_tools/platforms:is_windows": "@wpilib_wpiutil_windows_x64_files//:binaries_files",
-        "//build_tools/platforms:is_macos": "@wpilib_wpiutil_macos_x64_files//:binaries_files",
+        "//build_tools/platforms:is_athena": ["@wpilib_wpiutil_athena_files//:binaries_files"],
+        "//build_tools/platforms:is_linux": ["@wpilib_wpiutil_linux_x64_files//:binaries_files"],
+        "//build_tools/platforms:is_windows": ["@wpilib_wpiutil_windows_x64_files//:binaries_files"],
+        "//build_tools/platforms:is_macos": ["@wpilib_wpiutil_macos_x64_files//:binaries_files"],
+    }),
+    interface_libs = select({
+        "//build_tools/platforms:is_windows": ["@wpilib_wpiutil_windows_x64_files//:interface_binaries_files"],
+        "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
     deps = ["@wpilib_wpiutil_headers_files//:headers"],
@@ -66,30 +70,34 @@ cc_superimport(
 cc_superimport(
     name = "ntcore",
     dynamic_libs = select({
-        "//build_tools/platforms:is_linux": "@wpilib_ntcore_linux_x64_files//:binaries_files",
-        "//build_tools/platforms:is_windows": "@wpilib_ntcore_windows_x64_files//:binaries_files",
-        "//build_tools/platforms:is_macos": "@wpilib_ntcore_macos_x64_files//:binaries_files",
+        "//build_tools/platforms:is_linux": ["@wpilib_ntcore_linux_x64_files//:binaries_files"],
+        "//build_tools/platforms:is_windows": ["@wpilib_ntcore_windows_x64_files//:binaries_files"],
+        "//build_tools/platforms:is_macos": ["@wpilib_ntcore_macos_x64_files//:binaries_files"],
     }),
     visibility = ["//visibility:public"],
 )
 
 cc_superimport(
     name = "wpimath",
-    visibility = ["//visibility:public"],
     dynamic_libs = select({
-        "//build_tools/platforms:is_linux": "@wpilib_wpimath_linux_x64_files//:binaries_files",
-        "//build_tools/platforms:is_windows": "@wpilib_wpimath_windows_x64_files//:binaries_files",
-        "//build_tools/platforms:is_macos": "@wpilib_wpimath_macos_x64_files//:binaries_files",
+        "//build_tools/platforms:is_linux": ["@wpilib_wpimath_linux_x64_files//:binaries_files"],
+        "//build_tools/platforms:is_windows": ["@wpilib_wpimath_windows_x64_files//:binaries_files"],
+        "//build_tools/platforms:is_macos": ["@wpilib_wpimath_macos_x64_files//:binaries_files"],
     }),
+    visibility = ["//visibility:public"],
 )
 
 cc_superimport(
     name = "hal",
     dynamic_libs = select({
-        "//build_tools/platforms:is_athena": "@wpilib_hal_athena_files//:binaries_files",
-        "//build_tools/platforms:is_linux": "@wpilib_hal_linux_x64_files//:binaries_files",
-        "//build_tools/platforms:is_windows": "@wpilib_hal_windows_x64_files//:binaries_files",
-        "//build_tools/platforms:is_macos": "@wpilib_hal_macos_x64_files//:binaries_files",
+        "//build_tools/platforms:is_athena": ["@wpilib_hal_athena_files//:binaries_files"],
+        "//build_tools/platforms:is_linux": ["@wpilib_hal_linux_x64_files//:binaries_files"],
+        "//build_tools/platforms:is_windows": ["@wpilib_hal_windows_x64_files//:binaries_files"],
+        "//build_tools/platforms:is_macos": ["@wpilib_hal_macos_x64_files//:binaries_files"],
+    }),
+    interface_libs = select({
+        "//build_tools/platforms:is_windows": ["@wpilib_hal_windows_x64_files//:interface_binaries_files"],
+        "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
     deps = [
