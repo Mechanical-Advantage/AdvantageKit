@@ -35,4 +35,4 @@ bazel run --define "publishing_version=X.X.X" ...
 
 ## Testing
 
-TODO: The `jtest` rule checks that the method signatures of each class match the stock WPILib versions. This project is still in progress.
+The `signature-test` rule checks that the method signatures of each class match the stock WPILib versions.
