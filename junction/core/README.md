@@ -2,7 +2,7 @@
 
 > Central system for managing data, including reading and writing from log files and user code.
 
-`junction/core` manages the flow of data inputs and output in each cycle. See [Getting Started: Logging](/docs/START-LOGGING.md) for details of how to utliize the logging framework in user code, including a list of data sources managed by `junction/core`.
+`junction/core` manages the flow of data inputs and output in each cycle. See [Getting Started: Logging](/docs/START-LOGGING.md) for details of how to utilize the logging framework in user code, including a list of data sources managed by `junction/core`.
 
 ## Packages
 
@@ -11,10 +11,10 @@
 
 ## Interface
 
-Below are a few key classes which are utilized by user code. See documentation in each file for details of their interfaces.
+Below are a few key classes that are utilized by user code. See documentation in each file for details of their interfaces.
 
 * [`Logger.java`](/junction/core/src/org/littletonrobotics/junction/Logger.java) - Used to initially configure the logging framework, including and data receivers and replay sources. When running, input and output data are sent to this class to be logged and replayed.
-* [`LoggedRobot.java`](/junction/core/src/org/littletonrobotics/junction/LoggedRobot.java) - This is the superclass of the main robot class. This class controls the timing of loop cycles (maintaining a regular cycle on the real robot or replaying more quickly in a simiulator). It's also reponsible for running the periodic code for the logging framework.
+* [`LoggedRobot.java`](/junction/core/src/org/littletonrobotics/junction/LoggedRobot.java) - This is the superclass of the main robot class. This class controls the timing of loop cycles (maintaining a regular cycle on the real robot or replaying more quickly in a simulator). It's also responsible for running the periodic code for the logging framework.
 * [`LoggableInputs.java`](/junction/core/src/org/littletonrobotics/junction/inputs/LoggableInputs.java) - Input data from subsystems implements this interface, allowing the logging framework to freely read and write values.
 
 ## Building
@@ -31,7 +31,7 @@ To publish `junction/core` to your local Maven repository, use the following com
 bazel run --define "maven_repo=file://$HOME/.m2/repository" //junction/core:core-export.publish
 ```
 
-As with all components published to Maven, the version number can be set with a command line flag:
+As with all components published to Maven, the version number can be set with a command-line flag:
 
 ```bash
 bazel run --define "publishing_version=X.X.X" ...

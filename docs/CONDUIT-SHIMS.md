@@ -10,9 +10,9 @@ Input data from the Driver Station is some of the most critical information reco
 
 The built-in `DriverStation` class in WPILib is responsible for making DS data available to the user program. Classes like `RobotBase`, `Joystick`, and `XboxController` all refer back to `DriverStation`. Internally, `DriverStation` retrieves new data through the following steps (in summary):
 
-1. It launches a thread which waits for a new DS packet with updated data. These updates occur every 20ms, but *not in sync with the user program*.
+1. It launches a thread that waits for a new DS packet with updated data. These updates occur every 20ms, but *not in sync with the user program*.
 
-2. When a new packet arrives, common data like the robot state and joystick values are read from the HAL and stored to a local cache. The thread then blocks until the next packet is received.
+2. When a new packet arrives, common data like the robot state and joystick values are read from the HAL and stored in a local cache. The thread then blocks until the next packet is received.
 
 3. When this common data is requested by the user program, it is read from the internal cache.
 
@@ -26,9 +26,9 @@ The approach to logging this data seems clear - record all of the values from th
 
 ## Solution #1: Performance/Conduit
 
-Most of the logging framework is written in Java (this is [`junction`](/junction)). To improve the performance of reading DS data, we created a C++ component ([`conduit`](/conduit)). `conduit` is responsible for efficiently transfering DS data from the HAL to `junction`. Below is the new pathway for DS data:
+Most of the logging framework is written in Java (this is [`junction`](/junction)). To improve the performance of reading DS data, we created a C++ component ([`conduit`](/conduit)). `conduit` is responsible for efficiently transferring DS data from the HAL to `junction`. Below is the new pathway for DS data:
 
-1. `conduit` launches a thread which waits for new DS packets (much like the Java `DriverStation`). When a new packet arrives, all of the data is saved to an internal memory buffer in `conduit`. This includes all of the DS data, including the less common fields not cached by default.
+1. `conduit` launches a thread that waits for new DS packets (much like the Java `DriverStation`). When a new packet arrives, all of the data is saved to an internal memory buffer in `conduit`. This includes all of the DS data, including the less common fields not cached by default.
 
 2. When the logging framework needs to record DS data each cycle, it makes a single JNI call into `conduit`. The data from the internal memory buffer is copied to a shared buffer accessible to the Java code.
 
@@ -42,7 +42,7 @@ Using `conduit`, the logging framework already has a complete copy of all of the
 
 ## Timestamps
 
-The same problem of determinism applies not just to DS data, but also to the timestamp. Calls like `Timer.getFPGATimestamp()` read directly from the HAL, meaning that every call within a cycle will return a different value. This means that the exact behavior of the user program may not be reproducible as these values are not logged. Our solution is to record a single timestamp at the start of the loop cycle, which is used until the next udpate. The `RobotController` class is shimmed such that the `getFPGATime()` method returns the timestamp recorded by the logging framework (this method is used by a variety of other classes including `Timer`). Again, the shim guarantees that the data saved to the log file is identiacl to the data read by the user program.
+The same problem of determinism applies not just to DS data, but also to the timestamp. Calls like `Timer.getFPGATimestamp()` read directly from the HAL, meaning that every call within a cycle will return a different value. This means that the exact behavior of the user program may not be reproducible as these values are not logged. Our solution is to record a single timestamp at the start of the loop cycle, which is used until the next update. The `RobotController` class is shimmed such that the `getFPGATime()` method returns the timestamp recorded by the logging framework (this method is used by a variety of other classes including `Timer`). Again, the shim guarantees that the data saved to the log file is identical to the data read by the user program.
 
 The full list of modified classes is [here](/junction/shims/wpilib). The artifact `org.littletonrobotics.akit.junction:wpilib-shim` is a full replacement for `wpilibj`, except with our shimmed classes. The following lines in `build.gradle` (as seen in the [installation instructions](/docs/START-LOGGING.md#installation-with-gradle)) replace the default implementation:
 
@@ -60,4 +60,4 @@ It's critical that the timestamp and DS data are available to the user program a
 
 * When the timestamp is requested (including through a shimmed class), the real timestamp from the HAL will be returned.
 
-* During the normal logging periodic function, DS data will be updated from conduit. No other periodic code will run. Note that the main `Robot` class *must still inherit from `LoggedRobot`*, otherwise the periodic function of the logging framework will not be called and DS data will not be updated.
+* During the normal logging periodic function, DS data will be updated from `conduit`. No other periodic code will run. Note that the main `Robot` class *must still inherit from `LoggedRobot`*, otherwise the periodic function of the logging framework will not be called and DS data will not be updated.

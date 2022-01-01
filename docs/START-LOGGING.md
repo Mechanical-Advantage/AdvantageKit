@@ -8,9 +8,9 @@ Logging in AdvantageKit is built around a different principle, often used in ind
 
 Logging in AdvantageKit is built with the following goals in mind:
 
-* Support a high level of logging in way that is **accessible**. This menas reducing the changes required to user code as much as possible, and building on top of existing frameworks (like command-based WPILib).
+* Support a high level of logging in a way that is **accessible**. This means reducing the changes required to user code as much as possible, and building on top of existing frameworks (like command-based WPILib).
 
-* Provide **capable** and **easy-to-use** methods of viewing log data. The robot code saves logs in a custom binary format which is read by our viewer application [Advantage Scope](https://github.com/Mechanical-Advantage/AdvantageScope). Data can also be viewed live over the networkk.
+* Provide **capable** and **easy-to-use** methods of viewing log data. The robot code saves logs in a custom binary format which is read by our viewer application [Advantage Scope](https://github.com/Mechanical-Advantage/AdvantageScope). Data can also be viewed live over the network.
 
 * Maintain **openness** and **transparency** during development as part of 6328's efforts with the [#OpenAlliance](https://github.com/OpenAllianceFRC/info).
 
@@ -64,14 +64,14 @@ Below are definitions of each component:
 * **Replay source** - Provides data from an external source for use during replay. This almost always means reading data from a log file produced by the robot. A replay source only exists while in replay (never on the real robot).
 * **Data receiver** - Saves data to an external source in all modes. Multiple data receivers can be provided (or none at all). While a data receiver usually writes to a log file, it can also be used to send data over the network.
 * **LoggedSystemStats** *(Built-in input)* - Records robot stats like battery voltage, PDP current draw, and CAN bus utilization for diagnostics. This data is not available during replay.
-* **LoggedNetworkTables** *(Built-in input)* - Records and replays data in Network Tables. This is primarily intended for data which is not time sensitive such as dashboard options and tuning values.
+* **LoggedNetworkTables** *(Built-in input)* - Records and replays data in Network Tables. This is primarily intended for data that is not time-sensitive such as dashboard options and tuning values.
 * **LoggedDriverStation** *(Built-in input)* - Internal class managing driver station data. See [here](/docs/CONDUIT-SHIMS.md) for details on why this data needs to be managed by the framework.
 
 Data is stored based on string keys where slashes are used to denote subtables (similar to Network Tables) - each subsystem stores data in a separate subtable. A new set of data is produced for each cycle, meaning values are NOT persistent. If a key is not set during a cycle, its value will be `null` by default. The following data types are currently supported:
 
 `boolean, boolean[], int, int[], double, double[], String, String[], byte, byte[]`
 
-`Logger` is also responsible for manging timestamps. The current timestamp from the FPGA is read at the start of each cycle and syncronized for all logic. For example, calls to `Timer.getFPGATimestamp()` will return this syncronized timestamp. This system guarantees that control logic can be replayed accurately.
+`Logger` is also responsible for managing timestamps. The current timestamp from the FPGA is read at the start of each cycle and synchronized for all logic. For example, calls to `Timer.getFPGATimestamp()` will return this synchronized timestamp. This system guarantees that control logic can be replayed accurately.
 
 ## Robot Configuration
 
@@ -86,7 +86,7 @@ public class Robot extends LoggedRobot {
 }
 ```
 
-The user program is responsible for configuring and intializing the logging framework. This setup should be placed in `robotInit()` *before any other initialization*. An example configuration is provided below:
+The user program is responsible for configuring and initializing the logging framework. This setup should be placed in `robotInit()` *before any other initialization*. An example configuration is provided below:
 
 ```java
 setUseTiming(isReal()); // Run as fast as possible during replay
@@ -111,7 +111,7 @@ Metadata can be a valuable tool for ensuring that a log is replayed on the same 
 
 ## Subsystems
 
-By necessity, any interaction with external hardware must be isolated such that all input data is logged and can be replayed in the simulator where that hardware it not present. For most robot code (such as command-based projects), hardware interaction occurs in multiple "subsystem" classes. Traditionally, a subsystem has three main components:
+By necessity, any interaction with external hardware must be isolated such that all input data is logged and can be replayed in the simulator where that hardware is not present. For most robot code (such as command-based projects), hardware interaction occurs in multiple "subsystem" classes. Traditionally, a subsystem has three main components:
 
 ![Diagram of traditional subsystem](resources/subsystem-1.png)
 
@@ -158,7 +158,7 @@ public RobotContainer() {
 }
 ```
 
-> Note: We suggest use of an IO layer to minimize the chance of accidentally attempting to interact with hardware which doesn't exist. However, any structure will work where all input data flows through an inputs object implementing `LoggableInputs` and the two methods `fromLog` and `toLog`. Feel free to make use of whatever structure best fits your own requirements.
+> Note: We suggest the use of an IO layer to minimize the chance of interacting with hardware that doesn't exist. However, any structure will work where all input data flows through an inputs object implementing `LoggableInputs` and the two methods `fromLog` and `toLog`. Feel free to make use of whatever structure best fits your own requirements.
 
 ## Logging Outputs
 
@@ -190,6 +190,6 @@ Unless otherwise specified, all normal WPILib and vendordep features will functi
 
 * As explained in the "Subsystems" section, all hardware interaction must be isolated from the main control logic. This includes all motors, pneumatics, external sensors, vision processing, and robot status not controlled by the `DriverStation` class (including battery voltage, brownout status, and current draw from the PDP).
 
-* All user code must be single threaded. This is necessary to ensure that logged data is recorded and replayed predictably, and the timing of extra threads cannot be recreated in a simulator. 
+* All user code must be single-threaded. This is necessary to ensure that logged data is recorded and replayed predictably, and the timing of extra threads cannot be recreated in a simulator. 
 
 In addition, the logging framework typically increases the length of each loop cycle by 2-3ms. See [this page](CONDUIT-SHIMS.md) for more details. We recommend using the performance data automatically saved under `RealOutputs/LoggedRobot` to check if your code is at risk of causing loop overruns. In particular, recording Network Tables data is often performance intensive - you may need to reduce the number of logged NT subtables where possible.
