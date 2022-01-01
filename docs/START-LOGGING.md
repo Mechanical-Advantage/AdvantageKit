@@ -18,6 +18,8 @@ Logging in AdvantageKit is built with the following goals in mind:
 
 You can download the latest version of Advantage Scope [here](https://github.com/Mechanical-Advantage/AdvantageScope/releases/latest) for Windows, macOS, and Linux. This application is required for viewing log files.
 
+![Example screenshot of Advantage Scope](resources/advantage-scope.jpg)
+
 ## Installation With Gradle
 
 AdvantageKit is available through GitHub Packages. To make our Maven repository available through Gradle, add the following block to the `build.gradle` file:
