@@ -14,11 +14,10 @@
         "bazel-bin/third_party/wpilib/downloaded/wpilibj.jar"
     ],
     "java.project.sourcePaths": [
+        "dev_sandbox",
         "third_party/flatbuffers/java",
         "junction/shims/wpilib/src",
         "junction/core/src",
-        "example_java_project/test",
-        "example_java_project/src",
         "conduit/api/src",
         "build_tools/jpatch/sigcheck",
         "build_tools/repo",
