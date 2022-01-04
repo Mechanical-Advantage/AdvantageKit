@@ -8,23 +8,11 @@
         "**/.settings": true,
         "**/.factorypath": true
     },
-    "java.project.referencedLibraries": [
-        "bazel-bin/external/maven/**/*.jar",
-        "bazel-bin/external/frcmaven/**/*.jar",
-        "bazel-bin/third_party/wpilib/downloaded/wpilibj.jar"
-    ],
-    "java.project.sourcePaths": [
-        "dev_sandbox",
-        "third_party/flatbuffers/java",
-        "junction/shims/wpilib/src",
-        "junction/core/src",
-        "conduit/api/src",
-        "build_tools/jpatch/sigcheck",
-        "build_tools/repo",
-        "bazel-bin/conduit"
-    ],
     "java.import.gradle.enabled": false,
     "java.import.maven.enabled": false,
+    "java.import.bazel.enabled": true,
+    "java.import.bazel.src.path": "/src",
+    "java.import.bazel.test.path": "/test",
     "files.associations": {
         "BUILD": "bazel",
         "WORKSPACE": "bazel",
@@ -32,5 +20,5 @@
     "clangd.arguments": [
         "--header-insertion=never",
         "--compile-commands-dir=${workspaceFolder}/"
-    ]
+    ] 
 }

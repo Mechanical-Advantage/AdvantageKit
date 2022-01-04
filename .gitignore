@@ -1,4 +1,6 @@
 /bazel-*
+# Allow bazel-vscode extension to be checked in
+!bazel-vscode* 
 /compile_commands.json
 /.cache
 user.bazelrc
