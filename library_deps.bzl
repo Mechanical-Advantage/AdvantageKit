@@ -20,7 +20,7 @@ MAVEN_ARTIFACTS = [
     "junit:junit:4.13.2",
 ]
 
-WPILIB_VERSION = "2022.1.1-beta-4"
+WPILIB_VERSION = "2022.1.1-rc-1"
 
 FRCMAVEN_ARTIFACTS = ["%s:%s" % (x, WPILIB_VERSION) for x in [
     "edu.wpi.first.hal:hal-java",
