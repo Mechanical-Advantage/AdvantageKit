@@ -61,13 +61,13 @@ rules_pkg_dependencies()
 # https://github.com/hedronvision/bazel-compile-commands-extractor
 http_archive(
     name = "hedron_compile_commands",
-
-    # Replace the commit hash in both places (below) with the latest. 
-    # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" below).
-    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/e704e82375048df67200b96f83e3e5e7bda8897e.tar.gz",
+    sha256 = "512da68b344a8e66e598ff647239a6ab39b6330c0c4152183410bd65326c7923",
     strip_prefix = "bazel-compile-commands-extractor-e704e82375048df67200b96f83e3e5e7bda8897e",
+    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/e704e82375048df67200b96f83e3e5e7bda8897e.tar.gz",
 )
+
 load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
+
 hedron_compile_commands_setup()
 
 # All Maven artifacts that we use go here.  The philosophy is that we only ever have one version of any external
