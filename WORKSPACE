@@ -57,6 +57,19 @@ load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
 rules_pkg_dependencies()
 
+# Hedron's Compile Commands Extractor for Bazel
+# https://github.com/hedronvision/bazel-compile-commands-extractor
+http_archive(
+    name = "hedron_compile_commands",
+
+    # Replace the commit hash in both places (below) with the latest. 
+    # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" below).
+    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/e704e82375048df67200b96f83e3e5e7bda8897e.tar.gz",
+    strip_prefix = "bazel-compile-commands-extractor-e704e82375048df67200b96f83e3e5e7bda8897e",
+)
+load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
+hedron_compile_commands_setup()
+
 # All Maven artifacts that we use go here.  The philosophy is that we only ever have one version of any external
 # maven library in use across the entire codebase at any time.  If we update it, we make the changes everywhere
 # to keep things working.  This eliminates the problem of version conflicts between libraries.

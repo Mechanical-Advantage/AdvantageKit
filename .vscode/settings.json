@@ -1,6 +1,6 @@
 {
     "files.exclude": {
-        "external": true,
+        "external": false,
         "bazel-*": false,
         "compile_commands.json": false,
         "**/.classpath": true,
@@ -25,11 +25,12 @@
     ],
     "java.import.gradle.enabled": false,
     "java.import.maven.enabled": false,
-    "bsv.cc.compdb.targets": [
-        "//conduit/wpilibio"
-    ],
     "files.associations": {
         "BUILD": "bazel",
         "WORKSPACE": "bazel",
-    }
+    },
+    "clangd.arguments": [
+        "--header-insertion=never",
+        "--compile-commands-dir=${workspaceFolder}/"
+    ]
 }

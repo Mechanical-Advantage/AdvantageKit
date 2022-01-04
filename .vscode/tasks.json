@@ -15,6 +15,19 @@
                 "panel": "new"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Update compilation database",
+            "type": "shell",
+            "command": "bazel run @hedron_compile_commands//:refresh_all",
+            "windows": {
+                "command": "" // No windows support currently
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
         }
     ]
   }
