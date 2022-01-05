@@ -1,7 +1,6 @@
 # This loads the rule "http_archive", which is used to download zip files from the web
 # and make them available to other rules in our workspace.
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
-load("//build_tools/repo:wpilib_nativezip_utils.bzl", "wpilib_binary_config", "wpilib_nativezip")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "bazel_skylib",
@@ -70,6 +69,18 @@ load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_
 
 hedron_compile_commands_setup()
 
+# library_deps.bzl contains definitions for MAVEN_ARTIFACTS (maven central), FRCMAVEN_ARTIFACTS (wpilib maven server),
+# the wpilibj jar and sources file, and http_archive rules to download native wpilib dependencies.
+# Due to Bazel's requirement that all artifacts need an sha256 to verify they haven't changed, we have a Python script which
+# generates this file.  Please do not modify this file directly, instead modify the generator script and regenerate it.
+# An internet connection is required to run the generator as it requests the sha256 checksums for several files
+# and re-downloads all maven dependencies.
+
+# To add dependencies to any of the above categories, please see generate_library_deps.bzl, and then execute it when done.
+load(":library_deps.bzl", "FRCMAVEN_ARTIFACTS", "MAVEN_ARTIFACTS", "library_deps_setup")
+
+library_deps_setup()
+
 # All Maven artifacts that we use go here.  The philosophy is that we only ever have one version of any external
 # maven library in use across the entire codebase at any time.  If we update it, we make the changes everywhere
 # to keep things working.  This eliminates the problem of version conflicts between libraries.
@@ -78,11 +89,7 @@ hedron_compile_commands_setup()
 # Artifact ID = org.littletonrobotics:somelib:1.0.0  ->  Bazel target = @maven//:org_littletonrobotics_somelib
 # From the Bazel docs: "All non-alphanumeric characters are substituted with underscores."
 
-# Maven artifact lists are stored in library_deps.bzl.  To add artifacts, go there.
-# After adding artifacts, make sure to "repin" the maven dependencies by running "bazel run @unpinned_maven//:pin"
-# (or "bazel run @unpinned_frcmaven//:pin" for the frcmaven repo).
-# Newly added maven dependencies will NOT be downloaded until the appropriate command is run!
-load(":library_deps.bzl", "FRCMAVEN_ARTIFACTS", "MAVEN_ARTIFACTS", "WPILIB_VERSION")
+# Please see above about library_deps to find where the list of maven artifacts is located.
 
 maven_install(
     artifacts = MAVEN_ARTIFACTS,
@@ -199,258 +206,4 @@ register_toolchains(
     "//build_tools/toolchain/flatc:flatc_toolchain_linux_x64",
     "//build_tools/toolchain/flatc:flatc_toolchain_windows_x64",
     "//build_tools/toolchain/flatc:flatc_toolchain_macos_x64",
-)
-
-# Below are a bunch of http_archive rules to make various WPILib components available
-
-# HAL components
-NI_VERSION = "2022.2.3"
-
-NI_VISA_HEADERS_SHA = "7e428729d299cae5b0e1acd34f38609af6544c83095c3b4b5897d0183eb1a15f"
-
-NI_VISA_ATHENA_SHA = "014fff5a4684f3c443cbed8c52f19687733dd7053a98a1dad89941801e0b7930"
-
-NI_NETCOMM_HEADERS_SHA = "fddb8924887bd46c1d51099327085e821f30c1b2feefd168f1211675c17937d8"
-
-NI_NETCOMM_ATHENA_SHA = "f56c2fc0943f27f174642664b37fb4529d6f2b6405fe41a639a4c9f31e175c73"
-
-NI_CHIPOBJECT_HEADERS_SHA = "c43e7e9eb7a48c1f97c6b21a0474ec7c8527fbeb3d6c5f62d4d9566771afe25e"
-
-NI_CHIPOBJECT_ATHENA_SHA = "fdf47ae5ce052edd82ba2b6e007faabf9286f87b079e3789afc3235733d5475c"
-
-NI_RUNTIME_ATHENA_SHA = "186d1b41e96c5d761705221afe0b9f488d1ce86e8149a7b0afdc3abc93097266"
-
-WPILIBJ_JAR_SHA = "2cf1af95962675546e882d9c0cf29634759ac89be67c9d46813cad35ec1ec80c"
-
-WPILIBJ_SOURCES_JAR_SHA = "973cbe5af19708eae88cb1544b366f26981b75715abece8f1fb5a45d86bf2fda"
-
-WPILIB_HAL_HEADERS_SHA = "930ad6635c8bbfc0f8939261c79424981f6c12d3a07417b5ef226177c8e70d1c"
-
-WPILIB_HAL_ATHENA_SHA = "ef3c886ccf09ddb2ccce12f214ba2354e435bc40596bf04e0b7d9e0aac8bb949"
-
-WPILIB_HAL_LINUX_X64_SHA = "6b0699fc193537c478cf4296ac039dbc7f04b0120da1a04c1424b6007bdb5256"
-
-WPILIB_HAL_WINDOWS_X64_SHA = "809ad1b0ccbb8951c5557f4e7dc4591cd790344974b6ea45ea1232352d16d857"
-
-WPILIB_HAL_MACOS_X64_SHA = "69c15c67c7a7e7a2ed3cf685e52b15a1afaa9d652d7dd8b9042bce90d9318fd5"
-
-WPILIB_WPIUTIL_HEADERS_SHA = "37d5e1ba747a50988326ac34edc368c9285da608de0f33b63b29dfb159f42df3"
-
-WPILIB_WPIUTIL_ATHENA_SHA = "cc3dab1b3c2e8d49a5592c13faf9b395f0bdcc526e1cc906675942052b379d32"
-
-WPILIB_WPIUTIL_LINUX_X64_SHA = "a32c61d948b8a174becb320aaacac3ddcb4b2a3dcce23fb573e0074163bdf011"
-
-WPILIB_WPIUTIL_WINDOWS_X64_SHA = "6002df9b36d7ee7b22908b51ac1ffad565538cde0548ea137a8708f36b697780"
-
-WPILIB_WPIUTIL_MACOS_X64_SHA = "cea13455b87f781797b77d10164cbdb22e3c650535f1ce65243c8cd28d123274"
-
-WPILIB_WPIMATH_LINUX_X64_SHA = "5eb5b0424e34fa854318c026f7c5c52cafdf78579f5cebd6ae16464fcc709fd4"
-
-WPILIB_WPIMATH_WINDOWS_X64_SHA = "32c2d8dc2965d66456b4338f0e27d592908d0440147c58ca7afb1055d0c3a137"
-
-WPILIB_WPIMATH_MACOS_X64_SHA = "169ac35d4a87f8426f7b956eda7d5ca4297ed1379760f6c202ad6572e6a4ea51"
-
-WPILIB_NTCORE_LINUX_X64_SHA = "e1e4f64175c73649e6635b5af8ee63d984741164f438739afabc732c7aaa5b7e"
-
-WPILIB_NTCORE_WINDOWS_X64_SHA = "1acd184bb3159347c70ff893d366e4fe8ef208fd54f6296ecd59bf867441e0eb"
-
-WPILIB_NTCORE_MACOS_X64_SHA = "fbdd4a89c2ea71cf869eca055bb063ad6cae2d3126df287e1ad2f14ec07a16bf"
-
-WPILIB_HALSIM_LINUX_X64_SHA = "d9532b524720784000cbd440e0cf800177f9e0d777cc8f82be6ae54914926003"
-
-WPILIB_HALSIM_WINDOWS_X64_SHA = "c5b975eab72d477d10b09d14bd2b71864efb7e8097789d2480fc2c3c13b63475"
-
-WPILIB_HALSIM_MACOS_X64_SHA = "20e79045ccf9fcebef4529f5f881ec66713d33fd5e8a4962ac3bb75052f9805e"
-
-http_file(
-    name = "wpilibj_jar_file",
-    downloaded_file_path = "wpilibj.jar",  # java_import needs the filename to contain .jar
-    sha256 = WPILIBJ_JAR_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/wpilibj-java/%s/wpilibj-java-%s.jar" % (WPILIB_VERSION, WPILIB_VERSION)],
-)
-
-http_file(
-    name = "wpilibj_sources_jar_file",
-    downloaded_file_path = "wpilibj_sources.jar",
-    sha256 = WPILIBJ_SOURCES_JAR_SHA,
-    urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/wpilibj-java/%s/wpilibj-java-%s-sources.jar" % (WPILIB_VERSION, WPILIB_VERSION)],
-)
-
-wpilib_nativezip(
-    name = "ni_visa",
-    binary_configs = [
-        wpilib_binary_config(
-            platform = "athena",
-            sha256 = NI_VISA_ATHENA_SHA,
-        ),
-    ],
-    headers_sha256 = NI_VISA_HEADERS_SHA,
-    package = "ni-libraries",
-    remote_name = "visa",
-    version = NI_VERSION,
-    visibility = "@//third_party/ni:__pkg__",
-)
-
-wpilib_nativezip(
-    name = "ni_netcomm",
-    binary_configs = [
-        wpilib_binary_config(
-            platform = "athena",
-            sha256 = NI_NETCOMM_ATHENA_SHA,
-        ),
-    ],
-    headers_sha256 = NI_NETCOMM_HEADERS_SHA,
-    package = "ni-libraries",
-    remote_name = "netcomm",
-    version = NI_VERSION,
-    visibility = "@//third_party/ni:__pkg__",
-)
-
-wpilib_nativezip(
-    name = "ni_chipobject",
-    binary_configs = [
-        wpilib_binary_config(
-            platform = "athena",
-            sha256 = NI_CHIPOBJECT_ATHENA_SHA,
-        ),
-    ],
-    headers_sha256 = NI_CHIPOBJECT_HEADERS_SHA,
-    package = "ni-libraries",
-    remote_name = "chipobject",
-    version = NI_VERSION,
-    visibility = "@//third_party/ni:__pkg__",
-)
-
-wpilib_nativezip(
-    name = "ni_runtime",
-    binary_configs = [
-        wpilib_binary_config(
-            platform = "athena",
-            sha256 = NI_RUNTIME_ATHENA_SHA,
-        ),
-    ],
-    package = "ni-libraries",
-    remote_name = "runtime",
-    version = NI_VERSION,
-    visibility = "@//third_party/ni:__pkg__",
-)
-
-wpilib_nativezip(
-    name = "wpilib_wpiutil",
-    binary_configs = [
-        wpilib_binary_config(
-            platform = "athena",
-            sha256 = WPILIB_WPIUTIL_ATHENA_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "linux_x64",
-            sha256 = WPILIB_WPIUTIL_LINUX_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "windows_x64",
-            sha256 = WPILIB_WPIUTIL_WINDOWS_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "macos_x64",
-            sha256 = WPILIB_WPIUTIL_MACOS_X64_SHA,
-        ),
-    ],
-    headers_sha256 = WPILIB_WPIUTIL_HEADERS_SHA,
-    package = "wpiutil",
-    remote_name = "wpiutil-cpp",
-    version = WPILIB_VERSION,
-    visibility = "@//third_party/wpilib:__pkg__",
-)
-
-wpilib_nativezip(
-    name = "wpilib_wpimath",
-    binary_configs = [
-        wpilib_binary_config(
-            platform = "linux_x64",
-            sha256 = WPILIB_WPIMATH_LINUX_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "windows_x64",
-            sha256 = WPILIB_WPIMATH_WINDOWS_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "macos_x64",
-            sha256 = WPILIB_WPIMATH_MACOS_X64_SHA,
-        ),
-    ],
-    package = "wpimath",
-    remote_name = "wpimath-cpp",
-    version = WPILIB_VERSION,
-    visibility = "@//third_party/wpilib:__pkg__",
-)
-
-wpilib_nativezip(
-    name = "wpilib_ntcore",
-    binary_configs = [
-        wpilib_binary_config(
-            platform = "linux_x64",
-            sha256 = WPILIB_NTCORE_LINUX_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "windows_x64",
-            sha256 = WPILIB_NTCORE_WINDOWS_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "macos_x64",
-            sha256 = WPILIB_NTCORE_MACOS_X64_SHA,
-        ),
-    ],
-    package = "ntcore",
-    remote_name = "ntcore-cpp",
-    version = WPILIB_VERSION,
-    visibility = "@//third_party/wpilib:__pkg__",
-)
-
-wpilib_nativezip(
-    name = "wpilib_hal",
-    binary_configs = [
-        wpilib_binary_config(
-            platform = "athena",
-            sha256 = WPILIB_HAL_ATHENA_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "linux_x64",
-            sha256 = WPILIB_HAL_LINUX_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "windows_x64",
-            sha256 = WPILIB_HAL_WINDOWS_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "macos_x64",
-            sha256 = WPILIB_HAL_MACOS_X64_SHA,
-        ),
-    ],
-    headers_sha256 = WPILIB_HAL_HEADERS_SHA,
-    package = "hal",
-    remote_name = "hal-cpp",
-    version = WPILIB_VERSION,
-    visibility = "@//third_party/wpilib:__pkg__",
-)
-
-wpilib_nativezip(
-    name = "wpilib_halsim_gui",
-    binary_configs = [
-        wpilib_binary_config(
-            platform = "linux_x64",
-            sha256 = WPILIB_HALSIM_LINUX_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "windows_x64",
-            sha256 = WPILIB_HALSIM_WINDOWS_X64_SHA,
-        ),
-        wpilib_binary_config(
-            platform = "macos_x64",
-            sha256 = WPILIB_HALSIM_MACOS_X64_SHA,
-        ),
-    ],
-    package = "halsim",
-    remote_name = "halsim_gui",
-    version = WPILIB_VERSION,
-    visibility = "@//third_party/wpilib:__pkg__",
 )
