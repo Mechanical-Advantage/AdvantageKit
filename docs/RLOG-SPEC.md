@@ -21,10 +21,10 @@ Following the byte for message type, a timestamp message consists of a single do
 
 ## Key
 
-Each human readable string key (e.g. "/DriveTrain/LeftPositionRadians") is represented by a key ID to reduce the space required to encode the data from each cycle. Key IDs are shorts (2 bytes) which count up from 0. Each key message contains the following information:
+Each human-readable string key (e.g. "/DriveTrain/LeftPositionRadians") is represented by a key ID to reduce the space required to encode the data from each cycle. Key IDs are shorts (2 bytes) that count up from 0. Each key message contains the following information:
 
 1. Key ID (short, 2 bytes)
-2. Length of string key (short, 2 bytes)
+2. Number of bytes in string (short, 2 bytes)
 3. String key (UTF-8 encoded)
 
 ## Field
@@ -65,7 +65,7 @@ The possible value types are listed below along with the format of the value. Nu
 
 ### String (0x07)
 
-3. Length of string (short, 2 bytes)
+3. Number of bytes in string (short, 2 bytes)
 4. Field value (UTF-8 encoded)
 
 ### StringArray (0x08)
@@ -84,7 +84,9 @@ The possible value types are listed below along with the format of the value. Nu
 
 ## Networking
 
-When sending log data over a network, the same format is used. For efficiency, the server device can encode the same data for every client after the first cycle. When a new client connects, the server should send:
+When sending log data over a network, the same format is used. Each cycle is preceded by a single integer (4 bytes) containing the number of bytes in the cycle. This allows the client to easily determine when a cycle can be decoded.
+
+For efficiency, the server can encode the same data for every client after the first cycle. When a new client connects, the server should send:
 
 1. The log format revision (described above).
 2. Definitions of each pre-existing key ID.

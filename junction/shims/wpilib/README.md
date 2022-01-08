@@ -27,7 +27,7 @@ To publish `junction/shims/wpilib` to your local Maven repository, use the follo
 bazel run --define "maven_repo=file://$HOME/.m2/repository" //junction/wpilib:wpilib-export.publish
 ```
 
-As with all components published to Maven, the version number can be set with a command line flag:
+As with all components published to Maven, the version number can be set with a command-line flag:
 
 ```bash
 bazel run --define "publishing_version=X.X.X" ...
