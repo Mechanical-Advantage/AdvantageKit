@@ -3,7 +3,7 @@ name: Build
 on:
   push:
   release:
-    types: [released]
+    types: [released, prereleased]
 
 jobs:
   athena:
@@ -17,21 +17,21 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Build "conduit/wpilibio"
-        run: bazel build --config=athena //conduit/wpilibio:wpilibio-shared
-      - name: Build "conduit/api"
-        run: bazel build //conduit/api
-      - name: Build "junction/core"
-        run: bazel build //junction/core
-      - name: Build "junction/shims/wpilib"
-        run: bazel build //junction/shims/wpilib
+      - name: Build All
+        run: bazel build --config=athena --build_tag_filters=ci_build --verbose_failures ...
       - name: Get version number
         id: get_version
         if: github.event_name == 'release'
         uses: battila7/get-version-action@v2
-      - name: Upload "conduit/wpilibio"
+      - name: Upload "conduit/wpilibio:nativezip"
         if: github.event_name == 'release'
-        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" --define "publishing_nativezip_generate_pom=true" //conduit/wpilibio:wpilibio-nativezip-publish
+        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
+        env:
+          GITHUB_ACTOR: Mechanical-Advantage
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload "conduit/wpilibio:pom"
+        if: github.event_name == 'release'
+        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:pom.publish
         env:
           GITHUB_ACTOR: Mechanical-Advantage
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,21 +64,17 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
-    - name: Build "conduit/wpilibio"
-      run: bazel build //conduit/wpilibio:wpilibio-shared
-    - name: Build "conduit/api"
-      run: bazel build //conduit/api
-    - name: Build "junction/core"
-      run: bazel build //junction/core
-    - name: Build "junction/shims/wpilib"
-      run: bazel build //junction/shims/wpilib
+    - name: Build All
+      run: bazel build --build_tag_filters=ci_build --verbose_failures ...
+    - name: Test All
+      run: bazel test ...
     - name: Get version number
       id: get_version
       if: github.event_name == 'release'
       uses: battila7/get-version-action@v2
-    - name: Upload "conduit/wpilibio"
+    - name: Upload "conduit/wpilibio:nativezip"
       if: github.event_name == 'release'
-      run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:wpilibio-nativezip-publish
+      run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
       env:
         GITHUB_ACTOR: Mechanical-Advantage
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

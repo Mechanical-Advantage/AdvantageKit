@@ -4,10 +4,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.littletonrobotics.conduit.schema.CoreInputs;
+import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.Joystick;
 
 public class ConduitApi {
   // Length constants
+  private static final int NUM_JOYSTICKS = 6;
   private static final int NUM_JOYSTICK_AXES = 12;
   private static final int NUM_JOYSTICK_POVS = 12;
   private static final int JOYSTICK_NAME_LEN = 256;
@@ -24,12 +26,19 @@ public class ConduitApi {
   }
 
   private final CoreInputs inputs = new CoreInputs();
+  private final DSData ds;
+  private final Joystick[] joysticks = new Joystick[NUM_JOYSTICKS];
 
   private ConduitApi() {
+    ConduitJni.start();
     ByteBuffer buffer = ConduitJni.getBuffer();
     buffer.order(ByteOrder.LITTLE_ENDIAN);
 
     inputs.__init(0, buffer);
+    ds = inputs.ds();
+    for (int i = 0; i < NUM_JOYSTICKS; i++) {
+      joysticks[i] = ds.joysticks(new Joystick(), i);
+    }
   }
 
   public void captureData() {
@@ -41,13 +50,13 @@ public class ConduitApi {
   }
 
   public int getAllianceStation() {
-    return inputs.allianceStation();
+    return ds.allianceStation();
   }
 
   public String getEventName() {
     byte[] bytes = new byte[EVENT_NAME_LEN];
     for (int i = 0; i < EVENT_NAME_LEN; i++) {
-      bytes[i] = (byte) inputs.eventName(i);
+      bytes[i] = (byte) ds.eventName(i);
     }
     return new String(bytes);
   }
@@ -55,119 +64,89 @@ public class ConduitApi {
   public String getGameSpecificMessage() {
     byte[] bytes = new byte[GAME_SPECIFIC_MESSAGE_LEN];
     for (int i = 0; i < GAME_SPECIFIC_MESSAGE_LEN; i++) {
-      bytes[i] = (byte) inputs.gameSpecificMessage(i);
+      bytes[i] = (byte) ds.gameSpecificMessage(i);
     }
     return new String(bytes);
   }
 
   public int getGameSpecificMessageSize() {
-    return inputs.gameSpecificMessageSize();
+    return ds.gameSpecificMessageSize();
   }
 
   public int getMatchNumber() {
-    return inputs.matchNumber();
+    return ds.matchNumber();
   }
 
   public int getReplayNumber() {
-    return inputs.replayNumber();
+    return ds.replayNumber();
   }
 
   public int getMatchType() {
-    return inputs.matchType();
+    return ds.matchType();
   }
 
   public int getControlWord() {
-    return inputs.controlWord();
+    return ds.controlWord();
   }
 
   public double getMatchTime() {
-    return inputs.matchTime();
+    return ds.matchTime();
   }
 
   public String getJoystickName(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
     byte[] bytes = new byte[JOYSTICK_NAME_LEN];
     for (int i = 0; i < JOYSTICK_NAME_LEN; i++) {
-      bytes[i] = (byte) j.name(i);
+      bytes[i] = (byte) joysticks[joystickId].name(i);
     }
 
     return new String(bytes);
   }
 
   public int getJoystickType(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
-    return j.type();
+    return joysticks[joystickId].type();
   }
 
   public int getButtonCount(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
-    return j.buttonCount();
+    return joysticks[joystickId].buttonCount();
   }
 
   public int getButtonValues(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
-    return j.buttons();
+    return joysticks[joystickId].buttons();
   }
 
   public int getAxisCount(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
-    return j.axisCount();
+    return joysticks[joystickId].axisCount();
   }
 
   public int[] getAxisTypes(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
     int[] ret = new int[NUM_JOYSTICK_AXES];
     for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
-      ret[i] = j.axisTypes(i);
+      ret[i] = joysticks[joystickId].axisTypes(i);
     }
     return ret;
   }
 
   public float[] getAxisValues(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
     float[] ret = new float[NUM_JOYSTICK_AXES];
     for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
-      ret[i] = j.axisValues(i);
+      ret[i] = joysticks[joystickId].axisValues(i);
     }
     return ret;
   }
 
   public int getPovCount(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
-    return j.povCount();
+    return joysticks[joystickId].povCount();
   }
 
   public int[] getPovValues(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
     int[] ret = new int[NUM_JOYSTICK_POVS];
     for (int i = 0; i < NUM_JOYSTICK_POVS; i++) {
-      ret[i] = j.povValues(i);
+      ret[i] = joysticks[joystickId].povValues(i);
     }
     return ret;
   }
 
   public boolean isXbox(int joystickId) {
-    Joystick j = new Joystick();
-    inputs.joysticks(j, joystickId);
-
-    return j.isXbox();
+    return joysticks[joystickId].isXbox();
   }
 }

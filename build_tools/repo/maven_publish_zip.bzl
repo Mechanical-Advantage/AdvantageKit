@@ -1,5 +1,5 @@
 _TEMPLATE = """
-mvn deploy:deploy-file -DgroupId={group_id} -DartifactId={artifact_id} -Dversion={version} -DrepositoryId={repo_id} -Dpackaging=zip -Dfile={zip_file} -Durl={url} -Dclassifier={classifier} -DgeneratePom={generate_pom}
+mvn deploy:deploy-file -DgroupId={group_id} -DartifactId={artifact_id} -Dversion={version} -DrepositoryId={repo_id} -Dpackaging=zip -Dfile={zip_file} -Durl={url} -Dclassifier={classifier} -DgeneratePom=false
 """
 
 def _maven_publish_impl(ctx):
@@ -12,7 +12,6 @@ def _maven_publish_impl(ctx):
 
     maven_repo = ctx.var.get("maven_repo", "''")
     maven_repo_id = ctx.var.get("maven_repo_id", "github")
-    generate_pom = ctx.var.get("publishing_nativezip_generate_pom", "false")
 
     coordinates_split = coordinates_substituted.split(":")
     group_id = coordinates_split[0]
@@ -29,8 +28,7 @@ def _maven_publish_impl(ctx):
             zip_file = ctx.file.zip_file.short_path,
             url = maven_repo,
             classifier = ctx.attr.classifier,
-            generate_pom = generate_pom,
-            repo_id = maven_repo_id
+            repo_id = maven_repo_id,
         ),
     )
 
@@ -45,7 +43,7 @@ def _maven_publish_impl(ctx):
             runfiles = ctx.runfiles(
                 files = files,
                 collect_data = True,
-            ).merge(ctx.attr._uploader[DefaultInfo].data_runfiles),
+            ),
         ),
     ]
 
@@ -69,12 +67,6 @@ When signing with GPG, the current default key is used.
         "zip_file": attr.label(
             mandatory = True,
             allow_single_file = True,
-        ),
-        "_uploader": attr.label(
-            executable = True,
-            cfg = "host",
-            default = "//build_tools/repo:maven-zip-publisher",
-            allow_files = True,
         ),
         "is_windows": attr.bool(mandatory = True),
         "classifier": attr.string(mandatory = True),

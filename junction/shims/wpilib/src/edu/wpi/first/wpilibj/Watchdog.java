@@ -4,34 +4,30 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.hal.NotifierJNI;
 import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.littletonrobotics.junction.Logger;
+
 /**
- * A class that's a wrapper around a watchdog timer. Patched by AdvantageKit to
- * support logging.
+ * A class that's a wrapper around a watchdog timer.  Patched by AdvantageKit to support logging.
  *
- * <p>
- * When the timer expires, a message is printed to the console and an optional
- * user-provided callback is invoked.
+ * <p>When the timer expires, a message is printed to the console and an optional user-provided
+ * callback is invoked.
  *
- * <p>
- * The watchdog is initialized disabled, so the user needs to call enable()
- * before use.
+ * <p>The watchdog is initialized disabled, so the user needs to call enable() before use.
  */
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
-  private static final long kMinPrintPeriod = 1000000; // microseconds
+  private static final long kMinPrintPeriodMicroS = (long) 1e6;
 
-  private double m_startTime; // seconds
-  private double m_timeout; // seconds
-  private double m_expirationTime; // seconds
+  private double m_startTimeSeconds;
+  private double m_timeoutSeconds;
+  private double m_expirationTimeSeconds;
   private final Runnable m_callback;
-  private double m_lastTimeoutPrintTime; // seconds
+  private double m_lastTimeoutPrintSeconds;
 
   boolean m_isExpired;
 
@@ -52,12 +48,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Watchdog constructor.
    *
-   * @param timeout  The watchdog's timeout in seconds with microsecond
-   *                 resolution.
+   * @param timeoutSeconds The watchdog's timeout in seconds with microsecond resolution.
    * @param callback This function is called when the timeout expires.
    */
-  public Watchdog(double timeout, Runnable callback) {
-    m_timeout = timeout;
+  public Watchdog(double timeoutSeconds, Runnable callback) {
+    m_timeoutSeconds = timeoutSeconds;
     m_callback = callback;
     m_tracer = new Tracer();
   }
@@ -68,47 +63,50 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   @Override
-  public int compareTo(Watchdog rhs) {
-    // Elements with sooner expiration times are sorted as lesser. The head of
-    // Java's PriorityQueue is the least element.
-    return Double.compare(m_expirationTime, rhs.m_expirationTime);
-  }
-
-  @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Watchdog)) {
-      return false;
+    if (obj instanceof Watchdog) {
+      return Double.compare(m_expirationTimeSeconds, ((Watchdog) obj).m_expirationTimeSeconds) == 0;
     }
-    Watchdog oth = (Watchdog) obj;
-    return oth.m_expirationTime == m_expirationTime;
+    return false;
   }
 
   @Override
   public int hashCode() {
-    return Double.hashCode(m_expirationTime);
+    return Double.hashCode(m_expirationTimeSeconds);
   }
 
-  /** Returns the time in seconds since the watchdog was last fed. */
+  @Override
+  public int compareTo(Watchdog rhs) {
+    // Elements with sooner expiration times are sorted as lesser. The head of
+    // Java's PriorityQueue is the least element.
+    return Double.compare(m_expirationTimeSeconds, rhs.m_expirationTimeSeconds);
+  }
+
+  /**
+   * Returns the time in seconds since the watchdog was last fed.
+   *
+   * @return The time in seconds since the watchdog was last fed.
+   */
   public double getTime() {
-    return Logger.getInstance().getRealTimestamp() - m_startTime;
+    return Logger.getInstance().getRealTimestamp() - m_startTimeSeconds;
   }
 
   /**
    * Sets the watchdog's timeout.
    *
-   * @param timeout The watchdog's timeout in seconds with microsecond resolution.
+   * @param timeoutSeconds The watchdog's timeout in seconds with microsecond resolution.
    */
-  public void setTimeout(double timeout) {
-    m_startTime = Logger.getInstance().getRealTimestamp();
+  public void setTimeout(double timeoutSeconds) {
+    m_startTimeSeconds = Logger.getInstance().getRealTimestamp();
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();
     try {
-      m_timeout = timeout;
+      m_timeoutSeconds = timeoutSeconds;
       m_isExpired = false;
 
       m_watchdogs.remove(this);
-      m_expirationTime = m_startTime + m_timeout;
+      m_expirationTimeSeconds = m_startTimeSeconds + m_timeoutSeconds;
       m_watchdogs.add(this);
       updateAlarm();
     } finally {
@@ -116,17 +114,25 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     }
   }
 
-  /** Returns the watchdog's timeout in seconds. */
+  /**
+   * Returns the watchdog's timeout in seconds.
+   *
+   * @return The watchdog's timeout in seconds.
+   */
   public double getTimeout() {
     m_queueMutex.lock();
     try {
-      return m_timeout;
+      return m_timeoutSeconds;
     } finally {
       m_queueMutex.unlock();
     }
   }
 
-  /** Returns true if the watchdog timer has expired. */
+  /**
+   * Returns true if the watchdog timer has expired.
+   *
+   * @return True if the watchdog timer has expired.
+   */
   public boolean isExpired() {
     m_queueMutex.lock();
     try {
@@ -158,8 +164,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Resets the watchdog timer.
    *
-   * <p>
-   * This also enables the timer if it was previously disabled.
+   * <p>This also enables the timer if it was previously disabled.
    */
   public void reset() {
     enable();
@@ -167,7 +172,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   /** Enables the watchdog timer. */
   public void enable() {
-    m_startTime = Logger.getInstance().getRealTimestamp();
+    m_startTimeSeconds = Logger.getInstance().getRealTimestamp();
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();
@@ -175,7 +180,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       m_isExpired = false;
 
       m_watchdogs.remove(this);
-      m_expirationTime = m_startTime + m_timeout;
+      m_expirationTimeSeconds = m_startTimeSeconds + m_timeoutSeconds;
       m_watchdogs.add(this);
       updateAlarm();
     } finally {
@@ -197,9 +202,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Enable or disable suppression of the generic timeout message.
    *
-   * <p>
-   * This may be desirable if the user-provided callback already prints a more
-   * specific message.
+   * <p>This may be desirable if the user-provided callback already prints a more specific message.
    *
    * @param suppress Whether to suppress generic timeout message.
    */
@@ -213,7 +216,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       NotifierJNI.cancelNotifierAlarm(m_notifier);
     } else {
       NotifierJNI.updateNotifierAlarm(
-          m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e6));
+          m_notifier, (long) (m_watchdogs.peek().m_expirationTimeSeconds * 1e6));
     }
   }
 
@@ -243,11 +246,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         Watchdog watchdog = m_watchdogs.poll();
 
         double now = curTime * 1e-6;
-        if (now - watchdog.m_lastTimeoutPrintTime > kMinPrintPeriod) {
-          watchdog.m_lastTimeoutPrintTime = now;
+        if (now - watchdog.m_lastTimeoutPrintSeconds > kMinPrintPeriodMicroS) {
+          watchdog.m_lastTimeoutPrintSeconds = now;
           if (!watchdog.m_suppressTimeoutMessage) {
             DriverStation.reportWarning(
-                String.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout), false);
+                String.format("Watchdog not fed within %.6fs\n", watchdog.m_timeoutSeconds), false);
           }
         }
 

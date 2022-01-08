@@ -23,6 +23,8 @@ public class LoggedRobot extends IterativeRobotBase {
 
   private final int notifier = NotifierJNI.initializeNotifier();
 
+  private final double period;
+
   private double nextCycle;
   private boolean useTiming = true;
 
@@ -38,6 +40,7 @@ public class LoggedRobot extends IterativeRobotBase {
    */
   protected LoggedRobot(double period) {
     super(period);
+    this.period = period;
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
@@ -60,6 +63,9 @@ public class LoggedRobot extends IterativeRobotBase {
       simulationInit();
     }
 
+    // Save data from init cycle
+    Logger.getInstance().periodicAfterUser();
+
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
@@ -72,16 +78,19 @@ public class LoggedRobot extends IterativeRobotBase {
         if (curTime == 0) {
           break;
         }
-        nextCycle += m_period;
+        nextCycle += period;
       }
 
       double loopCycleStart = Logger.getInstance().getRealTimestamp();
-      Logger.getInstance().periodic();
+      Logger.getInstance().periodicBeforeUser();
       double userCodeStart = Logger.getInstance().getRealTimestamp();
       loopFunc();
       double loopCycleEnd = Logger.getInstance().getRealTimestamp();
-      Logger.getInstance().recordOutput("FullCycleMS", (loopCycleEnd - loopCycleStart) * 1000);
-      Logger.getInstance().recordOutput("UserCodeMS", (loopCycleEnd - userCodeStart) * 1000);
+      Logger.getInstance().recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) * 1000);
+      Logger.getInstance().recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) * 1000);
+      Logger.getInstance().recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) * 1000);
+
+      Logger.getInstance().periodicAfterUser(); // Save data
     }
   }
 
@@ -93,7 +102,7 @@ public class LoggedRobot extends IterativeRobotBase {
 
   /** Get time period between calls to Periodic() functions. */
   public double getPeriod() {
-    return m_period;
+    return period;
   }
 
   /** Sets whether to use standard timing or run as fast as possible. */

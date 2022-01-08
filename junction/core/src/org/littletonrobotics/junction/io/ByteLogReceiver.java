@@ -72,15 +72,15 @@ public class ByteLogReceiver implements LogRawDataReceiver {
     if (fileStream != null) {
       // Auto rename
       if (autoRename) {
-        if (System.currentTimeMillis() > 946702800000L) {
+        if (System.currentTimeMillis() > 1638334800000L) { // 12/1/2021, the RIO 2 defaults to 7/1/2021
           if (!updatedTime) {
             rename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.rlog'").format(new Date()));
             updatedTime = true;
           }
 
-          if (DriverStation.getInstance().getMatchType() != MatchType.None && !updatedMatch) {
+          if (DriverStation.getMatchType() != MatchType.None && !updatedMatch) {
             String matchText = "";
-            switch (DriverStation.getInstance().getMatchType()) {
+            switch (DriverStation.getMatchType()) {
               case Practice:
                 matchText = "p";
                 break;
@@ -93,7 +93,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
               default:
                 break;
             }
-            matchText += Integer.toString(DriverStation.getInstance().getMatchNumber());
+            matchText += Integer.toString(DriverStation.getMatchNumber());
             rename(filename.substring(0, filename.length() - 5) + "_" + matchText + ".rlog");
             updatedMatch = true;
           }
@@ -107,6 +107,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
         DriverStation.reportError("Failed to write data to log file.", true);
       }
     }
+
   }
 
   private void rename(String newFilename) {

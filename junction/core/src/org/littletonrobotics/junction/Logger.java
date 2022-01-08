@@ -16,12 +16,10 @@ import org.littletonrobotics.junction.io.LogReplaySource;
 /** Central class for recording and replaying log data. */
 public class Logger {
   private static final int receiverQueueCapcity = 500; // 10s at 50Hz
-  private static final boolean debugTiming = false;
 
   private static Logger instance;
 
   private boolean running = false;
-  private double lastDebugPrint = 0.0;
   private LogTable entry;
   private LogTable outputTable;
   private Map<String, String> metadata = new HashMap<>();
@@ -107,8 +105,8 @@ public class Logger {
       // Start receiver thread
       receiverThread.start();
 
-      // Run first periodic cycle
-      periodic();
+      // Start first periodic cycle
+      periodicBeforeUser();
 
       // Record metadata
       LogTable metadataTable = entry.getSubtable(replaySource == null ? "RealMetadata" : "ReplayMetadata");
@@ -135,19 +133,10 @@ public class Logger {
    * Periodic method to be called before robotInit and each loop cycle. Updates
    * timestamp and globally logged data.
    */
-  public void periodic() {
+  void periodicBeforeUser() {
     if (running) {
-      double periodicStart = getRealTimestamp();
-      if (entry != null) {
-        try {
-          receiverQueue.put(entry);
-        } catch (InterruptedException exception) {
-          return; // Main thread interrupted
-        }
-      }
 
       // Get next entry
-      double captureStart = getRealTimestamp();
       ConduitApi conduit = ConduitApi.getInstance();
       conduit.captureData();
       if (replaySource == null) {
@@ -171,24 +160,35 @@ public class Logger {
       processInputs("NetworkTables", LoggedNetworkTables.getInstance());
       double periodicEnd = getRealTimestamp();
 
-      // Print timing data
-      if (debugTiming && getRealTimestamp() > lastDebugPrint + 0.5) {
-        lastDebugPrint = getRealTimestamp();
-        String receiveLength = Double.toString((double) Math.round((captureStart - periodicStart) * 100000) / 100);
-        String captureLength = Double.toString((double) Math.round((driverStationStart - captureStart) * 100000) / 100);
-        String driverStationLength = Double
-            .toString((double) Math.round((systemStatsStart - driverStationStart) * 100000) / 100);
-        String systemStatsLength = Double
-            .toString((double) Math.round((networkTablesStart - systemStatsStart) * 100000) / 100);
-        String networkTablesLength = Double
-            .toString((double) Math.round((periodicEnd - networkTablesStart) * 100000) / 100);
-        System.out.println("RE=" + receiveLength + ", CA=" + captureLength + ", DS="
-            + driverStationLength + ", SS=" + systemStatsLength + ", NT="
-            + networkTablesLength + ", #=" + Integer.toString(receiverQueue.size()));
-      }
+      // Log output data
+      recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) * 1000);
+      recordOutput("Logger/SSPeriodicMS", (networkTablesStart - systemStatsStart) * 1000);
+      recordOutput("Logger/NTPeriodicMS", (periodicEnd - networkTablesStart) * 1000);
+      recordOutput("Logger/QueuedCycles", receiverQueue.size());
     } else {
       // Retrieve new driver station data even if logger is disabled
+      ConduitApi.getInstance().captureData();
       LoggedDriverStation.getInstance().periodic();
+    }
+  }
+
+  /**
+   * Periodic method to be called after robotInit and each loop cycle. Sends data
+   * to data receivers. Running this after user code allows IO operations to
+   * occur between cycles rather than interferring with the main thread.
+   */
+  void periodicAfterUser() {
+    if (running) {
+      try {
+        receiverQueue.put(entry);
+
+        // Prevent further operations on the same entry
+        entry = null;
+        outputTable = null;
+
+      } catch (InterruptedException exception) {
+        return; // Main thread interrupted
+      }
     }
   }
 
@@ -197,10 +197,10 @@ public class Logger {
    * entry.
    */
   public double getTimestamp() {
-    if (entry == null) {
-      return 0.0;
-    } else {
+    if (running) {
       return entry.getTimestamp();
+    } else {
+      return getRealTimestamp();
     }
   }
 

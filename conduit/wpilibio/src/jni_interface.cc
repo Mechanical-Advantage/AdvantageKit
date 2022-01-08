@@ -17,3 +17,8 @@ JNIEXPORT void JNICALL Java_org_littletonrobotics_conduit_ConduitJni_capture(
     JNIEnv* env, jclass clazz) {
   akit::conduit::wpilibio::capture_data();
 }
+
+JNIEXPORT void JNICALL
+Java_org_littletonrobotics_conduit_ConduitJni_start(JNIEnv* env, jclass clazz) {
+  akit::conduit::wpilibio::start();
+}

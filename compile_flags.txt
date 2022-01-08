@@ -1,23 +1,13 @@
-# Tells clangd about all include paths in the codebase.
-# Ideally we would generate a compile_commands.json, but Bazel/VSCode don't have great tooling for that currently.
-# When new include paths are added in Bazel targets, they need to be defined here. 
-
-# We treat every file as C++.  This is needed because a ".h" file will be interpreted as C,
-# and a lot of .h files are actually C++, but clangd can't tell the difference
 -xc++
 
-# We use C++17 globally.
 -std=c++17
 
-# Mark the root directory as an include path
 -I
 .
 
-# Mark bazel-bin as an include path (generated headers end up here)
 -I
 bazel-bin
 
-# Include paths set in //third_party
 -isystem
 third_party/jni/include
 
@@ -27,40 +17,23 @@ third_party/jni/platform/linux_x64
 -isystem
 third_party/flatbuffers/include
 
-# Include paths from external repos
-# Each one has two entries: one pulling from the "external" symlink at the repo root (best support on MacOS/Linux)
-# and one pulling from bazel-bin/external (works on Windows, though jumping to source within external libs doesn't work).
--isystem
-external/com_google_googletest/googletest/include
 -isystem
 bazel-bin/external/com_google_googletest/googletest/include
 
 -isystem
-external/com_google_googletest/googlemock/include
--isystem
 bazel-bin/external/com_google_googletest/googlemock/include
 
--isystem
-external/ni_chipobject_headers_files
 -isystem
 bazel-bin/external/ni_chipobject_headers_files
 
 -isystem
-external/ni_netcomm_headers_files
--isystem
 bazel-bin/external/ni_netcomm_headers_files
 
--isystem
-external/ni_visa_headers_files
 -isystem
 bazel-bin/external/ni_visa_headers_files
 
 -isystem
-external/wpilib_hal_headers_files
--isystem
 bazel-bin/external/wpilib_hal_headers_files
 
--isystem
-external/wpilib_wpiutil_headers_files
 -isystem
 bazel-bin/external/wpilib_wpiutil_headers_files

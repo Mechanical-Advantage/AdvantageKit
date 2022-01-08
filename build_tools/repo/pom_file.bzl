@@ -13,12 +13,13 @@ _TYPED_DEP = """        <dependency>
             <type>{3}</type>
         </dependency>"""
 
-def _explode_coordinates(coords):
+def _explode_coordinates(coords, publishing_version):
     """Takes a maven coordinate and explodes it into a tuple of
     (groupId, artifactId, version, type)
     """
     if not coords:
         return None
+    coords = coords.format(publishing_version = publishing_version)
 
     parts = coords.split(":")
     if len(parts) == 3:
@@ -36,9 +37,9 @@ def _pom_file_impl(ctx):
 
     info = ctx.attr.target[MavenInfo]
 
-    coordinates_substituted = info.coordinates.format(publishing_version = ctx.var["publishing_version"])
+    publishing_version = ctx.var["publishing_version"]
 
-    coordinates = _explode_coordinates(coordinates_substituted)
+    coordinates = _explode_coordinates(info.coordinates, publishing_version)
     substitutions = {
         "{groupId}": coordinates[0],
         "{artifactId}": coordinates[1],
@@ -48,7 +49,7 @@ def _pom_file_impl(ctx):
 
     deps = []
     for dep in sorted(info.maven_deps.to_list()):
-        exploded = _explode_coordinates(dep)
+        exploded = _explode_coordinates(dep, publishing_version)
         if (exploded[3] == "jar"):
             template = _PLAIN_DEP
         else:

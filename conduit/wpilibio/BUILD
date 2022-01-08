@@ -1,12 +1,19 @@
 load("//build_tools/cc:platform_dynamic_library.bzl", "cc_platform_dynamic_library")
 load("//build_tools/repo:maven_publish_zip.bzl", "maven_publish_zip")
+load("//build_tools/repo:maven_publish_pom.bzl", "maven_publish_pom")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 cc_library(
-    name = "wpilibio-lib",
+    name = "wpilibio",
     srcs = glob(["src/**/*.cc"]),
     hdrs = glob(["include/**/*.h"]),
+    linkopts = select({
+        "//build_tools/platforms:is_linux_any": ["-lpthread"],
+        "//build_tools/platforms:is_macos": ["-lpthread"],
+        "//conditions:default": [],
+    }),
     linkstatic = True,  # Only statically link this library since we want it to statically link into the dynamic lib below
+    tags = ["ci_build"],
     visibility = ["//visibility:public"],
     deps = [
         "//conduit:conduit-schema-cc",
@@ -17,15 +24,15 @@ cc_library(
 )
 
 cc_platform_dynamic_library(
-    name = "wpilibio-shared",
+    name = "shared",
     libname = "wpilibio",
     visibility = ["//visibility:public"],
-    deps = [":wpilibio-lib"],
+    deps = [":wpilibio"],
 )
 
 pkg_zip(
-    name = "wpilibio-nativezip",
-    srcs = [":wpilibio-shared"],
+    name = "nativezip",
+    srcs = [":shared"],
     package_dir = select({
         "//build_tools/platforms:is_athena": "/linux/athena/shared",
         "//build_tools/platforms:is_linux": "/linux/x86-64/shared",
@@ -42,7 +49,7 @@ pkg_zip(
 )
 
 maven_publish_zip(
-    name = "wpilibio-nativezip-publish",
+    name = "nativezip.publish",
     classifier = select({
         "//build_tools/platforms:is_athena": "linuxathena",
         "//build_tools/platforms:is_linux": "linuxx86-64",
@@ -50,5 +57,15 @@ maven_publish_zip(
         "//build_tools/platforms:is_macos": "osxx86-64",
     }),
     coordinates = "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
-    zip_file = ":wpilibio-nativezip",
+    tags = [
+        "ci_publish",
+        "ci_publish_desktop",
+    ],
+    zip_file = ":nativezip",
+)
+
+maven_publish_pom(
+    name = "pom.publish",
+    coordinates = "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
+    tags = ["ci_publish"],
 )
