@@ -186,6 +186,16 @@ Logger.getInstance().recordOutput("Odometry/RotationRadians", pose.getRotation()
 
 Remember that unlike Network Tables, **logged data is not persistent**. These fields must be logged every cycle in order to remain visible. This data is automatically saved to the `RealOutputs` or `ReplayOutputs` table, and it can be divided further into subtables using slashes (as seen above).
 
+The "Odometry" tab in Advantage Scope can visualize the following types of output data:
+
+* **Robot pose** - The robot's position on the field, rendered with a trail to show past and future movement. *(Double array of [x, y, rotation])*
+
+* **Ghost pose** - A transparent robot without a trail, used for supplemental information. This could be a position setpoint, vision measurement, etc. *(Double array of [x, y, rotation])*
+
+* **Vision coordinates** - The location of a vision target that is actively being targeted. A green line is drawn from the robot to this location. *(Double array of [x, y])*
+
+> Units and origin location are configurable on the tab. Distances can be measured in meters or inches, and rotation can be measured in degrees or radians.
+
 ## Restrictions
 
 Unless otherwise specified, all normal WPILib and vendordep features will function correctly under the logging framework. See a list of exceptions below:
