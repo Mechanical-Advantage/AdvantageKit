@@ -2,6 +2,7 @@ package org.littletonrobotics.conduit;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
@@ -17,6 +18,8 @@ public class ConduitApi {
   private static final int GAME_SPECIFIC_MESSAGE_LEN = 64;
 
   private static ConduitApi instance = null;
+
+  private static final Charset utf8Charset = Charset.forName("UTF-8");
 
   public static ConduitApi getInstance() {
     if (instance == null) {
@@ -55,18 +58,22 @@ public class ConduitApi {
 
   public String getEventName() {
     byte[] bytes = new byte[EVENT_NAME_LEN];
-    for (int i = 0; i < EVENT_NAME_LEN; i++) {
+    int i;
+    for (i = 0; i < EVENT_NAME_LEN; i++) {
+      if (bytes[i] == 0) break;
       bytes[i] = (byte) ds.eventName(i);
     }
-    return new String(bytes);
+    return new String(bytes, 0, i, utf8Charset);
   }
 
   public String getGameSpecificMessage() {
     byte[] bytes = new byte[GAME_SPECIFIC_MESSAGE_LEN];
-    for (int i = 0; i < GAME_SPECIFIC_MESSAGE_LEN; i++) {
+    int i;
+    for (i = 0; i < GAME_SPECIFIC_MESSAGE_LEN; i++) {
+      if (bytes[i] == 0) break;
       bytes[i] = (byte) ds.gameSpecificMessage(i);
     }
-    return new String(bytes);
+    return new String(bytes, 0, i, utf8Charset);
   }
 
   public int getGameSpecificMessageSize() {
@@ -95,11 +102,13 @@ public class ConduitApi {
 
   public String getJoystickName(int joystickId) {
     byte[] bytes = new byte[JOYSTICK_NAME_LEN];
-    for (int i = 0; i < JOYSTICK_NAME_LEN; i++) {
+    int i;
+    for (i = 0; i < JOYSTICK_NAME_LEN; i++) {
+      if (bytes[i] == 0) break;
       bytes[i] = (byte) joysticks[joystickId].name(i);
     }
 
-    return new String(bytes);
+    return new String(bytes, 0, i, utf8Charset);
   }
 
   public int getJoystickType(int joystickId) {
