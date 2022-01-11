@@ -60,8 +60,9 @@ public class ConduitApi {
     byte[] bytes = new byte[EVENT_NAME_LEN];
     int i;
     for (i = 0; i < EVENT_NAME_LEN; i++) {
-      if (bytes[i] == 0) break;
       bytes[i] = (byte) ds.eventName(i);
+      if (bytes[i] == 0)
+        break;
     }
     return new String(bytes, 0, i, utf8Charset);
   }
@@ -70,8 +71,9 @@ public class ConduitApi {
     byte[] bytes = new byte[GAME_SPECIFIC_MESSAGE_LEN];
     int i;
     for (i = 0; i < GAME_SPECIFIC_MESSAGE_LEN; i++) {
-      if (bytes[i] == 0) break;
       bytes[i] = (byte) ds.gameSpecificMessage(i);
+      if (bytes[i] == 0)
+        break;
     }
     return new String(bytes, 0, i, utf8Charset);
   }
@@ -104,8 +106,9 @@ public class ConduitApi {
     byte[] bytes = new byte[JOYSTICK_NAME_LEN];
     int i;
     for (i = 0; i < JOYSTICK_NAME_LEN; i++) {
-      if (bytes[i] == 0) break;
       bytes[i] = (byte) joysticks[joystickId].name(i);
+      if (bytes[i] == 0)
+        break;
     }
 
     return new String(bytes, 0, i, utf8Charset);

@@ -132,8 +132,7 @@ public class LoggedDriverStation {
 
       dsInputs.allianceStation = conduit.getAllianceStation();
       dsInputs.eventName = conduit.getEventName().trim();
-      dsInputs.gameSpecificMessage = conduit.getGameSpecificMessage().substring(0,
-          conduit.getGameSpecificMessageSize());
+      dsInputs.gameSpecificMessage = conduit.getGameSpecificMessage().trim();
       dsInputs.matchNumber = conduit.getMatchNumber();
       dsInputs.replayNumber = conduit.getReplayNumber();
       dsInputs.matchType = conduit.getMatchType();
