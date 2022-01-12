@@ -181,11 +181,6 @@ public class Logger {
     if (running) {
       try {
         receiverQueue.put(entry);
-
-        // Prevent further operations on the same entry
-        entry = null;
-        outputTable = null;
-
       } catch (InterruptedException exception) {
         return; // Main thread interrupted
       }
