@@ -13,11 +13,12 @@
 load("//build_tools/repo:maven.bzl", "artifact_list_to_genfile_targets")
 load(":library_deps.bzl", "FRCMAVEN_ARTIFACTS", "MAVEN_ARTIFACTS")
 load("//build_tools/repo:copy_filegroup.bzl", "copy_cc_headers")
+load("//build_tools/repo/vendordep:vendordep_json.bzl", "vendordep_json")
 
 # Copies the headers for googletest into the bazel-bin directory for VSCode to use
 copy_cc_headers(
     name = "copy_gtest_headers",
-    cc_target = "@com_google_googletest//:gtest"
+    cc_target = "@com_google_googletest//:gtest",
 )
 
 # Get a list of genfile target names which provide the files in the bazel-bin directory that VSCode can see.
@@ -38,6 +39,20 @@ filegroup(
         "@wpilib_hal_headers_files//:headers_genfiles",
 
         # Copied C/C++ headers
-        ":copy_gtest_headers"
+        ":copy_gtest_headers",
     ] + maven_genfile_targets,
+)
+
+vendordep_json(
+    name = "vendordep",
+    java_coordinates = [
+        "org.littletonrobotics.akit.junction:wpilib-shim:{publishing_version}",
+        "org.littletonrobotics.akit.junction:junction-core:{publishing_version}",
+        "org.littletonrobotics.akit.conduit:conduit-api:{publishing_version}",
+    ],
+    json_name = "AdvantageKit",
+    nativezip_coordinates = [
+        "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
+    ],
+    uuid = "d820cc26-74e3-11ec-90d6-0242ac120003",
 )
