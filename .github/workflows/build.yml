@@ -12,38 +12,55 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Setup Java
+      - name: Set up Java
         uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Build All
+      - name: Build all
         run: bazel build --config=athena --build_tag_filters=ci_build --verbose_failures ...
       - name: Get version number
         id: get_version
         if: github.event_name == 'release'
         uses: battila7/get-version-action@v2
-      - name: Upload "conduit/wpilibio:nativezip"
+      - name: Get release info
+        id: get_release_info
         if: github.event_name == 'release'
-        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
+        uses: bruceadams/get-release@v1.2.3
+      - name: Generate vendordep
+        if: github.event_name == 'release'
+        run: bazel build //:vendordep
+      - name: Upload vendordep
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_ACTOR: Mechanical-Advantage
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload "conduit/wpilibio:pom"
-        if: github.event_name == 'release'
-        run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:pom.publish
-        env:
-          GITHUB_ACTOR: Mechanical-Advantage
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload "conduit/api"
-        if: github.event_name == 'release'
-        run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/api:api-export.publish
-      - name: Upload "junction/core"
-        if: github.event_name == 'release'
-        run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/core:core-export.publish
-      - name: Upload "junction/shims/wpilib"
-        if: github.event_name == 'release'
-        run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/shims/wpilib:wpilib-export.publish
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: bazel-bin/AdvantageKit.json
+          asset_name: AdvantageKit.json
+          asset_content_type: application/json
+      # - name: Upload "conduit/wpilibio:nativezip"
+      #   if: github.event_name == 'release'
+      #   run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
+      #   env:
+      #     GITHUB_ACTOR: Mechanical-Advantage
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Upload "conduit/wpilibio:pom"
+      #   if: github.event_name == 'release'
+      #   run: bazel run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:pom.publish
+      #   env:
+      #     GITHUB_ACTOR: Mechanical-Advantage
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Upload "conduit/api"
+      #   if: github.event_name == 'release'
+      #   run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/api:api-export.publish
+      # - name: Upload "junction/core"
+      #   if: github.event_name == 'release'
+      #   run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/core:core-export.publish
+      # - name: Upload "junction/shims/wpilib"
+      #   if: github.event_name == 'release'
+      #   run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/shims/wpilib:wpilib-export.publish
      
   desktop:
     strategy:
@@ -59,22 +76,22 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-    - name: Setup Java
+    - name: Set up Java
       uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
         java-version: '11'
-    - name: Build All
+    - name: Build all
       run: bazel build --build_tag_filters=ci_build --verbose_failures ...
-    - name: Test All
+    - name: Test all
       run: bazel test ...
     - name: Get version number
       id: get_version
       if: github.event_name == 'release'
       uses: battila7/get-version-action@v2
-    - name: Upload "conduit/wpilibio:nativezip"
-      if: github.event_name == 'release'
-      run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
-      env:
-        GITHUB_ACTOR: Mechanical-Advantage
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Upload "conduit/wpilibio:nativezip"
+    #   if: github.event_name == 'release'
+    #   run: bazel run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
+    #   env:
+    #     GITHUB_ACTOR: Mechanical-Advantage
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
