@@ -44,10 +44,10 @@ configurations.all {
 }
 ```
 
-To pull in the logging framework, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" and paste in the URL below. The changelog for the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest)) includes the WPILib version on which it is based; we recommend using the same version in your robot project. You can check the selected version of WPILib at the top of `build.gradle` to the right of "edu.wpi.first.GradleRIO".
+To pull in the logging framework, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" and paste in the URL below (replacing vX.X.X with the latest release). The changelog for the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest)) includes the WPILib version on which it is based; we recommend using the same version in your robot project. You can check the selected version of WPILib at the top of `build.gradle` to the after "edu.wpi.first.GradleRIO".
 
 ```
-https://raw.githubusercontent.com/Mechanical-Advantage/AdvantageKit/main/AdvantageKit.json
+https://github.com/Mechanical-Advantage/AdvantageKit/releases/download/vX.X.X/AdvantageKit.json
 ```
 
 > AdvantageKit v1.0.0 and later are based on WPILib 2022. Note that these versions include performance improvements not present in the 2021 builds.
