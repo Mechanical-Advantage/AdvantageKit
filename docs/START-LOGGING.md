@@ -92,7 +92,7 @@ The user program is responsible for configuring and initializing the logging fra
 
 ```java
 setUseTiming(isReal()); // Run as fast as possible during replay
-LoggedNetworkTables.getInstance().addTable("/LiveWindow"); // Log & replay "LiveWindow" values (only "SmartDashboard" is logged by default).
+LoggedNetworkTables.getInstance().addTable("/SmartDashboard"); // Log & replay "SmartDashboard" values (no tables are logged by default).
 Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
 if (isReal()) {

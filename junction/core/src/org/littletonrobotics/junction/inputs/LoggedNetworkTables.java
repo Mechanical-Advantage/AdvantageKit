@@ -22,7 +22,6 @@ public class LoggedNetworkTables implements LoggableInputs {
   private List<String> tables = new ArrayList<>();
 
   private LoggedNetworkTables() {
-    tables.add("/SmartDashboard");
   }
 
   public static LoggedNetworkTables getInstance() {
