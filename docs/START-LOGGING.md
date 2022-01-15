@@ -202,6 +202,8 @@ Unless otherwise specified, all normal WPILib and vendordep features will functi
 
 * As explained in the "Subsystems" section, all hardware interaction must be isolated from the main control logic. This includes all motors, pneumatics, external sensors, vision processing, and robot status not controlled by the `DriverStation` class (including battery voltage, brownout status, and current draw from the PDP).
 
+* While NT logging is supported, change listeners will **not** be triggered during replay. This means that `Sendable` data (such as `SendableChoosers`) will not be updated correctly. Any choosers must be contained in an IO layer. We are considering possible solutions to log this data automatically.
+
 * All user code must be single-threaded. This is necessary to ensure that logged data is recorded and replayed predictably, as the timing of extra threads cannot be recreated in a simulator. 
 
 In addition, the logging framework typically increases the length of each loop cycle by 2-3ms. See [this page](CONDUIT-SHIMS.md) for more details. We recommend using the performance data automatically saved under `RealOutputs/LoggedRobot` to check if your code is at risk of causing loop overruns. In particular, recording Network Tables data is often performance intensive - you may need to reduce the number of logged NT subtables where possible.
