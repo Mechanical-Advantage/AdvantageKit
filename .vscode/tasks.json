@@ -7,8 +7,10 @@
             "label": "Fetch Dependencies",
             "type": "shell",
             "command": "bazel build //:vscode",
-            "runOptions": {
-                "runOn": "folderOpen"
+            "windows": {
+                "runOptions": {
+                    "runOn": "folderOpen"
+                },
             },
             "presentation": {
                 "reveal": "always",
@@ -30,4 +32,4 @@
             "problemMatcher": []
         }
     ]
-  }
+}

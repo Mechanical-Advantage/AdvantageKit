@@ -1,4 +1,4 @@
-load("@rules_jvm_external//private/rules:javadoc.bzl", "javadoc")
+load("//build_tools/repo:javadoc.bzl", "javadoc")
 load("@rules_jvm_external//private/rules:maven_project_jar.bzl", "maven_project_jar")
 load("//build_tools/repo:maven_publish.bzl", "maven_publish")
 load("//build_tools/repo:pom_file.bzl", "pom_file")

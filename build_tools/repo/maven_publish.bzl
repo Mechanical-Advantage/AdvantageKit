@@ -23,7 +23,12 @@ def _maven_publish_impl(ctx):
     user = ctx.var.get("maven_user", "''")
     password = ctx.var.get("maven_password", "''")
 
-    javadocs_short_path = ctx.file.javadocs.short_path if ctx.file.javadocs else "''"
+    javadocs_file = None
+    if ctx.files.javadocs and len(ctx.files.javadocs) > 0:
+        javadocs_file = ctx.files.javadocs[0]
+    
+
+    javadocs_short_path = javadocs_file.short_path if javadocs_file else "''"
 
     ctx.actions.write(
         output = executable,
@@ -47,8 +52,8 @@ def _maven_publish_impl(ctx):
         ctx.file.pom,
         ctx.file.source_jar,
     ]
-    if ctx.file.javadocs:
-        files.append(ctx.file.javadocs)
+    if javadocs_file:
+        files.append(javadocs_file)
 
     return [
         DefaultInfo(
@@ -62,7 +67,7 @@ def _maven_publish_impl(ctx):
         MavenPublishInfo(
             coordinates = coordinates_substituted,
             artifact_jar = ctx.file.artifact_jar,
-            javadocs = ctx.file.javadocs,
+            javadocs = javadocs_file,
             source_jar = ctx.file.source_jar,
             pom = ctx.file.pom,
         ),
@@ -90,7 +95,8 @@ When signing with GPG, the current default key is used.
             allow_single_file = True,
         ),
         "javadocs": attr.label(
-            allow_single_file = True,
+            allow_files = True,
+            #allow_single_file = True,
         ),
         "artifact_jar": attr.label(
             mandatory = True,
