@@ -3,11 +3,14 @@
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 
+#include <chrono>
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <mutex>
 
 static const int NUM_JOYSTICKS = 6;
+using namespace std::chrono_literals;
 
 DsReader::DsReader() : is_running(false) {}
 
@@ -101,7 +104,13 @@ void DsReader::update_ds_data() {
 }
 
 void DsReader::read(schema::DSData* ds_buf) {
-  copy_mutex.lock();
-  std::memcpy(ds_buf, &internal_buf, sizeof(schema::DSData));
-  copy_mutex.unlock();
+  if (copy_mutex.try_lock_for(5s)) {
+    std::memcpy(ds_buf, &internal_buf, sizeof(schema::DSData));
+    copy_mutex.unlock();
+  } else {
+    std::cout
+        << "[conduit] Could not acquire DS read lock after 5 seconds!  Exiting!"
+        << std::endl;
+    exit(1);
+  }
 }

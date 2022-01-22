@@ -25,7 +25,7 @@ class DsReader {
   std::thread ds_thread;
   std::atomic<bool> is_running;
 
-  std::mutex copy_mutex;
+  std::timed_mutex copy_mutex;
 
   // Function called by the thread
   void update_ds_data();
