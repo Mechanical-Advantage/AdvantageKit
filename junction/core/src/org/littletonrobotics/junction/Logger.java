@@ -6,6 +6,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.inputs.*;
@@ -180,9 +181,9 @@ public class Logger {
   void periodicAfterUser() {
     if (running) {
       try {
-        receiverQueue.put(entry);
-      } catch (InterruptedException exception) {
-        return; // Main thread interrupted
+        receiverQueue.add(entry);
+      } catch (IllegalStateException exception) {
+        DriverStation.reportError("Capacity of receiver queue exceeded, data will NOT be logged.", false);
       }
     }
   }
