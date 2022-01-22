@@ -369,7 +369,11 @@ public class LogTable {
 
     LogValue(String value) {
       type = LoggableType.String;
-      this.value = value;
+      if (value != null) {
+        this.value = value;
+      } else {
+        this.value = "";
+      }
     }
 
     public String getString() {
@@ -422,6 +426,9 @@ public class LogTable {
     public boolean hasChanged(LogValue oldValue) {
       if (oldValue == null) {
         return true;
+      }
+      if (value == null || oldValue.value == null) {
+        return false; // Invalid data, don't try to encode it
       }
 
       if (oldValue.type != type) {
