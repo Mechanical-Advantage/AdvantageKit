@@ -20,5 +20,6 @@
     "clangd.arguments": [
         "--header-insertion=never",
         "--compile-commands-dir=${workspaceFolder}/"
-    ] 
+    ],
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

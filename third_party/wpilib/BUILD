@@ -73,6 +73,11 @@ cc_superimport(
         "//build_tools/platforms:is_linux": ["@wpilib_ntcore_linux_x64_files//:binaries_files"],
         "//build_tools/platforms:is_windows": ["@wpilib_ntcore_windows_x64_files//:binaries_files"],
         "//build_tools/platforms:is_macos": ["@wpilib_ntcore_macos_x64_files//:binaries_files"],
+        "//conditions:default": [],
+    }),
+    target_compatible_with = select({
+        "//build_tools/platforms:is_athena": ["@platforms//:incompatible"],
+        "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
 )
@@ -83,6 +88,11 @@ cc_superimport(
         "//build_tools/platforms:is_linux": ["@wpilib_wpimath_linux_x64_files//:binaries_files"],
         "//build_tools/platforms:is_windows": ["@wpilib_wpimath_windows_x64_files//:binaries_files"],
         "//build_tools/platforms:is_macos": ["@wpilib_wpimath_macos_x64_files//:binaries_files"],
+        "//conditions:default": [],
+    }),
+    target_compatible_with = select({
+        "//build_tools/platforms:is_athena": ["@platforms//:incompatible"],
+        "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
 )
