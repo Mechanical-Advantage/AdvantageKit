@@ -7,6 +7,10 @@ user.bazelrc
 
 /dev_sandbox
 
+# Bazel for IntelliJ
+/.clwb
+/.ijwb
+
 ### macOS ###
 # General
 .DS_Store
