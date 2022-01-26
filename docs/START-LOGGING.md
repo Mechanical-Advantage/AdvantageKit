@@ -180,7 +180,7 @@ The logging framework supports recording this output data on the real robot and 
 
 ```java
 Logger.getInstance().recordOutput("Odometry/XMeters", pose.getX());
-Logger.getInstance().recordOutput("Odometry/YMeters", pose.getX());
+Logger.getInstance().recordOutput("Odometry/YMeters", pose.getY());
 Logger.getInstance().recordOutput("Odometry/RotationRadians", pose.getRotation().getRadians());
 ```
 
