@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -11,6 +13,7 @@ import org.littletonrobotics.junction.LogTable;
 
 /** Replays log values from a custom binary format. */
 public class ByteLogReplay implements LogReplaySource {
+  private static final String advantageScopeFileName = "akit-log-path.txt";
 
   private final String filename;
 
@@ -55,10 +58,27 @@ public class ByteLogReplay implements LogReplaySource {
     }
   }
 
-  /** Prompts the user to enter a path and returns the result. */
+  /**
+   * Prompts the user to enter a path and returns the result. Automatically uses
+   * the open file in Advantage Scope if available.
+   */
   public static String promptForPath() {
+
+    // Read file from Advantage Scope
+    Path advantageScopeTempPath = Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
+    String advantageScopeLogPath = null;
+    try (Scanner fileScanner = new Scanner(advantageScopeTempPath)) {
+      advantageScopeLogPath = fileScanner.nextLine();
+    } catch (IOException e) {
+    }
+    if (advantageScopeLogPath != null) {
+      System.out.println("Using log from Advantage Scope - \"" + advantageScopeLogPath + "\"");
+      return advantageScopeLogPath;
+    }
+
+    // Prompt on stdin
     Scanner scanner = new Scanner(System.in);
-    System.out.print("Enter path to log file: ");
+    System.out.print("No log open in Advantage Scope. Enter path to file: ");
     String filename = scanner.nextLine();
     scanner.close();
     if (filename.charAt(0) == '\'' || filename.charAt(0) == '"') {
