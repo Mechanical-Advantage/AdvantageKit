@@ -151,6 +151,32 @@ http_archive(
 #    remote = "https://github.com/wpilibsuite/allwpilib"
 #)
 
+BAZEL_TOOLCHAIN_TAG = "0.6.3"
+BAZEL_TOOLCHAIN_SHA = "da607faed78c4cb5a5637ef74a36fdd2286f85ca5192222c4664efec2d529bb8"
+
+http_archive(
+    name = "com_grail_bazel_toolchain",
+    sha256 = BAZEL_TOOLCHAIN_SHA,
+    strip_prefix = "bazel-toolchain-{tag}".format(tag = BAZEL_TOOLCHAIN_TAG),
+    canonical_id = BAZEL_TOOLCHAIN_TAG,
+    url = "https://github.com/grailbio/bazel-toolchain/archive/{tag}.tar.gz".format(tag = BAZEL_TOOLCHAIN_TAG),
+)
+
+load("@com_grail_bazel_toolchain//toolchain:deps.bzl", "bazel_toolchain_dependencies")
+
+bazel_toolchain_dependencies()
+
+load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
+
+llvm_toolchain(
+    name = "llvm_toolchain",
+    llvm_version = "13.0.0",
+)
+
+load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
+
+llvm_register_toolchains()
+
 # This tells Bazel how to download the athena (roborio) toolchain for cross compiling
 # on 64 bit linux.
 http_archive(
