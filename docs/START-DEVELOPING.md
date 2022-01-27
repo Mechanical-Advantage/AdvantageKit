@@ -9,6 +9,8 @@ If you've done this kind of thing before, you can follow [Bazel's official insta
 
 If you don't know where to start with any of these, follow one of our guides below for [Windows](#windows), [Linux](#linux), or [macOS](#macos).
 
+For tips on using common IDEs, see our instructions for [Visual Studio Code](#vscode) and [IntelliJ IDEA / CLion](#intellij-idea-and-clion).
+
 ## Windows
 
 **Many developer convenience features are not supported on Windows.  If you are interested in doing extensive development work on AdvantageKit, we strongly recommend setting up [WSL/WSL2](https://docs.microsoft.com/en-us/windows/wsl/install) and working within that environment.  WSL has excellent integration with VSCode and is fully supported by us as a stable development environment.**
@@ -70,3 +72,22 @@ brew install bazel
 ```
 
 >If you are on an Apple Silicon Mac, please do not use Homebrew to install Bazel and instead use the above instructions to ensure an x86_64 version of Bazel is installed.
+
+# IDE Setup
+
+## VSCode
+Make sure you install the Workspace recommended extensions.  This will ensure you have clangd (for C++ completion), Bazel (code completion for BUILD files, run tasks from VSCode), and the Java extension pack.
+
+### C/C++
+
+clangd uses a "compilation database" to provide code completion.  Currently, we have managed to get Bazel to generate this file (`compile_commands.json`) on Linux and macOS, though it is not working on Windows.  To compensate for this, we use a `compile_flags.txt` file to handle basic clangd support on Windows.  The experience will not be as nice as working on Linux/macOS, but it will be at least usable.
+
+To generate this compilation database, open the VSCode command palette, type "Run Task", and then run the "Update Compilation Database" task.  As you create and delete source files, you may need to run this task again if clangd seems to be misbehaving.
+
+On Windows, VSCode should automatically run the "Fetch Dependencies" task at startup.  If this doesn't happen, open the command palette, type "Run Task", and run the "Fetch Dependencies" task.  This downloads and extracts all of the required headers for clangd to work with on Windows.
+
+### Java
+We ship a version of SalesForce's Bazel Java Language Server extension in our repo.  To use it, go to the extensions tab, select "Install from VSIX" from the "..." menu, and then navigate to the `bazel-vscode-x.x.x.vsix` file in the root of the repository and install it.  Restart VSCode and it should begin working with Java code.
+
+## IntelliJ IDEA and CLion
+The Google provided plugins for [IntelliJ IDEA](https://plugins.jetbrains.com/plugin/8609-bazel) and [CLion](https://plugins.jetbrains.com/plugin/9554-bazel) work perfectly with our workspace.  To install them, head to the plugin page and make sure you install supported versions of IDEA/CLion for the latest available version of the extension.  The extension typically doesn't support the very latest versions, but it is easy to install a supported version from Jetbrains Toolbox.
