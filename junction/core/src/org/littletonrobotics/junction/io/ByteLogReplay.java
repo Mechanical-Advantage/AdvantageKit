@@ -31,7 +31,7 @@ public class ByteLogReplay implements LogReplaySource {
       file = new FileInputStream(filename);
       data = new DataInputStream(file);
     } catch (FileNotFoundException e) {
-      DriverStation.reportError("Failed to open replay log file for.", true);
+      DriverStation.reportError("Failed to open replay log file.", true);
     }
   }
 
@@ -40,9 +40,7 @@ public class ByteLogReplay implements LogReplaySource {
       try {
         file.close();
         file = null;
-      } catch (IOException e) {
-        DriverStation.reportError("Failed to close replay log file.", true);
-      }
+      } catch (IOException e) {}
     }
   }
 

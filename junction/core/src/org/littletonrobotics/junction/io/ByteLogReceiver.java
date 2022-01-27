@@ -23,6 +23,9 @@ public class ByteLogReceiver implements LogRawDataReceiver {
   private FileOutputStream fileStream;
   private ByteEncoder encoder;
 
+  private boolean openFault = false;
+  private boolean writeFault = false;
+
   /**
    * Create a new ByteLogReceiver for writing to a ".rlog" file.
    * 
@@ -53,6 +56,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
       new File(folder + filename).delete();
       fileStream = new FileOutputStream(folder + filename);
     } catch (FileNotFoundException e) {
+      openFault = true;
       DriverStation.reportError("Failed to open log file. Data will NOT be recorded.", true);
     }
   }
@@ -63,7 +67,6 @@ public class ByteLogReceiver implements LogRawDataReceiver {
         fileStream.close();
         fileStream = null;
       } catch (IOException e) {
-        DriverStation.reportError("Failed to close log file.", true);
       }
     }
   }
@@ -103,11 +106,12 @@ public class ByteLogReceiver implements LogRawDataReceiver {
       // Write data
       try {
         fileStream.write(encoder.getOutput().array());
+        writeFault = false;
       } catch (IOException e) {
+        writeFault = true;
         DriverStation.reportError("Failed to write data to log file.", true);
       }
     }
-
   }
 
   private void rename(String newFilename) {
@@ -120,7 +124,8 @@ public class ByteLogReceiver implements LogRawDataReceiver {
       fileStream.close();
       fileStream = new FileOutputStream(folder + filename, true);
     } catch (IOException e) {
-      DriverStation.reportError("Failed to rename log file.", true);
+      openFault = true;
+      DriverStation.reportError("Failed to open renamed log file. Data will NOT be recorded.", true);
     }
   }
 
@@ -130,5 +135,21 @@ public class ByteLogReceiver implements LogRawDataReceiver {
   public static String addPathSuffix(String path, String suffix) {
     String[] tokens = path.split("\\.");
     return tokens[0] + suffix + "." + tokens[1];
+  }
+
+  /**
+   * Returns the state of the open file fault. This is tripped when the
+   * log file cannot be opened, meaning that data is not being saved.
+   */
+  public boolean getOpenFault() {
+    return openFault;
+  }
+
+  /**
+   * Returns the state of the write fault. This is tripped when the
+   * data cannot be written to the log file.
+   */
+  public boolean getWriteFault() {
+    return writeFault;
   }
 }

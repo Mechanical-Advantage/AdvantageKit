@@ -28,6 +28,7 @@ public class Logger {
   private LogReplaySource replaySource;
   private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
   private final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
+  private boolean receiverQueueFault = false;
 
   private Logger() {
   }
@@ -182,11 +183,21 @@ public class Logger {
     if (running) {
       try {
         receiverQueue.add(entry);
+        receiverQueueFault = false;
       } catch (IllegalStateException exception) {
+        receiverQueueFault = true;
         DriverStation.reportError("Capacity of receiver queue exceeded, data will NOT be logged.", false);
       }
     }
   }
+  
+  /**
+   * Returns the state of the receiver queue fault. This is tripped when the
+   * receiver queue fills up, meaning that data is no longer being saved.
+   */
+  public boolean getReceiverQueueFault() { 
+    return receiverQueueFault;
+  } 
 
   /**
    * Returns the current FPGA timestamp or replayed time based on the current log
