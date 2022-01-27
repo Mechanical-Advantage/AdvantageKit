@@ -1,11 +1,14 @@
 package org.littletonrobotics.junction.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.littletonrobotics.junction.Logger;
 
 /** Sends log data over a socket connection. */
 public class LogSocketServer implements LogRawDataReceiver {
@@ -31,15 +34,18 @@ public class LogSocketServer implements LogRawDataReceiver {
 
   public void processEntry() {
     if (thread != null) {
-      thread.sendEntry();
+      thread.periodic();
     }
   }
 
   private class ServerThread extends Thread {
+    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if hearbeat not received for this length
+
     ServerSocket server;
     ByteEncoder encoder;
 
     List<Socket> sockets = new ArrayList<>();
+    List<Double> lastHeartbeats = new ArrayList<>();
 
     public ServerThread(int port, ByteEncoder encoder) {
       super("LogSocketServer");
@@ -59,30 +65,22 @@ public class LogSocketServer implements LogRawDataReceiver {
       while (true) {
         try {
           Socket socket = server.accept();
-          byte[] data = encoder.getNewcomerData().array();
-          byte[] lengthBytes = ByteBuffer.allocate(Integer.BYTES).putInt(data.length).array();
-          byte[] fullData = new byte[lengthBytes.length + data.length];
-          System.arraycopy(lengthBytes, 0, fullData, 0, lengthBytes.length);
-          System.arraycopy(data, 0, fullData, lengthBytes.length, data.length);
-          socket.getOutputStream().write(fullData);
+          socket.getOutputStream().write(encodeData(encoder.getNewcomerData().array()));
           sockets.add(socket);
+          lastHeartbeats.add(Logger.getInstance().getRealTimestamp());
           System.out.println("Connected to log client - " + socket.getInetAddress().getHostAddress());
-
         } catch (IOException e) {
           e.printStackTrace();
         }
       }
     }
 
-    public void sendEntry() {
+    public void periodic() {
       if (server == null) {
         return;
       }
-      byte[] data = encoder.getOutput().array();
-      byte[] lengthBytes = ByteBuffer.allocate(Integer.BYTES).putInt(data.length).array();
-      byte[] fullData = new byte[lengthBytes.length + data.length];
-      System.arraycopy(lengthBytes, 0, fullData, 0, lengthBytes.length);
-      System.arraycopy(data, 0, fullData, lengthBytes.length, data.length);
+
+      byte[] data = encodeData(encoder.getOutput().array());
       for (int i = 0; i < sockets.size(); i++) {
         Socket socket = sockets.get(i);
         if (socket.isClosed()) {
@@ -90,17 +88,43 @@ public class LogSocketServer implements LogRawDataReceiver {
         }
 
         try {
-          socket.getOutputStream().write(fullData);
+          // Read heartbeat
+          InputStream inputStream = socket.getInputStream();
+          if (inputStream.available() > 0) {
+            inputStream.skip(inputStream.available());
+            lastHeartbeats.set(i, Logger.getInstance().getRealTimestamp());
+          }
+
+          // Close connection if socket timed out
+          if (Logger.getInstance().getRealTimestamp() - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
+            socket.close();
+            printDisconnectMessage(socket, "timeout");
+          } else {
+
+            // Send new data
+            socket.getOutputStream().write(data);
+          }
         } catch (IOException e) {
           try {
             socket.close();
-            System.out.println("Disconnected from log client - " + socket.getInetAddress().getHostAddress());
+            printDisconnectMessage(socket, "IOException");
           } catch (IOException a) {
             a.printStackTrace();
           }
         }
       }
+    }
 
+    private byte[] encodeData(byte[] data) {
+      byte[] lengthBytes = ByteBuffer.allocate(Integer.BYTES).putInt(data.length).array();
+      byte[] fullData = new byte[lengthBytes.length + data.length];
+      System.arraycopy(lengthBytes, 0, fullData, 0, lengthBytes.length);
+      System.arraycopy(data, 0, fullData, lengthBytes.length, data.length);
+      return fullData;
+    }
+
+    private void printDisconnectMessage(Socket socket, String reason) {
+      System.out.println("Disconnected from log client (" + reason + ") - " + socket.getInetAddress().getHostAddress());
     }
 
     public void close() {
