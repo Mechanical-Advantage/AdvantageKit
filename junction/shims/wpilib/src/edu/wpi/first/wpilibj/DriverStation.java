@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.inputs.LoggedDriverStation;
 
 import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.datalog.DataLog;
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -872,5 +873,25 @@ public class DriverStation {
    * @param word Word to update.
    */
   public static void updateControlWordFromCache(ControlWord word) {
+  }
+
+  /**
+   * Starts logging DriverStation data to data log. Repeated calls are ignored. This method
+   * has been patched by AdvantageKit and is nonfunctional.
+   *
+   * @param log data log
+   * @param logJoysticks if true, log joystick data
+   */
+  @SuppressWarnings("PMD.NonThreadSafeSingleton")
+  public static void startDataLog(DataLog log, boolean logJoysticks) {
+  }
+
+  /**
+   * Starts logging DriverStation data to data log, including joystick data. Repeated calls are
+   * ignored. This method has been patched by AdvantageKit and is nonfunctional.
+   *
+   * @param log data log
+   */
+  public static void startDataLog(DataLog log) {
   }
 }

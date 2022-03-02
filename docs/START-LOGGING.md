@@ -206,6 +206,8 @@ Unless otherwise specified, all normal WPILib and vendordep features will functi
 
 * While NT logging is supported, change listeners will **not** be triggered during replay. This means that `Sendable` data (such as `SendableChoosers`) will not be updated correctly. Any choosers must be contained in an IO layer. We are considering possible solutions to log this data automatically.
 
+* The built-in [data logging feature](https://docs.wpilib.org/en/stable/docs/software/telemetry/datalog.html) introduced in WPILib 2022.4.1 is not supported by the shimmed `DriverStation` class. We recommend using only a single logging system at a time; AdvantageKit already logs all of the available DS data.
+
 * All user code must be single-threaded. This is necessary to ensure that logged data is recorded and replayed predictably, as the timing of extra threads cannot be recreated in a simulator. 
 
 In addition, the logging framework typically increases the length of each loop cycle by 2-3ms. See [this page](CONDUIT-SHIMS.md) for more details. We recommend using the performance data automatically saved under `RealOutputs/LoggedRobot` to check if your code is at risk of causing loop overruns. In particular, recording Network Tables data is often performance intensive - you may need to reduce the number of logged NT subtables where possible.
