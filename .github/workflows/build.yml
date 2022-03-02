@@ -70,7 +70,7 @@ jobs:
         host:
           - {os: macos-latest, displayName: "macOS"}
           - {os: ubuntu-latest, displayName: "Linux"}
-          - {os: windows-latest, displayName: "Windows"}
+          - {os: windows-2019, displayName: "Windows"}
 
     name: Build for ${{ matrix.host.displayName }}
     runs-on: ${{ matrix.host.os }}
