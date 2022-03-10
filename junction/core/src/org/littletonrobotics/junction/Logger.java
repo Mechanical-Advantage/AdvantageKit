@@ -109,12 +109,6 @@ public class Logger {
 
       // Start first periodic cycle
       periodicBeforeUser();
-
-      // Record metadata
-      LogTable metadataTable = entry.getSubtable(replaySource == null ? "RealMetadata" : "ReplayMetadata");
-      for (Map.Entry<String, String> item : metadata.entrySet()) {
-        metadataTable.put(item.getKey(), item.getValue());
-      }
     }
   }
 
@@ -151,6 +145,12 @@ public class Logger {
           System.exit(0);
         }
         outputTable = entry.getSubtable("ReplayOutputs");
+      }
+
+      // Record metadata
+      LogTable metadataTable = entry.getSubtable(replaySource == null ? "RealMetadata" : "ReplayMetadata");
+      for (Map.Entry<String, String> item : metadata.entrySet()) {
+        metadataTable.put(item.getKey(), item.getValue());
       }
 
       // Update default inputs
