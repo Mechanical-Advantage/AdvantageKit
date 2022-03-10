@@ -9,9 +9,11 @@ import java.util.Date;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
+import org.littletonrobotics.junction.Logger;
 
 /** Records log values to a custom binary format. */
 public class ByteLogReceiver implements LogRawDataReceiver {
+  private static final double timeUpdateDelay = 3.0; // Wait several seconds to ensure timezone is updated
 
   private String folder;
   private String filename;
@@ -19,6 +21,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
   private boolean autoRename = false;
   private boolean updatedTime = false;
   private boolean updatedMatch = false;
+  private Double firstUpdatedTime = null;
 
   private FileOutputStream fileStream;
   private ByteEncoder encoder;
@@ -75,31 +78,37 @@ public class ByteLogReceiver implements LogRawDataReceiver {
     if (fileStream != null) {
       // Auto rename
       if (autoRename) {
-        if (System.currentTimeMillis() > 1638334800000L) { // 12/1/2021, the RIO 2 defaults to 7/1/2021
-          if (!updatedTime) {
-            rename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.rlog'").format(new Date()));
-            updatedTime = true;
+
+        // Update timestamp
+        if (!updatedTime) {
+          if (System.currentTimeMillis() > 1638334800000L) { // 12/1/2021, the RIO 2 defaults to 7/1/2021
+            if (firstUpdatedTime == null) {
+              firstUpdatedTime = Logger.getInstance().getRealTimestamp();
+            } else if (Logger.getInstance().getRealTimestamp() - firstUpdatedTime > timeUpdateDelay) {
+              rename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.rlog'").format(new Date()));
+              updatedTime = true;
+            }
           }
 
-          if (DriverStation.getMatchType() != MatchType.None && !updatedMatch) {
-            String matchText = "";
-            switch (DriverStation.getMatchType()) {
-              case Practice:
-                matchText = "p";
-                break;
-              case Qualification:
-                matchText = "q";
-                break;
-              case Elimination:
-                matchText = "e";
-                break;
-              default:
-                break;
-            }
-            matchText += Integer.toString(DriverStation.getMatchNumber());
-            rename(filename.substring(0, filename.length() - 5) + "_" + matchText + ".rlog");
-            updatedMatch = true;
+          // Update match
+        } else if (DriverStation.getMatchType() != MatchType.None && !updatedMatch) {
+          String matchText = "";
+          switch (DriverStation.getMatchType()) {
+            case Practice:
+              matchText = "p";
+              break;
+            case Qualification:
+              matchText = "q";
+              break;
+            case Elimination:
+              matchText = "e";
+              break;
+            default:
+              break;
           }
+          matchText += Integer.toString(DriverStation.getMatchNumber());
+          rename(filename.substring(0, filename.length() - 5) + "_" + matchText + ".rlog");
+          updatedMatch = true;
         }
       }
 
