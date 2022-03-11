@@ -190,24 +190,24 @@ public class Logger {
       }
     }
   }
-  
+
   /**
    * Returns the state of the receiver queue fault. This is tripped when the
    * receiver queue fills up, meaning that data is no longer being saved.
    */
-  public boolean getReceiverQueueFault() { 
+  public boolean getReceiverQueueFault() {
     return receiverQueueFault;
-  } 
+  }
 
   /**
    * Returns the current FPGA timestamp or replayed time based on the current log
    * entry.
    */
   public double getTimestamp() {
-    if (running) {
-      return entry.getTimestamp();
-    } else {
+    if (!running || entry == null) {
       return getRealTimestamp();
+    } else {
+      return entry.getTimestamp();
     }
   }
 
