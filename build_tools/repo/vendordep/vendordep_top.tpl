@@ -4,7 +4,7 @@
     "version": "{version}",
     "uuid": "{uuid}",
     "mavenUrls": [],
-    "jsonUrl": "https://github.com/Mechanical-Advantage/AdvantageKit/releases/download/v{version}/AdvantageKit.json",
+    "jsonUrl": "https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest/download/AdvantageKit.json",
     "javaDependencies": [{javaDependencies}    ],
     "jniDependencies": [{jniDependencies}    ],
     "cppDependencies": []
