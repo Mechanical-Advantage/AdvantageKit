@@ -14,6 +14,7 @@ build -c opt # Build optimized by default
 
 build:athena --platforms=//build_tools/platforms:athena # Creates a "--config athena" CLI shortcut instead of having to type the whole platform string
 build:athena --cxxopt=-std=c++17 --cxxopt=-pedantic-errors
+build:athena --platform_suffix=_athena
 build:linux --cxxopt=-std=c++17 --cxxopt=-pedantic-errors
 build:macos --cxxopt=-std=c++17 --cxxopt=-pedantic-errors
 build:windows --cxxopt=/std:c++17
