@@ -212,7 +212,7 @@ public class Logger {
   }
 
   /**
-   * Returns the true FPGA timestamp, regardless of the timestamp used for
+   * Returns the true FPGA timestamp in seconds, regardless of the timestamp used for
    * logging. Useful for analyzing performance. DO NOT USE this method for any
    * logic which might need to be replayed.
    */
