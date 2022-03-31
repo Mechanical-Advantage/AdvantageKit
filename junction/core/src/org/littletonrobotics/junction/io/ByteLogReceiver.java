@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,7 +14,8 @@ import org.littletonrobotics.junction.Logger;
 
 /** Records log values to a custom binary format. */
 public class ByteLogReceiver implements LogRawDataReceiver {
-  private static final double timeUpdateDelay = 3.0; // Wait several seconds to ensure timezone is updated
+  private static final double writePeriodSecs = 0.25;
+  private static final double timestampUpdateDelay = 3.0; // Wait several seconds to ensure timezone is updated
 
   private String folder;
   private String filename;
@@ -25,6 +27,9 @@ public class ByteLogReceiver implements LogRawDataReceiver {
 
   private FileOutputStream fileStream;
   private ByteEncoder encoder;
+
+  private ByteBuffer writeBuffer = ByteBuffer.allocate(0);
+  private double lastWriteTimestamp = 0.0;
 
   private boolean openFault = false;
   private boolean writeFault = false;
@@ -55,6 +60,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
 
   public void start(ByteEncoder encoder) {
     this.encoder = encoder;
+    lastWriteTimestamp = 0.0;
     try {
       new File(folder + filename).delete();
       fileStream = new FileOutputStream(folder + filename);
@@ -84,7 +90,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
           if (System.currentTimeMillis() > 1638334800000L) { // 12/1/2021, the RIO 2 defaults to 7/1/2021
             if (firstUpdatedTime == null) {
               firstUpdatedTime = Logger.getInstance().getRealTimestamp();
-            } else if (Logger.getInstance().getRealTimestamp() - firstUpdatedTime > timeUpdateDelay) {
+            } else if (Logger.getInstance().getRealTimestamp() - firstUpdatedTime > timestampUpdateDelay) {
               rename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.rlog'").format(new Date()));
               updatedTime = true;
             }
@@ -112,13 +118,21 @@ public class ByteLogReceiver implements LogRawDataReceiver {
         }
       }
 
-      // Write data
-      try {
-        fileStream.write(encoder.getOutput().array());
-        writeFault = false;
-      } catch (IOException e) {
-        writeFault = true;
-        DriverStation.reportError("Failed to write data to log file.", true);
+      // Save to buffer
+      writeBuffer = ByteBuffer.allocate(writeBuffer.capacity() + encoder.getOutput().capacity()).put(writeBuffer.array()).put(encoder.getOutput().array());
+
+      // Write data to file
+      if (Logger.getInstance().getRealTimestamp() - lastWriteTimestamp > writePeriodSecs) {
+        lastWriteTimestamp = Logger.getInstance().getRealTimestamp();
+        try {
+          fileStream.write(writeBuffer.array());
+          fileStream.getFD().sync();
+          writeBuffer = ByteBuffer.allocate(0);
+          writeFault = false;
+        } catch (IOException e) {
+          writeFault = true;
+          DriverStation.reportError("Failed to write data to log file.", true);
+        }
       }
     }
   }
