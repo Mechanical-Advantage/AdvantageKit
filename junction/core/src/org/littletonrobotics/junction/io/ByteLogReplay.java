@@ -57,10 +57,19 @@ public class ByteLogReplay implements LogReplaySource {
   }
 
   /**
-   * Prompts the user to enter a path and returns the result. Automatically uses
-   * the open file in Advantage Scope if available.
+   * Prompts the user to enter a path and returns the result.
+   *
+   * Uses the following priorities for path selection:
+   * 1. The value of the 'AKIT_LOG_PATH' environment variable, if set
+   * 2. The file last opened in Advantage Scope, if available
+   * 3. The result of the prompt displayed to the user
    */
   public static String promptForPath() {
+    // Read environment variables
+    String envPath = System.getenv("AKIT_LOG_PATH");
+    if (envPath != null) {
+      return envPath;
+    }
 
     // Read file from Advantage Scope
     Path advantageScopeTempPath = Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
