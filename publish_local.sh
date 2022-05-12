@@ -9,6 +9,7 @@ bazel run --define "publishing_javadoc=false" //conduit/wpilibio:pom.publish
 bazel run --define "publishing_javadoc=false" //conduit/wpilibio:nativezip.publish -c opt
 bazel run --define "publishing_javadoc=false" //junction/core:core-export.publish
 bazel run --define "publishing_javadoc=false" //junction/shims/wpilib:wpilib-export.publish
+bazel run --define "publishing_javadoc=false" //junction/autolog:autolog-export.publish
 if [[ "$*" == athena ]]
 then
     bazel run --define "publishing_javadoc=false" --config=athena //conduit/wpilibio:nativezip.publish -c opt
