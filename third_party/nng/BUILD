@@ -5,5 +5,8 @@ cmake(
     generate_args = ["-GNinja"],
     lib_name = "libnng",
     lib_source = "@nng//:all_srcs",
+    cache_entries = {
+        "NNG_TESTS": "false"
+    },
     visibility = ["//visibility:public"]
 )
