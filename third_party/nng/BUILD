@@ -3,7 +3,7 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 cmake(
     name = "nng",
     cache_entries = {
-        "NNG_TESTS": "false",
+        "NNG_TESTS": "OFF",
     },
     generate_args = ["-GNinja"],
     lib_name = select({
