@@ -34,6 +34,7 @@ MAVEN_DEPS = [
     "org.ejml:ejml-simple:0.38",
     "org.ejml:ejml-core:0.38",
     "junit:junit:4.13.2",
+    "com.squareup:javapoet:1.13.0"
 ]
 
 # WPILib dependencies to pull from frcmaven.  If no version is provided, the above version is used.
