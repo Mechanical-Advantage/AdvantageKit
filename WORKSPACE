@@ -177,6 +177,38 @@ load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
 
 llvm_register_toolchains()
 
+http_archive(
+    name = "rules_foreign_cc",
+    sha256 = "6041f1374ff32ba711564374ad8e007aef77f71561a7ce784123b9b4b88614fc",
+    strip_prefix = "rules_foreign_cc-0.8.0",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.8.0.tar.gz",
+)
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+
+# This sets up some common toolchains for building targets. For more details, please see
+# https://bazelbuild.github.io/rules_foreign_cc/0.8.0/flatten.html#rules_foreign_cc_dependencies
+rules_foreign_cc_dependencies()
+
+_ALL_CONTENT = """
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+)
+"""
+
+# pcre source code repository
+http_archive(
+    name = "nng",
+    build_file_content = _ALL_CONTENT,
+    strip_prefix = "nng-1.5.2",
+    urls = [
+        "https://github.com/nanomsg/nng/archive/refs/tags/v1.5.2.zip"
+    ],
+    sha256 = "652ff3a2dbaeae194942205c369e9259e2b5cb5985d679d744cbfb95d1c807a3",
+)
+
 # This tells Bazel how to download the athena (roborio) toolchain for cross compiling
 # on 64 bit linux.
 http_archive(
