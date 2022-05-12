@@ -13,10 +13,6 @@
     "java.import.bazel.enabled": true,
     "java.import.bazel.src.path": "/src",
     "java.import.bazel.test.path": "/test",
-    "files.associations": {
-        "BUILD": "bazel",
-        "WORKSPACE": "bazel",
-    },
     "clangd.arguments": [
         "--header-insertion=never",
         "--compile-commands-dir=${workspaceFolder}/"
