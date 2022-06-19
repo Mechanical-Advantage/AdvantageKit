@@ -60,6 +60,9 @@ jobs:
       - name: 'Release: Upload "junction/core"'
         if: github.event_name == 'release'
         run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/core:core-export.publish
+      - name: 'Release: Upload "junction/autolog"'
+        if: github.event_name == 'release'
+        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/autolog:autolog-export.publish
       - name: 'Release: Upload "junction/shims/wpilib"'
         if: github.event_name == 'release'
         run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/shims/wpilib:wpilib-export.publish

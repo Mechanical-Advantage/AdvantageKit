@@ -1,7 +1,6 @@
 package org.littletonrobotics.junction;
 
 import com.squareup.javapoet.*;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -11,6 +10,7 @@ import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -26,17 +26,26 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
         return null;
     }
 
+    private static final TypeName LOG_TABLE_TYPE = ClassName.get("org.littletonrobotics.junction", "LogTable");
+    private static final TypeName LOGGABLE_INPUTS_TYPE = ClassName.get("org.littletonrobotics.junction.inputs", "LoggableInputs");
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        roundEnv.getElementsAnnotatedWith(AutoLog.class).forEach(classElement -> {
+        Optional<? extends TypeElement> annotationOptional = annotations.stream().filter((te) -> te.getSimpleName().toString().equals("AutoLog")).findFirst();
+        if (!annotationOptional.isPresent()) {
+            return false;
+        }
+
+        TypeElement annotation = annotationOptional.get();
+        roundEnv.getElementsAnnotatedWith(annotation).forEach(classElement -> {
             MethodSpec.Builder toLogBuilder = MethodSpec.methodBuilder("toLog")
                     .addAnnotation(Override.class)
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameter(LogTable.class, "table");
+                    .addParameter(LOG_TABLE_TYPE, "table");
             MethodSpec.Builder fromLogBuilder = MethodSpec.methodBuilder("fromLog")
                     .addAnnotation(Override.class)
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameter(LogTable.class, "table");
+                    .addParameter(LOG_TABLE_TYPE, "table");
 
             List<FieldSpec> fields = new ArrayList<>();
 
@@ -53,7 +62,7 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
 
             TypeSpec type = TypeSpec
                     .classBuilder(classElement.getSimpleName() + "AutoLogged")
-                    .addSuperinterface(LoggableInputs.class)
+                    .addSuperinterface(LOGGABLE_INPUTS_TYPE)
                     .superclass(classElement.asType())
                     .addMethod(toLogBuilder.build())
                     .addMethod(fromLogBuilder.build())
