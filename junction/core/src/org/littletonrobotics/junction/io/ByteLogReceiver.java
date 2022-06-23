@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -119,7 +120,8 @@ public class ByteLogReceiver implements LogRawDataReceiver {
       }
 
       // Save to buffer
-      writeBuffer = ByteBuffer.allocate(writeBuffer.capacity() + encoder.getOutput().capacity()).put(writeBuffer.array()).put(encoder.getOutput().array());
+      writeBuffer = ByteBuffer.allocate(writeBuffer.capacity() + encoder.getOutput().capacity())
+          .put(writeBuffer.array()).put(encoder.getOutput().array());
 
       // Write data to file
       if (Logger.getInstance().getRealTimestamp() - lastWriteTimestamp > writePeriodSecs) {
@@ -138,17 +140,18 @@ public class ByteLogReceiver implements LogRawDataReceiver {
   }
 
   private void rename(String newFilename) {
-    File oldFile = new File(folder + filename);
-    File newFile = new File(folder + newFilename);
-    oldFile.renameTo(newFile);
-    filename = newFilename;
-
     try {
       fileStream.close();
+
+      File oldFile = new File(folder + filename);
+      File newFile = new File(folder + newFilename);
+      Files.move(oldFile.toPath(), newFile.toPath());
+      filename = newFilename;
+
       fileStream = new FileOutputStream(folder + filename, true);
     } catch (IOException e) {
       openFault = true;
-      DriverStation.reportError("Failed to open renamed log file. Data will NOT be recorded.", true);
+      DriverStation.reportError("Failed to rename log file. Data will NOT be recorded.", true);
     }
   }
 
