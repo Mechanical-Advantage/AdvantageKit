@@ -53,7 +53,7 @@ public final class RobotController {
    * @return The current time in microseconds according to the FPGA.
    */
   public static long getFPGATime() {
-    return (long) (Logger.getInstance().getTimestamp() * 1000000.0);
+    return Logger.getInstance().getTimestamp();
   }
 
   /**

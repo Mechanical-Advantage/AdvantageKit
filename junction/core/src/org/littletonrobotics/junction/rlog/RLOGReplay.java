@@ -1,4 +1,4 @@
-package org.littletonrobotics.junction.io;
+package org.littletonrobotics.junction.rlog;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -10,23 +10,24 @@ import java.util.Scanner;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.LogReplaySource;
 
-/** Replays log values from a custom binary format. */
-public class ByteLogReplay implements LogReplaySource {
+/** Replays log values from the RLOG format. */
+public class RLOGReplay implements LogReplaySource {
   private static final String advantageScopeFileName = "akit-log-path.txt";
 
   private final String filename;
 
   private FileInputStream file;
   private DataInputStream data;
-  private ByteDecoder decoder;
+  private RLOGDecoder decoder;
 
-  public ByteLogReplay(String filename) {
+  public RLOGReplay(String filename) {
     this.filename = filename;
   }
 
   public void start() {
-    decoder = new ByteDecoder();
+    decoder = new RLOGDecoder();
     try {
       file = new FileInputStream(filename);
       data = new DataInputStream(file);
@@ -40,7 +41,8 @@ public class ByteLogReplay implements LogReplaySource {
       try {
         file.close();
         file = null;
-      } catch (IOException e) {}
+      } catch (IOException e) {
+      }
     }
   }
 

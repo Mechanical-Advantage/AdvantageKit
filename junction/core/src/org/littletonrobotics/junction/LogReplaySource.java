@@ -1,4 +1,4 @@
-package org.littletonrobotics.junction.io;
+package org.littletonrobotics.junction;
 
 import org.littletonrobotics.junction.LogTable;
 

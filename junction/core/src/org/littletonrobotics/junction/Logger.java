@@ -10,9 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.inputs.*;
-import org.littletonrobotics.junction.io.LogDataReceiver;
-import org.littletonrobotics.junction.io.LogRawDataReceiver;
-import org.littletonrobotics.junction.io.LogReplaySource;
+import org.littletonrobotics.junction.rlog.RLOGDataReceiver;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
@@ -64,7 +62,7 @@ public class Logger {
    * Adds a new raw data receiver to process real or replayed data. This method
    * only works during setup before starting to log.
    */
-  public void addDataReceiver(LogRawDataReceiver dataReceiver) {
+  public void addDataReceiver(RLOGDataReceiver dataReceiver) {
     if (!running) {
       receiverThread.addDataReceiver(dataReceiver);
     }
@@ -136,7 +134,7 @@ public class Logger {
       ConduitApi conduit = ConduitApi.getInstance();
       conduit.captureData();
       if (replaySource == null) {
-        entry = new LogTable(conduit.getTimestamp() / 1000000.0);
+        entry = new LogTable(conduit.getTimestamp());
         outputTable = entry.getSubtable("RealOutputs");
       } else {
         entry = replaySource.getEntry();
@@ -200,10 +198,10 @@ public class Logger {
   }
 
   /**
-   * Returns the current FPGA timestamp or replayed time based on the current log
-   * entry.
+   * Returns the current FPGA timestamp in microseconds or replayed time based on
+   * the current log entry.
    */
-  public double getTimestamp() {
+  public long getTimestamp() {
     if (!running || entry == null) {
       return getRealTimestamp();
     } else {
@@ -212,12 +210,12 @@ public class Logger {
   }
 
   /**
-   * Returns the true FPGA timestamp in seconds, regardless of the timestamp used for
-   * logging. Useful for analyzing performance. DO NOT USE this method for any
-   * logic which might need to be replayed.
+   * Returns the true FPGA timestamp in microseconds, regardless of the timestamp
+   * used for logging. Useful for analyzing performance. DO NOT USE this method
+   * for any logic which might need to be replayed.
    */
-  public double getRealTimestamp() {
-    return HALUtil.getFPGATime() / 1000000.0;
+  public long getRealTimestamp() {
+    return HALUtil.getFPGATime();
   }
 
   /**

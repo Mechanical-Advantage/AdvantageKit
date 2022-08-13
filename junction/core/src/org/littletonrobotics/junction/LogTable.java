@@ -9,14 +9,14 @@ import java.util.Map;
  * table.
  */
 public class LogTable {
-  private final double timestamp;
+  private final long timestamp;
   private final String prefix;
   private final Map<String, LogValue> data;
 
   /**
    * Creates a new LogTable, to serve as the root table.
    */
-  public LogTable(double timestamp) {
+  public LogTable(long timestamp) {
     this.timestamp = timestamp;
     prefix = "/";
     data = new HashMap<String, LogValue>();
@@ -25,7 +25,7 @@ public class LogTable {
   /**
    * Creates a new LogTable, copying data from the given source.
    */
-  public LogTable(double timestamp, LogTable source) {
+  public LogTable(long timestamp, LogTable source) {
     this.timestamp = timestamp;
     prefix = source.prefix;
     data = new HashMap<String, LogValue>();
@@ -35,7 +35,7 @@ public class LogTable {
   /**
    * Creates a new LogTable, to reference a subtable.
    */
-  private LogTable(double timestamp, String prefix, Map<String, LogValue> data) {
+  private LogTable(long timestamp, String prefix, Map<String, LogValue> data) {
     this.timestamp = timestamp;
     this.prefix = prefix;
     this.data = data;
@@ -44,7 +44,7 @@ public class LogTable {
   /**
    * Returns the timestamp of the table.
    */
-  public double getTimestamp() {
+  public long getTimestamp() {
     return timestamp;
   }
 

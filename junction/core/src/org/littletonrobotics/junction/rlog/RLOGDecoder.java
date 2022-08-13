@@ -1,4 +1,4 @@
-package org.littletonrobotics.junction.io;
+package org.littletonrobotics.junction.rlog;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -10,12 +10,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LoggableType;
 
-/** Converts byte array format to log tables. */
-public class ByteDecoder {
+/** Converts the RLOG format to log tables. */
+public class RLOGDecoder {
   public static final List<Byte> supportedLogRevisions = List.of((byte) 1);
 
   private Byte logRevision = null;
-  private LogTable table = new LogTable(0.0);
+  private LogTable table = new LogTable(0);
   private Map<Short, String> keyIDs = new HashMap<>();
 
   public LogTable decodeTable(DataInputStream input) {
@@ -32,7 +32,7 @@ public class ByteDecoder {
       if (input.available() == 0) {
         return null; // No more data, so we can't start a new table
       }
-      table = new LogTable(decodeTimestamp(input), table);
+      table = new LogTable((long) (decodeTimestamp(input) * 1000000.0), table);
 
       readLoop: while (true) {
         if (input.available() == 0) {

@@ -1,4 +1,4 @@
-package org.littletonrobotics.junction.io;
+package org.littletonrobotics.junction.rlog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,16 +10,16 @@ import java.util.List;
 
 import org.littletonrobotics.junction.Logger;
 
-/** Sends log data over a socket connection. */
-public class LogSocketServer implements LogRawDataReceiver {
+/** Sends log data over a socket connection using the RLOG format. */
+public class RLOGServer implements RLOGDataReceiver {
   private final int port;
   private ServerThread thread;
 
-  public LogSocketServer(int port) {
+  public RLOGServer(int port) {
     this.port = port;
   }
 
-  public void start(ByteEncoder encoder) {
+  public void start(RLOGEncoder encoder) {
     thread = new ServerThread(port, encoder);
     thread.start();
     System.out.println("Log server started on port " + Integer.toString(port));
@@ -42,12 +42,12 @@ public class LogSocketServer implements LogRawDataReceiver {
     private static final double heartbeatTimeoutSecs = 3.0; // Close connection if hearbeat not received for this length
 
     ServerSocket server;
-    ByteEncoder encoder;
+    RLOGEncoder encoder;
 
     List<Socket> sockets = new ArrayList<>();
     List<Double> lastHeartbeats = new ArrayList<>();
 
-    public ServerThread(int port, ByteEncoder encoder) {
+    public ServerThread(int port, RLOGEncoder encoder) {
       super("LogSocketServer");
       this.setDaemon(true);
       this.encoder = encoder;

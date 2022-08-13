@@ -1,6 +1,4 @@
-package org.littletonrobotics.junction.io;
-
-import org.littletonrobotics.junction.LogTable;
+package org.littletonrobotics.junction;
 
 /**
  * Receives entries from the logging system during real operation or simulation.

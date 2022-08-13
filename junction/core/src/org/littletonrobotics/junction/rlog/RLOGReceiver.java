@@ -1,4 +1,4 @@
-package org.littletonrobotics.junction.io;
+package org.littletonrobotics.junction.rlog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import org.littletonrobotics.junction.Logger;
 
-/** Records log values to a custom binary format. */
-public class ByteLogReceiver implements LogRawDataReceiver {
+/** Records log values to the RLOG format. */
+public class RLOGReceiver implements RLOGDataReceiver {
   private static final double writePeriodSecs = 0.25;
   private static final double timestampUpdateDelay = 3.0; // Wait several seconds to ensure timezone is updated
 
@@ -27,7 +27,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
   private Double firstUpdatedTime = null;
 
   private FileOutputStream fileStream;
-  private ByteEncoder encoder;
+  private RLOGEncoder encoder;
 
   private ByteBuffer writeBuffer = ByteBuffer.allocate(0);
   private double lastWriteTimestamp = 0.0;
@@ -42,7 +42,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
    *             filename will be generated based on the current time and match
    *             number (if applicable).
    */
-  public ByteLogReceiver(String path) {
+  public RLOGReceiver(String path) {
     if (path.endsWith(".rlog")) {
       File pathFile = new File(path);
       folder = pathFile.getParent() + "/";
@@ -59,7 +59,7 @@ public class ByteLogReceiver implements LogRawDataReceiver {
     }
   }
 
-  public void start(ByteEncoder encoder) {
+  public void start(RLOGEncoder encoder) {
     this.encoder = encoder;
     lastWriteTimestamp = 0.0;
     try {

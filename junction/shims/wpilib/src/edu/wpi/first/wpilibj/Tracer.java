@@ -42,7 +42,7 @@ public class Tracer {
 
   /** Restarts the epoch timer. */
   public void resetTimer() {
-    m_startTime = (long) (Logger.getInstance().getRealTimestamp() * 1000000.0);
+    m_startTime = Logger.getInstance().getRealTimestamp();
   }
 
   /**
@@ -60,7 +60,7 @@ public class Tracer {
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
-    long currentTime = (long) (Logger.getInstance().getRealTimestamp() * 1000000.0);
+    long currentTime = Logger.getInstance().getRealTimestamp();
     m_epochs.put(epochName, currentTime - m_startTime);
     m_startTime = currentTime;
   }

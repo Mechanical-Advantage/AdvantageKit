@@ -1,17 +1,17 @@
-package org.littletonrobotics.junction.io;
+package org.littletonrobotics.junction.rlog;
 
 /**
- * Receives entries (encoded as bytes) from the logging system during real
- * operation or simulation.
+ * Receives entries (encoded as bytes in the RLOG format) from the logging
+ * system during real operation or simulation.
  */
-public interface LogRawDataReceiver {
+public interface RLOGDataReceiver {
 
   /**
    * Called before the logging system begins reporting data. This should be used
    * to connect to files, find network devices, start threads, etc. The encoder
    * object provided here will be updated as records change.
    */
-  public default void start(ByteEncoder encoder) {
+  public default void start(RLOGEncoder encoder) {
   };
 
   /**

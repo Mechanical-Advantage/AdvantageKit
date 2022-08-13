@@ -1,4 +1,4 @@
-package org.littletonrobotics.junction.io;
+package org.littletonrobotics.junction.rlog;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -10,13 +10,13 @@ import java.util.Map;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 
-/** Converts log tables to byte array format. */
-public class ByteEncoder {
+/** Converts log tables to the RLOG format. */
+public class RLOGEncoder {
   public static final byte logRevision = (byte) 1;
 
   private ByteBuffer nextOutput;
   private boolean isFirstTable = true;
-  private LogTable lastTable = new LogTable(0.0);
+  private LogTable lastTable = new LogTable(0);
   private Map<String, Short> keyIDs = new HashMap<>();
   private short nextKeyID = 0;
 
@@ -45,7 +45,7 @@ public class ByteEncoder {
     buffers.add(ByteBuffer.allocate(1).put(logRevision));
 
     // Encode timestamp
-    buffers.add(encodeTimestamp(lastTable.getTimestamp()));
+    buffers.add(encodeTimestamp(lastTable.getTimestamp() / 1000000.0));
 
     // Encode key IDs
     for (Map.Entry<String, Short> keyID : keyIDs.entrySet()) {
@@ -83,7 +83,7 @@ public class ByteEncoder {
     }
 
     // Encode timestamp
-    buffers.add(encodeTimestamp(table.getTimestamp()));
+    buffers.add(encodeTimestamp(table.getTimestamp() / 1000000.0));
 
     // Encode new/changed fields
     for (Map.Entry<String, LogValue> field : newMap.entrySet()) {
