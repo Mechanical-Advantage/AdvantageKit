@@ -90,7 +90,7 @@ public class RLOGReceiver implements RLOGDataReceiver {
         if (!updatedTime) {
           if (System.currentTimeMillis() > 1638334800000L) { // 12/1/2021, the RIO 2 defaults to 7/1/2021
             if (firstUpdatedTime == null) {
-              firstUpdatedTime = Logger.getInstance().getRealTimestamp();
+              firstUpdatedTime = Logger.getInstance().getRealTimestamp() / 1000000.0;
             } else if (Logger.getInstance().getRealTimestamp() - firstUpdatedTime > timestampUpdateDelay) {
               rename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.rlog'").format(new Date()));
               updatedTime = true;

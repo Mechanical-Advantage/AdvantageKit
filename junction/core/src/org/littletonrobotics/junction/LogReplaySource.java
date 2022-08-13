@@ -1,7 +1,5 @@
 package org.littletonrobotics.junction;
 
-import org.littletonrobotics.junction.LogTable;
-
 /**
  * Provides a stream of log entries to be fed back to the robot code during
  * simulation.
