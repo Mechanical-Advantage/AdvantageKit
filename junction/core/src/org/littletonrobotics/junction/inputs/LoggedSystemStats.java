@@ -1,5 +1,6 @@
 package org.littletonrobotics.junction.inputs;
 
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -49,6 +50,7 @@ public class LoggedSystemStats implements LoggableInputs {
       powerDistributionCurrents[channel] = powerDistribution.getCurrent(channel);
     }
     table.put("PowerDistributionCurrents", powerDistributionCurrents);
+    table.put("EpochTime", WPIUtilJNI.getSystemTime());
   }
 
   public void fromLog(LogTable table) {

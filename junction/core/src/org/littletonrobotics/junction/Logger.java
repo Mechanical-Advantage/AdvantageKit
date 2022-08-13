@@ -19,7 +19,7 @@ public class Logger {
   private static Logger instance;
 
   private boolean running = false;
-  private LogTable entry;
+  private LogTable entry = new LogTable(0);
   private LogTable outputTable;
   private Map<String, String> metadata = new HashMap<>();
 
@@ -134,7 +134,7 @@ public class Logger {
       ConduitApi conduit = ConduitApi.getInstance();
       conduit.captureData();
       if (replaySource == null) {
-        entry = new LogTable(conduit.getTimestamp());
+        entry = new LogTable(conduit.getTimestamp(), entry);
         outputTable = entry.getSubtable("RealOutputs");
       } else {
         entry = replaySource.getEntry();
