@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -48,26 +49,26 @@ public class LoggedNetworkTables implements LoggableInputs {
         NetworkTableEntry entry = entries[entryId];
         String key = entry.getName().substring(1);
         switch (entry.getType()) {
+          case kRaw:
+            table.put(key, entry.getRaw(new byte[0]));
           case kBoolean:
             table.put(key, entry.getBoolean(false));
-            break;
-          case kBooleanArray:
-            table.put(key, entry.getBooleanArray(new boolean[0]));
             break;
           case kDouble:
             table.put(key, entry.getDouble(0.0));
             break;
-          case kDoubleArray:
-            table.put(key, entry.getDoubleArray(new double[0]));
-            break;
           case kString:
             table.put(key, entry.getString(""));
+            break;
+          case kBooleanArray:
+            table.put(key, entry.getBooleanArray(new boolean[0]));
+            break;
+          case kDoubleArray:
+            table.put(key, entry.getDoubleArray(new double[0]));
             break;
           case kStringArray:
             table.put(key, entry.getStringArray(new String[0]));
             break;
-          case kRaw:
-            table.put(key, entry.getRaw(new byte[0]));
           default:
             break;
         }
@@ -82,20 +83,30 @@ public class LoggedNetworkTables implements LoggableInputs {
       NetworkTableEntry tableEntry = netTable.getEntry(mapEntry.getKey());
 
       switch (mapEntry.getValue().type) {
+        case Raw:
+          tableEntry.setRaw(mapEntry.getValue().getRaw());
+          break;
         case Boolean:
           tableEntry.setBoolean(mapEntry.getValue().getBoolean());
-          break;
-        case BooleanArray:
-          tableEntry.setBooleanArray(mapEntry.getValue().getBooleanArray());
           break;
         case Integer:
           tableEntry.setDouble(mapEntry.getValue().getInteger());
           break;
-        case IntegerArray:
-          tableEntry.setDoubleArray(Arrays.stream(mapEntry.getValue().getIntegerArray()).asDoubleStream().toArray());
+        case Float:
+          tableEntry.setDouble(mapEntry.getValue().getFloat());
           break;
         case Double:
           tableEntry.setDouble(mapEntry.getValue().getDouble());
+          break;
+        case BooleanArray:
+          tableEntry.setBooleanArray(mapEntry.getValue().getBooleanArray());
+          break;
+        case IntegerArray:
+          tableEntry.setDoubleArray(Arrays.stream(mapEntry.getValue().getIntegerArray()).asDoubleStream().toArray());
+          break;
+        case FloatArray:
+          float[] floatArray = mapEntry.getValue().getFloatArray();
+          tableEntry.setDoubleArray(IntStream.range(0, floatArray.length).mapToDouble(i -> floatArray[i]).toArray());
           break;
         case DoubleArray:
           tableEntry.setDoubleArray(mapEntry.getValue().getDoubleArray());
@@ -105,9 +116,6 @@ public class LoggedNetworkTables implements LoggableInputs {
           break;
         case StringArray:
           tableEntry.setStringArray(mapEntry.getValue().getStringArray());
-          break;
-        case ByteArray:
-          tableEntry.setRaw(mapEntry.getValue().getByteArray());
           break;
         default:
           break;

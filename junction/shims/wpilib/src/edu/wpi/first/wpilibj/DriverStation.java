@@ -312,7 +312,7 @@ public class DriverStation {
     }
 
     if (pov < logDS.getJoystickData(stick).povs.length) {
-      return logDS.getJoystickData(stick).povs[pov];
+      return (int) logDS.getJoystickData(stick).povs[pov];
     }
 
     reportJoystickUnpluggedWarning(
@@ -331,7 +331,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
 
-    return logDS.getJoystickData(stick).buttonValues;
+    return (int) logDS.getJoystickData(stick).buttonValues;
   }
 
   /**
@@ -373,7 +373,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return logDS.getJoystickData(stick).buttonCount;
+    return (int) logDS.getJoystickData(stick).buttonCount;
   }
 
   /**
@@ -401,7 +401,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return logDS.getJoystickData(stick).type;
+    return (int) logDS.getJoystickData(stick).type;
   }
 
   /**
@@ -430,7 +430,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return logDS.getJoystickData(stick).axisTypes[axis];
+    return (int) logDS.getJoystickData(stick).axisTypes[axis];
   }
 
   /**
@@ -607,7 +607,7 @@ public class DriverStation {
    * @return the match type
    */
   public static MatchType getMatchType() {
-    int matchType = logDS.getDSData().matchType;
+    int matchType = (int) logDS.getDSData().matchType;
     switch (matchType) {
       case 1:
         return MatchType.Practice;
@@ -626,7 +626,7 @@ public class DriverStation {
    * @return the match number
    */
   public static int getMatchNumber() {
-    return logDS.getDSData().matchNumber;
+    return (int) logDS.getDSData().matchNumber;
   }
 
   /**
@@ -635,7 +635,7 @@ public class DriverStation {
    * @return the replay number
    */
   public static int getReplayNumber() {
-    return logDS.getDSData().replayNumber;
+    return (int) logDS.getDSData().replayNumber;
   }
 
   /**
@@ -644,7 +644,7 @@ public class DriverStation {
    * @return the current alliance
    */
   public static Alliance getAlliance() {
-    switch (logDS.getDSData().allianceStation) {
+    switch ((int) logDS.getDSData().allianceStation) {
       case 0:
       case 1:
       case 2:
@@ -666,7 +666,7 @@ public class DriverStation {
    * @return the location of the team's driver station controls: 1, 2, or 3
    */
   public static int getLocation() {
-    switch (logDS.getDSData().allianceStation) {
+    switch ((int) logDS.getDSData().allianceStation) {
       case 0:
       case 3:
         return 1;
@@ -876,10 +876,11 @@ public class DriverStation {
   }
 
   /**
-   * Starts logging DriverStation data to data log. Repeated calls are ignored. This method
+   * Starts logging DriverStation data to data log. Repeated calls are ignored.
+   * This method
    * has been patched by AdvantageKit and is nonfunctional.
    *
-   * @param log data log
+   * @param log          data log
    * @param logJoysticks if true, log joystick data
    */
   @SuppressWarnings("PMD.NonThreadSafeSingleton")
@@ -887,7 +888,8 @@ public class DriverStation {
   }
 
   /**
-   * Starts logging DriverStation data to data log, including joystick data. Repeated calls are
+   * Starts logging DriverStation data to data log, including joystick data.
+   * Repeated calls are
    * ignored. This method has been patched by AdvantageKit and is nonfunctional.
    *
    * @param log data log

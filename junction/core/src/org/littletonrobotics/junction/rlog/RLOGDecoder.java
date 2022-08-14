@@ -8,17 +8,16 @@ import java.util.Map;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.LogTable;
-import org.littletonrobotics.junction.LogTable.LoggableType;
 
 /** Converts the RLOG format to log tables. */
 public class RLOGDecoder {
   public static final List<Byte> supportedLogRevisions = List.of((byte) 1);
 
   private Byte logRevision = null;
-  private LogTable table = new LogTable(0);
   private Map<Short, String> keyIDs = new HashMap<>();
 
-  public LogTable decodeTable(DataInputStream input) {
+  public LogTable decodeTable(DataInputStream input, LogTable lastTable) {
+    LogTable table = null;
     readTable: try {
       if (logRevision == null) {
         logRevision = input.readByte();
@@ -32,7 +31,7 @@ public class RLOGDecoder {
       if (input.available() == 0) {
         return null; // No more data, so we can't start a new table
       }
-      table = new LogTable((long) (decodeTimestamp(input) * 1000000.0), table);
+      table = new LogTable((long) (decodeTimestamp(input) * 1000000.0), lastTable);
 
       readLoop: while (true) {
         if (input.available() == 0) {
@@ -47,7 +46,7 @@ public class RLOGDecoder {
             decodeKey(input);
             break;
           case 2: // Updated field
-            decodeValue(input);
+            decodeValue(input, table);
             break;
         }
       }
@@ -56,7 +55,7 @@ public class RLOGDecoder {
       return null; // Problem decoding, might have been interrupted while writing this cycle
     }
 
-    return new LogTable(table.getTimestamp(), table);
+    return table;
   }
 
   private double decodeTimestamp(DataInputStream input) throws IOException {
@@ -70,34 +69,17 @@ public class RLOGDecoder {
     keyIDs.put(keyID, key);
   }
 
-  private void decodeValue(DataInputStream input) throws IOException {
+  private void decodeValue(DataInputStream input, LogTable table) throws IOException {
     String key = keyIDs.get(input.readShort()).substring(1);
-    int typeInt = input.read();
-    if (typeInt == 0) {
-      table.remove(key);
-      return;
-    }
-
-    LoggableType type = LoggableType.values()[typeInt - 1];
     short length;
-    switch (type) {
-      case Boolean:
+    switch (input.read()) {
+      case 0:
+        // The null type (delete command) is no longer supported
+        break;
+      case 1:
         table.put(key, input.readBoolean());
         break;
-      case Byte:
-        table.put(key, input.readByte());
-        break;
-      case Integer:
-        table.put(key, input.readInt());
-        break;
-      case Double:
-        table.put(key, input.readDouble());
-        break;
-      case String:
-        length = input.readShort();
-        table.put(key, new String(input.readNBytes(length), "UTF-8"));
-        break;
-      case BooleanArray:
+      case 2:
         length = input.readShort();
         boolean[] booleanArray = new boolean[length];
         for (int i = 0; i < length; i++) {
@@ -105,23 +87,21 @@ public class RLOGDecoder {
         }
         table.put(key, booleanArray);
         break;
-      case ByteArray:
-        length = input.readShort();
-        byte[] byteArray = new byte[length];
-        for (int i = 0; i < length; i++) {
-          byteArray[i] = input.readByte();
-        }
-        table.put(key, byteArray);
+      case 3:
+        table.put(key, input.readInt());
         break;
-      case IntegerArray:
+      case 4:
         length = input.readShort();
-        int[] intArray = new int[length];
+        long[] intArray = new long[length];
         for (int i = 0; i < length; i++) {
           intArray[i] = input.readInt();
         }
         table.put(key, intArray);
         break;
-      case DoubleArray:
+      case 5:
+        table.put(key, input.readDouble());
+        break;
+      case 6:
         length = input.readShort();
         double[] doubleArray = new double[length];
         for (int i = 0; i < length; i++) {
@@ -129,7 +109,11 @@ public class RLOGDecoder {
         }
         table.put(key, doubleArray);
         break;
-      case StringArray:
+      case 7:
+        length = input.readShort();
+        table.put(key, new String(input.readNBytes(length), "UTF-8"));
+        break;
+      case 8:
         length = input.readShort();
         String[] stringArray = new String[length];
         for (int i = 0; i < length; i++) {
@@ -137,6 +121,20 @@ public class RLOGDecoder {
           stringArray[i] = new String(input.readNBytes(stringLength), "UTF-8");
         }
         table.put(key, stringArray);
+        break;
+      case 9:
+        // Convert single byte to byte array (single bytes are no longer supported)
+        table.put(key, new byte[] { input.readByte() });
+        break;
+      case 10:
+        length = input.readShort();
+        byte[] byteArray = new byte[length];
+        for (int i = 0; i < length; i++) {
+          byteArray[i] = input.readByte();
+        }
+        table.put(key, byteArray);
+        break;
+      default:
         break;
     }
   }

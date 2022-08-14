@@ -8,10 +8,12 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.littletonrobotics.junction.LogDataReceiver;
+import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 
 /** Sends log data over a socket connection using the RLOG format. */
-public class RLOGServer implements RLOGDataReceiver {
+public class RLOGServer implements LogDataReceiver {
   private final int port;
   private ServerThread thread;
 
@@ -19,8 +21,8 @@ public class RLOGServer implements RLOGDataReceiver {
     this.port = port;
   }
 
-  public void start(RLOGEncoder encoder) {
-    thread = new ServerThread(port, encoder);
+  public void start() {
+    thread = new ServerThread(port);
     thread.start();
     System.out.println("Log server started on port " + Integer.toString(port));
   }
@@ -32,9 +34,9 @@ public class RLOGServer implements RLOGDataReceiver {
     }
   }
 
-  public void processEntry() {
+  public void putEntry(LogTable table) {
     if (thread != null) {
-      thread.periodic();
+      thread.periodic(table);
     }
   }
 
@@ -42,15 +44,14 @@ public class RLOGServer implements RLOGDataReceiver {
     private static final double heartbeatTimeoutSecs = 3.0; // Close connection if hearbeat not received for this length
 
     ServerSocket server;
-    RLOGEncoder encoder;
+    RLOGEncoder encoder = new RLOGEncoder();
 
     List<Socket> sockets = new ArrayList<>();
     List<Double> lastHeartbeats = new ArrayList<>();
 
-    public ServerThread(int port, RLOGEncoder encoder) {
+    public ServerThread(int port) {
       super("LogSocketServer");
       this.setDaemon(true);
-      this.encoder = encoder;
       try {
         server = new ServerSocket(port);
       } catch (IOException e) {
@@ -75,11 +76,12 @@ public class RLOGServer implements RLOGDataReceiver {
       }
     }
 
-    public void periodic() {
+    public void periodic(LogTable table) {
       if (server == null) {
         return;
       }
 
+      encoder.encodeTable(table);
       byte[] data = encodeData(encoder.getOutput().array());
       for (int i = 0; i < sockets.size(); i++) {
         Socket socket = sockets.get(i);

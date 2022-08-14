@@ -1,7 +1,5 @@
 package org.littletonrobotics.junction;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -10,7 +8,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.inputs.*;
-import org.littletonrobotics.junction.rlog.RLOGDataReceiver;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
@@ -21,7 +18,6 @@ public class Logger {
   private boolean running = false;
   private LogTable entry = new LogTable(0);
   private LogTable outputTable;
-  private Map<String, String> metadata = new HashMap<>();
 
   private LogReplaySource replaySource;
   private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
@@ -59,16 +55,6 @@ public class Logger {
   }
 
   /**
-   * Adds a new raw data receiver to process real or replayed data. This method
-   * only works during setup before starting to log.
-   */
-  public void addDataReceiver(RLOGDataReceiver dataReceiver) {
-    if (!running) {
-      receiverThread.addDataReceiver(dataReceiver);
-    }
-  }
-
-  /**
    * Records a metadata value. This method only works during setup before starting
    * to log, then data will be recorded during the first cycle.
    * 
@@ -77,7 +63,7 @@ public class Logger {
    */
   public void recordMetadata(String key, String value) {
     if (!running) {
-      metadata.put(key, value);
+      entry.getSubtable(replaySource == null ? "RealMetadata" : "ReplayMetadata").put(key, value);
     }
   }
 
@@ -95,7 +81,6 @@ public class Logger {
   public void start() {
     if (!running) {
       running = true;
-      entry = null;
 
       // Start replay source
       if (replaySource != null) {
@@ -137,18 +122,12 @@ public class Logger {
         entry = new LogTable(conduit.getTimestamp(), entry);
         outputTable = entry.getSubtable("RealOutputs");
       } else {
-        entry = replaySource.getEntry();
+        entry = replaySource.getEntry(entry);
         if (entry == null) {
           end();
           System.exit(0);
         }
         outputTable = entry.getSubtable("ReplayOutputs");
-      }
-
-      // Record metadata
-      LogTable metadataTable = entry.getSubtable(replaySource == null ? "RealMetadata" : "ReplayMetadata");
-      for (Map.Entry<String, String> item : metadata.entrySet()) {
-        metadataTable.put(item.getKey(), item.getValue());
       }
 
       // Update default inputs
@@ -244,7 +223,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Boolean value) {
+  public void recordOutput(String key, byte[] value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -258,7 +237,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, boolean[] value) {
+  public void recordOutput(String key, boolean value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -272,7 +251,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Integer value) {
+  public void recordOutput(String key, long value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -286,7 +265,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, int[] value) {
+  public void recordOutput(String key, float value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -300,21 +279,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Double value) {
-    if (running) {
-      outputTable.put(key, value);
-    }
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public void recordOutput(String key, double[] value) {
+  public void recordOutput(String key, double value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -342,35 +307,63 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
+  public void recordOutput(String key, boolean[] value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, long[] value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, float[] value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, double[] value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
   public void recordOutput(String key, String[] value) {
-    if (running) {
-      outputTable.put(key, value);
-    }
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public void recordOutput(String key, byte value) {
-    if (running) {
-      outputTable.put(key, value);
-    }
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public void recordOutput(String key, byte[] value) {
     if (running) {
       outputTable.put(key, value);
     }

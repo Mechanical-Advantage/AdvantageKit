@@ -11,10 +11,13 @@ import java.util.Date;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
+
+import org.littletonrobotics.junction.LogDataReceiver;
+import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 
 /** Records log values to the RLOG format. */
-public class RLOGReceiver implements RLOGDataReceiver {
+public class RLOGWriter implements LogDataReceiver {
   private static final double writePeriodSecs = 0.25;
   private static final double timestampUpdateDelay = 3.0; // Wait several seconds to ensure timezone is updated
 
@@ -27,7 +30,7 @@ public class RLOGReceiver implements RLOGDataReceiver {
   private Double firstUpdatedTime = null;
 
   private FileOutputStream fileStream;
-  private RLOGEncoder encoder;
+  private RLOGEncoder encoder = new RLOGEncoder();
 
   private ByteBuffer writeBuffer = ByteBuffer.allocate(0);
   private double lastWriteTimestamp = 0.0;
@@ -36,13 +39,13 @@ public class RLOGReceiver implements RLOGDataReceiver {
   private boolean writeFault = false;
 
   /**
-   * Create a new ByteLogReceiver for writing to a ".rlog" file.
+   * Create a new RLOGWriter for writing to a ".rlog" file.
    * 
    * @param path Path to log file or folder. If only a folder is provided, the
    *             filename will be generated based on the current time and match
    *             number (if applicable).
    */
-  public RLOGReceiver(String path) {
+  public RLOGWriter(String path) {
     if (path.endsWith(".rlog")) {
       File pathFile = new File(path);
       folder = pathFile.getParent() + "/";
@@ -59,8 +62,7 @@ public class RLOGReceiver implements RLOGDataReceiver {
     }
   }
 
-  public void start(RLOGEncoder encoder) {
-    this.encoder = encoder;
+  public void start() {
     lastWriteTimestamp = 0.0;
     try {
       new File(folder + filename).delete();
@@ -81,7 +83,7 @@ public class RLOGReceiver implements RLOGDataReceiver {
     }
   }
 
-  public void processEntry() {
+  public void putEntry(LogTable table) {
     if (fileStream != null) {
       // Auto rename
       if (autoRename) {
@@ -120,6 +122,7 @@ public class RLOGReceiver implements RLOGDataReceiver {
       }
 
       // Save to buffer
+      encoder.encodeTable(table);
       writeBuffer = ByteBuffer.allocate(writeBuffer.capacity() + encoder.getOutput().capacity())
           .put(writeBuffer.array()).put(encoder.getOutput().array());
 
@@ -153,14 +156,6 @@ public class RLOGReceiver implements RLOGDataReceiver {
       openFault = true;
       DriverStation.reportError("Failed to rename log file. Data will NOT be recorded.", true);
     }
-  }
-
-  /**
-   * Adds a suffix to the given path (e.g. "test.rlog" -> "test_simulated.rlog").
-   */
-  public static String addPathSuffix(String path, String suffix) {
-    String[] tokens = path.split("\\.");
-    return tokens[0] + suffix + "." + tokens[1];
   }
 
   /**

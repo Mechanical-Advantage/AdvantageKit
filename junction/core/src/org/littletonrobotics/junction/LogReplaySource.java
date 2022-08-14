@@ -21,8 +21,8 @@ public interface LogReplaySource {
   };
 
   /**
-   * Called every loop cycle to get the next set of data. Fields from previous
-   * cycles will NOT be preserved. Return null to end replay.
+   * Called every loop cycle to get the next set of data. Return null to end
+   * replay.
    */
-  public LogTable getEntry();
+  public LogTable getEntry(LogTable lastEntry);
 }
