@@ -34,7 +34,7 @@ public class RLOGServer implements LogDataReceiver {
     }
   }
 
-  public void putEntry(LogTable table) {
+  public void putTable(LogTable table) {
     if (thread != null) {
       thread.periodic(table);
     }

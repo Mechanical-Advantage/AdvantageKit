@@ -30,7 +30,7 @@ public class RLOGWriter implements LogDataReceiver {
   private Double firstUpdatedTime = null;
 
   private FileOutputStream fileStream;
-  private RLOGEncoder encoder = new RLOGEncoder();
+  private RLOGEncoder encoder;
 
   private ByteBuffer writeBuffer = ByteBuffer.allocate(0);
   private double lastWriteTimestamp = 0.0;
@@ -63,6 +63,7 @@ public class RLOGWriter implements LogDataReceiver {
   }
 
   public void start() {
+    encoder = new RLOGEncoder();
     lastWriteTimestamp = 0.0;
     try {
       new File(folder + filename).delete();
@@ -83,7 +84,7 @@ public class RLOGWriter implements LogDataReceiver {
     }
   }
 
-  public void putEntry(LogTable table) {
+  public void putTable(LogTable table) {
     if (fileStream != null) {
       // Auto rename
       if (autoRename) {

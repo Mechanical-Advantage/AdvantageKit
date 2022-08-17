@@ -31,7 +31,7 @@ public class ReceiverThread extends Thread {
 
         // Send data to receivers
         for (int i = 0; i < dataReceivers.size(); i++) {
-          dataReceivers.get(i).putEntry(entry);
+          dataReceivers.get(i).putTable(entry);
         }
       }
     } catch (InterruptedException exception) {

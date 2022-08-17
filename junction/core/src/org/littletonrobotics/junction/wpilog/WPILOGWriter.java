@@ -66,7 +66,7 @@ public class WPILOGWriter implements LogDataReceiver {
     log.close();
   }
 
-  public void putEntry(LogTable table) {
+  public void putTable(LogTable table) {
     // Auto rename
     if (autoRename) {
 

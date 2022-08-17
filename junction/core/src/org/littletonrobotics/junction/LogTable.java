@@ -10,25 +10,35 @@ import java.util.Objects;
  * table.
  */
 public class LogTable {
-  private final long timestamp;
   private final String prefix;
+  private final SharedTimestamp timestamp;
   private final Map<String, LogValue> data;
+
+  /** Timestamp wrapper to enable passing by reference to subtables. */
+  private static class SharedTimestamp {
+    public long value = 0;
+
+    public SharedTimestamp(long value) {
+      this.value = value;
+    }
+  }
 
   /**
    * Creates a new LogTable, to serve as the root table.
    */
   public LogTable(long timestamp) {
-    this.timestamp = timestamp;
     prefix = "/";
+    this.timestamp = new SharedTimestamp(timestamp);
     data = new HashMap<String, LogValue>();
   }
 
   /**
-   * Creates a new LogTable, copying data from the given source.
+   * Creates a new LogTable, copying data from the given source. The original
+   * table can be safely modified without affecting the copy.
    */
-  public LogTable(long timestamp, LogTable source) {
-    this.timestamp = timestamp;
+  public LogTable(LogTable source) {
     prefix = source.prefix;
+    this.timestamp = new SharedTimestamp(source.timestamp.value);
     data = new HashMap<String, LogValue>();
     data.putAll(source.data);
   }
@@ -36,17 +46,24 @@ public class LogTable {
   /**
    * Creates a new LogTable, to reference a subtable.
    */
-  private LogTable(long timestamp, String prefix, Map<String, LogValue> data) {
-    this.timestamp = timestamp;
+  private LogTable(String prefix, LogTable parent) {
     this.prefix = prefix;
-    this.data = data;
+    this.timestamp = parent.timestamp;
+    this.data = parent.data;
+  }
+
+  /**
+   * Updates the timestamp of the table.
+   */
+  public void setTimestamp(long timestamp) {
+    this.timestamp.value = timestamp;
   }
 
   /**
    * Returns the timestamp of the table.
    */
   public long getTimestamp() {
-    return timestamp;
+    return timestamp.value;
   }
 
   /**
@@ -57,28 +74,29 @@ public class LogTable {
    * @return The subtable object.
    */
   public LogTable getSubtable(String tableName) {
-    return new LogTable(timestamp, prefix + tableName + "/", data);
+    return new LogTable(prefix + tableName + "/", this);
   }
 
   /**
-   * Returns a copy of all values from the table.
+   * Returns a set of all values from the table. If reading a single subtable, the
+   * data will be a copy. Otherwise, it will be a reference.
    * 
    * @param subtableOnly If true, include only values in the subtable (no prefix).
    *                     If false, include all values.
    * @return Map of the requested data.
    */
   public Map<String, LogValue> getAll(boolean subtableOnly) {
-    Map<String, LogValue> result = new HashMap<String, LogValue>();
     if (subtableOnly) {
+      Map<String, LogValue> result = new HashMap<String, LogValue>();
       for (Map.Entry<String, LogValue> field : data.entrySet()) {
         if (field.getKey().startsWith(prefix)) {
           result.put(field.getKey().substring(prefix.length()), field.getValue());
         }
       }
+      return result;
     } else {
-      result.putAll(data);
+      return data;
     }
-    return result;
   }
 
   /**
@@ -311,7 +329,7 @@ public class LogTable {
 
   /** Returns a string representation of the table. */
   public String toString() {
-    String output = "Timestamp=" + Long.toString(timestamp) + "\n";
+    String output = "Timestamp=" + Long.toString(timestamp.value) + "\n";
     output += "Prefix=\"" + prefix + "\"\n";
     output += "{\n";
     for (Map.Entry<String, LogValue> field : getAll(true).entrySet()) {

@@ -41,15 +41,7 @@ public class RLOGReader implements LogReplaySource {
     }
   }
 
-  public LogTable getEntry(LogTable lastEntry) {
-    if (file != null) {
-      LogTable table = decoder.decodeTable(data, lastEntry);
-      if (table == null) {
-        System.out.println("Replay of log has ended.");
-      }
-      return table;
-    } else {
-      return null;
-    }
+  public boolean updateTable(LogTable table) {
+    return decoder.decodeTable(data, table);
   }
 }

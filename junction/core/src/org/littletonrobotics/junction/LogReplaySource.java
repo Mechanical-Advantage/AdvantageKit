@@ -21,8 +21,11 @@ public interface LogReplaySource {
   };
 
   /**
-   * Called every loop cycle to get the next set of data. Return null to end
-   * replay.
+   * Called every loop cycle to get the next set of data.
+   * 
+   * @param table A reference to the current data table, to be updated with new
+   *              data (including a timestamp).
+   * @return A boolean indicating whether the replay should exit.
    */
-  public LogTable getEntry(LogTable lastEntry);
+  public boolean updateTable(LogTable table);
 }

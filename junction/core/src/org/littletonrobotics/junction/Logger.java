@@ -87,6 +87,13 @@ public class Logger {
         replaySource.start();
       }
 
+      // Create output table
+      if (replaySource == null) {
+        outputTable = entry.getSubtable("RealOutputs");
+      } else {
+        outputTable = entry.getSubtable("ReplayOutputs");
+      }
+
       // Start receiver thread
       receiverThread.start();
 
@@ -119,15 +126,13 @@ public class Logger {
       ConduitApi conduit = ConduitApi.getInstance();
       conduit.captureData();
       if (replaySource == null) {
-        entry = new LogTable(conduit.getTimestamp(), entry);
-        outputTable = entry.getSubtable("RealOutputs");
+        entry.setTimestamp(conduit.getTimestamp());
       } else {
-        entry = replaySource.getEntry(entry);
+        replaySource.updateTable(entry);
         if (entry == null) {
           end();
           System.exit(0);
         }
-        outputTable = entry.getSubtable("ReplayOutputs");
       }
 
       // Update default inputs
@@ -159,7 +164,9 @@ public class Logger {
   void periodicAfterUser() {
     if (running) {
       try {
-        receiverQueue.add(entry);
+        // Send a copy of the data to the receivers. The original object will be
+        // kept and updated with the next timestamp (and new data if replaying).
+        receiverQueue.add(new LogTable(entry));
         receiverQueueFault = false;
       } catch (IllegalStateException exception) {
         receiverQueueFault = true;
