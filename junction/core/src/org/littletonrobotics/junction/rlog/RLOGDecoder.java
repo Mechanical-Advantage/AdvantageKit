@@ -21,7 +21,7 @@ public class RLOGDecoder {
    * 
    * @param input The RLOG data to decode.
    * @param table The table to update with new data.
-   * @return A boolean indicating whether the replay should exit.
+   * @return A boolean indicating whether the replay should continue.
    */
   public boolean decodeTable(DataInputStream input, LogTable table) {
     readTable: try {
@@ -30,12 +30,12 @@ public class RLOGDecoder {
         if (!supportedLogRevisions.contains(logRevision)) {
           DriverStation.reportError("Log revision " + Integer.toString(logRevision & 0xff) + " is not supported.",
               false);
-          return true;
+          return false;
         }
         input.skip(1); // Second byte specifies timestamp type, this will be assumed
       }
       if (input.available() == 0) {
-        return true; // No more data, so we can't start a new table
+        return false; // No more data, so we can't start a new table
       }
       table.setTimestamp((long) (decodeTimestamp(input) * 1000000.0));
 
@@ -58,10 +58,10 @@ public class RLOGDecoder {
       }
 
     } catch (IOException e) {
-      return true; // Problem decoding, might have been interrupted while writing this cycle
+      return false; // Problem decoding, might have been interrupted while writing this cycle
     }
 
-    return false;
+    return true;
   }
 
   private double decodeTimestamp(DataInputStream input) throws IOException {

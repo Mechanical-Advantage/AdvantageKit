@@ -8,9 +8,9 @@ import java.util.Map;
 
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,24 +18,22 @@ import edu.wpi.first.wpilibj.DriverStation.MatchType;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
-  private static final String extraHeader = "AdvantageKit";
-  private static final String entryMetadata = "{\"source\":\"AdvantageKit\"}";
   private static final double writePeriodSecs = 0.25;
   private static final double timestampUpdateDelay = 3.0; // Wait several seconds to ensure timezone is updated
 
   private String folder;
   private String filename;
 
-  private boolean autoRename = false;
-  private boolean updatedTime = false;
-  private boolean updatedMatch = false;
-  private Double firstUpdatedTime = null;
+  private boolean autoRename;
+  private boolean updatedTime;
+  private boolean updatedMatch;
+  private Double firstUpdatedTime;
 
   private DataLog log;
-  private LogTable lastTable = new LogTable(0);
+  private LogTable lastTable;
   private int timestampID;
-  private Map<String, Integer> entryIDs = new HashMap<>();
-  private Map<String, LoggableType> entryTypes = new HashMap<>();
+  private Map<String, Integer> entryIDs;
+  private Map<String, LoggableType> entryTypes;
 
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
@@ -58,8 +56,15 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   public void start() {
-    log = new DataLog(folder, filename, writePeriodSecs, extraHeader);
-    timestampID = log.start("/Timestamp", "int64", entryMetadata, 0);
+    log = new DataLog(folder, filename, writePeriodSecs, WPILOGConstants.extraHeader);
+    timestampID = log.start(WPILOGConstants.timestampKey, "int64", WPILOGConstants.entryMetadata, 0);
+    lastTable = new LogTable(0);
+
+    entryIDs = new HashMap<>();
+    entryTypes = new HashMap<>();
+    updatedTime = false;
+    updatedMatch = false;
+    firstUpdatedTime = null;
   }
 
   public void end() {
@@ -118,7 +123,7 @@ public class WPILOGWriter implements LogDataReceiver {
       boolean appendData = false;
       if (!entryIDs.containsKey(field.getKey())) { // New field
         entryIDs.put(field.getKey(),
-            log.start(field.getKey(), type.getWPILOGType(), entryMetadata, table.getTimestamp()));
+            log.start(field.getKey(), type.getWPILOGType(), WPILOGConstants.entryMetadata, table.getTimestamp()));
         entryTypes.put(field.getKey(), type);
         appendData = true;
       } else if (!field.getValue().equals(oldMap.get(field.getKey()))) { // Updated field

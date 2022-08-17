@@ -2,6 +2,7 @@ package org.littletonrobotics.junction;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -578,37 +579,26 @@ public class LogTable {
   public enum LoggableType {
     Raw, Boolean, Integer, Float, Double, String, BooleanArray, IntegerArray, FloatArray, DoubleArray, StringArray;
 
+    private static final List<String> wpilogTypes = List.of("raw", "boolean", "int64", "float", "double", "string",
+        "boolean[]", "int64[]", "float[]", "double[]", "string[]");
+
     /**
      * Returns the standard string type for WPILOGs.
-     * 
      * https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc#data-types
      */
     public String getWPILOGType() {
-      switch (this) {
-        case Raw:
-          return "raw";
-        case Boolean:
-          return "boolean";
-        case Integer:
-          return "int64";
-        case Float:
-          return "float";
-        case Double:
-          return "double";
-        case String:
-          return "string";
-        case BooleanArray:
-          return "boolean[]";
-        case IntegerArray:
-          return "int64[]";
-        case FloatArray:
-          return "float[]";
-        case DoubleArray:
-          return "double[]";
-        case StringArray:
-          return "string[]";
-        default:
-          return "";
+      return wpilogTypes.get(this.ordinal());
+    }
+
+    /**
+     * Returns the type based on a standard string type for WPILOGs.
+     * https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc#data-types
+     */
+    public static LoggableType fromWPILOGType(String type) {
+      if (wpilogTypes.contains(type)) {
+        return LoggableType.values()[wpilogTypes.indexOf(type)];
+      } else {
+        return null;
       }
     }
   }

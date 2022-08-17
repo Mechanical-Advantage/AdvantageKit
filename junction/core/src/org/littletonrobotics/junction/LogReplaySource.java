@@ -25,7 +25,7 @@ public interface LogReplaySource {
    * 
    * @param table A reference to the current data table, to be updated with new
    *              data (including a timestamp).
-   * @return A boolean indicating whether the replay should exit.
+   * @return A boolean indicating whether the replay should continue.
    */
   public boolean updateTable(LogTable table);
 }

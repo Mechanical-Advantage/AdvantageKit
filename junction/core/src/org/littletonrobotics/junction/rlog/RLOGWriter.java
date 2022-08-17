@@ -24,16 +24,16 @@ public class RLOGWriter implements LogDataReceiver {
   private String folder;
   private String filename;
 
-  private boolean autoRename = false;
-  private boolean updatedTime = false;
-  private boolean updatedMatch = false;
-  private Double firstUpdatedTime = null;
+  private boolean autoRename;
+  private boolean updatedTime;
+  private boolean updatedMatch;
+  private Double firstUpdatedTime;
 
   private FileOutputStream fileStream;
   private RLOGEncoder encoder;
 
-  private ByteBuffer writeBuffer = ByteBuffer.allocate(0);
-  private double lastWriteTimestamp = 0.0;
+  private ByteBuffer writeBuffer;
+  private double lastWriteTimestamp;
 
   private boolean openFault = false;
   private boolean writeFault = false;
@@ -64,7 +64,12 @@ public class RLOGWriter implements LogDataReceiver {
 
   public void start() {
     encoder = new RLOGEncoder();
+    writeBuffer = ByteBuffer.allocate(0);
     lastWriteTimestamp = 0.0;
+    updatedTime = false;
+    updatedMatch = false;
+    firstUpdatedTime = null;
+
     try {
       new File(folder + filename).delete();
       fileStream = new FileOutputStream(folder + filename);
