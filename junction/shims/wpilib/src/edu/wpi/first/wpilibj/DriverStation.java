@@ -877,8 +877,7 @@ public class DriverStation {
 
   /**
    * Starts logging DriverStation data to data log. Repeated calls are ignored.
-   * This method
-   * has been patched by AdvantageKit and is nonfunctional.
+   * This method has been patched by AdvantageKit and is nonfunctional.
    *
    * @param log          data log
    * @param logJoysticks if true, log joystick data
@@ -889,8 +888,8 @@ public class DriverStation {
 
   /**
    * Starts logging DriverStation data to data log, including joystick data.
-   * Repeated calls are
-   * ignored. This method has been patched by AdvantageKit and is nonfunctional.
+   * Repeated calls are ignored. This method has been patched by AdvantageKit and
+   * is nonfunctional.
    *
    * @param log data log
    */
