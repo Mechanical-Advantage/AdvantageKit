@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.PDPData;
+import org.littletonrobotics.conduit.schema.SystemData;
 import org.littletonrobotics.conduit.schema.Joystick;
 
 public class ConduitApi {
@@ -32,6 +33,7 @@ public class ConduitApi {
   private final CoreInputs inputs = new CoreInputs();
   private final DSData ds;
   private final PDPData pdp;
+  private final SystemData sys;
   private final Joystick[] joysticks = new Joystick[NUM_JOYSTICKS];
 
   private ConduitApi() {
@@ -42,6 +44,7 @@ public class ConduitApi {
     inputs.__init(0, buffer);
     ds = inputs.ds();
     pdp = inputs.pdp();
+    sys = inputs.sys();
     for (int i = 0; i < NUM_JOYSTICKS; i++) {
       joysticks[i] = ds.joysticks(new Joystick(), i);
     }
@@ -196,5 +199,21 @@ public class ConduitApi {
 
   public double getPDPTotalEnergy() {
     return pdp.totalEnergy();
+  }
+
+  public double getVoltage() {
+    return sys.voltage();
+  }
+
+  public boolean getBrownedOut() {
+    return sys.brownedOut() != 0;
+  }
+
+  public float getCANBusUtilization() {
+    return sys.canBusUtilization();
+  }
+
+  public long getEpochTime() {
+    return sys.epochTime();
   }
 }
