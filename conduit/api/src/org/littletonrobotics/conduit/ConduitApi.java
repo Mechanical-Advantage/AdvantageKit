@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
+import org.littletonrobotics.conduit.schema.PDPData;
 import org.littletonrobotics.conduit.schema.Joystick;
 
 public class ConduitApi {
@@ -30,6 +31,7 @@ public class ConduitApi {
 
   private final CoreInputs inputs = new CoreInputs();
   private final DSData ds;
+  private final PDPData pdp;
   private final Joystick[] joysticks = new Joystick[NUM_JOYSTICKS];
 
   private ConduitApi() {
@@ -39,6 +41,7 @@ public class ConduitApi {
 
     inputs.__init(0, buffer);
     ds = inputs.ds();
+    pdp = inputs.pdp();
     for (int i = 0; i < NUM_JOYSTICKS; i++) {
       joysticks[i] = ds.joysticks(new Joystick(), i);
     }
@@ -160,5 +163,38 @@ public class ConduitApi {
 
   public boolean isXbox(int joystickId) {
     return joysticks[joystickId].isXbox();
+  }
+
+  public double getPDPTemperature() {
+    return pdp.temperature();
+  }
+
+  public double getPDPVoltage() {
+    return pdp.voltage();
+  }
+
+  public double getPDPChannelCurrent(int channel) {
+    return pdp.channelCurrent(channel);
+  }
+
+  public double[] getPDPCurrent() {
+    double[] ret = new double[pdp.channelCount()];
+    for (int i = 0; i < ret.length; i++) {
+      ret[i] = pdp.channelCurrent(i);
+    }
+
+    return ret;
+  }
+
+  public double getPDPTotalCurrent() {
+    return pdp.totalCurrent();
+  }
+
+  public double getPDPTotalPower() {
+    return pdp.totalPower();
+  }
+
+  public double getPDPTotalEnergy() {
+    return pdp.totalEnergy();
   }
 }
