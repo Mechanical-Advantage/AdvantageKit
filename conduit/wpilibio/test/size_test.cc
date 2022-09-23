@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <hal/HAL.h>
+#include <hal/PowerDistribution.h>
 
 #include "conduit/conduit_schema_generated.h"
 
@@ -77,4 +78,33 @@ TEST(SizeTests, JoystickSizes) {
 
   ASSERT_EQ(sizeof(HAL_JoystickDescriptor::isXbox),
             sizeof(decltype(joystick.is_xbox())));
+}
+
+TEST(SizeTests, PDPDataSizes) {
+  schema::PDPData pdp;
+  pdp.temperature();
+  pdp.voltage();
+  pdp.channel_count();
+  pdp.channel_current();
+  pdp.total_current();
+  pdp.total_energy();
+  pdp.total_power();
+
+  ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTemperature(0,0))),
+            sizeof(decltype(pdp.temperature())));
+
+  ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionVoltage(0,0))),
+            sizeof(decltype(pdp.voltage())));
+
+  ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0,0))),
+            sizeof(decltype(pdp.channel_count())));
+
+  // Not sure how to test the array size for HAL_GetPowerDistributionAllChannelCurrents
+
+  ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalCurrent(0,0))),
+            sizeof(decltype(pdp.total_current())));
+  ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalPower(0,0))),
+            sizeof(decltype(pdp.total_power())));
+  ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalEnergy(0,0))),
+            sizeof(decltype(pdp.total_energy())));
 }

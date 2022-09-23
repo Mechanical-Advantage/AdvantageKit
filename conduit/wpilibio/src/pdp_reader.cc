@@ -29,7 +29,6 @@ void PDPReader::start() {
   std::int32_t status;
   pdp_handle = HAL_InitializePowerDistribution(-1, HAL_PowerDistributionType_kAutomatic, stack.c_str(), &status);
 
-  channel_count = HAL_GetPowerDistributionNumChannels(pdp_handle, &status);
   pdp_thread = std::thread(&PDPReader::update_pdp_data, this);
 }
 
@@ -58,7 +57,7 @@ void PDPReader::update_pdp_data() {
     internal_buf.mutate_voltage(voltage);
     internal_buf.mutate_channel_count(channel_count);
 
-    flatbuffers::Array<double, 20> *current_buf = internal_buf.mutable_channel_current();
+    flatbuffers::Array<double, 24> *current_buf = internal_buf.mutable_channel_current();
     for (int32_t i = 0; i < channel_count; i++)
     {
       current_buf->Mutate(i, channel_currents[i]);

@@ -39,8 +39,8 @@ struct DSData {
 struct PDPData {
     temperature:float64;
     voltage:float64;
-    channel_count:uint8;
-    channel_current:[float64:20];
+    channel_count:int32;
+    channel_current:[float64:24];
     total_current:float64;
     total_power:float64;
     total_energy:float64;
