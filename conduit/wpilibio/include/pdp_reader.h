@@ -7,6 +7,8 @@ using namespace org::littletonrobotics::conduit;
 #include <mutex>
 #include <atomic>
 
+#include <hal/PowerDistribution.h>
+
 // Reads data from the power distribution panel.  The data is read in a thread and copied
 // into a schema::PDPData internal buffer.  This copying is done under lock. When
 // a read is requested, the same lock is acquired.  This minimizes contention
@@ -32,4 +34,6 @@ class PDPReader {
 
   // Internal buffer used to store the read data
   schema::PDPData internal_buf;
+
+  HAL_PowerDistributionHandle pdp_handle;
 };

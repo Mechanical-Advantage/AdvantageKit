@@ -39,10 +39,11 @@ struct DSData {
 struct PDPData {
     temperature:float64;
     voltage:float64;
-    channelCurrent:[float64:20];
-    totalCurrent:float64;
-    totalPower:float64;
-    totalEnergy:float64;
+    channel_count:uint8;
+    channel_current:[float64:20];
+    total_current:float64;
+    total_power:float64;
+    total_energy:float64;
 }
 
 struct CoreInputs {
