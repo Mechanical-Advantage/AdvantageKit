@@ -3,6 +3,7 @@
 #include <hal/PowerDistribution.h>
 #include <hal/HALBase.h>
 #include <wpi/StackTrace.h>
+#include <hal/DriverStation.h>
 
 #include <chrono>
 #include <cstdint>
@@ -35,6 +36,9 @@ void PDPReader::start() {
 void PDPReader::update_pdp_data() {
   is_running = true;
   while (is_running) {
+    // We should wait on something... DS packet?
+    HAL_WaitForDSData();
+    
     std::int32_t status;
 
     double temperature = HAL_GetPowerDistributionTemperature(pdp_handle, &status);

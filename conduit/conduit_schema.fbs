@@ -46,8 +46,16 @@ struct PDPData {
     total_energy:float64;
 }
 
+struct SystemData {
+    voltage:float64;
+    browned_out:int32;
+    can_bus_utilization:float32;
+    epoch_time:uint64;
+}
+
 struct CoreInputs {
     timestamp:int64;
     ds:DSData;
     pdp:PDPData;
+    sys:SystemData;
 }
