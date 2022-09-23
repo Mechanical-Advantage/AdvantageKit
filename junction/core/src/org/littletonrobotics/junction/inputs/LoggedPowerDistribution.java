@@ -1,26 +1,21 @@
 package org.littletonrobotics.junction.inputs;
 
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.RobotController;
+
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTable;
-
 /**
- * Manages logging power distribution data (current, power, etc.)
+ * Manages logging power distribution data. This is NOT replayed to the simulator.
  */
-public class LoggedPowerDistribution implements LoggableInputs {
-  private double pdpTemperature;
-  private double pdpVoltage;
-  private double[] pdpChannelCurrents;
-  private double pdpTotalCurrent;
-  private double pdpTotalPower;
-  private double pdpTotalEnergy;
+public class LoggedPowerDistribution {
 
   private static LoggedPowerDistribution instance;
   private static final Logger logger = Logger.getInstance();
+
+  private final PowerDistributionInputs pdpInputs = new PowerDistributionInputs();
 
   private LoggedPowerDistribution() {
   }
@@ -32,35 +27,43 @@ public class LoggedPowerDistribution implements LoggableInputs {
     return instance;
   }
 
-  /**
-   * Records inputs from the real driver station via conduit
-   */
+  public static class PowerDistributionInputs implements LoggableInputs {
+    public double pdpTemperature;
+    public double pdpVoltage;
+    public double[] pdpChannelCurrents;
+    public double pdpTotalCurrent;
+    public double pdpTotalPower;
+    public double pdpTotalEnergy;
+
+    @Override
+    public void toLog(LogTable table) {
+      table.put("PowerDistributionTemperature", pdpTemperature);
+      table.put("PowerDistributionVoltage", pdpVoltage);
+      table.put("PowerDistributionChannelCurrent", pdpChannelCurrents);
+      table.put("PowerDistributionTotalCurrent", pdpTotalCurrent);
+      table.put("PowerDistributionTotalPower", pdpTotalPower);
+      table.put("PowerDistributionTotalEnergy", pdpTotalEnergy);
+    }
+
+    @Override
+    public void fromLog(LogTable table) {
+      // Ignore replayed inputs
+    }
+  }
+
   public void periodic() {
     // Update inputs from conduit
     if (!logger.hasReplaySource()) {
       ConduitApi conduit = ConduitApi.getInstance();
-
-      pdpTemperature = conduit.getPDPTemperature();
-      pdpVoltage = conduit.getPDPVoltage();
-      pdpChannelCurrents = conduit.getPDPCurrent();
-      pdpTotalCurrent = conduit.getPDPTotalCurrent();
-      pdpTotalPower = conduit.getPDPTotalPower();
-      pdpTotalEnergy = conduit.getPDPTotalEnergy();
+      pdpInputs.pdpTemperature = conduit.getPDPTemperature();
+      pdpInputs.pdpVoltage = conduit.getPDPVoltage();
+      pdpInputs.pdpChannelCurrents = conduit.getPDPCurrent();
+      pdpInputs.pdpTotalCurrent = conduit.getPDPTotalCurrent();
+      pdpInputs.pdpTotalPower = conduit.getPDPTotalPower();
+      pdpInputs.pdpTotalEnergy = conduit.getPDPTotalEnergy();
     }
+
+    logger.processInputs("PowerDistribution", pdpInputs);
   }
 
-  @Override
-  public void toLog(LogTable table) {
-    table.put("PowerDistributionTemperature", pdpTemperature);
-    table.put("PowerDistributionVoltage", pdpVoltage);
-    table.put("PowerDistributionChannelCurrent", pdpChannelCurrents);
-    table.put("PowerDistributionTotalCurrent", pdpTotalCurrent);
-    table.put("PowerDistributionTotalPower", pdpTotalPower);
-    table.put("PowerDistributionTotalEnergy", pdpTotalEnergy);
-  }
-
-  @Override
-  public void fromLog(LogTable table) {
-    // Ignore replayed inputs
-  }
 }

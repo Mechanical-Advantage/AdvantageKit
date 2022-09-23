@@ -157,20 +157,24 @@ public class Logger {
       double driverStationStart = getRealTimestamp();
       LoggedDriverStation.getInstance().periodic();
       double systemStatsStart = getRealTimestamp();
-      processInputs("SystemStats", LoggedSystemStats.getInstance());
+      LoggedSystemStats.getInstance().periodic();
+      double powerDistributionStart = getRealTimestamp();
+      LoggedPowerDistribution.getInstance().periodic();
       double networkTablesStart = getRealTimestamp();
       processInputs("NetworkTables", LoggedNetworkTables.getInstance());
       double periodicEnd = getRealTimestamp();
 
       // Log output data
       recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) * 1000);
-      recordOutput("Logger/SSPeriodicMS", (networkTablesStart - systemStatsStart) * 1000);
+      recordOutput("Logger/SSPeriodicMS", (powerDistributionStart - systemStatsStart) * 1000);
+      recordOutput("Logger/PDPeriodicMS", (networkTablesStart - powerDistributionStart) * 1000);
       recordOutput("Logger/NTPeriodicMS", (periodicEnd - networkTablesStart) * 1000);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
     } else {
       // Retrieve new driver station data even if logger is disabled
       ConduitApi.getInstance().captureData();
       LoggedDriverStation.getInstance().periodic();
+      LoggedSystemStats.getInstance().periodic();
     }
   }
 
