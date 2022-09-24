@@ -28,7 +28,7 @@ void PDPReader::start() {
   auto stack = wpi::GetStackTrace(1);
   
   std::int32_t status;
-  pdp_handle = HAL_InitializePowerDistribution(-1, HAL_PowerDistributionType_kAutomatic, stack.c_str(), &status);
+  pdp_handle = HAL_InitializePowerDistribution(HAL_DEFAULT_POWER_DISTRIBUTION_MODULE, HAL_PowerDistributionType_kAutomatic, stack.c_str(), &status);
 
   pdp_thread = std::thread(&PDPReader::update_pdp_data, this);
 }
