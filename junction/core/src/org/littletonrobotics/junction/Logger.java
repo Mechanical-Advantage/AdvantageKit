@@ -174,6 +174,7 @@ public class Logger {
       // Retrieve new driver station data even if logger is disabled
       ConduitApi.getInstance().captureData();
       LoggedDriverStation.getInstance().periodic();
+      LoggedPowerDistribution.getInstance().periodic();
       LoggedSystemStats.getInstance().periodic();
     }
   }
