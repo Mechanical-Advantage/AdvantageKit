@@ -1,8 +1,5 @@
 package org.littletonrobotics.junction.inputs;
 
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.RobotController;
-
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
@@ -37,12 +34,12 @@ public class LoggedPowerDistribution {
 
     @Override
     public void toLog(LogTable table) {
-      table.put("PowerDistributionTemperature", pdpTemperature);
-      table.put("PowerDistributionVoltage", pdpVoltage);
-      table.put("PowerDistributionChannelCurrent", pdpChannelCurrents);
-      table.put("PowerDistributionTotalCurrent", pdpTotalCurrent);
-      table.put("PowerDistributionTotalPower", pdpTotalPower);
-      table.put("PowerDistributionTotalEnergy", pdpTotalEnergy);
+      table.put("Temperature", pdpTemperature);
+      table.put("Voltage", pdpVoltage);
+      table.put("ChannelCurrent", pdpChannelCurrents);
+      table.put("TotalCurrent", pdpTotalCurrent);
+      table.put("TotalPower", pdpTotalPower);
+      table.put("TotalEnergy", pdpTotalEnergy);
     }
 
     @Override

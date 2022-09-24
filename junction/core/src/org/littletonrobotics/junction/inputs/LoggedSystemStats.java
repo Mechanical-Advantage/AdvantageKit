@@ -1,8 +1,5 @@
 package org.littletonrobotics.junction.inputs;
 
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.RobotController;
-
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
