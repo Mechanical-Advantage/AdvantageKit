@@ -19,6 +19,7 @@ cc_library(
         "//conduit:conduit-schema-cc",
         "//conduit/api:api-jni",
         "//third_party/wpilib:hal",
+        "//third_party/wpilib:wpiutil",
     ],
     alwayslink = True,
 )
