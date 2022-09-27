@@ -18,11 +18,12 @@ cc_library(
         "include/flatbuffers/stl_emulation.h",
         "include/flatbuffers/util.h",
     ],
+    includes = ["include"],
     linkstatic = 1,
     strip_include_prefix = "/third_party/flatbuffers/include",
 )
 
 java_library(
     name = "runtime_java",
-    srcs = glob(["java/**/*.java"])
+    srcs = glob(["java/**/*.java"]),
 )
