@@ -37,9 +37,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     }
   }
 
-  private final int m_module;
-  private final int m_handle;
-
   /**
    * Constructs a PowerDistribution object.
    *
@@ -48,8 +45,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    */
   public PowerDistribution(int module, ModuleType moduleType) {
     LoggedPowerDistribution.getInstance(module, moduleType);
-    m_module = LoggedPowerDistribution.getInstance().getInputs().module_id;
-    m_handle = LoggedPowerDistribution.getInstance().getInputs().handle;
+    int m_module = LoggedPowerDistribution.getInstance().getInputs().module_id;
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
   }
@@ -61,8 +57,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    */
   public PowerDistribution() {
     LoggedPowerDistribution.getInstance(kDefaultModule, ModuleType.kAutomatic);
-    m_module = LoggedPowerDistribution.getInstance().getInputs().module_id;
-    m_handle = LoggedPowerDistribution.getInstance().getInputs().handle;
+    int m_module = LoggedPowerDistribution.getInstance().getInputs().module_id;
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
   }
@@ -141,12 +136,21 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   /** Reset the total energy to 0. */
   public void resetTotalEnergy() {
-    PowerDistributionJNI.resetTotalEnergy(m_handle);
+    int handle = LoggedPowerDistribution.getInstance().getInputs().handle;
+    if (handle == 0) {
+      return;
+    }
+
+    PowerDistributionJNI.resetTotalEnergy(handle);
   }
 
   /** Clear all PDP/PDH sticky faults. */
   public void clearStickyFaults() {
-    PowerDistributionJNI.clearStickyFaults(m_handle);
+    int handle = LoggedPowerDistribution.getInstance().getInputs().handle;
+    if (handle == 0) {
+      return;
+    }
+    PowerDistributionJNI.clearStickyFaults(handle);
   }
 
   /**
@@ -155,8 +159,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The module number (CAN ID).
    */
   public int getModule() {
-    // TODO
-    return 0; //m_module;
+    return LoggedPowerDistribution.getInstance().getInputs().module_id;
   }
 
   /**
@@ -165,7 +168,12 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The module type
    */
   public ModuleType getType() {
-    int type = PowerDistributionJNI.getType(m_handle);
+    int handle = LoggedPowerDistribution.getInstance().getInputs().handle;
+    if (handle == 0) {
+      return ModuleType.kCTRE;
+    }
+
+    int type = PowerDistributionJNI.getType(handle);
     if (type == PowerDistributionJNI.REV_TYPE) {
       return ModuleType.kRev;
     } else {
@@ -179,7 +187,12 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The output state of the PDH switchable channel
    */
   public boolean getSwitchableChannel() {
-    return PowerDistributionJNI.getSwitchableChannel(m_handle);
+    int handle = LoggedPowerDistribution.getInstance().getInputs().handle;
+    if (handle == 0) {
+      return false;
+    }
+
+    return PowerDistributionJNI.getSwitchableChannel(handle);
   }
 
   /**
@@ -188,11 +201,21 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @param enabled Whether to turn the PDH switchable channel on or off
    */
   public void setSwitchableChannel(boolean enabled) {
-    PowerDistributionJNI.setSwitchableChannel(m_handle, enabled);
+    int handle = LoggedPowerDistribution.getInstance().getInputs().handle;
+    if (handle == 0) {
+      return;
+    }
+
+    PowerDistributionJNI.setSwitchableChannel(handle, enabled);
   }
 
   public PowerDistributionVersion getVersion() {
-    return PowerDistributionJNI.getVersion(m_handle);
+    int handle = LoggedPowerDistribution.getInstance().getInputs().handle;
+    if (handle == 0) {
+      return new PowerDistributionVersion(0, 0, 0, 0, 0, 0);
+    }
+
+    return PowerDistributionJNI.getVersion(handle);
   }
 
   public PowerDistributionFaults getFaults() {

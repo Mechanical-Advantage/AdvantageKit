@@ -51,7 +51,6 @@ void PDPReader::configure(JNIEnv *env, jint module, jint type)
   hal::CheckStatus(env, status, false);
 
   runtime = HAL_GetRuntimeType();
-
   if (runtime != HAL_Runtime_Simulation) {
     if (pd_type == HAL_PowerDistributionType_kCTRE) {
       pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kCTRE, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
@@ -141,7 +140,7 @@ void PDPReader::update_ctre_pdp_data(uint8_t loop_counter) {
         current_buf->Mutate(4, channel_currents[4]);
         current_buf->Mutate(5, channel_currents[5]);
 
-        copy_mutex.lock();
+        copy_mutex.unlock();
       }
     }
 
@@ -174,7 +173,7 @@ void PDPReader::update_ctre_pdp_data(uint8_t loop_counter) {
         current_buf->Mutate(10, channel_currents[4]);
         current_buf->Mutate(11, channel_currents[5]);
 
-        copy_mutex.lock();
+        copy_mutex.unlock();
       }
     }
 
@@ -208,7 +207,7 @@ void PDPReader::update_ctre_pdp_data(uint8_t loop_counter) {
         current_buf->Mutate(14, channel_currents[14]);
         current_buf->Mutate(15, channel_currents[15]);
 
-        copy_mutex.lock();
+        copy_mutex.unlock();
       }
     }
   }
