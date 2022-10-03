@@ -50,10 +50,14 @@ void PDPReader::configure(JNIEnv *env, jint module, jint type)
   pd_type = HAL_GetPowerDistributionType(pd_handle, &status);
   hal::CheckStatus(env, status, false);
 
-  if (pd_type == HAL_PowerDistributionType_kCTRE) {
-    pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kCTRE, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
-  } else if (pd_type == HAL_PowerDistributionType_kRev) {
-    pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kREV, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
+  runtime = HAL_GetRuntimeType();
+
+  if (runtime != HAL_Runtime_Simulation) {
+    if (pd_type == HAL_PowerDistributionType_kCTRE) {
+      pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kCTRE, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
+    } else if (pd_type == HAL_PowerDistributionType_kRev) {
+      pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kREV, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
+    }
   }
 
   copy_mutex.lock();
@@ -61,8 +65,9 @@ void PDPReader::configure(JNIEnv *env, jint module, jint type)
   internal_buf.mutate_handle(pd_handle);
   internal_buf.mutate_type(pd_type);
   internal_buf.mutate_module_id(pd_module_id);
-
-  if (pd_type == HAL_PowerDistributionType_kCTRE) {
+  if (runtime == HAL_Runtime_Simulation) {
+    internal_buf.mutate_channel_count(24);
+  } else if (pd_type == HAL_PowerDistributionType_kCTRE) {
     internal_buf.mutate_channel_count(16);
   } else if (pd_type == HAL_PowerDistributionType_kRev) {
     internal_buf.mutate_channel_count(24);
@@ -81,14 +86,16 @@ void PDPReader::update_pd_data() {
     auto now = HAL_GetFPGATime(&status) * 1us;
     std::this_thread::sleep_for(5ms - (now - timestamp));
     timestamp = HAL_GetFPGATime(&status) * 1us;
-    loop_counter += 1;
-    loop_counter %= 20; // repeat every 100ms
+    loop_counter += 5;
+    loop_counter %= 100; // repeat every 100ms
 
     if (!should_run) {
       continue;
     }
 
-    if (pd_type == HAL_PowerDistributionType_kCTRE) {
+    if (runtime == HAL_Runtime_Simulation) {
+      update_sim_data(loop_counter);
+    } else if (pd_type == HAL_PowerDistributionType_kCTRE) {
       update_ctre_pdp_data(loop_counter);
     } else if (pd_type == HAL_PowerDistributionType_kRev) {
       update_rev_pdh_data(loop_counter);
@@ -98,9 +105,8 @@ void PDPReader::update_pd_data() {
 
 void PDPReader::update_ctre_pdp_data(uint8_t loop_counter) {
   std::int32_t status;
-  internal_buf.mutate_channel_count(16);
 
-  if (loop_counter % 5 == 0) {
+  if (loop_counter % 25 == 0) {
     // Read Status 1, 2, 3 (0x50, 0x51, 0x52)
     double channel_currents[MAX_CHANNEL_COUNT];
     double temperature;
@@ -207,7 +213,7 @@ void PDPReader::update_ctre_pdp_data(uint8_t loop_counter) {
     }
   }
 
-   if (loop_counter % 4 == 0) {
+   if (loop_counter % 20 == 0) {
     // Read StatusEnergy (0x5D)
     double total_current;
     double total_power;
@@ -241,7 +247,6 @@ void PDPReader::update_ctre_pdp_data(uint8_t loop_counter) {
 
 void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
   std::int32_t status;
-  internal_buf.mutate_channel_count(16);
 
   uint8_t data[8];
   int32_t length;
@@ -489,6 +494,107 @@ void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
     copy_mutex.unlock();
   }
 
+}
+
+void PDPReader::update_sim_data(uint8_t loop_counter) {
+  if (loop_counter % 20 != 0) {
+    return;
+  }
+
+  int32_t status;
+
+  HAL_PowerDistributionFaults faults;
+  uint32_t faults_bits = 0;
+  HAL_GetPowerDistributionFaults(pd_handle, &faults, &status);
+
+  faults_bits |= faults.channel0BreakerFault << 0;
+  faults_bits |= faults.channel1BreakerFault << 1;
+  faults_bits |= faults.channel2BreakerFault << 2;
+  faults_bits |= faults.channel3BreakerFault << 3;
+  faults_bits |= faults.channel4BreakerFault << 4;
+  faults_bits |= faults.channel5BreakerFault << 5;
+  faults_bits |= faults.channel6BreakerFault << 6;
+  faults_bits |= faults.channel7BreakerFault << 7;
+  faults_bits |= faults.channel8BreakerFault << 8;
+  faults_bits |= faults.channel9BreakerFault << 9;
+  faults_bits |= faults.channel10BreakerFault << 10;
+  faults_bits |= faults.channel11BreakerFault << 11;
+  faults_bits |= faults.channel12BreakerFault << 12;
+  faults_bits |= faults.channel13BreakerFault << 13;
+  faults_bits |= faults.channel14BreakerFault << 14;
+  faults_bits |= faults.channel15BreakerFault << 15;
+  faults_bits |= faults.channel16BreakerFault << 16;
+  faults_bits |= faults.channel17BreakerFault << 17;
+  faults_bits |= faults.channel18BreakerFault << 18;
+  faults_bits |= faults.channel19BreakerFault << 19;
+  faults_bits |= faults.channel20BreakerFault << 20;
+  faults_bits |= faults.channel21BreakerFault << 21;
+  faults_bits |= faults.channel22BreakerFault << 22;
+  faults_bits |= faults.channel23BreakerFault << 23;
+  faults_bits |= faults.brownout << 24;
+  faults_bits |= faults.canWarning << 25;
+  faults_bits |= faults.hardwareFault << 26;
+
+  HAL_PowerDistributionStickyFaults sticky_faults;
+  uint32_t sticky_faults_bits = 0;
+  HAL_GetPowerDistributionStickyFaults(pd_handle, &sticky_faults, &status);
+
+  sticky_faults_bits |= sticky_faults.channel0BreakerFault << 0;
+  sticky_faults_bits |= sticky_faults.channel1BreakerFault << 1;
+  sticky_faults_bits |= sticky_faults.channel2BreakerFault << 2;
+  sticky_faults_bits |= sticky_faults.channel3BreakerFault << 3;
+  sticky_faults_bits |= sticky_faults.channel4BreakerFault << 4;
+  sticky_faults_bits |= sticky_faults.channel5BreakerFault << 5;
+  sticky_faults_bits |= sticky_faults.channel6BreakerFault << 6;
+  sticky_faults_bits |= sticky_faults.channel7BreakerFault << 7;
+  sticky_faults_bits |= sticky_faults.channel8BreakerFault << 8;
+  sticky_faults_bits |= sticky_faults.channel9BreakerFault << 9;
+  sticky_faults_bits |= sticky_faults.channel10BreakerFault << 10;
+  sticky_faults_bits |= sticky_faults.channel11BreakerFault << 11;
+  sticky_faults_bits |= sticky_faults.channel12BreakerFault << 12;
+  sticky_faults_bits |= sticky_faults.channel13BreakerFault << 13;
+  sticky_faults_bits |= sticky_faults.channel14BreakerFault << 14;
+  sticky_faults_bits |= sticky_faults.channel15BreakerFault << 15;
+  sticky_faults_bits |= sticky_faults.channel16BreakerFault << 16;
+  sticky_faults_bits |= sticky_faults.channel17BreakerFault << 17;
+  sticky_faults_bits |= sticky_faults.channel18BreakerFault << 18;
+  sticky_faults_bits |= sticky_faults.channel19BreakerFault << 19;
+  sticky_faults_bits |= sticky_faults.channel20BreakerFault << 20;
+  sticky_faults_bits |= sticky_faults.channel21BreakerFault << 21;
+  sticky_faults_bits |= sticky_faults.channel22BreakerFault << 22;
+  sticky_faults_bits |= sticky_faults.channel23BreakerFault << 23;
+  sticky_faults_bits |= sticky_faults.brownout << 24;
+  sticky_faults_bits |= sticky_faults.canWarning << 25;
+  sticky_faults_bits |= sticky_faults.canBusOff << 26;
+  sticky_faults_bits |= sticky_faults.hasReset << 27;
+
+  double channel_current[24];
+  HAL_GetPowerDistributionAllChannelCurrents(pd_handle, channel_current, 24, &status);
+
+  double temperature = HAL_GetPowerDistributionTemperature(pd_handle, &status);
+  double voltage = HAL_GetPowerDistributionVoltage(pd_handle, &status);
+  double total_current = HAL_GetPowerDistributionTotalCurrent(pd_handle, &status);
+  double total_power = HAL_GetPowerDistributionTotalPower(pd_handle, &status);
+  double total_energy = HAL_GetPowerDistributionTotalEnergy(pd_handle, &status);
+
+  copy_mutex.lock();
+
+  auto currents = internal_buf.mutable_channel_current();
+
+  for (int i = 0; i < 24; i++) {
+    currents->Mutate(i, channel_current[i]);
+  }
+
+  internal_buf.mutate_temperature(temperature);
+  internal_buf.mutate_voltage(voltage);
+  internal_buf.mutate_total_current(total_current);
+  internal_buf.mutate_total_power(total_power);
+  internal_buf.mutate_total_energy(total_energy);
+
+  internal_buf.mutate_faults(faults_bits);
+  internal_buf.mutate_sticky_faults(sticky_faults_bits);
+
+  copy_mutex.unlock();
 }
 
 void PDPReader::read(schema::PDPData* pdp_buf) {

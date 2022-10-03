@@ -11,6 +11,7 @@ using namespace org::littletonrobotics::conduit;
 
 #include <hal/CANAPITypes.h>
 #include <hal/PowerDistribution.h>
+#include <hal/HALBase.h>
 
 // Reads data from the power distribution panel.  The data is read in a thread and copied
 // into a schema::PDPData internal buffer.  This copying is done under lock. When
@@ -40,6 +41,8 @@ class PDPReader {
   void update_ctre_pdp_data(uint8_t loop_counter);
 
   void update_rev_pdh_data(uint8_t loop_counter);
+  
+  void update_sim_data(uint8_t loop_counter);
 
   // Internal buffer used to store the read data
   schema::PDPData internal_buf;
@@ -48,6 +51,8 @@ class PDPReader {
   HAL_CANHandle pd_can_handle;
   HAL_PowerDistributionType pd_type;
   int32_t pd_module_id;
+
+  HAL_RuntimeType runtime;
 
   std::chrono::microseconds timestamp;
   uint8_t loop_counter;
