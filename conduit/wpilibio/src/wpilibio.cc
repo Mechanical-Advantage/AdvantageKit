@@ -7,6 +7,8 @@
 
 #include <cstdint>
 
+#include <jni.h>
+
 #include "conduit/conduit_schema_generated.h"
 #include "conduit/wpilibio/include/ds_reader.h"
 #include "conduit/wpilibio/include/pdp_reader.h"
@@ -52,6 +54,11 @@ void capture_data(void) {
   ds_reader.read(ds_view);
   pdp_reader.read(pdp_view);
   sys_reader.read(sys_view);
+}
+
+void configurePDP(JNIEnv *env, jint moduleNumber, jint type)
+{
+  pdp_reader.configure(env, moduleNumber, type);
 }
 
 }  // namespace wpilibio

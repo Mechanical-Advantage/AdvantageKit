@@ -180,15 +180,6 @@ public class ConduitApi {
     return pdp.channelCurrent(channel);
   }
 
-  public double[] getPDPCurrent() {
-    double[] ret = new double[pdp.channelCount()];
-    for (int i = 0; i < ret.length; i++) {
-      ret[i] = pdp.channelCurrent(i);
-    }
-
-    return ret;
-  }
-
   public double getPDPTotalCurrent() {
     return pdp.totalCurrent();
   }
@@ -231,5 +222,33 @@ public class ConduitApi {
 
   public long getEpochTime() {
     return sys.epochTime();
+  }
+
+  public void configurePowerDistribution(int moduleID, int type) {
+    ConduitJni.configurePowerDistribution(moduleID, type);
+  }
+
+  public int getPDPChannelCount() {
+    return pdp.channelCount();
+  }
+
+  public int getPDPHandle() {
+    return pdp.handle();
+  }
+
+  public int getPDPType() {
+    return pdp.type();
+  }
+
+  public int getPDPModuleId() {
+    return pdp.moduleId();
+  }
+
+  public long getPDPFaults() {
+    return pdp.faults();
+  }
+
+  public long getPDPStickyFaults() {
+    return pdp.stickyFaults();
   }
 }

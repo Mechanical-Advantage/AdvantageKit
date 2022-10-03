@@ -37,9 +37,14 @@ struct DSData {
 }
 
 struct PDPData {
+    handle:int32;
+    channel_count:int32;
+    type:int32;
+    module_id:int32;
+    faults:uint32;
+    sticky_faults:uint32;
     temperature:float64;
     voltage:float64;
-    channel_count:int32;
     channel_current:[float64:24];
     total_current:float64;
     total_power:float64;
