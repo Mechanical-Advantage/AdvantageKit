@@ -46,10 +46,18 @@ struct PDPData {
     total_energy:float64;
 }
 
+struct CANStatus {
+    percent_bus_utilization:float32;
+    bus_off_count:uint32;
+    tx_full_count:uint32;
+    receive_error_count:uint32;
+    transmit_error_count:uint32;
+}
+
 struct SystemData {
     voltage:float64;
     browned_out:int32;
-    can_bus_utilization:float32;
+    can_status:CANStatus;
     epoch_time:uint64;
 }
 

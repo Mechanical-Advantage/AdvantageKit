@@ -6,9 +6,9 @@ import java.nio.charset.Charset;
 
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
+import org.littletonrobotics.conduit.schema.Joystick;
 import org.littletonrobotics.conduit.schema.PDPData;
 import org.littletonrobotics.conduit.schema.SystemData;
-import org.littletonrobotics.conduit.schema.Joystick;
 
 public class ConduitApi {
   // Length constants
@@ -210,7 +210,23 @@ public class ConduitApi {
   }
 
   public float getCANBusUtilization() {
-    return sys.canBusUtilization();
+    return sys.canStatus().percentBusUtilization();
+  }
+
+  public long getBusOffCount() {
+    return sys.canStatus().busOffCount();
+  }
+
+  public long getTxFullCount() {
+    return sys.canStatus().txFullCount();
+  }
+
+  public long getReceiveErrorCount() {
+    return sys.canStatus().receiveErrorCount();
+  }
+
+  public long getTransmitErrorCount() {
+    return sys.canStatus().transmitErrorCount();
   }
 
   public long getEpochTime() {

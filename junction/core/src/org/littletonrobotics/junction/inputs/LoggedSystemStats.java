@@ -4,6 +4,8 @@ import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.hal.can.CANStatus;
+
 /**
  * Manages logging general system data. This is NOT replayed to the simulator.
  */
@@ -27,14 +29,18 @@ public class LoggedSystemStats {
   public static class SystemStatsInputs implements LoggableInputs {
     public double batteryVoltage;
     public boolean brownedOut;
-    public float canBusUtilization;
+    public CANStatus canStatus = new CANStatus();
     public long epochTime;
 
     @Override
     public void toLog(LogTable table) {
       table.put("BatteryVoltage", batteryVoltage);
       table.put("BrownedOut", brownedOut);
-      table.put("CANBusUtilization", canBusUtilization);
+      table.put("CANBusUtilization", canStatus.percentBusUtilization);
+      table.put("CANBusOffCount", canStatus.busOffCount);
+      table.put("CANBusTxFullCount", canStatus.txFullCount);
+      table.put("CANBusReceiveErrorCount", canStatus.receiveErrorCount);
+      table.put("CANBusTransmitErrorCount", canStatus.transmitErrorCount);
       table.put("EpochTime", epochTime);      
     }
 
@@ -51,11 +57,21 @@ public class LoggedSystemStats {
 
       sysInputs.batteryVoltage = conduit.getVoltage();
       sysInputs.brownedOut = conduit.getBrownedOut();
-      sysInputs.canBusUtilization = conduit.getCANBusUtilization();
+      sysInputs.canStatus.setStatus(
+        (int) conduit.getCANBusUtilization(),
+        (int) conduit.getBusOffCount(),
+        (int) conduit.getTxFullCount(),
+        (int) conduit.getReceiveErrorCount(),
+        (int) conduit.getTransmitErrorCount()
+      );
       sysInputs.epochTime = conduit.getEpochTime();
     }
 
     logger.processInputs("SystemStats", sysInputs);
+  }
+
+  public SystemStatsInputs getInputs() {
+    return sysInputs;
   }
 
 }

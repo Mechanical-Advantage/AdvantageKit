@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
@@ -254,8 +255,6 @@ public final class RobotController {
    * @return The status of the CAN bus
    */
   public static CANStatus getCANStatus() {
-    CANStatus status = new CANStatus();
-    CANJNI.getCANStatus(status);
-    return status;
+    return LoggedSystemStats.getInstance().getInputs().canStatus;
   }
 }

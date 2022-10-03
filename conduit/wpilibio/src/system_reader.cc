@@ -62,8 +62,14 @@ void SystemReader::update_system_data() {
 
     internal_buf.mutate_voltage(voltage);
     internal_buf.mutate_browned_out(browned_out);
-    internal_buf.mutate_can_bus_utilization(percent_bus_utilization);
     internal_buf.mutate_epoch_time(systemTime);
+
+    auto canStatus = internal_buf.mutable_can_status();
+    canStatus.mutate_percent_bus_utilization(percent_bus_utilization);
+    canStatus.mutate_bus_off_count(bus_off_count);
+    canStatus.mutate_tx_full_count(tx_full_count);
+    canStatus.mutate_receive_error_count(receive_error_count);
+    canStatus.mutate_transmit_error_count(transmit_error_count);
 
     copy_mutex.unlock();
   }

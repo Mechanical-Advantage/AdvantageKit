@@ -19,6 +19,7 @@ flatbuffer_java_library(
         "org/littletonrobotics/conduit/schema/Joystick.java",
         "org/littletonrobotics/conduit/schema/PDPData.java",
         "org/littletonrobotics/conduit/schema/SystemData.java",
+        "org/littletonrobotics/conduit/schema/CANStatus.java",
     ],
     visibility = ["//visibility:public"],
 )
