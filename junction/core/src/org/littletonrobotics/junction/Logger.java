@@ -160,7 +160,7 @@ public class Logger {
       LoggedSystemStats.getInstance().periodic();
       double powerDistributionStart = getRealTimestamp();
       LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
-      if (instance != null) {
+      if (loggedPowerDistribution != null) {
         loggedPowerDistribution.periodic();
       }
       double networkTablesStart = getRealTimestamp();
@@ -177,7 +177,10 @@ public class Logger {
       // Retrieve new driver station data even if logger is disabled
       ConduitApi.getInstance().captureData();
       LoggedDriverStation.getInstance().periodic();
-      LoggedPowerDistribution.getInstance().periodic();
+      LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
+      if (loggedPowerDistribution != null) {
+        loggedPowerDistribution.periodic();
+      }
       LoggedSystemStats.getInstance().periodic();
     }
   }
