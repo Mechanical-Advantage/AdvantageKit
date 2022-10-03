@@ -86,6 +86,25 @@ TEST(SizeTests, JoystickSizes) {
 TEST(SizeTests, PDPDataSizes) {
   schema::PDPData pdp;
 
+  ASSERT_EQ(sizeof(decltype(HAL_InitializePowerDistribution(0, 
+                                HAL_PowerDistributionType_kCTRE, 0, 0))),
+            sizeof(decltype(pdp.handle())));
+
+  ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0, 0))),
+            sizeof(decltype(pdp.channel_count())));
+
+  ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionType(0, 0))),
+            sizeof(decltype(pdp.type())));
+
+  ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionModuleNumber(0, 0))),
+            sizeof(decltype(pdp.module_id())));
+  
+  ASSERT_EQ(sizeof(HAL_PowerDistributionFaults),
+            sizeof(decltype(pdp.faults())));
+
+  ASSERT_EQ(sizeof(HAL_PowerDistributionStickyFaults),
+            sizeof(decltype(pdp.sticky_faults())));
+
   ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTemperature(0,0))),
             sizeof(decltype(pdp.temperature())));
 
