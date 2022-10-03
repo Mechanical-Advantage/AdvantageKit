@@ -159,7 +159,10 @@ public class Logger {
       double systemStatsStart = getRealTimestamp();
       LoggedSystemStats.getInstance().periodic();
       double powerDistributionStart = getRealTimestamp();
-      LoggedPowerDistribution.getInstance().periodic();
+      LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
+      if (instance != null) {
+        loggedPowerDistribution.periodic();
+      }
       double networkTablesStart = getRealTimestamp();
       processInputs("NetworkTables", LoggedNetworkTables.getInstance());
       double periodicEnd = getRealTimestamp();
