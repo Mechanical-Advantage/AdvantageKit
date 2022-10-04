@@ -60,8 +60,22 @@ struct CANStatus {
 }
 
 struct SystemData {
-    voltage:float64;
+    voltage_vin:float64;
+    current_vin:float64;
+    user_voltage_3v3:float64;
+    user_current_3v3:float64;
+    user_active_3v3:int32;
+    user_current_faults_3v3:int32;
+    user_voltage_5v:float64;
+    user_current_5v:float64;
+    user_active_5v:int32;
+    user_current_faults_5v:int32;
+    user_voltage_6v:float64;
+    user_current_6v:float64;
+    user_active_6v:int32;
+    user_current_faults_6v:int32;
     browned_out:int32;
+    system_active:int32;
     can_status:CANStatus;
     epoch_time:uint64;
 }

@@ -193,7 +193,7 @@ public class ConduitApi {
   }
 
   public double getVoltage() {
-    return sys.voltage();
+    return sys.voltageVin();
   }
 
   public boolean getBrownedOut() {
