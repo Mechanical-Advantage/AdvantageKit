@@ -73,8 +73,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return Number of output channels (16 for PDP, 24 for PDH).
    */
   public int getNumChannels() {
-    // TODO
-    return 0; // PowerDistributionJNI.getNumChannels(m_handle);
+    return LoggedPowerDistribution.getInstance().getInputs().channelCount;
   }
 
   /**
