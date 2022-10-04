@@ -192,12 +192,68 @@ public class ConduitApi {
     return pdp.totalEnergy();
   }
 
-  public double getVoltage() {
+  public double getVoltageVin() {
     return sys.voltageVin();
+  }
+
+  public double getCurrentVin() {
+    return sys.currentVin();
+  }
+
+  public double getUserVoltage3v3() {
+    return sys.userVoltage3v3();
+  }
+
+  public double getUserCurrent3v3() {
+    return sys.userCurrent3v3();
+  }
+
+  public boolean getUserActive3v3() {
+    return sys.userActive3v3() != 0;
+  }
+
+  public int getUserCurrentFaults3v3() {
+    return sys.userCurrentFaults3v3();
+  }
+
+  public double getUserVoltage5v() {
+    return sys.userVoltage5v();
+  }
+
+  public double getUserCurrent5v() {
+    return sys.userCurrent5v();
+  }
+
+  public boolean getUserActive5v() {
+    return sys.userActive5v() != 0;
+  }
+
+  public int getUserCurrentFaults5v() {
+    return sys.userCurrentFaults5v();
+  }
+
+  public double getUserVoltage6v() {
+    return sys.userVoltage6v();
+  }
+
+  public double getUserCurrent6v() {
+    return sys.userCurrent6v();
+  }
+
+  public boolean getUserActive6v() {
+    return sys.userActive6v() != 0;
+  }
+
+  public int getUserCurrentFaults6v() {
+    return sys.userCurrentFaults6v();
   }
 
   public boolean getBrownedOut() {
     return sys.brownedOut() != 0;
+  }
+
+  public boolean getSystemActive() {
+    return sys.systemActive() != 0;
   }
 
   public float getCANBusUtilization() {
