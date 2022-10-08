@@ -98,7 +98,7 @@ public class RLOGServer implements LogDataReceiver {
           }
 
           // Close connection if socket timed out
-          if (Logger.getInstance().getRealTimestamp() - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
+          if (Logger.getInstance().getRealTimestamp() / 1000000.0 - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
             socket.close();
             printDisconnectMessage(socket, "timeout");
           } else {

@@ -57,7 +57,8 @@ public class WPILOGWriter implements LogDataReceiver {
 
   public void start() {
     log = new DataLog(folder, filename, writePeriodSecs, WPILOGConstants.extraHeader);
-    timestampID = log.start(WPILOGConstants.timestampKey, "int64", WPILOGConstants.entryMetadata, 0);
+    timestampID = log.start(WPILOGConstants.timestampKey, LoggableType.Integer.getWPILOGType(),
+        WPILOGConstants.entryMetadata, 0);
     lastTable = new LogTable(0);
 
     entryIDs = new HashMap<>();
@@ -80,7 +81,7 @@ public class WPILOGWriter implements LogDataReceiver {
         if (System.currentTimeMillis() > 1638334800000L) { // 12/1/2021, the RIO 2 defaults to 7/1/2021
           if (firstUpdatedTime == null) {
             firstUpdatedTime = Logger.getInstance().getRealTimestamp() / 1000000.0;
-          } else if (Logger.getInstance().getRealTimestamp() - firstUpdatedTime > timestampUpdateDelay) {
+          } else if (Logger.getInstance().getRealTimestamp() / 1000000.0 - firstUpdatedTime > timestampUpdateDelay) {
             log.setFilename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.wpilog'").format(new Date()));
             updatedTime = true;
           }

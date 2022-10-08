@@ -25,7 +25,7 @@ public class LoggedRobot extends IterativeRobotBase {
 
   private final double period;
 
-  private double nextCycle;
+  private long nextCycle;
   private boolean useTiming = true;
 
   /** Constructor for LoggedRobot. */
@@ -73,22 +73,22 @@ public class LoggedRobot extends IterativeRobotBase {
     nextCycle = Logger.getInstance().getRealTimestamp();
     while (true) {
       if (useTiming) {
-        NotifierJNI.updateNotifierAlarm(notifier, (long) (nextCycle * 1e6));
+        NotifierJNI.updateNotifierAlarm(notifier, nextCycle);
         long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
         if (curTime == 0) {
           break;
         }
-        nextCycle += period;
+        nextCycle += period * 1000000.0;
       }
 
-      double loopCycleStart = Logger.getInstance().getRealTimestamp();
+      long loopCycleStart = Logger.getInstance().getRealTimestamp();
       Logger.getInstance().periodicBeforeUser();
-      double userCodeStart = Logger.getInstance().getRealTimestamp();
+      long userCodeStart = Logger.getInstance().getRealTimestamp();
       loopFunc();
-      double loopCycleEnd = Logger.getInstance().getRealTimestamp();
-      Logger.getInstance().recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) * 1000);
-      Logger.getInstance().recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) * 1000);
-      Logger.getInstance().recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) * 1000);
+      long loopCycleEnd = Logger.getInstance().getRealTimestamp();
+      Logger.getInstance().recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) / 1000.0);
+      Logger.getInstance().recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) / 1000.0);
+      Logger.getInstance().recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) / 1000.0);
 
       Logger.getInstance().periodicAfterUser(); // Save data
     }

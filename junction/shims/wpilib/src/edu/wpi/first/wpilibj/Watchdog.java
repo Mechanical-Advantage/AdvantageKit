@@ -12,12 +12,16 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.Logger;
 
 /**
- * A class that's a wrapper around a watchdog timer.  Patched by AdvantageKit to support logging.
+ * A class that's a wrapper around a watchdog timer. Patched by AdvantageKit to
+ * support logging.
  *
- * <p>When the timer expires, a message is printed to the console and an optional user-provided
- * callback is invoked.
+ * <p>
+ * When the timer expires, a message is printed to the console and an optional
+ * user-provided callback is invoked.
  *
- * <p>The watchdog is initialized disabled, so the user needs to call enable() before use.
+ * <p>
+ * The watchdog is initialized disabled, so the user needs to call enable()
+ * before use.
  */
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
@@ -48,8 +52,9 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Watchdog constructor.
    *
-   * @param timeoutSeconds The watchdog's timeout in seconds with microsecond resolution.
-   * @param callback This function is called when the timeout expires.
+   * @param timeoutSeconds The watchdog's timeout in seconds with microsecond
+   *                       resolution.
+   * @param callback       This function is called when the timeout expires.
    */
   public Watchdog(double timeoutSeconds, Runnable callback) {
     m_timeoutSeconds = timeoutSeconds;
@@ -88,16 +93,17 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @return The time in seconds since the watchdog was last fed.
    */
   public double getTime() {
-    return Logger.getInstance().getRealTimestamp() - m_startTimeSeconds;
+    return Logger.getInstance().getRealTimestamp() / 1000000.0 - m_startTimeSeconds;
   }
 
   /**
    * Sets the watchdog's timeout.
    *
-   * @param timeoutSeconds The watchdog's timeout in seconds with microsecond resolution.
+   * @param timeoutSeconds The watchdog's timeout in seconds with microsecond
+   *                       resolution.
    */
   public void setTimeout(double timeoutSeconds) {
-    m_startTimeSeconds = Logger.getInstance().getRealTimestamp();
+    m_startTimeSeconds = Logger.getInstance().getRealTimestamp() / 1000000.0;
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();
@@ -164,7 +170,8 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Resets the watchdog timer.
    *
-   * <p>This also enables the timer if it was previously disabled.
+   * <p>
+   * This also enables the timer if it was previously disabled.
    */
   public void reset() {
     enable();
@@ -172,7 +179,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   /** Enables the watchdog timer. */
   public void enable() {
-    m_startTimeSeconds = Logger.getInstance().getRealTimestamp();
+    m_startTimeSeconds = Logger.getInstance().getRealTimestamp() / 1000000.0;
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();
@@ -202,7 +209,9 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Enable or disable suppression of the generic timeout message.
    *
-   * <p>This may be desirable if the user-provided callback already prints a more specific message.
+   * <p>
+   * This may be desirable if the user-provided callback already prints a more
+   * specific message.
    *
    * @param suppress Whether to suppress generic timeout message.
    */

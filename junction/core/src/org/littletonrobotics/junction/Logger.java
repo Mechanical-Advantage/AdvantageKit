@@ -1,5 +1,7 @@
 package org.littletonrobotics.junction;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -18,6 +20,7 @@ public class Logger {
   private boolean running = false;
   private LogTable entry = new LogTable(0);
   private LogTable outputTable;
+  private Map<String, String> metadata = new HashMap<>();
 
   private LogReplaySource replaySource;
   private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
@@ -63,7 +66,7 @@ public class Logger {
    */
   public void recordMetadata(String key, String value) {
     if (!running) {
-      entry.getSubtable(replaySource == null ? "RealMetadata" : "ReplayMetadata").put(key, value);
+      metadata.put(key, value);
     }
   }
 
@@ -92,6 +95,12 @@ public class Logger {
         outputTable = entry.getSubtable("RealOutputs");
       } else {
         outputTable = entry.getSubtable("ReplayOutputs");
+      }
+
+      // Record metadata
+      LogTable metadataTable = entry.getSubtable(replaySource == null ? "RealMetadata" : "ReplayMetadata");
+      for (Map.Entry<String, String> item : metadata.entrySet()) {
+        metadataTable.put(item.getKey(), item.getValue());
       }
 
       // Start receiver thread
@@ -128,26 +137,25 @@ public class Logger {
       if (replaySource == null) {
         entry.setTimestamp(conduit.getTimestamp());
       } else {
-        replaySource.updateTable(entry);
-        if (entry == null) {
+        if (!replaySource.updateTable(entry)) {
           end();
           System.exit(0);
         }
       }
 
       // Update default inputs
-      double driverStationStart = getRealTimestamp();
+      long driverStationStart = getRealTimestamp();
       LoggedDriverStation.getInstance().periodic();
-      double systemStatsStart = getRealTimestamp();
+      long systemStatsStart = getRealTimestamp();
       processInputs("SystemStats", LoggedSystemStats.getInstance());
-      double networkTablesStart = getRealTimestamp();
+      long networkTablesStart = getRealTimestamp();
       processInputs("NetworkTables", LoggedNetworkTables.getInstance());
-      double periodicEnd = getRealTimestamp();
+      long periodicEnd = getRealTimestamp();
 
       // Log output data
-      recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) * 1000);
-      recordOutput("Logger/SSPeriodicMS", (networkTablesStart - systemStatsStart) * 1000);
-      recordOutput("Logger/NTPeriodicMS", (periodicEnd - networkTablesStart) * 1000);
+      recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) / 1000.0);
+      recordOutput("Logger/SSPeriodicMS", (networkTablesStart - systemStatsStart) / 1000.0);
+      recordOutput("Logger/NTPeriodicMS", (periodicEnd - networkTablesStart) / 1000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
     } else {
       // Retrieve new driver station data even if logger is disabled

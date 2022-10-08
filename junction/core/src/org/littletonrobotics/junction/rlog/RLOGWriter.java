@@ -99,7 +99,7 @@ public class RLOGWriter implements LogDataReceiver {
           if (System.currentTimeMillis() > 1638334800000L) { // 12/1/2021, the RIO 2 defaults to 7/1/2021
             if (firstUpdatedTime == null) {
               firstUpdatedTime = Logger.getInstance().getRealTimestamp() / 1000000.0;
-            } else if (Logger.getInstance().getRealTimestamp() - firstUpdatedTime > timestampUpdateDelay) {
+            } else if (Logger.getInstance().getRealTimestamp() / 1000000.0 - firstUpdatedTime > timestampUpdateDelay) {
               rename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.rlog'").format(new Date()));
               updatedTime = true;
             }
@@ -133,8 +133,8 @@ public class RLOGWriter implements LogDataReceiver {
           .put(writeBuffer.array()).put(encoder.getOutput().array());
 
       // Write data to file
-      if (Logger.getInstance().getRealTimestamp() - lastWriteTimestamp > writePeriodSecs) {
-        lastWriteTimestamp = Logger.getInstance().getRealTimestamp();
+      if (Logger.getInstance().getRealTimestamp() / 1000000.0 - lastWriteTimestamp > writePeriodSecs) {
+        lastWriteTimestamp = Logger.getInstance().getRealTimestamp() / 1000000.0;
         try {
           fileStream.write(writeBuffer.array());
           fileStream.getFD().sync();
