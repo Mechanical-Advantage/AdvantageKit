@@ -51,35 +51,62 @@ public class LoggedSystemStats {
       table.put("BatteryVoltage", voltageVin);
       table.put("BatteryCurrent", currentVin);
 
-      table.put("3vRailVoltage", userVoltage3v3);
-      table.put("3vRailCurrent", userCurrent3v3);
-      table.put("3vRailActive", userActive3v3);
-      table.put("3vRailCurrentFaults", userCurrentFaults3v3);
+      table.put("3v3Rail/Voltage", userVoltage3v3);
+      table.put("3v3Rail/Current", userCurrent3v3);
+      table.put("3v3Rail/Active", userActive3v3);
+      table.put("3v3Rail/CurrentFaults", userCurrentFaults3v3);
 
-      table.put("5vRailVoltage", userVoltage5v);
-      table.put("5vRailCurrent", userCurrent5v);
-      table.put("5vRailActive", userActive5v);
-      table.put("5vRailCurrentFaults", userCurrentFaults5v);
+      table.put("5vRail/Voltage", userVoltage5v);
+      table.put("5vRail/Current", userCurrent5v);
+      table.put("5vRail/Active", userActive5v);
+      table.put("5vRail/CurrentFaults", userCurrentFaults5v);
 
-      table.put("6vRailVoltage", userVoltage6v);
-      table.put("6vRailCurrent", userCurrent6v);
-      table.put("6vRailActive", userActive6v);
-      table.put("6vRailCurrentFaults", userCurrentFaults6v);
+      table.put("6vRail/Voltage", userVoltage6v);
+      table.put("6vRail/Current", userCurrent6v);
+      table.put("6vRail/Active", userActive6v);
+      table.put("6vRail/CurrentFaults", userCurrentFaults6v);
 
       table.put("BrownedOut", brownedOut);
       table.put("SystemActive", systemActive);
-      
-      table.put("CANBusUtilization", canStatus.percentBusUtilization);
-      table.put("CANBusOffCount", canStatus.busOffCount);
-      table.put("CANBusTxFullCount", canStatus.txFullCount);
-      table.put("CANBusReceiveErrorCount", canStatus.receiveErrorCount);
-      table.put("CANBusTransmitErrorCount", canStatus.transmitErrorCount);
-      table.put("EpochTime", epochTime);      
+
+      table.put("CANBus/Utilization", canStatus.percentBusUtilization);
+      table.put("CANBus/OffCount", canStatus.busOffCount);
+      table.put("CANBus/TxFullCount", canStatus.txFullCount);
+      table.put("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount);
+      table.put("CANBus/TransmitErrorCount", canStatus.transmitErrorCount);
+      table.put("EpochTimeMicros", (int) epochTime);
     }
 
     @Override
     public void fromLog(LogTable table) {
-      // ignore replayed inputs
+      voltageVin = table.getDouble("BatteryVoltage", voltageVin);
+      currentVin = table.getDouble("BatteryCurrent", currentVin);
+
+      userVoltage3v3 = table.getDouble("3v3Rail/Voltage", userVoltage3v3);
+      userCurrent3v3 = table.getDouble("3v3Rail/Current", userCurrent3v3);
+      userActive3v3 = table.getBoolean("3v3Rail/Active", userActive3v3);
+      userCurrentFaults3v3 = table.getInteger("3v3Rail/CurrentFaults", userCurrentFaults3v3);
+
+      userVoltage5v = table.getDouble("5vRail/Voltage", userVoltage5v);
+      userCurrent5v = table.getDouble("5vRail/Current", userCurrent5v);
+      userActive5v = table.getBoolean("5vRail/Active", userActive5v);
+      userCurrentFaults5v = table.getInteger("5vRail/CurrentFaults", userCurrentFaults5v);
+
+      userVoltage6v = table.getDouble("6vRail/Voltage", userVoltage6v);
+      userCurrent6v = table.getDouble("6vRail/Current", userCurrent6v);
+      userActive6v = table.getBoolean("6vRail/Active", userActive6v);
+      userCurrentFaults6v = table.getInteger("6vRail/CurrentFaults", userCurrentFaults6v);
+
+      brownedOut = table.getBoolean("BrownedOut", brownedOut);
+      systemActive = table.getBoolean("SystemActive", systemActive);
+
+      canStatus.setStatus(
+          table.getDouble("CANBus/Utilization", canStatus.percentBusUtilization),
+          table.getInteger("CANBus/OffCount", canStatus.busOffCount),
+          table.getInteger("CANBus/TxFullCount", canStatus.txFullCount),
+          table.getInteger("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount),
+          table.getInteger("CANBus/TransmitErrorCount", canStatus.transmitErrorCount));
+      epochTime = table.getInteger("EpochTimeMicros", (int) epochTime);
     }
   }
 
@@ -109,12 +136,11 @@ public class LoggedSystemStats {
       sysInputs.brownedOut = conduit.getBrownedOut();
       sysInputs.systemActive = conduit.getSystemActive();
       sysInputs.canStatus.setStatus(
-        (int) conduit.getCANBusUtilization(),
-        (int) conduit.getBusOffCount(),
-        (int) conduit.getTxFullCount(),
-        (int) conduit.getReceiveErrorCount(),
-        (int) conduit.getTransmitErrorCount()
-      );
+          conduit.getCANBusUtilization(),
+          (int) conduit.getBusOffCount(),
+          (int) conduit.getTxFullCount(),
+          (int) conduit.getReceiveErrorCount(),
+          (int) conduit.getTransmitErrorCount());
       sysInputs.epochTime = conduit.getEpochTime();
     }
 

@@ -14,9 +14,8 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
-import java.lang.System.Logger;
-
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+
 /**
  * Class for getting voltage, current, temperature, power and energy from the CTRE Power
  * Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over CAN.
@@ -40,12 +39,12 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Constructs a PowerDistribution object.
    *
-   * @param module The CAN ID of the PDP/PDH.
+   * @param module     The CAN ID of the PDP/PDH.
    * @param moduleType Module type (CTRE or REV).
    */
   public PowerDistribution(int module, ModuleType moduleType) {
     LoggedPowerDistribution.getInstance(module, moduleType);
-    int m_module = LoggedPowerDistribution.getInstance().getInputs().module_id;
+    int m_module = LoggedPowerDistribution.getInstance().getInputs().moduleId;
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
   }
@@ -53,11 +52,13 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Constructs a PowerDistribution object.
    *
-   * <p>Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1 for REV).
+   * <p>
+   * Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1 for
+   * REV).
    */
   public PowerDistribution() {
     LoggedPowerDistribution.getInstance(kDefaultModule, ModuleType.kAutomatic);
-    int m_module = LoggedPowerDistribution.getInstance().getInputs().module_id;
+    int m_module = LoggedPowerDistribution.getInstance().getInputs().moduleId;
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
   }
@@ -158,7 +159,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The module number (CAN ID).
    */
   public int getModule() {
-    return LoggedPowerDistribution.getInstance().getInputs().module_id;
+    return LoggedPowerDistribution.getInstance().getInputs().moduleId;
   }
 
   /**
@@ -219,12 +220,12 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   public PowerDistributionFaults getFaults() {
     long faults = LoggedPowerDistribution.getInstance().getInputs().faults;
-    return new PowerDistributionFaults((int)faults); 
+    return new PowerDistributionFaults((int) faults);
   }
 
   public PowerDistributionStickyFaults getStickyFaults() {
-    long stickyFaults = LoggedPowerDistribution.getInstance().getInputs().sticky_faults;
-    return new PowerDistributionStickyFaults((int)stickyFaults);
+    long stickyFaults = LoggedPowerDistribution.getInstance().getInputs().stickyFaults;
+    return new PowerDistributionStickyFaults((int) stickyFaults);
   }
 
   @Override
@@ -243,6 +244,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     builder.addBooleanProperty(
         "SwitchableChannel",
         () -> getSwitchableChannel(),
-        value -> setSwitchableChannel(value)); 
+        value -> setSwitchableChannel(value));
   }
 }

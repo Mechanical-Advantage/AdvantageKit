@@ -55,12 +55,13 @@ public class LoggedPowerDistribution {
     public double pdpTotalCurrent;
     public double pdpTotalPower;
     public double pdpTotalEnergy;
+
     public int channelCount;
     public int handle;
     public int type;
-    public int module_id;
+    public int moduleId;
     public long faults;
-    public long sticky_faults;
+    public long stickyFaults;
 
     @Override
     public void toLog(LogTable table) {
@@ -70,11 +71,24 @@ public class LoggedPowerDistribution {
       table.put("TotalCurrent", pdpTotalCurrent);
       table.put("TotalPower", pdpTotalPower);
       table.put("TotalEnergy", pdpTotalEnergy);
+
+      table.put("ChannelCount", channelCount);
+      table.put("Faults", (int) faults);
+      table.put("StickyFaults", (int) stickyFaults);
     }
 
     @Override
     public void fromLog(LogTable table) {
-      // Ignore replayed inputs
+      pdpTemperature = table.getDouble("Temperature", pdpTemperature);
+      pdpVoltage = table.getDouble("Voltage", pdpVoltage);
+      pdpChannelCurrents = table.getDoubleArray("ChannelCurrent", pdpChannelCurrents);
+      pdpTotalCurrent = table.getDouble("TotalCurrent", pdpTotalCurrent);
+      pdpTotalPower = table.getDouble("TotalPower", pdpTotalPower);
+      pdpTotalEnergy = table.getDouble("TotalEnergy", pdpTotalEnergy);
+
+      channelCount = table.getInteger("ChannelCount", channelCount);
+      faults = table.getInteger("Faults", (int) faults);
+      stickyFaults = table.getInteger("StickyFaults", (int) stickyFaults);
     }
   }
 
@@ -93,9 +107,9 @@ public class LoggedPowerDistribution {
       pdpInputs.channelCount = conduit.getPDPChannelCount();
       pdpInputs.handle = conduit.getPDPHandle();
       pdpInputs.type = conduit.getPDPType();
-      pdpInputs.module_id = conduit.getPDPModuleId();
+      pdpInputs.moduleId = conduit.getPDPModuleId();
       pdpInputs.faults = conduit.getPDPFaults();
-      pdpInputs.sticky_faults = conduit.getPDPStickyFaults();
+      pdpInputs.stickyFaults = conduit.getPDPStickyFaults();
     }
 
     logger.processInputs("PowerDistribution", pdpInputs);
