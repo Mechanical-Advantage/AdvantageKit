@@ -38,9 +38,6 @@ void DsReader::update_ds_data() {
     HAL_MatchInfo match_info;
     HAL_GetMatchInfo(&match_info);
 
-    int32_t control_word;
-    HAL_GetControlWord((HAL_ControlWord*)&control_word);
-
     double match_time = HAL_GetMatchTime(&status);
 
     schema::Joystick stick_bufs[NUM_JOYSTICKS];
@@ -85,7 +82,6 @@ void DsReader::update_ds_data() {
     internal_buf.mutate_match_number(match_info.matchNumber);
     internal_buf.mutate_replay_number(match_info.replayNumber);
     internal_buf.mutate_match_type(match_info.matchType);
-    internal_buf.mutate_control_word(control_word);
     internal_buf.mutate_match_time(match_time);
 
     internal_buf.mutate_game_specific_message_size(
@@ -104,7 +100,13 @@ void DsReader::update_ds_data() {
 }
 
 void DsReader::read(schema::DSData* ds_buf) {
+  // Update control word synchronously because the "DS attached" value will
+  // update after DS packets are no longer being received
+  int32_t control_word;
+  HAL_GetControlWord((HAL_ControlWord*)&control_word);
+
   if (copy_mutex.try_lock_for(5s)) {
+    internal_buf.mutate_control_word(control_word);
     std::memcpy(ds_buf, &internal_buf, sizeof(schema::DSData));
     copy_mutex.unlock();
   } else {
