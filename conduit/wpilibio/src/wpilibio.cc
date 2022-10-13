@@ -33,7 +33,6 @@ SystemReader sys_reader;
 void start() {
   ds_reader.start();
   pdp_reader.start();
-  sys_reader.start();
 }
 
 void make_buffer() {
