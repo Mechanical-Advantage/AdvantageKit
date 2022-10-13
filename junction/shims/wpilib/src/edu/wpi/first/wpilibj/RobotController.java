@@ -7,14 +7,13 @@ package edu.wpi.first.wpilibj;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANStatus;
 
 /**
  * Contains functions for roboRIO functionality. Patched by AdvantageKit to
- * support logging.
+ * support logging. Patched by AdvantageKit to support logging.
  */
 public final class RobotController {
   private RobotController() {

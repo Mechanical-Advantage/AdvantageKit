@@ -17,8 +17,9 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 
 /**
- * Class for getting voltage, current, temperature, power and energy from the CTRE Power
- * Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over CAN.
+ * Class for getting voltage, current, temperature, power and energy from the
+ * CTRE Power Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over
+ * CAN. Patched by AdvantageKit to support logging.
  */
 public class PowerDistribution implements Sendable, AutoCloseable {
 
