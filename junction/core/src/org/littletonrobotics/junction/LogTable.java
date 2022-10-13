@@ -92,7 +92,9 @@ public class LogTable {
 
   /** Writes a new BooleanArray value to the table. */
   public void put(String key, boolean[] value) {
-    data.put(prefix + key, new LogValue(value));
+    boolean[] valueClone = new boolean[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    data.put(prefix + key, new LogValue(valueClone));
   }
 
   /** Writes a new Integer value to the table. */
@@ -102,7 +104,9 @@ public class LogTable {
 
   /** Writes a new IntegerArray value to the table. */
   public void put(String key, int[] value) {
-    data.put(prefix + key, new LogValue(value));
+    int[] valueClone = new int[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    data.put(prefix + key, new LogValue(valueClone));
   }
 
   /** Writes a new Double value to the table. */
@@ -112,7 +116,9 @@ public class LogTable {
 
   /** Writes a new DoubleArray value to the table. */
   public void put(String key, double[] value) {
-    data.put(prefix + key, new LogValue(value));
+    double[] valueClone = new double[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    data.put(prefix + key, new LogValue(valueClone));
   }
 
   /** Writes a new String value to the table. */
@@ -122,7 +128,9 @@ public class LogTable {
 
   /** Writes a new StringArray value to the table. */
   public void put(String key, String[] value) {
-    data.put(prefix + key, new LogValue(value));
+    String[] valueClone = new String[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    data.put(prefix + key, new LogValue(valueClone));
   }
 
   /** Writes a new Byte value to the table. */
@@ -132,7 +140,9 @@ public class LogTable {
 
   /** Writes a new ByteArray value to the table. */
   public void put(String key, byte[] value) {
-    data.put(prefix + key, new LogValue(value));
+    byte[] valueClone = new byte[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    data.put(prefix + key, new LogValue(valueClone));
   }
 
   /** Reads a generic value from the table. */
