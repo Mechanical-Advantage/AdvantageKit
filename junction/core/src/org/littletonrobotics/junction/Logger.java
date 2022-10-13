@@ -132,9 +132,13 @@ public class Logger {
   void periodicBeforeUser() {
     if (running) {
 
-      // Get next entry
+      // Capture conduit data
       ConduitApi conduit = ConduitApi.getInstance();
+      double conduitCaptureStart = getRealTimestamp();
       conduit.captureData();
+
+      // Get next entry
+      double prepareTablesStart = getRealTimestamp();
       if (replaySource == null) {
         entry = new LogTable(conduit.getTimestamp() / 1000000.0);
         outputTable = entry.getSubtable("RealOutputs");
@@ -168,6 +172,8 @@ public class Logger {
       double periodicEnd = getRealTimestamp();
 
       // Log output data
+      recordOutput("Logger/ConduitCaptureMS", (prepareTablesStart - conduitCaptureStart) * 1000);
+      recordOutput("Logger/PrepareTablesMS", (driverStationStart - prepareTablesStart) * 1000);
       recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) * 1000);
       recordOutput("Logger/SSPeriodicMS", (powerDistributionStart - systemStatsStart) * 1000);
       recordOutput("Logger/PDPeriodicMS", (networkTablesStart - powerDistributionStart) * 1000);
