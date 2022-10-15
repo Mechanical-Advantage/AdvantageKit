@@ -7,8 +7,12 @@ import java.util.concurrent.BlockingQueue;
 
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 
 import org.littletonrobotics.conduit.ConduitApi;
+import org.littletonrobotics.junction.console.ConsoleSource;
+import org.littletonrobotics.junction.console.RIOConsoleSource;
+import org.littletonrobotics.junction.console.SimConsoleSource;
 import org.littletonrobotics.junction.inputs.*;
 
 /** Central class for recording and replaying log data. */
@@ -21,6 +25,7 @@ public class Logger {
   private LogTable entry = new LogTable(0);
   private LogTable outputTable;
   private Map<String, String> metadata = new HashMap<>();
+  private ConsoleSource console;
 
   private LogReplaySource replaySource;
   private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
@@ -85,6 +90,13 @@ public class Logger {
     if (!running) {
       running = true;
 
+      // Start console capture
+      if (RobotBase.isReal()) {
+        console = new RIOConsoleSource();
+      } else {
+        console = new SimConsoleSource();
+      }
+
       // Start replay source
       if (replaySource != null) {
         replaySource.start();
@@ -117,6 +129,11 @@ public class Logger {
   public void end() {
     if (running) {
       running = false;
+      try {
+        console.close();
+      } catch (Exception e) {
+        DriverStation.reportError("Failed to stop console capture.", true);
+      }
       if (replaySource != null) {
         replaySource.end();
       }
@@ -141,6 +158,12 @@ public class Logger {
           end();
           System.exit(0);
         }
+      }
+
+      // Update console output
+      String consoleData = console.getNewData();
+      if (!consoleData.isBlank()) {
+        recordOutput("Console", consoleData);
       }
 
       // Update default inputs
