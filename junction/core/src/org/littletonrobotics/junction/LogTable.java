@@ -24,33 +24,36 @@ public class LogTable {
     }
   }
 
+  /** Creates a new LogTable. */
+  private LogTable(String prefix, SharedTimestamp timestamp, Map<String,LogValue> data) {
+    this.prefix = prefix;
+    this.timestamp = timestamp;
+    this.data = data;
+  }
+
   /**
    * Creates a new LogTable, to serve as the root table.
    */
   public LogTable(long timestamp) {
-    prefix = "/";
-    this.timestamp = new SharedTimestamp(timestamp);
-    data = new HashMap<String, LogValue>();
-  }
-
-  /**
-   * Creates a new LogTable, copying data from the given source. The original
-   * table can be safely modified without affecting the copy.
-   */
-  public LogTable(LogTable source) {
-    prefix = source.prefix;
-    this.timestamp = new SharedTimestamp(source.timestamp.value);
-    data = new HashMap<String, LogValue>();
-    data.putAll(source.data);
+    this("/", new SharedTimestamp(timestamp), new HashMap<String,LogValue>());
   }
 
   /**
    * Creates a new LogTable, to reference a subtable.
    */
   private LogTable(String prefix, LogTable parent) {
-    this.prefix = prefix;
-    this.timestamp = parent.timestamp;
-    this.data = parent.data;
+    this(prefix, parent.timestamp, parent.data);
+  }
+
+  /**
+   * Creates a new LogTable, copying data from the given source. The original
+   * table can be safely modified without affecting the copy.
+   */
+  public static LogTable clone(LogTable source) {
+    Map<String,LogValue> data = new HashMap<String, LogValue>();
+    data.putAll(source.data);
+    return new LogTable(source.prefix, new SharedTimestamp(source.timestamp.value), data);
+    
   }
 
   /**

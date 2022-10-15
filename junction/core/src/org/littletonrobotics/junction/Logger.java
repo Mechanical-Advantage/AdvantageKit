@@ -174,7 +174,7 @@ public class Logger {
       try {
         // Send a copy of the data to the receivers. The original object will be
         // kept and updated with the next timestamp (and new data if replaying).
-        receiverQueue.add(new LogTable(entry));
+        receiverQueue.add(LogTable.clone(entry));
         receiverQueueFault = false;
       } catch (IllegalStateException exception) {
         receiverQueueFault = true;
