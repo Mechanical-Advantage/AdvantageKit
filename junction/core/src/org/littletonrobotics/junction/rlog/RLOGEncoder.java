@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 
 /** Converts log tables to the RLOG format. */
-public class RLOGEncoder {
+class RLOGEncoder {
   public static final byte logRevision = (byte) 1;
 
   private ByteBuffer nextOutput;

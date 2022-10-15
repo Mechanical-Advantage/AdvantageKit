@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.LogTable;
 
 /** Converts the RLOG format to log tables. */
-public class RLOGDecoder {
+class RLOGDecoder {
   public static final List<Byte> supportedLogRevisions = List.of((byte) 1);
 
   private Byte logRevision = null;
