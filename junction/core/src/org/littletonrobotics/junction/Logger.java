@@ -171,14 +171,11 @@ public class Logger {
       LoggedDriverStation.getInstance().periodic();
       long systemStatsStart = getRealTimestamp();
       processInputs("SystemStats", LoggedSystemStats.getInstance());
-      long networkTablesStart = getRealTimestamp();
-      processInputs("NetworkTables", LoggedNetworkTables.getInstance());
       long periodicEnd = getRealTimestamp();
 
       // Log output data
       recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) / 1000.0);
-      recordOutput("Logger/SSPeriodicMS", (networkTablesStart - systemStatsStart) / 1000.0);
-      recordOutput("Logger/NTPeriodicMS", (periodicEnd - networkTablesStart) / 1000.0);
+      recordOutput("Logger/SSPeriodicMS", (periodicEnd - systemStatsStart) / 1000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
     } else {
       // Retrieve new driver station data even if logger is disabled
