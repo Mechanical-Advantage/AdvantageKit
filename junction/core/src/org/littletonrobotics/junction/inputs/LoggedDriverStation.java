@@ -96,7 +96,7 @@ public class LoggedDriverStation {
     public long buttonCount = 0;
     public long buttonValues = 0;
     public long[] povs = {};
-    public double[] axisValues = {};
+    public float[] axisValues = {};
     public long[] axisTypes = {};
 
     public void toLog(LogTable table) {
@@ -117,7 +117,7 @@ public class LoggedDriverStation {
       buttonCount = table.getInteger("ButtonCount", buttonCount);
       buttonValues = table.getInteger("ButtonValues", buttonValues);
       povs = table.getIntegerArray("POVs", povs);
-      axisValues = table.getDoubleArray("AxisValues", axisValues);
+      axisValues = table.getFloatArray("AxisValues", axisValues);
       axisTypes = table.getIntegerArray("AxisTypes", axisTypes);
     }
   }
@@ -166,7 +166,7 @@ public class LoggedDriverStation {
         int axisCount = conduit.getAxisCount(id);
         float[] axisValues = conduit.getAxisValues(id);
         int[] axisTypes = conduit.getAxisTypes(id);
-        joystick.axisValues = new double[axisCount];
+        joystick.axisValues = new float[axisCount];
         joystick.axisTypes = new long[axisCount];
         for (int i = 0; i < axisCount; i++) {
           joystick.axisValues[i] = axisValues[i];
