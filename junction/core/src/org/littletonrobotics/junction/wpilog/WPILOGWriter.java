@@ -56,11 +56,19 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   public void start() {
+    // Delete log if it already exists
+    File logFile = new File(folder, filename);
+    if (logFile.exists()) {
+      logFile.delete();
+    }
+
+    // Create new log
     log = new DataLog(folder, filename, writePeriodSecs, WPILOGConstants.extraHeader);
     timestampID = log.start(WPILOGConstants.timestampKey, LoggableType.Integer.getWPILOGType(),
         WPILOGConstants.entryMetadata, 0);
     lastTable = new LogTable(0);
 
+    // Reset data
     entryIDs = new HashMap<>();
     entryTypes = new HashMap<>();
     updatedTime = false;

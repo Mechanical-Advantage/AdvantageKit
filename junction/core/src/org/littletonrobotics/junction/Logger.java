@@ -161,9 +161,10 @@ public class Logger {
       }
 
       // Update console output
+      long consoleCaptureStart = getRealTimestamp();
       String consoleData = console.getNewData();
-      if (!consoleData.isBlank()) {
-        recordOutput("Console", consoleData);
+      if (!consoleData.isEmpty()) {
+        recordOutput("Console", consoleData.trim());
       }
 
       // Update default inputs
@@ -174,6 +175,7 @@ public class Logger {
       long periodicEnd = getRealTimestamp();
 
       // Log output data
+      recordOutput("Logger/ConsolePeriodicMS", (driverStationStart - consoleCaptureStart) / 1000.0);
       recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) / 1000.0);
       recordOutput("Logger/SSPeriodicMS", (periodicEnd - systemStatsStart) / 1000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());

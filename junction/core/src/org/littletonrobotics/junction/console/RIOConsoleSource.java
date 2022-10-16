@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class RIOConsoleSource implements ConsoleSource {
   private static final String filePath = "/home/lvuser/FRC_UserProgram.log";
   private BufferedReader reader = null;
+  private String data = "";
 
   public RIOConsoleSource() {
     try {
@@ -28,25 +29,33 @@ public class RIOConsoleSource implements ConsoleSource {
       return null;
     }
 
-    String output = "";
+    // Read new data from console
     while (true) {
-      String nextLine = null;
+      int nextChar = -1;
       try {
-        nextLine = reader.readLine();
+        nextChar = reader.read();
       } catch (IOException e) {
         DriverStation.reportError("Failed to read console file \"" + filePath + "\"", true);
       }
-      if (nextLine == null) {
+      if (nextChar == -1) {
         break;
       } else {
-        output += nextLine + "\n";
+        data += new String(new byte[] { (byte) nextChar });
       }
     }
 
-    return output;
+    // Read all complete lines
+    int lastNewline = data.lastIndexOf("\n");
+    String completeLines = "";
+    if (lastNewline != -1) {
+      completeLines = data.substring(0, lastNewline);
+      data = data.substring(lastNewline + 1);
+    }
+    return completeLines;
   }
 
   public void close() throws Exception {
     reader.close();
   }
+
 }

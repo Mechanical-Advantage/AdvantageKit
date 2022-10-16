@@ -35,7 +35,7 @@ public class SimConsoleSource implements ConsoleSource {
     String newStderrStr = fullStderrStr.substring(customStderrPos);
     customStderrPos = fullStderrStr.length();
 
-    return (newStdoutStr + newStderrStr).trim();
+    return newStdoutStr + newStderrStr;
   }
 
   @Override
