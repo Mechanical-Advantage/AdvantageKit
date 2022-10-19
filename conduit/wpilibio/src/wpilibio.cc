@@ -57,7 +57,7 @@ void capture_data(void) {
 
 void configurePDP(JNIEnv *env, jint moduleNumber, jint type)
 {
-  pdp_reader.configure(env, moduleNumber, type);
+  pdp_reader.configure(env, moduleNumber, type, pdp_view);
 }
 
 }  // namespace wpilibio

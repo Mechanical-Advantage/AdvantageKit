@@ -21,247 +21,149 @@ using namespace std::chrono_literals;
 #define MAX_CHANNEL_COUNT 24
 
 
-PDPReader::PDPReader() : is_running(false) {}
+PDPReader::PDPReader() {}
 
-PDPReader::~PDPReader() {
-  if (is_running) {
-    is_running = false;    // Stop the thread when we destruct this object
-    pdp_thread.join();
-  }
-}
+PDPReader::~PDPReader() {}
 
-void PDPReader::start() {
-  pdp_thread = std::thread(&PDPReader::update_pd_data, this);
-}
+void PDPReader::start() {}
 
-void PDPReader::configure(JNIEnv *env, jint module, jint type)
+void PDPReader::configure(JNIEnv *env, jint module, jint type, schema::PDPData *pdp_buf)
 {
-  should_run = false;
+  if (copy_mutex.try_lock_for(5s)) {
+    int32_t status = 0;
+    auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+    pd_handle = HAL_InitializePowerDistribution(module, static_cast<HAL_PowerDistributionType>(type), stack.c_str(), &status);
+    hal::CheckStatus(env, status, false);
 
-  int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  pd_handle = HAL_InitializePowerDistribution(module, static_cast<HAL_PowerDistributionType>(type), stack.c_str(), &status);
-  hal::CheckStatusForceThrow(env, status);
+    int32_t pd_module_id = HAL_GetPowerDistributionModuleNumber(pd_handle, &status);
+    hal::CheckStatus(env, status, false);
 
+    pd_type = HAL_GetPowerDistributionType(pd_handle, &status);
+    hal::CheckStatus(env, status, false);
 
-  pd_module_id = HAL_GetPowerDistributionModuleNumber(pd_handle, &status);
-  hal::CheckStatus(env, status, false);
-
-  pd_type = HAL_GetPowerDistributionType(pd_handle, &status);
-  hal::CheckStatus(env, status, false);
-
-  runtime = HAL_GetRuntimeType();
-  if (runtime != HAL_Runtime_Simulation) {
-    if (pd_type == HAL_PowerDistributionType_kCTRE) {
-      pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kCTRE, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
-    } else if (pd_type == HAL_PowerDistributionType_kRev) {
-      pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kREV, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
+    runtime = HAL_GetRuntimeType();
+    if (runtime != HAL_Runtime_Simulation) {
+      if (pd_type == HAL_PowerDistributionType_kCTRE) {
+        pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kCTRE, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
+      } else if (pd_type == HAL_PowerDistributionType_kRev) {
+        pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kREV, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
+      }
     }
-  }
 
-  copy_mutex.lock();
-
-  internal_buf.mutate_handle(pd_handle);
-  internal_buf.mutate_type(pd_type);
-  internal_buf.mutate_module_id(pd_module_id);
-  if (runtime == HAL_Runtime_Simulation) {
-    internal_buf.mutate_channel_count(24);
-  } else if (pd_type == HAL_PowerDistributionType_kCTRE) {
-    internal_buf.mutate_channel_count(16);
-  } else if (pd_type == HAL_PowerDistributionType_kRev) {
-    internal_buf.mutate_channel_count(24);
-  }
-
-  copy_mutex.unlock();
-
-  should_run = true;
-}
-
-void PDPReader::update_pd_data() {
-  is_running = true;
-  int32_t status;
-
-  while (is_running) {
-    auto now = HAL_GetFPGATime(&status) * 1us;
-    std::this_thread::sleep_for(5ms - (now - timestamp));
-    timestamp = HAL_GetFPGATime(&status) * 1us;
-    loop_counter += 5;
-    loop_counter %= 100; // repeat every 100ms
-
-    if (!should_run) {
-      continue;
-    }
+    pdp_buf->mutate_handle(pd_handle);
+    pdp_buf->mutate_type(pd_type);
+    pdp_buf->mutate_module_id(pd_module_id);
 
     if (runtime == HAL_Runtime_Simulation) {
-      update_sim_data(loop_counter);
+      pdp_buf->mutate_channel_count(24);
     } else if (pd_type == HAL_PowerDistributionType_kCTRE) {
-      update_ctre_pdp_data(loop_counter);
+      pdp_buf->mutate_channel_count(16);
     } else if (pd_type == HAL_PowerDistributionType_kRev) {
-      update_rev_pdh_data(loop_counter);
+      pdp_buf->mutate_channel_count(24);
     }
+
+    copy_mutex.unlock();
+  } else {
+    std::cout
+        << "[conduit] Could not acquire PDP config lock after 5 seconds!  Exiting!"
+        << std::endl;
+    exit(1);
   }
 }
 
-void PDPReader::update_ctre_pdp_data(uint8_t loop_counter) {
-  std::int32_t status;
+void PDPReader::update_pd_data(schema::PDPData *pdp_buf) {
+  if (runtime == HAL_Runtime_Simulation) {
+    update_sim_data(pdp_buf);
+  } else if (pd_type == HAL_PowerDistributionType_kCTRE) {
+    update_ctre_pdp_data(pdp_buf);
+  } else if (pd_type == HAL_PowerDistributionType_kRev) {
+    update_rev_pdh_data(pdp_buf);
+  }
+}
 
-  if (loop_counter % 25 == 0) {
-    // Read Status 1, 2, 3 (0x50, 0x51, 0x52)
-    double channel_currents[MAX_CHANNEL_COUNT];
-    double temperature;
-    double voltage;
+void PDPReader::update_ctre_pdp_data(schema::PDPData *pdp_buf) {
+  int32_t status;
+  int32_t length;
+  uint64_t timestamp;
 
-    {
-      PdpStatus1 pdpStatus1;
-      int32_t length;
-      uint64_t timestamp;
-      HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_1, pdpStatus1.data, &length, &timestamp, &status);
 
-      PdpStatus1Result status1;
-      parseStatusFrame1(pdpStatus1, status1);
+  PdpStatus1 pdpStatus1;
+  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_1, pdpStatus1.data, &length, &timestamp, &status);
 
-      channel_currents[0] = status1.chan1 * 0.125;
-      channel_currents[1] = status1.chan2 * 0.125;
-      channel_currents[2] = status1.chan3 * 0.125;
-      channel_currents[3] = status1.chan4 * 0.125;
-      channel_currents[4] = status1.chan5 * 0.125;
-      channel_currents[5] = status1.chan6 * 0.125;
+  PdpStatus1Result status1;
+  parseStatusFrame1(pdpStatus1, status1);
 
-      if (status == 0) {
-        // Copy all data into the internal buffer
-        copy_mutex.lock();
+  if (status == 0) {
+    auto current_buf = pdp_buf->mutable_channel_current();
 
-        auto current_buf = internal_buf.mutable_channel_current();
-
-        current_buf->Mutate(0, channel_currents[0]);
-        current_buf->Mutate(1, channel_currents[1]);
-        current_buf->Mutate(2, channel_currents[2]);
-        current_buf->Mutate(3, channel_currents[3]);
-        current_buf->Mutate(4, channel_currents[4]);
-        current_buf->Mutate(5, channel_currents[5]);
-
-        copy_mutex.unlock();
-      }
-    }
-
-    {
-      PdpStatus2 pdpStatus2;
-      int32_t length;
-      uint64_t timestamp;
-      HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_2, pdpStatus2.data, &length, &timestamp, &status);
-
-      PdpStatus2Result status2;
-      parseStatusFrame2(pdpStatus2, status2);
-
-      channel_currents[6] = status2.chan7 * 0.125;
-      channel_currents[7] = status2.chan8 * 0.125;
-      channel_currents[8] = status2.chan9 * 0.125;
-      channel_currents[9] = status2.chan10 * 0.125;
-      channel_currents[10] = status2.chan11 * 0.125;
-      channel_currents[11] = status2.chan12 * 0.125;
-
-      if (status == 0) {
-        // Copy all data into the internal buffer
-        copy_mutex.lock();
-
-        auto current_buf = internal_buf.mutable_channel_current();
-
-        current_buf->Mutate(6, channel_currents[0]);
-        current_buf->Mutate(7, channel_currents[1]);
-        current_buf->Mutate(8, channel_currents[2]);
-        current_buf->Mutate(9, channel_currents[3]);
-        current_buf->Mutate(10, channel_currents[4]);
-        current_buf->Mutate(11, channel_currents[5]);
-
-        copy_mutex.unlock();
-      }
-    }
-
-    {
-      PdpStatus3 pdpStatus3;
-      int32_t length;
-      uint64_t timestamp;
-      HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_3, pdpStatus3.data, &length, &timestamp, &status);
-
-      PdpStatus3Result status3;
-      parseStatusFrame3(pdpStatus3, status3);
-
-      channel_currents[12] = status3.chan13 * 0.125;
-      channel_currents[13] = status3.chan14 * 0.125;
-      channel_currents[14] = status3.chan15 * 0.125;
-      channel_currents[15] = status3.chan16 * 0.125;
-      temperature = status3.temp * 1.03250836957542 - 67.8564500484966;
-      voltage = status3.busVoltage * 0.05 + 4.0;
-
-      if (status == 0) {
-        // Copy all data into the internal buffer
-        copy_mutex.lock();
-
-        internal_buf.mutate_temperature(temperature);
-        internal_buf.mutate_voltage(voltage);
-
-        auto current_buf = internal_buf.mutable_channel_current();
-
-        current_buf->Mutate(12, channel_currents[12]);
-        current_buf->Mutate(13, channel_currents[13]);
-        current_buf->Mutate(14, channel_currents[14]);
-        current_buf->Mutate(15, channel_currents[15]);
-
-        copy_mutex.unlock();
-      }
-    }
+    current_buf->Mutate(0, status1.chan1 * 0.125);
+    current_buf->Mutate(1, status1.chan2 * 0.125);
+    current_buf->Mutate(2, status1.chan3 * 0.125);
+    current_buf->Mutate(3, status1.chan4 * 0.125);
+    current_buf->Mutate(4, status1.chan5 * 0.125);
+    current_buf->Mutate(5, status1.chan6 * 0.125);
   }
 
-   if (loop_counter % 20 == 0) {
-    // Read StatusEnergy (0x5D)
-    double total_current;
-    double total_power;
-    double total_energy;
 
-    PdpStatusEnergy pdpStatus;
-    int32_t length;
-    uint64_t timestamp;
-    HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_ENERGY, pdpStatus.data, &length, &timestamp, &status);
+  PdpStatus2 pdpStatus2;
+  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_2, pdpStatus2.data, &length, &timestamp, &status);
 
-    PdpStatusEnergyResult energy;
-    parseStatusFrameEnergy(pdpStatus, energy);
+  PdpStatus2Result status2;
+  parseStatusFrame2(pdpStatus2, status2);
 
-    total_current = energy.totalCurrent * 0.125;
-    total_power = energy.totalPower * 0.125;
-    total_energy = energy.totalEnergy * 0.125 * 0.001 * energy.TmeasMs_likelywillbe20ms_;
+  if (status == 0) {
+    auto current_buf = pdp_buf->mutable_channel_current();
 
-    if (status == 0) {
-      // Copy all data into the internal buffer
-      copy_mutex.lock();
+    current_buf->Mutate(6, status2.chan7 * 0.125);
+    current_buf->Mutate(7, status2.chan8 * 0.125);
+    current_buf->Mutate(8, status2.chan9 * 0.125);
+    current_buf->Mutate(9, status2.chan10 * 0.125);
+    current_buf->Mutate(10, status2.chan11 * 0.125);
+    current_buf->Mutate(11, status2.chan12 * 0.125);
+  }
+    
 
-      internal_buf.mutate_total_current(total_current);
-      internal_buf.mutate_total_power(total_power);
-      internal_buf.mutate_total_energy(total_energy);
+  PdpStatus3 pdpStatus3;
+  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_3, pdpStatus3.data, &length, &timestamp, &status);
 
-      copy_mutex.unlock();
-    }
+  PdpStatus3Result status3;
+  parseStatusFrame3(pdpStatus3, status3);
+
+  if (status == 0) {
+    pdp_buf->mutate_temperature(status3.temp * 1.03250836957542 - 67.8564500484966);
+    pdp_buf->mutate_voltage(status3.busVoltage * 0.05 + 4.0);
+
+    auto current_buf = pdp_buf->mutable_channel_current();
+
+    current_buf->Mutate(12, status3.chan13 * 0.125);
+    current_buf->Mutate(13, status3.chan14 * 0.125);
+    current_buf->Mutate(14, status3.chan15 * 0.125);
+    current_buf->Mutate(15, status3.chan16 * 0.125);
+  }
+
+
+  PdpStatusEnergy pdpStatus;
+  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_ENERGY, pdpStatus.data, &length, &timestamp, &status);
+
+  PdpStatusEnergyResult energy;
+  parseStatusFrameEnergy(pdpStatus, energy);
+
+  if (status == 0) {
+    pdp_buf->mutate_total_current(energy.totalCurrent * 0.125);
+    pdp_buf->mutate_total_power(energy.totalPower * 0.125);
+    pdp_buf->mutate_total_energy(energy.totalEnergy * 0.125 * 0.001 * energy.TmeasMs_likelywillbe20ms_);
   }
 }
 
 
-void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
-  std::int32_t status;
+void PDPReader::update_rev_pdh_data(schema::PDPData *pdp_buf) {
+  int32_t status;
 
   uint8_t data[8];
   int32_t length;
   uint64_t timestamp;
-  // I don't know the frequency of these can frames; it is not published
-
-  double channel_currents[MAX_CHANNEL_COUNT];
-  int32_t faults = 0;
-  int32_t sticky_faults = 0;
-  double voltage = 0;
-  double temp = 0;
-  // bool enabled = false;
-  // bool switch_channel = false;
-  double total_current;
-  double total_power = 0;
-  double total_energy = 0;
+  uint32_t faults = 0;
+  uint32_t sticky_faults = 0;
 
 
   HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_0_API_ID, data, &length, &timestamp, &status);
@@ -269,37 +171,25 @@ void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
   PDH_status_0_t status0;
   PDH_status_0_unpack(&status0, data, length);
 
-  channel_currents[0] = status0.channel_0_current * 0.125;
-  channel_currents[1] = status0.channel_1_current * 0.125;
-  channel_currents[2] = status0.channel_2_current * 0.125;
-  channel_currents[3] = status0.channel_3_current * 0.125;
-  channel_currents[4] = status0.channel_4_current * 0.125;
-  channel_currents[5] = status0.channel_5_current * 0.125;
-
   faults |= status0.channel_0_breaker_fault << 0;
   faults |= status0.channel_1_breaker_fault << 1;
   faults |= status0.channel_2_breaker_fault << 2;
   faults |= status0.channel_3_breaker_fault << 3;
 
   if (status == 0) {
-    // Copy all data into the internal buffer
-    copy_mutex.lock();
+    auto currents = pdp_buf->mutable_channel_current();
 
-    auto currents = internal_buf.mutable_channel_current();
+    currents->Mutate(0, status0.channel_0_current * 0.125);
+    currents->Mutate(1, status0.channel_1_current * 0.125);
+    currents->Mutate(2, status0.channel_2_current * 0.125);
+    currents->Mutate(3, status0.channel_3_current * 0.125);
+    currents->Mutate(3, status0.channel_4_current * 0.125);
+    currents->Mutate(3, status0.channel_5_current * 0.125);
 
-    currents->Mutate(0, channel_currents[0]);
-    currents->Mutate(1, channel_currents[1]);
-    currents->Mutate(2, channel_currents[2]);
-    currents->Mutate(3, channel_currents[3]);
-    currents->Mutate(3, channel_currents[4]);
-    currents->Mutate(3, channel_currents[5]);
-
-    auto mut_faults = internal_buf.faults();
+    auto mut_faults = pdp_buf->faults();
     mut_faults = (mut_faults & 0xFFFFFFF0) | (mut_faults & faults);
 
-    internal_buf.mutate_faults(mut_faults);
-
-    copy_mutex.unlock();
+    pdp_buf->mutate_faults(mut_faults);
   }
 
 
@@ -308,37 +198,25 @@ void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
   PDH_status_1_t status1;
   PDH_status_1_unpack(&status1, data, length);
 
-  channel_currents[6] = status1.channel_6_current * 0.125;
-  channel_currents[7] = status1.channel_7_current * 0.125;
-  channel_currents[8] = status1.channel_8_current * 0.125;
-  channel_currents[9] = status1.channel_9_current * 0.125;
-  channel_currents[10] = status1.channel_10_current * 0.125;
-  channel_currents[11] = status1.channel_11_current * 0.125;
-
   faults |= status1.channel_4_breaker_fault << 4;
   faults |= status1.channel_5_breaker_fault << 5;
   faults |= status1.channel_6_breaker_fault << 6;
   faults |= status1.channel_7_breaker_fault << 7;
 
   if (status == 0) {
-    // Copy all data into the internal buffer
-    copy_mutex.lock();
+    auto currents = pdp_buf->mutable_channel_current();
 
-    auto currents = internal_buf.mutable_channel_current();
+    currents->Mutate(6, status1.channel_6_current * 0.125);
+    currents->Mutate(7, status1.channel_7_current * 0.125);
+    currents->Mutate(8, status1.channel_8_current * 0.125);
+    currents->Mutate(9, status1.channel_9_current * 0.125);
+    currents->Mutate(10, status1.channel_10_current * 0.125);
+    currents->Mutate(11, status1.channel_11_current * 0.125);
 
-    currents->Mutate(6, channel_currents[6]);
-    currents->Mutate(7, channel_currents[7]);
-    currents->Mutate(8, channel_currents[8]);
-    currents->Mutate(9, channel_currents[9]);
-    currents->Mutate(10, channel_currents[10]);
-    currents->Mutate(11, channel_currents[11]);
-
-    auto mut_faults = internal_buf.faults();
+    auto mut_faults = pdp_buf->faults();
     mut_faults = (mut_faults & 0xFFFFFFF0F) | (mut_faults & faults);
 
-    internal_buf.mutate_faults(mut_faults);
-
-    copy_mutex.unlock();
+    pdp_buf->mutate_faults(mut_faults);
   }
 
 
@@ -347,37 +225,25 @@ void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
   PDH_status_2_t status2;
   PDH_status_2_unpack(&status2, data, length);
 
-  channel_currents[12] = status2.channel_12_current * 0.125;
-  channel_currents[13] = status2.channel_13_current * 0.125;
-  channel_currents[14] = status2.channel_14_current * 0.125;
-  channel_currents[15] = status2.channel_15_current * 0.125;
-  channel_currents[16] = status2.channel_16_current * 0.125;
-  channel_currents[17] = status2.channel_17_current * 0.125;
-
   faults |= status2.channel_8_breaker_fault << 8;
   faults |= status2.channel_9_breaker_fault << 9;
   faults |= status2.channel_10_breaker_fault << 10;
   faults |= status2.channel_11_breaker_fault << 11;
 
   if (status == 0) {
-    // Copy all data into the internal buffer
-    copy_mutex.lock();
+    auto currents = pdp_buf->mutable_channel_current();
 
-    auto currents = internal_buf.mutable_channel_current();
+    currents->Mutate(12, status2.channel_12_current * 0.125);
+    currents->Mutate(13, status2.channel_13_current * 0.125);
+    currents->Mutate(14, status2.channel_14_current * 0.125);
+    currents->Mutate(15, status2.channel_15_current * 0.125);
+    currents->Mutate(16, status2.channel_16_current * 0.125);
+    currents->Mutate(17, status2.channel_17_current * 0.125);
 
-    currents->Mutate(12, channel_currents[12]);
-    currents->Mutate(13, channel_currents[13]);
-    currents->Mutate(14, channel_currents[14]);
-    currents->Mutate(15, channel_currents[15]);
-    currents->Mutate(16, channel_currents[16]);
-    currents->Mutate(17, channel_currents[17]);
-
-    auto mut_faults = internal_buf.faults();
+    auto mut_faults = pdp_buf->faults();
     mut_faults = (mut_faults & 0xFFFFFF0FF) | (mut_faults & faults);
 
-    internal_buf.mutate_faults(mut_faults);
-
-    copy_mutex.unlock();
+    pdp_buf->mutate_faults(mut_faults);
   }
 
 
@@ -385,13 +251,6 @@ void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
 
   PDH_status_3_t status3;
   PDH_status_3_unpack(&status3, data, length);
-
-  channel_currents[18] = status2.channel_12_current * 0.125;
-  channel_currents[19] = status2.channel_13_current * 0.125;
-  channel_currents[20] = status2.channel_14_current * 0.0625;
-  channel_currents[21] = status2.channel_15_current * 0.0625;
-  channel_currents[22] = status2.channel_16_current * 0.0625;
-  channel_currents[23] = status2.channel_17_current * 0.0625;
 
   faults |= status3.channel_12_breaker_fault << 12;
   faults |= status3.channel_13_breaker_fault << 13;
@@ -407,24 +266,20 @@ void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
   faults |= status3.channel_23_breaker_fault << 23;
 
   if (status == 0) {
-    // Copy all data into the internal buffer
-    copy_mutex.lock();
 
-    auto currents = internal_buf.mutable_channel_current();
+    auto currents = pdp_buf->mutable_channel_current();
 
-    currents->Mutate(18, channel_currents[18]);
-    currents->Mutate(19, channel_currents[19]);
-    currents->Mutate(20, channel_currents[20]);
-    currents->Mutate(21, channel_currents[21]);
-    currents->Mutate(22, channel_currents[22]);
-    currents->Mutate(23, channel_currents[23]);
+    currents->Mutate(18, status2.channel_12_current * 0.125);
+    currents->Mutate(19, status2.channel_13_current * 0.125);
+    currents->Mutate(20, status2.channel_14_current * 0.0625);
+    currents->Mutate(21, status2.channel_15_current * 0.0625);
+    currents->Mutate(22, status2.channel_16_current * 0.0625);
+    currents->Mutate(23, status2.channel_17_current * 0.0625);
 
-    auto mut_faults = internal_buf.faults();
+    auto mut_faults = pdp_buf->faults();
     mut_faults = (mut_faults & 0xFF000FFF) | (mut_faults & faults);
 
-    internal_buf.mutate_faults(mut_faults);
-
-    copy_mutex.unlock();
+    pdp_buf->mutate_faults(mut_faults);
   }
 
 
@@ -432,11 +287,6 @@ void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
 
   PDH_status_4_t status4;
   PDH_status_4_unpack(&status4, data, length);
-
-  voltage = status4.v_bus * 0.0078125;
-  // enabled = status4.system_enable;
-  // switch_channel = status4.switch_channel_state;
-  total_current = status4.total_current * 2;
 
   faults |= status4.brownout_fault << 24;
   faults |= status4.can_warning_fault << 25;
@@ -474,32 +324,18 @@ void PDPReader::update_rev_pdh_data(uint8_t loop_counter) {
   sticky_faults |= status4.sticky_firmware_fault << 29;
 
   if (status == 0) {
-    // Copy all data into the internal buffer
-    copy_mutex.lock();
+    pdp_buf->mutate_voltage(status4.v_bus * 0.0078125);
+    pdp_buf->mutate_total_current(status4.total_current * 2);
+    pdp_buf->mutate_sticky_faults(sticky_faults);
 
-    internal_buf.mutate_voltage(voltage);
-    internal_buf.mutate_total_current(total_current);
-    internal_buf.mutate_sticky_faults(sticky_faults);
-
-    auto mut_faults = internal_buf.faults();
+    auto mut_faults = pdp_buf->faults();
     mut_faults = (mut_faults & 0xF8FFFFFF) | (mut_faults & faults);
 
-    internal_buf.mutate_faults(mut_faults);
-
-    internal_buf.mutate_temperature(temp);
-    internal_buf.mutate_total_energy(total_energy);
-    internal_buf.mutate_total_power(total_power);
-
-    copy_mutex.unlock();
+    pdp_buf->mutate_faults(mut_faults);
   }
-
 }
 
-void PDPReader::update_sim_data(uint8_t loop_counter) {
-  if (loop_counter % 20 != 0) {
-    return;
-  }
-
+void PDPReader::update_sim_data(schema::PDPData *pdp_buf) {
   int32_t status;
 
   HAL_PowerDistributionFaults faults;
@@ -576,29 +412,26 @@ void PDPReader::update_sim_data(uint8_t loop_counter) {
   double total_power = HAL_GetPowerDistributionTotalPower(pd_handle, &status);
   double total_energy = HAL_GetPowerDistributionTotalEnergy(pd_handle, &status);
 
-  copy_mutex.lock();
 
-  auto currents = internal_buf.mutable_channel_current();
+  auto currents = pdp_buf->mutable_channel_current();
 
   for (int i = 0; i < 24; i++) {
     currents->Mutate(i, channel_current[i]);
   }
 
-  internal_buf.mutate_temperature(temperature);
-  internal_buf.mutate_voltage(voltage);
-  internal_buf.mutate_total_current(total_current);
-  internal_buf.mutate_total_power(total_power);
-  internal_buf.mutate_total_energy(total_energy);
+  pdp_buf->mutate_temperature(temperature);
+  pdp_buf->mutate_voltage(voltage);
+  pdp_buf->mutate_total_current(total_current);
+  pdp_buf->mutate_total_power(total_power);
+  pdp_buf->mutate_total_energy(total_energy);
 
-  internal_buf.mutate_faults(faults_bits);
-  internal_buf.mutate_sticky_faults(sticky_faults_bits);
-
-  copy_mutex.unlock();
+  pdp_buf->mutate_faults(faults_bits);
+  pdp_buf->mutate_sticky_faults(sticky_faults_bits);
 }
 
 void PDPReader::read(schema::PDPData* pdp_buf) {
   if (copy_mutex.try_lock_for(5s)) {
-    std::memcpy(pdp_buf, &internal_buf, sizeof(schema::PDPData));
+    update_pd_data(pdp_buf);
     copy_mutex.unlock();
   } else {
     std::cout
