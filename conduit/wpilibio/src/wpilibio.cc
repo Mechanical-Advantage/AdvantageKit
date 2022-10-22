@@ -3,11 +3,10 @@
 #include <hal/DriverStation.h>
 #include <hal/DriverStationTypes.h>
 #include <hal/HALBase.h>
+#include <jni.h>
 #include <stdlib.h>
 
 #include <cstdint>
-
-#include <jni.h>
 
 #include "conduit/conduit_schema_generated.h"
 #include "conduit/wpilibio/include/ds_reader.h"
@@ -30,10 +29,7 @@ DsReader ds_reader;
 PDPReader pdp_reader;
 SystemReader sys_reader;
 
-void start() {
-  ds_reader.start();
-  pdp_reader.start();
-}
+void start() { ds_reader.start(); }
 
 void make_buffer() {
   // Allocate shared buffer
@@ -55,8 +51,7 @@ void capture_data(void) {
   sys_reader.read(sys_view);
 }
 
-void configurePDP(JNIEnv *env, jint moduleNumber, jint type)
-{
+void configurePDP(JNIEnv* env, jint moduleNumber, jint type) {
   pdp_reader.configure(env, moduleNumber, type, pdp_view);
 }
 

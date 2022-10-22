@@ -1,14 +1,11 @@
 #include "conduit/wpilibio/include/pdp_reader.h"
-#include "conduit/wpilibio/include/HALUtil.h"
-#include "conduit/wpilibio/include/pdp_util.h"
-#include "conduit/wpilibio/include/pdh_util.h"
 
-#include <hal/PowerDistribution.h>
-#include <hal/HALBase.h>
-#include <wpi/StackTrace.h>
-#include <hal/DriverStation.h>
-#include <wpi/jni_util.h>
 #include <hal/CANAPI.h>
+#include <hal/DriverStation.h>
+#include <hal/HALBase.h>
+#include <hal/PowerDistribution.h>
+#include <wpi/StackTrace.h>
+#include <wpi/jni_util.h>
 
 #include <chrono>
 #include <cstdint>
@@ -16,62 +13,15 @@
 #include <iostream>
 #include <mutex>
 
+#include "conduit/wpilibio/include/HALUtil.h"
+#include "conduit/wpilibio/include/pdh_util.h"
+#include "conduit/wpilibio/include/pdp_util.h"
+
 using namespace std::chrono_literals;
 
 #define MAX_CHANNEL_COUNT 24
 
-
-PDPReader::PDPReader() {}
-
-PDPReader::~PDPReader() {}
-
-void PDPReader::start() {}
-
-void PDPReader::configure(JNIEnv *env, jint module, jint type, schema::PDPData *pdp_buf)
-{
-  if (copy_mutex.try_lock_for(5s)) {
-    int32_t status = 0;
-    auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-    pd_handle = HAL_InitializePowerDistribution(module, static_cast<HAL_PowerDistributionType>(type), stack.c_str(), &status);
-    hal::CheckStatus(env, status, false);
-
-    int32_t pd_module_id = HAL_GetPowerDistributionModuleNumber(pd_handle, &status);
-    hal::CheckStatus(env, status, false);
-
-    pd_type = HAL_GetPowerDistributionType(pd_handle, &status);
-    hal::CheckStatus(env, status, false);
-
-    runtime = HAL_GetRuntimeType();
-    if (runtime != HAL_Runtime_Simulation) {
-      if (pd_type == HAL_PowerDistributionType_kCTRE) {
-        pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kCTRE, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
-      } else if (pd_type == HAL_PowerDistributionType_kRev) {
-        pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kREV, pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
-      }
-    }
-
-    pdp_buf->mutate_handle(pd_handle);
-    pdp_buf->mutate_type(pd_type);
-    pdp_buf->mutate_module_id(pd_module_id);
-
-    if (runtime == HAL_Runtime_Simulation) {
-      pdp_buf->mutate_channel_count(24);
-    } else if (pd_type == HAL_PowerDistributionType_kCTRE) {
-      pdp_buf->mutate_channel_count(16);
-    } else if (pd_type == HAL_PowerDistributionType_kRev) {
-      pdp_buf->mutate_channel_count(24);
-    }
-
-    copy_mutex.unlock();
-  } else {
-    std::cout
-        << "[conduit] Could not acquire PDP config lock after 5 seconds!  Exiting!"
-        << std::endl;
-    exit(1);
-  }
-}
-
-void PDPReader::update_pd_data(schema::PDPData *pdp_buf) {
+void PDPReader::read(schema::PDPData* pdp_buf) {
   if (runtime == HAL_Runtime_Simulation) {
     update_sim_data(pdp_buf);
   } else if (pd_type == HAL_PowerDistributionType_kCTRE) {
@@ -81,14 +31,56 @@ void PDPReader::update_pd_data(schema::PDPData *pdp_buf) {
   }
 }
 
-void PDPReader::update_ctre_pdp_data(schema::PDPData *pdp_buf) {
+void PDPReader::configure(JNIEnv* env, jint module, jint type,
+                          schema::PDPData* pdp_buf) {
+  int32_t status = 0;
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  pd_handle = HAL_InitializePowerDistribution(
+      module, static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
+      &status);
+  hal::CheckStatus(env, status, false);
+
+  int32_t pd_module_id =
+      HAL_GetPowerDistributionModuleNumber(pd_handle, &status);
+  hal::CheckStatus(env, status, false);
+
+  pd_type = HAL_GetPowerDistributionType(pd_handle, &status);
+  hal::CheckStatus(env, status, false);
+
+  runtime = HAL_GetRuntimeType();
+  if (runtime != HAL_Runtime_Simulation) {
+    if (pd_type == HAL_PowerDistributionType_kCTRE) {
+      pd_can_handle =
+          HAL_InitializeCAN(HAL_CAN_Man_kCTRE, pd_module_id,
+                            HAL_CAN_Dev_kPowerDistribution, &status);
+    } else if (pd_type == HAL_PowerDistributionType_kRev) {
+      pd_can_handle =
+          HAL_InitializeCAN(HAL_CAN_Man_kREV, pd_module_id,
+                            HAL_CAN_Dev_kPowerDistribution, &status);
+    }
+  }
+
+  pdp_buf->mutate_handle(pd_handle);
+  pdp_buf->mutate_type(pd_type);
+  pdp_buf->mutate_module_id(pd_module_id);
+
+  if (runtime == HAL_Runtime_Simulation) {
+    pdp_buf->mutate_channel_count(24);
+  } else if (pd_type == HAL_PowerDistributionType_kCTRE) {
+    pdp_buf->mutate_channel_count(16);
+  } else if (pd_type == HAL_PowerDistributionType_kRev) {
+    pdp_buf->mutate_channel_count(24);
+  }
+}
+
+void PDPReader::update_ctre_pdp_data(schema::PDPData* pdp_buf) {
   int32_t status;
   int32_t length;
   uint64_t timestamp;
 
-
   PdpStatus1 pdpStatus1;
-  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_1, pdpStatus1.data, &length, &timestamp, &status);
+  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_1, pdpStatus1.data, &length,
+                          &timestamp, &status);
 
   PdpStatus1Result status1;
   parseStatusFrame1(pdpStatus1, status1);
@@ -104,9 +96,9 @@ void PDPReader::update_ctre_pdp_data(schema::PDPData *pdp_buf) {
     current_buf->Mutate(5, status1.chan6 * 0.125);
   }
 
-
   PdpStatus2 pdpStatus2;
-  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_2, pdpStatus2.data, &length, &timestamp, &status);
+  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_2, pdpStatus2.data, &length,
+                          &timestamp, &status);
 
   PdpStatus2Result status2;
   parseStatusFrame2(pdpStatus2, status2);
@@ -121,16 +113,17 @@ void PDPReader::update_ctre_pdp_data(schema::PDPData *pdp_buf) {
     current_buf->Mutate(10, status2.chan11 * 0.125);
     current_buf->Mutate(11, status2.chan12 * 0.125);
   }
-    
 
   PdpStatus3 pdpStatus3;
-  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_3, pdpStatus3.data, &length, &timestamp, &status);
+  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_3, pdpStatus3.data, &length,
+                          &timestamp, &status);
 
   PdpStatus3Result status3;
   parseStatusFrame3(pdpStatus3, status3);
 
   if (status == 0) {
-    pdp_buf->mutate_temperature(status3.temp * 1.03250836957542 - 67.8564500484966);
+    pdp_buf->mutate_temperature(status3.temp * 1.03250836957542 -
+                                67.8564500484966);
     pdp_buf->mutate_voltage(status3.busVoltage * 0.05 + 4.0);
 
     auto current_buf = pdp_buf->mutable_channel_current();
@@ -141,9 +134,9 @@ void PDPReader::update_ctre_pdp_data(schema::PDPData *pdp_buf) {
     current_buf->Mutate(15, status3.chan16 * 0.125);
   }
 
-
   PdpStatusEnergy pdpStatus;
-  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_ENERGY, pdpStatus.data, &length, &timestamp, &status);
+  HAL_ReadCANPacketLatest(pd_can_handle, PDP_STATUS_ENERGY, pdpStatus.data,
+                          &length, &timestamp, &status);
 
   PdpStatusEnergyResult energy;
   parseStatusFrameEnergy(pdpStatus, energy);
@@ -151,12 +144,12 @@ void PDPReader::update_ctre_pdp_data(schema::PDPData *pdp_buf) {
   if (status == 0) {
     pdp_buf->mutate_total_current(energy.totalCurrent * 0.125);
     pdp_buf->mutate_total_power(energy.totalPower * 0.125);
-    pdp_buf->mutate_total_energy(energy.totalEnergy * 0.125 * 0.001 * energy.TmeasMs_likelywillbe20ms_);
+    pdp_buf->mutate_total_energy(energy.totalEnergy * 0.125 * 0.001 *
+                                 energy.TmeasMs_likelywillbe20ms_);
   }
 }
 
-
-void PDPReader::update_rev_pdh_data(schema::PDPData *pdp_buf) {
+void PDPReader::update_rev_pdh_data(schema::PDPData* pdp_buf) {
   int32_t status;
 
   uint8_t data[8];
@@ -165,8 +158,8 @@ void PDPReader::update_rev_pdh_data(schema::PDPData *pdp_buf) {
   uint32_t faults = 0;
   uint32_t sticky_faults = 0;
 
-
-  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_0_API_ID, data, &length, &timestamp, &status);
+  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_0_API_ID, data, &length,
+                          &timestamp, &status);
 
   PDH_status_0_t status0;
   PDH_status_0_unpack(&status0, data, length);
@@ -192,8 +185,8 @@ void PDPReader::update_rev_pdh_data(schema::PDPData *pdp_buf) {
     pdp_buf->mutate_faults(mut_faults);
   }
 
-
-  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_1_API_ID, data, &length, &timestamp, &status);
+  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_1_API_ID, data, &length,
+                          &timestamp, &status);
 
   PDH_status_1_t status1;
   PDH_status_1_unpack(&status1, data, length);
@@ -219,8 +212,8 @@ void PDPReader::update_rev_pdh_data(schema::PDPData *pdp_buf) {
     pdp_buf->mutate_faults(mut_faults);
   }
 
-
-  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_2_API_ID, data, &length, &timestamp, &status);
+  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_2_API_ID, data, &length,
+                          &timestamp, &status);
 
   PDH_status_2_t status2;
   PDH_status_2_unpack(&status2, data, length);
@@ -246,8 +239,8 @@ void PDPReader::update_rev_pdh_data(schema::PDPData *pdp_buf) {
     pdp_buf->mutate_faults(mut_faults);
   }
 
-
-  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_3_API_ID, data, &length, &timestamp, &status);
+  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_3_API_ID, data, &length,
+                          &timestamp, &status);
 
   PDH_status_3_t status3;
   PDH_status_3_unpack(&status3, data, length);
@@ -266,7 +259,6 @@ void PDPReader::update_rev_pdh_data(schema::PDPData *pdp_buf) {
   faults |= status3.channel_23_breaker_fault << 23;
 
   if (status == 0) {
-
     auto currents = pdp_buf->mutable_channel_current();
 
     currents->Mutate(18, status2.channel_12_current * 0.125);
@@ -282,8 +274,8 @@ void PDPReader::update_rev_pdh_data(schema::PDPData *pdp_buf) {
     pdp_buf->mutate_faults(mut_faults);
   }
 
-
-  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_4_API_ID, data, &length, &timestamp, &status);
+  HAL_ReadCANPacketLatest(pd_can_handle, PDH_STATUS_4_API_ID, data, &length,
+                          &timestamp, &status);
 
   PDH_status_4_t status4;
   PDH_status_4_unpack(&status4, data, length);
@@ -335,7 +327,7 @@ void PDPReader::update_rev_pdh_data(schema::PDPData *pdp_buf) {
   }
 }
 
-void PDPReader::update_sim_data(schema::PDPData *pdp_buf) {
+void PDPReader::update_sim_data(schema::PDPData* pdp_buf) {
   int32_t status;
 
   HAL_PowerDistributionFaults faults;
@@ -404,14 +396,15 @@ void PDPReader::update_sim_data(schema::PDPData *pdp_buf) {
   sticky_faults_bits |= sticky_faults.hasReset << 27;
 
   double channel_current[24];
-  HAL_GetPowerDistributionAllChannelCurrents(pd_handle, channel_current, 24, &status);
+  HAL_GetPowerDistributionAllChannelCurrents(pd_handle, channel_current, 24,
+                                             &status);
 
   double temperature = HAL_GetPowerDistributionTemperature(pd_handle, &status);
   double voltage = HAL_GetPowerDistributionVoltage(pd_handle, &status);
-  double total_current = HAL_GetPowerDistributionTotalCurrent(pd_handle, &status);
+  double total_current =
+      HAL_GetPowerDistributionTotalCurrent(pd_handle, &status);
   double total_power = HAL_GetPowerDistributionTotalPower(pd_handle, &status);
   double total_energy = HAL_GetPowerDistributionTotalEnergy(pd_handle, &status);
-
 
   auto currents = pdp_buf->mutable_channel_current();
 
@@ -427,16 +420,4 @@ void PDPReader::update_sim_data(schema::PDPData *pdp_buf) {
 
   pdp_buf->mutate_faults(faults_bits);
   pdp_buf->mutate_sticky_faults(sticky_faults_bits);
-}
-
-void PDPReader::read(schema::PDPData* pdp_buf) {
-  if (copy_mutex.try_lock_for(5s)) {
-    update_pd_data(pdp_buf);
-    copy_mutex.unlock();
-  } else {
-    std::cout
-        << "[conduit] Could not acquire PDP read lock after 5 seconds!  Exiting!"
-        << std::endl;
-    exit(1);
-  }
 }
