@@ -5,16 +5,15 @@
 package edu.wpi.first.wpilibj;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.hal.PowerJNI;
-import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
 
 /**
  * Contains functions for roboRIO functionality. Patched by AdvantageKit to
- * support logging.
+ * support logging. Patched by AdvantageKit to support logging.
  */
 public final class RobotController {
   private RobotController() {
@@ -71,7 +70,7 @@ public final class RobotController {
    * @return The battery voltage in Volts.
    */
   public static double getBatteryVoltage() {
-    return PowerJNI.getVinVoltage();
+    return LoggedSystemStats.getInstance().getInputs().voltageVin;
   }
 
   /**
@@ -82,7 +81,7 @@ public final class RobotController {
    * @return True if the FPGA outputs are enabled.
    */
   public static boolean isSysActive() {
-    return HAL.getSystemActive();
+    return LoggedSystemStats.getInstance().getInputs().systemActive;
   }
 
   /**
@@ -91,7 +90,7 @@ public final class RobotController {
    * @return True if the system is browned out
    */
   public static boolean isBrownedOut() {
-    return HAL.getBrownedOut();
+    return LoggedSystemStats.getInstance().getInputs().brownedOut;
   }
 
   /**
@@ -100,7 +99,7 @@ public final class RobotController {
    * @return The controller input voltage value in Volts
    */
   public static double getInputVoltage() {
-    return PowerJNI.getVinVoltage();
+    return LoggedSystemStats.getInstance().getInputs().voltageVin;
   }
 
   /**
@@ -109,7 +108,7 @@ public final class RobotController {
    * @return The controller input current value in Amps
    */
   public static double getInputCurrent() {
-    return PowerJNI.getVinCurrent();
+    return LoggedSystemStats.getInstance().getInputs().currentVin;
   }
 
   /**
@@ -118,7 +117,7 @@ public final class RobotController {
    * @return The controller 3.3V rail voltage value in Volts
    */
   public static double getVoltage3V3() {
-    return PowerJNI.getUserVoltage3V3();
+    return LoggedSystemStats.getInstance().getInputs().userVoltage3v3;
   }
 
   /**
@@ -127,7 +126,7 @@ public final class RobotController {
    * @return The controller 3.3V rail output current value in Amps
    */
   public static double getCurrent3V3() {
-    return PowerJNI.getUserCurrent3V3();
+    return LoggedSystemStats.getInstance().getInputs().userCurrent3v3;
   }
 
   /**
@@ -137,7 +136,7 @@ public final class RobotController {
    * @return The controller 3.3V rail enabled value
    */
   public static boolean getEnabled3V3() {
-    return PowerJNI.getUserActive3V3();
+    return LoggedSystemStats.getInstance().getInputs().userActive3v3;
   }
 
   /**
@@ -147,7 +146,7 @@ public final class RobotController {
    * @return The number of faults
    */
   public static int getFaultCount3V3() {
-    return PowerJNI.getUserCurrentFaults3V3();
+    return LoggedSystemStats.getInstance().getInputs().userCurrentFaults3v3;
   }
 
   /**
@@ -156,7 +155,7 @@ public final class RobotController {
    * @return The controller 5V rail voltage value in Volts
    */
   public static double getVoltage5V() {
-    return PowerJNI.getUserVoltage5V();
+    return LoggedSystemStats.getInstance().getInputs().userVoltage5v;
   }
 
   /**
@@ -165,7 +164,7 @@ public final class RobotController {
    * @return The controller 5V rail output current value in Amps
    */
   public static double getCurrent5V() {
-    return PowerJNI.getUserCurrent5V();
+    return LoggedSystemStats.getInstance().getInputs().userCurrent5v;
   }
 
   /**
@@ -175,7 +174,7 @@ public final class RobotController {
    * @return The controller 5V rail enabled value
    */
   public static boolean getEnabled5V() {
-    return PowerJNI.getUserActive5V();
+    return LoggedSystemStats.getInstance().getInputs().userActive5v;
   }
 
   /**
@@ -185,7 +184,7 @@ public final class RobotController {
    * @return The number of faults
    */
   public static int getFaultCount5V() {
-    return PowerJNI.getUserCurrentFaults5V();
+    return LoggedSystemStats.getInstance().getInputs().userCurrentFaults5v;
   }
 
   /**
@@ -194,7 +193,7 @@ public final class RobotController {
    * @return The controller 6V rail voltage value in Volts
    */
   public static double getVoltage6V() {
-    return PowerJNI.getUserVoltage6V();
+    return LoggedSystemStats.getInstance().getInputs().userVoltage6v;
   }
 
   /**
@@ -203,7 +202,7 @@ public final class RobotController {
    * @return The controller 6V rail output current value in Amps
    */
   public static double getCurrent6V() {
-    return PowerJNI.getUserCurrent6V();
+    return LoggedSystemStats.getInstance().getInputs().userCurrent6v;
   }
 
   /**
@@ -213,7 +212,7 @@ public final class RobotController {
    * @return The controller 6V rail enabled value
    */
   public static boolean getEnabled6V() {
-    return PowerJNI.getUserActive6V();
+    return LoggedSystemStats.getInstance().getInputs().userActive6v;
   }
 
   /**
@@ -223,7 +222,7 @@ public final class RobotController {
    * @return The number of faults
    */
   public static int getFaultCount6V() {
-    return PowerJNI.getUserCurrentFaults6V();
+    return LoggedSystemStats.getInstance().getInputs().userCurrentFaults6v;
   }
 
   /**
@@ -254,8 +253,6 @@ public final class RobotController {
    * @return The status of the CAN bus
    */
   public static CANStatus getCANStatus() {
-    CANStatus status = new CANStatus();
-    CANJNI.getCANStatus(status);
-    return status;
+    return LoggedSystemStats.getInstance().getInputs().canStatus;
   }
 }
