@@ -62,6 +62,7 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
 
             TypeSpec type = TypeSpec
                     .classBuilder(classElement.getSimpleName() + "AutoLogged")
+                    .addModifiers(Modifier.PUBLIC)
                     .addSuperinterface(LOGGABLE_INPUTS_TYPE)
                     .superclass(classElement.asType())
                     .addMethod(toLogBuilder.build())
