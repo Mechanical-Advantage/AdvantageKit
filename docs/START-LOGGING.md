@@ -131,7 +131,9 @@ Data logging of inputs should occur between the control logic and hardware inter
 
 *Refer to [this folder](https://github.com/Mechanical-Advantage/LoggingDevelopment/tree/master/src/main/java/frc/robot/subsystems/template) for some example IO interfaces and implementations.*
 
-Outputs (setting voltage, setpoint, PID constants, etc.) make use of simple methods for each command. Input data is more controlled such that it can be logged and replayed. Each IO interface defines a class with public attributes for all input data ([example](https://github.com/Mechanical-Advantage/LoggingDevelopment/blob/master/src/main/java/frc/robot/subsystems/template/ClosedLoopIO.java#L13)), along with methods for saving and replaying that data from a log (`toLog` and `fromLog`). The IO layer then includes a single method (`updateInputs`) for updating all of that data. The subsystem class contains an instance of both the current IO implementation and the "inputs" object. Once per cycle, it updates the input data and sends it to the logging framework:
+Outputs (setting voltage, setpoint, PID constants, etc.) make use of simple methods for each command. Input data is more controlled such that it can be logged and replayed. Each IO interface defines a class with public attributes for all input data ([example](https://github.com/Mechanical-Advantage/LoggingDevelopment/blob/master/src/main/java/frc/robot/subsystems/template/ClosedLoopIO.java#L13)), along with methods for saving and replaying that data from a log (`toLog` and `fromLog`). As of version 1.8, the new, highly experimental annotation `@AutoLog` can be used to automatically generate these methods. Read the `@AutoLog` section below for more info.
+
+The IO layer then includes a single method (`updateInputs`) for updating all of that data. The subsystem class contains an instance of both the current IO implementation and the "inputs" object. Once per cycle, it updates the input data and sends it to the logging framework:
 
 ```java
 io.updateInputs(inputs); // Update input data from the IO layer
@@ -211,3 +213,48 @@ Unless otherwise specified, all normal WPILib and vendordep features will functi
 * All user code must be single-threaded. This is necessary to ensure that logged data is recorded and replayed predictably, as the timing of extra threads cannot be recreated in a simulator. 
 
 In addition, the logging framework typically increases the length of each loop cycle by 2-3ms. See [this page](CONDUIT-SHIMS.md) for more details. We recommend using the performance data automatically saved under `RealOutputs/LoggedRobot` to check if your code is at risk of causing loop overruns. In particular, recording Network Tables data is often performance intensive - you may need to reduce the number of logged NT subtables where possible.
+
+## `@AutoLog`
+
+As of version 1.8, a new `@AutoLog` annotation was added. By adding this annotation to your inputs class, AdvantageKit will automatically generate implementations of `toLog` and `fromLog` for your inputs.
+
+For example:
+
+```java
+@AutoLog
+public class MyInputs {
+    public double myField = 0;
+}
+```
+
+This will generate the following class:
+
+```java
+class MyInputsAutoLogged extends MyInputs implements LoggableInputs {
+    public void toLog(LogTable table) {
+        table.put("MyField", myField);
+    }
+
+    public void fromLog(LogTable table) {
+        myField = table.getDouble("MyField", myField);
+    }
+}
+```
+
+Note that you should use the `<className>AutoLogged` class, rather than your annotated class. In order to use `@AutoLog`, modify your `build.gradle` to include:
+
+```groovy
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java'
+            srcDirs 'build/generated/sources/annotationProcessor/java/main'
+        }
+    }
+}
+
+dependencies {
+    // ...
+    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:<version>"
+}
+```
