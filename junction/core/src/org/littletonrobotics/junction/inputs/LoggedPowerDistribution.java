@@ -7,7 +7,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.hal.PowerDistributionJNI;
 
-
 /**
  * Manages logging power distribution data.
  */
@@ -37,8 +36,7 @@ public class LoggedPowerDistribution {
     return instance;
   }
 
-  public static LoggedPowerDistribution getInstance(int moduleID, PowerDistribution.ModuleType moduleType)
-  {
+  public static LoggedPowerDistribution getInstance(int moduleID, PowerDistribution.ModuleType moduleType) {
     if (instance == null) {
       instance = new LoggedPowerDistribution(moduleID, moduleType);
     } else if (instance.moduleID != moduleID || instance.moduleType != moduleType.value) {
@@ -86,9 +84,9 @@ public class LoggedPowerDistribution {
       pdpTotalPower = table.getDouble("TotalPower", pdpTotalPower);
       pdpTotalEnergy = table.getDouble("TotalEnergy", pdpTotalEnergy);
 
-      channelCount = table.getInteger("ChannelCount", channelCount);
-      faults = table.getInteger("Faults", (int) faults);
-      stickyFaults = table.getInteger("StickyFaults", (int) stickyFaults);
+      channelCount = (int) table.getInteger("ChannelCount", channelCount);
+      faults = table.getInteger("Faults", faults);
+      stickyFaults = table.getInteger("StickyFaults", stickyFaults);
     }
   }
 

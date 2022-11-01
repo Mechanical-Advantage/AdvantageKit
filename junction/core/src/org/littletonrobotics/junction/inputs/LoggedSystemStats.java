@@ -32,15 +32,15 @@ public class LoggedSystemStats {
     public double userVoltage3v3;
     public double userCurrent3v3;
     public boolean userActive3v3;
-    public long userCurrentFaults3v3;
+    public int userCurrentFaults3v3;
     public double userVoltage5v;
     public double userCurrent5v;
     public boolean userActive5v;
-    public long userCurrentFaults5v;
+    public int userCurrentFaults5v;
     public double userVoltage6v;
     public double userCurrent6v;
     public boolean userActive6v;
-    public long userCurrentFaults6v;
+    public int userCurrentFaults6v;
     public boolean brownedOut;
     public boolean systemActive;
     public CANStatus canStatus = new CANStatus();
@@ -85,17 +85,17 @@ public class LoggedSystemStats {
       userVoltage3v3 = table.getDouble("3v3Rail/Voltage", userVoltage3v3);
       userCurrent3v3 = table.getDouble("3v3Rail/Current", userCurrent3v3);
       userActive3v3 = table.getBoolean("3v3Rail/Active", userActive3v3);
-      userCurrentFaults3v3 = table.getInteger("3v3Rail/CurrentFaults", userCurrentFaults3v3);
+      userCurrentFaults3v3 = (int) table.getInteger("3v3Rail/CurrentFaults", userCurrentFaults3v3);
 
       userVoltage5v = table.getDouble("5vRail/Voltage", userVoltage5v);
       userCurrent5v = table.getDouble("5vRail/Current", userCurrent5v);
       userActive5v = table.getBoolean("5vRail/Active", userActive5v);
-      userCurrentFaults5v = table.getInteger("5vRail/CurrentFaults", userCurrentFaults5v);
+      userCurrentFaults5v = (int) table.getInteger("5vRail/CurrentFaults", userCurrentFaults5v);
 
       userVoltage6v = table.getDouble("6vRail/Voltage", userVoltage6v);
       userCurrent6v = table.getDouble("6vRail/Current", userCurrent6v);
       userActive6v = table.getBoolean("6vRail/Active", userActive6v);
-      userCurrentFaults6v = table.getInteger("6vRail/CurrentFaults", userCurrentFaults6v);
+      userCurrentFaults6v = (int) table.getInteger("6vRail/CurrentFaults", userCurrentFaults6v);
 
       brownedOut = table.getBoolean("BrownedOut", brownedOut);
       systemActive = table.getBoolean("SystemActive", systemActive);
