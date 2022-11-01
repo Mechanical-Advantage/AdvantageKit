@@ -151,14 +151,15 @@ http_archive(
 #    remote = "https://github.com/wpilibsuite/allwpilib"
 #)
 
-BAZEL_TOOLCHAIN_TAG = "0.6.3"
-BAZEL_TOOLCHAIN_SHA = "da607faed78c4cb5a5637ef74a36fdd2286f85ca5192222c4664efec2d529bb8"
+BAZEL_TOOLCHAIN_TAG = "0.7.2"
+
+BAZEL_TOOLCHAIN_SHA = "f7aa8e59c9d3cafde6edb372d9bd25fb4ee7293ab20b916d867cd0baaa642529"
 
 http_archive(
     name = "com_grail_bazel_toolchain",
+    canonical_id = BAZEL_TOOLCHAIN_TAG,
     sha256 = BAZEL_TOOLCHAIN_SHA,
     strip_prefix = "bazel-toolchain-{tag}".format(tag = BAZEL_TOOLCHAIN_TAG),
-    canonical_id = BAZEL_TOOLCHAIN_TAG,
     url = "https://github.com/grailbio/bazel-toolchain/archive/{tag}.tar.gz".format(tag = BAZEL_TOOLCHAIN_TAG),
 )
 
@@ -171,6 +172,10 @@ load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
 llvm_toolchain(
     name = "llvm_toolchain",
     llvm_version = "13.0.0",
+    stdlib = {
+        "linux-x86_64": "stdc++",
+        "linux-aarch64": "stdc++",
+    },
 )
 
 load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
@@ -202,11 +207,11 @@ filegroup(
 http_archive(
     name = "nng",
     build_file_content = _ALL_CONTENT,
+    sha256 = "652ff3a2dbaeae194942205c369e9259e2b5cb5985d679d744cbfb95d1c807a3",
     strip_prefix = "nng-1.5.2",
     urls = [
-        "https://github.com/nanomsg/nng/archive/refs/tags/v1.5.2.zip"
+        "https://github.com/nanomsg/nng/archive/refs/tags/v1.5.2.zip",
     ],
-    sha256 = "652ff3a2dbaeae194942205c369e9259e2b5cb5985d679d744cbfb95d1c807a3",
 )
 
 # This tells Bazel how to download the athena (roborio) toolchain for cross compiling

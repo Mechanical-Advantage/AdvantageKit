@@ -22,3 +22,8 @@ JNIEXPORT void JNICALL
 Java_org_littletonrobotics_conduit_ConduitJni_start(JNIEnv* env, jclass clazz) {
   akit::conduit::wpilibio::start();
 }
+
+JNIEXPORT void JNICALL
+Java_org_littletonrobotics_conduit_ConduitJni_configurePowerDistribution(JNIEnv* env, jclass clazz, jint module, jint moduleType) {
+  akit::conduit::wpilibio::configurePDP(env, module, moduleType);
+}

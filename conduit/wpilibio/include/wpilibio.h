@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <jni.h>
 
 namespace akit {
 namespace conduit {
@@ -18,6 +19,8 @@ void make_buffer();
 
 // Captures data into the shared buffer
 void capture_data();
+
+void configurePDP(JNIEnv *env, jint moduleNumber, jint type);
 
 }  // namespace wpilibio
 }  // namespace conduit

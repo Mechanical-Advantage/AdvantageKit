@@ -148,9 +148,13 @@ public class Logger {
   void periodicBeforeUser() {
     if (running) {
 
-      // Get next entry
+      // Capture conduit data
       ConduitApi conduit = ConduitApi.getInstance();
+      long conduitCaptureStart = getRealTimestamp();
       conduit.captureData();
+
+      // Get next entry
+      long prepareTablesStart = getRealTimestamp();
       if (replaySource == null) {
         entry.setTimestamp(conduit.getTimestamp());
       } else {
@@ -171,18 +175,31 @@ public class Logger {
       long driverStationStart = getRealTimestamp();
       LoggedDriverStation.getInstance().periodic();
       long systemStatsStart = getRealTimestamp();
-      processInputs("SystemStats", LoggedSystemStats.getInstance());
+      LoggedSystemStats.getInstance().periodic();
+      long powerDistributionStart = getRealTimestamp();
+      LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
+      if (loggedPowerDistribution != null) {
+        loggedPowerDistribution.periodic();
+      }
       long periodicEnd = getRealTimestamp();
 
       // Log output data
-      recordOutput("Logger/ConsolePeriodicMS", (driverStationStart - consoleCaptureStart) / 1000.0);
+      recordOutput("Logger/ConduitPeriodMS", (prepareTablesStart - conduitCaptureStart) / 1000.0);
+      recordOutput("Logger/TablesPeriodicMS", (consoleCaptureStart - prepareTablesStart) / 1000.0);
+      recordOutput("Logger/ConsolePeriodicMs", (driverStationStart - consoleCaptureStart) / 1000.0);
       recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) / 1000.0);
-      recordOutput("Logger/SSPeriodicMS", (periodicEnd - systemStatsStart) / 1000.0);
+      recordOutput("Logger/SSPeriodicMS", (powerDistributionStart - systemStatsStart) / 1000.0);
+      recordOutput("Logger/PDPeriodicMS", (periodicEnd - powerDistributionStart) / 1000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
     } else {
-      // Retrieve new driver station data even if logger is disabled
+      // Retrieve new data even if logger is disabled
       ConduitApi.getInstance().captureData();
       LoggedDriverStation.getInstance().periodic();
+      LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
+      if (loggedPowerDistribution != null) {
+        loggedPowerDistribution.periodic();
+      }
+      LoggedSystemStats.getInstance().periodic();
     }
   }
 

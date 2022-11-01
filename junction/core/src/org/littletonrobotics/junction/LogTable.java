@@ -25,7 +25,7 @@ public class LogTable {
   }
 
   /** Creates a new LogTable. */
-  private LogTable(String prefix, SharedTimestamp timestamp, Map<String,LogValue> data) {
+  private LogTable(String prefix, SharedTimestamp timestamp, Map<String, LogValue> data) {
     this.prefix = prefix;
     this.timestamp = timestamp;
     this.data = data;
@@ -35,7 +35,7 @@ public class LogTable {
    * Creates a new LogTable, to serve as the root table.
    */
   public LogTable(long timestamp) {
-    this("/", new SharedTimestamp(timestamp), new HashMap<String,LogValue>());
+    this("/", new SharedTimestamp(timestamp), new HashMap<String, LogValue>());
   }
 
   /**
@@ -50,10 +50,10 @@ public class LogTable {
    * table can be safely modified without affecting the copy.
    */
   public static LogTable clone(LogTable source) {
-    Map<String,LogValue> data = new HashMap<String, LogValue>();
+    Map<String, LogValue> data = new HashMap<String, LogValue>();
     data.putAll(source.data);
     return new LogTable(source.prefix, new SharedTimestamp(source.timestamp.value), data);
-    
+
   }
 
   /**
@@ -123,6 +123,8 @@ public class LogTable {
    */
   public void put(String key, byte[] value) {
     if (writeAllowed(key, LoggableType.Raw)) {
+      byte[] valueClone = new byte[value.length];
+      System.arraycopy(value, 0, valueClone, 0, value.length);
       data.put(prefix + key, new LogValue(value));
     }
   }
@@ -183,6 +185,8 @@ public class LogTable {
    */
   public void put(String key, boolean[] value) {
     if (writeAllowed(key, LoggableType.BooleanArray)) {
+      boolean[] valueClone = new boolean[value.length];
+      System.arraycopy(value, 0, valueClone, 0, value.length);
       data.put(prefix + key, new LogValue(value));
     }
   }
@@ -193,6 +197,8 @@ public class LogTable {
    */
   public void put(String key, long[] value) {
     if (writeAllowed(key, LoggableType.IntegerArray)) {
+      long[] valueClone = new long[value.length];
+      System.arraycopy(value, 0, valueClone, 0, value.length);
       data.put(prefix + key, new LogValue(value));
     }
   }
@@ -203,6 +209,8 @@ public class LogTable {
    */
   public void put(String key, float[] value) {
     if (writeAllowed(key, LoggableType.FloatArray)) {
+      float[] valueClone = new float[value.length];
+      System.arraycopy(value, 0, valueClone, 0, value.length);
       data.put(prefix + key, new LogValue(value));
     }
   }
@@ -213,6 +221,8 @@ public class LogTable {
    */
   public void put(String key, double[] value) {
     if (writeAllowed(key, LoggableType.DoubleArray)) {
+      double[] valueClone = new double[value.length];
+      System.arraycopy(value, 0, valueClone, 0, value.length);
       data.put(prefix + key, new LogValue(value));
     }
   }
@@ -223,6 +233,8 @@ public class LogTable {
    */
   public void put(String key, String[] value) {
     if (writeAllowed(key, LoggableType.StringArray)) {
+      String[] valueClone = new String[value.length];
+      System.arraycopy(value, 0, valueClone, 0, value.length);
       data.put(prefix + key, new LogValue(value));
     }
   }

@@ -80,7 +80,7 @@ public class Tracer {
    * @param output the stream that the output is sent to
    */
   public void printEpochs(Consumer<String> output) {
-    long now = (long) (Logger.getInstance().getRealTimestamp() * 1000000.0);
+    long now = Logger.getInstance().getRealTimestamp();
     if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
       StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;
