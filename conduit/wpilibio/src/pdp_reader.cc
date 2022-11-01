@@ -42,14 +42,20 @@ void PDPReader::configure(JNIEnv* env, jint module, jint type,
   pd_handle = HAL_InitializePowerDistribution(
       module, static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
       &status);
+#ifdef AKIT_ATHENA
   hal::CheckStatus(env, status, false);
+#endif
 
   int32_t pd_module_id =
       HAL_GetPowerDistributionModuleNumber(pd_handle, &status);
+#ifdef AKIT_ATHENA
   hal::CheckStatus(env, status, false);
+#endif
 
   pd_type = HAL_GetPowerDistributionType(pd_handle, &status);
+#ifdef AKIT_ATHENA
   hal::CheckStatus(env, status, false);
+#endif
 
   runtime = HAL_GetRuntimeType();
   if (runtime != HAL_Runtime_Simulation) {
