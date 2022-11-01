@@ -7,7 +7,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.hal.can.CANStatus;
 
 /**
- * Manages logging general system data. This is NOT replayed to the simulator.
+ * Manages logging general system data.
  */
 public class LoggedSystemStats {
 

@@ -9,7 +9,7 @@ import edu.wpi.first.hal.PowerDistributionJNI;
 
 
 /**
- * Manages logging power distribution data. This is NOT replayed to the simulator.
+ * Manages logging power distribution data.
  */
 public class LoggedPowerDistribution {
 
