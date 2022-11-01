@@ -14,21 +14,25 @@
 #include <mutex>
 
 #include "conduit/wpilibio/include/HALUtil.h"
+#ifdef AKIT_ATHENA
 #include "conduit/wpilibio/include/pdh_util.h"
 #include "conduit/wpilibio/include/pdp_util.h"
+#endif
 
 using namespace std::chrono_literals;
 
 #define MAX_CHANNEL_COUNT 24
 
 void PDPReader::read(schema::PDPData* pdp_buf) {
-  if (runtime == HAL_Runtime_Simulation) {
-    update_sim_data(pdp_buf);
-  } else if (pd_type == HAL_PowerDistributionType_kCTRE) {
+#ifdef AKIT_ATHENA
+  if (pd_type == HAL_PowerDistributionType_kCTRE) {
     update_ctre_pdp_data(pdp_buf);
   } else if (pd_type == HAL_PowerDistributionType_kRev) {
     update_rev_pdh_data(pdp_buf);
   }
+#else
+  update_sim_data(pdp_buf);
+#endif
 }
 
 void PDPReader::configure(JNIEnv* env, jint module, jint type,
@@ -38,14 +42,20 @@ void PDPReader::configure(JNIEnv* env, jint module, jint type,
   pd_handle = HAL_InitializePowerDistribution(
       module, static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
       &status);
+#ifdef AKIT_ATHENA
   hal::CheckStatus(env, status, false);
+#endif
 
   int32_t pd_module_id =
       HAL_GetPowerDistributionModuleNumber(pd_handle, &status);
+#ifdef AKIT_ATHENA
   hal::CheckStatus(env, status, false);
+#endif
 
   pd_type = HAL_GetPowerDistributionType(pd_handle, &status);
+#ifdef AKIT_ATHENA
   hal::CheckStatus(env, status, false);
+#endif
 
   runtime = HAL_GetRuntimeType();
   if (runtime != HAL_Runtime_Simulation) {
@@ -72,6 +82,8 @@ void PDPReader::configure(JNIEnv* env, jint module, jint type,
     pdp_buf->mutate_channel_count(24);
   }
 }
+
+#ifdef AKIT_ATHENA
 
 void PDPReader::update_ctre_pdp_data(schema::PDPData* pdp_buf) {
   int32_t status;
@@ -326,6 +338,8 @@ void PDPReader::update_rev_pdh_data(schema::PDPData* pdp_buf) {
     pdp_buf->mutate_faults(mut_faults);
   }
 }
+
+#endif
 
 void PDPReader::update_sim_data(schema::PDPData* pdp_buf) {
   int32_t status;

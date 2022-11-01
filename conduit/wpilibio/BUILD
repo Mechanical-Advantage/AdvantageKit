@@ -13,6 +13,10 @@ cc_library(
         "//conditions:default": [],
     }),
     linkstatic = True,  # Only statically link this library since we want it to statically link into the dynamic lib below
+    local_defines = select({
+        "//build_tools/platforms:is_athena": ["AKIT_ATHENA"],
+        "//conditions:default": [],
+    }),
     tags = ["ci_build"],
     visibility = ["//visibility:public"],
     deps = [
