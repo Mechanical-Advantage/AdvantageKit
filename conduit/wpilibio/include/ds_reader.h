@@ -15,21 +15,5 @@ using namespace org::littletonrobotics::conduit;
 // operation since the two buffers are the same structure
 class DsReader {
  public:
-  DsReader();
-  ~DsReader();
-  void start();
   void read(schema::DSData* ds_buf);
-
- private:
-  // Thread to read data from the driver station
-  std::thread ds_thread;
-  std::atomic<bool> is_running;
-
-  std::timed_mutex copy_mutex;
-
-  // Function called by the thread
-  void update_ds_data();
-
-  // Internal buffer used to store the read data
-  schema::DSData internal_buf;
 };

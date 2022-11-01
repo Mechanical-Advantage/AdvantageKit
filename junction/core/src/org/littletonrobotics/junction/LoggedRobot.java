@@ -1,5 +1,6 @@
 package org.littletonrobotics.junction;
 
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
@@ -67,7 +68,8 @@ public class LoggedRobot extends IterativeRobotBase {
     Logger.getInstance().periodicAfterUser();
 
     // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
+    System.out.println("********** Robot program startup complete **********");
+    DriverStationJNI.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
     nextCycle = Logger.getInstance().getRealTimestamp();

@@ -186,7 +186,7 @@ public class Logger {
       // Log output data
       recordOutput("Logger/ConduitPeriodMS", (prepareTablesStart - conduitCaptureStart) / 1000.0);
       recordOutput("Logger/TablesPeriodicMS", (consoleCaptureStart - prepareTablesStart) / 1000.0);
-      recordOutput("Logger/ConsolePeriodicMs", (driverStationStart - consoleCaptureStart) / 1000.0);
+      recordOutput("Logger/ConsolePeriodicMS", (driverStationStart - consoleCaptureStart) / 1000.0);
       recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) / 1000.0);
       recordOutput("Logger/SSPeriodicMS", (powerDistributionStart - systemStatsStart) / 1000.0);
       recordOutput("Logger/PDPeriodicMS", (periodicEnd - powerDistributionStart) / 1000.0);

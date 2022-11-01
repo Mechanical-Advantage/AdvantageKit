@@ -37,7 +37,6 @@ public class ConduitApi {
   private final Joystick[] joysticks = new Joystick[NUM_JOYSTICKS];
 
   private ConduitApi() {
-    ConduitJni.start();
     ByteBuffer buffer = ConduitJni.getBuffer();
     buffer.order(ByteOrder.LITTLE_ENDIAN);
 

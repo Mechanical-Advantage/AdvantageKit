@@ -13,6 +13,5 @@ class ConduitJni {
 
   public static native ByteBuffer getBuffer();
   public static native void capture();
-  public static native void start();
   public static native void configurePowerDistribution(int moduleID, int moduleType);
 }
