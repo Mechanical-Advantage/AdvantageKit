@@ -594,24 +594,45 @@ public class LogTable {
   public enum LoggableType {
     Raw, Boolean, Integer, Float, Double, String, BooleanArray, IntegerArray, FloatArray, DoubleArray, StringArray;
 
+    // https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc#data-types
     private static final List<String> wpilogTypes = List.of("raw", "boolean", "int64", "float", "double", "string",
         "boolean[]", "int64[]", "float[]", "double[]", "string[]");
 
+    // https://github.com/wpilibsuite/allwpilib/blob/main/ntcore/doc/networktables4.adoc#supported-data-types
+    private static final List<String> nt4Types = List.of("raw", "boolean", "int", "float", "double", "string",
+        "boolean[]", "int[]", "float[]", "double[]", "string[]");
+
     /**
      * Returns the standard string type for WPILOGs.
-     * https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc#data-types
      */
     public String getWPILOGType() {
       return wpilogTypes.get(this.ordinal());
     }
 
     /**
+     * Returns the standard string type for NT4.
+     */
+    public String getNT4Type() {
+      return nt4Types.get(this.ordinal());
+    }
+
+    /**
      * Returns the type based on a standard string type for WPILOGs.
-     * https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc#data-types
      */
     public static LoggableType fromWPILOGType(String type) {
       if (wpilogTypes.contains(type)) {
         return LoggableType.values()[wpilogTypes.indexOf(type)];
+      } else {
+        return null;
+      }
+    }
+
+    /**
+     * Returns the type based on a standard string type for NT4.
+     */
+    public static LoggableType fromNT4Type(String type) {
+      if (nt4Types.contains(type)) {
+        return LoggableType.values()[nt4Types.indexOf(type)];
       } else {
         return null;
       }
