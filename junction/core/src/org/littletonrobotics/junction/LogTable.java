@@ -108,10 +108,11 @@ public class LogTable {
    * exist or is already the correct type).
    */
   private boolean writeAllowed(String key, LoggableType type) {
-    if (!data.containsKey(key)) {
+    LogValue currentValue = data.get(key);
+    if (currentValue == null) {
       return true;
     }
-    if (data.get(key).type.equals(type)) {
+    if (currentValue.type.equals(type)) {
       return true;
     }
     return false;
