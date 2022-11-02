@@ -17,7 +17,6 @@ DsReader::DsReader() : is_running(false) {}
 DsReader::~DsReader() {
   if (is_running) {
     is_running = false;    // Stop the thread when we destruct this object
-    HAL_ReleaseDSMutex();  // This releases WaitForDSData if it's waiting
     ds_thread.join();
   }
 }
@@ -29,7 +28,7 @@ void DsReader::start() {
 void DsReader::update_ds_data() {
   is_running = true;
   while (is_running) {
-    HAL_WaitForDSData();
+    HAL_RefreshDSData();
 
     std::int32_t status;
 
