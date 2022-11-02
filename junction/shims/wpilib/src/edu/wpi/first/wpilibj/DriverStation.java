@@ -6,9 +6,25 @@ package edu.wpi.first.wpilibj;
 
 import org.littletonrobotics.junction.inputs.LoggedDriverStation;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.ControlWord;
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.MatchInfoData;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.FloatArrayLogEntry;
+import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
+import edu.wpi.first.util.EventVector;
+import edu.wpi.first.util.WPIUtilJNI;
+import java.nio.ByteBuffer;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -16,10 +32,9 @@ import edu.wpi.first.util.datalog.DataLog;
  */
 @SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.ExcessiveClassLength", "PMD.ExcessivePublicCount", "PMD.GodClass",
     "PMD.TooManyFields" })
-public class DriverStation {
+public final class DriverStation {
   /** Number of Joystick Ports. */
   public static final int kJoystickPorts = 6;
-
   /** The robot alliance that the robot is a part of. */
   public enum Alliance {
     Red, Blue, Invalid
@@ -28,49 +43,17 @@ public class DriverStation {
   public enum MatchType {
     None, Practice, Qualification, Elimination
   }
-
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
   private static double m_nextMessageTime;
 
-  private static class DriverStationTask implements Runnable {
-    DriverStationTask() {
-    }
-
-    @Override
-    public void run() {
-      DriverStation.run();
-    }
-  } /* DriverStationTask */
-
-  private static DriverStation instance = new DriverStation();
   private static LoggedDriverStation logDS = LoggedDriverStation.getInstance();
 
   // Joystick button rising/falling edge flags
   private static int[] m_lastJoystickButtonsPressDetect = new int[kJoystickPorts];
   private static int[] m_lastJoystickButtonsReleaseDetect = new int[kJoystickPorts];
 
-  // Internal Driver Station thread
-  @SuppressWarnings("PMD.SingularField")
-  private static Thread m_thread;
-
-  private static volatile boolean m_threadKeepAlive = true;
 
   private static boolean m_silenceJoystickWarning;
-
-  // Robot state status variables
-  private static boolean m_userInDisabled;
-  private static boolean m_userInAutonomous;
-  private static boolean m_userInTeleop;
-  private static boolean m_userInTest;
-
-  /**
-   * Gets an instance of the DriverStation.
-   *
-   * @return The DriverStation.
-   */
-  public static DriverStation getInstance() {
-    return DriverStation.instance;
-  }
 
   /**
    * DriverStation constructor.
@@ -84,24 +67,6 @@ public class DriverStation {
 
   static {
     HAL.initialize(500, 0);
-
-    m_thread = new Thread(new DriverStationTask(), "FRCDriverStation");
-    m_thread.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY) / 2);
-
-    m_thread.start();
-  }
-
-  /** Kill the thread. */
-  public static synchronized void release() {
-    m_threadKeepAlive = false;
-    if (m_thread != null) {
-      try {
-        m_thread.join();
-      } catch (InterruptedException ex) {
-        Thread.currentThread().interrupt();
-      }
-      m_thread = null;
-    }
   }
 
   /**
@@ -173,7 +138,8 @@ public class DriverStation {
         }
       }
     }
-    HAL.sendError(isError, code, false, error, locString, traceString.toString(), true);
+    DriverStationJNI.sendError(
+        isError, code, false, error, locString, traceString.toString(), true);
   }
 
   /**
@@ -285,7 +251,7 @@ public class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (axis < 0 || axis >= HAL.kMaxJoystickAxes) {
+    if (axis < 0 || axis >= DriverStationJNI.kMaxJoystickAxes) {
       throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
@@ -307,7 +273,7 @@ public class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (pov < 0 || pov >= HAL.kMaxJoystickPOVs) {
+    if (pov < 0 || pov >= DriverStationJNI.kMaxJoystickPOVs) {
       throw new IllegalArgumentException("Joystick POV is out of range");
     }
 
@@ -498,18 +464,6 @@ public class DriverStation {
 
   /**
    * Gets a value indicating whether the Driver Station requires the robot to be
-   * running in operator-controlled mode.
-   *
-   * @return True if operator-controlled mode should be enabled, false otherwise.
-   * @deprecated Use isTeleop() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static boolean isOperatorControl() {
-    return isTeleop();
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be
    * running in
    * operator-controlled mode.
    *
@@ -517,20 +471,6 @@ public class DriverStation {
    */
   public static boolean isTeleop() {
     return !(isAutonomous() || isTest());
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be
-   * running in
-   * operator-controller mode and enabled.
-   *
-   * @return True if operator-controlled mode should be set and the robot should
-   *         be enabled.
-   * @deprecated Use isTeleopEnabled() instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static boolean isOperatorControlEnabled() {
-    return isTeleopEnabled();
   }
 
   /**
@@ -561,16 +501,6 @@ public class DriverStation {
    */
   public static boolean isDSAttached() {
     return logDS.getDSData().dsAttached;
-  }
-
-  /**
-   * Gets if a new control packet from the driver station arrived since the last
-   * time this function was called.
-   *
-   * @return True if the control data has been updated since the last call.
-   */
-  public static boolean isNewControlData() {
-    return true;
   }
 
   /**
@@ -685,32 +615,6 @@ public class DriverStation {
   }
 
   /**
-   * Wait for new data from the driver station.
-   *
-   * <p>
-   * Checks if new control data has arrived since the last waitForData call on the
-   * current thread. If new data has not arrived, returns immediately.
-   */
-  public static void waitForData() {
-    waitForData(0);
-  }
-
-  /**
-   * Wait for new data or for timeout, which ever comes first. If timeout is 0,
-   * wait for new data only.
-   *
-   * <p>
-   * Checks if new control data has arrived since the last waitForData call on the
-   * current thread. If new data has not arrived, returns immediately.
-   *
-   * @param timeout The maximum time in seconds to wait.
-   * @return true if there is new data, otherwise false
-   */
-  public static boolean waitForData(double timeout) {
-    return true;
-  }
-
-  /**
    * Return the approximate match time. The FMS does not send an official match
    * time to the robots, but does send an approximate match time. The value will
    * count down the time remaining in the current period (auto or teleop).
@@ -723,66 +627,6 @@ public class DriverStation {
    */
   public static double getMatchTime() {
     return logDS.getDSData().matchTime;
-  }
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting disabled code; if false, leaving disabled
-   *                 code
-   */
-  public static void inDisabled(boolean entering) {
-    m_userInDisabled = entering;
-  }
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting autonomous code; if false, leaving
-   *                 autonomous code
-   */
-  public static void inAutonomous(boolean entering) {
-    m_userInAutonomous = entering;
-  }
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop code
-   * @deprecated Use {@link #inTeleop(boolean)} instead.
-   */
-  @Deprecated(since = "2022", forRemoval = true)
-  public static void inOperatorControl(boolean entering) {
-    m_userInTeleop = entering;
-  }
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic
-   * purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop code
-   */
-  public static void inTeleop(boolean entering) {
-    m_userInTeleop = entering;
-  }
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting test code; if false, leaving test code
-   */
-  public static void inTest(boolean entering) {
-    m_userInTest = entering;
-  }
-
-  /** Forces waitForData() to return immediately. */
-  public static void wakeupWaitForData() {
-    return;
   }
 
   /**
@@ -805,6 +649,25 @@ public class DriverStation {
   public static boolean isJoystickConnectionWarningSilenced() {
     return !isFMSAttached() && m_silenceJoystickWarning;
   }
+
+  /**
+   * Refresh the passed in control word to contain the current control word cache.
+   * This method has been patched by AdvantageKit and is nonfunctional.
+   *
+   * @param word Word to refresh.
+   */
+  public static void refreshControlWordFromCache(ControlWord word) {}
+
+    /**
+   * Copy data from the DS task for the user. If no new data exists, it will just be returned,
+   * otherwise the data will be copied from the DS polling loop.  This method has been patched
+   * by AdvantageKit and is nonfunctional.
+   */
+  public static void refreshData() {}
+
+  public static void provideRefreshedDataEventHandle(int handle) {}
+
+  public static void removeRefreshedDataEventHandle(int handle) {}
 
   /**
    * Reports errors related to unplugged joysticks Throttles the errors so that
@@ -830,49 +693,6 @@ public class DriverStation {
         m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
       }
     }
-  }
-
-  /** Provides the service routine for the DS polling m_thread. */
-  private static void run() {
-    int safetyCounter = 0;
-    while (m_threadKeepAlive) {
-      try {
-        Thread.sleep(20);
-      } catch (InterruptedException e) {
-        return;
-      }
-
-      if (isDisabled()) {
-        safetyCounter = 0;
-      }
-
-      safetyCounter++;
-      if (safetyCounter >= 4) {
-        MotorSafety.checkMotors();
-        safetyCounter = 0;
-      }
-      if (m_userInDisabled) {
-        HAL.observeUserProgramDisabled();
-      }
-      if (m_userInAutonomous) {
-        HAL.observeUserProgramAutonomous();
-      }
-      if (m_userInTeleop) {
-        HAL.observeUserProgramTeleop();
-      }
-      if (m_userInTest) {
-        HAL.observeUserProgramTest();
-      }
-    }
-  }
-
-  /**
-   * Forces a control word cache update, and update the passed in control word.
-   * This method has been patched by AdvantageKit and is nonfunctional.
-   *
-   * @param word Word to update.
-   */
-  public static void updateControlWordFromCache(ControlWord word) {
   }
 
   /**

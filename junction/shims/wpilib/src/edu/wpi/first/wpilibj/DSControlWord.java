@@ -28,11 +28,11 @@ public class DSControlWord {
    * internally.
    */
   public DSControlWord() {
-    update();
+    refresh();
   }
 
   /** Update internal Driver Station control word. */
-  public void update() {
+  public void refresh() {
     enabled = logDS.getDSData().enabled;
     autonomous = logDS.getDSData().autonomous;
     test = logDS.getDSData().test;

@@ -4,6 +4,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.NotifierJNI;
 
 /**
@@ -67,7 +68,7 @@ public class LoggedRobot extends IterativeRobotBase {
     Logger.getInstance().periodicAfterUser();
 
     // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
+    DriverStationJNI.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
     nextCycle = Logger.getInstance().getRealTimestamp();
