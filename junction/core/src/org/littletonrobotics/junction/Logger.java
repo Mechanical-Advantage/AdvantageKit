@@ -172,11 +172,9 @@ public class Logger {
       }
 
       // Update default inputs
-      long driverStationStart = getRealTimestamp();
+      long saveDataStart = getRealTimestamp();
       LoggedDriverStation.getInstance().periodic();
-      long systemStatsStart = getRealTimestamp();
       LoggedSystemStats.getInstance().periodic();
-      long powerDistributionStart = getRealTimestamp();
       LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
       if (loggedPowerDistribution != null) {
         loggedPowerDistribution.periodic();
@@ -184,12 +182,9 @@ public class Logger {
       long periodicEnd = getRealTimestamp();
 
       // Log output data
-      recordOutput("Logger/ConduitPeriodMS", (prepareTablesStart - conduitCaptureStart) / 1000.0);
-      recordOutput("Logger/TablesPeriodicMS", (consoleCaptureStart - prepareTablesStart) / 1000.0);
-      recordOutput("Logger/ConsolePeriodicMS", (driverStationStart - consoleCaptureStart) / 1000.0);
-      recordOutput("Logger/DSPeriodicMS", (systemStatsStart - driverStationStart) / 1000.0);
-      recordOutput("Logger/SSPeriodicMS", (powerDistributionStart - systemStatsStart) / 1000.0);
-      recordOutput("Logger/PDPeriodicMS", (periodicEnd - powerDistributionStart) / 1000.0);
+      recordOutput("Logger/ConduitPeriodicMS", (prepareTablesStart - conduitCaptureStart) / 1000.0);
+      recordOutput("Logger/ConsolePeriodicMS", (saveDataStart - consoleCaptureStart) / 1000.0);
+      recordOutput("Logger/SavePeriodicMS", (periodicEnd - saveDataStart) / 1000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
     } else {
       // Retrieve new data even if logger is disabled
