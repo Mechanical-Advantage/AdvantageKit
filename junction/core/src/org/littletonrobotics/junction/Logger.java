@@ -6,6 +6,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -118,6 +119,10 @@ public class Logger {
       // Start receiver thread
       receiverThread.start();
 
+      // Enable mock time for WPIUtil
+      WPIUtilJNI.setMockTime(getRealTimestamp());
+      WPIUtilJNI.enableMockTime();
+
       // Start first periodic cycle
       periodicBeforeUser();
     }
@@ -138,6 +143,7 @@ public class Logger {
         replaySource.end();
       }
       receiverThread.interrupt();
+      WPIUtilJNI.disableMockTime();
     }
   }
 
@@ -152,9 +158,9 @@ public class Logger {
       ConduitApi conduit = ConduitApi.getInstance();
       long conduitCaptureStart = getRealTimestamp();
       conduit.captureData();
+      long conduitCaptureEnd = getRealTimestamp();
 
       // Get next entry
-      long prepareTablesStart = getRealTimestamp();
       if (replaySource == null) {
         entry.setTimestamp(conduit.getTimestamp());
       } else {
@@ -163,6 +169,9 @@ public class Logger {
           System.exit(0);
         }
       }
+
+      // Set mock time for WPIUtil
+      WPIUtilJNI.setMockTime(entry.getTimestamp());
 
       // Update console output
       long consoleCaptureStart = getRealTimestamp();
@@ -182,7 +191,7 @@ public class Logger {
       long periodicEnd = getRealTimestamp();
 
       // Log output data
-      recordOutput("Logger/ConduitPeriodicMS", (prepareTablesStart - conduitCaptureStart) / 1000.0);
+      recordOutput("Logger/ConduitPeriodicMS", (conduitCaptureEnd - conduitCaptureStart) / 1000.0);
       recordOutput("Logger/ConsolePeriodicMS", (saveDataStart - consoleCaptureStart) / 1000.0);
       recordOutput("Logger/SavePeriodicMS", (periodicEnd - saveDataStart) / 1000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
