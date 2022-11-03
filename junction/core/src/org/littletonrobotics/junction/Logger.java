@@ -5,16 +5,24 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.console.ConsoleSource;
 import org.littletonrobotics.junction.console.RIOConsoleSource;
 import org.littletonrobotics.junction.console.SimConsoleSource;
-import org.littletonrobotics.junction.inputs.*;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+import org.littletonrobotics.junction.inputs.LoggedDriverStation;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.inputs.LoggedSystemStats;
+
+import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
@@ -425,5 +433,166 @@ public class Logger {
     if (running) {
       outputTable.put(key, value);
     }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The translations are logged as a double array (x_1, y_1, ...)
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, Translation2d[] value) {
+    double[] data = new double[value.length * 2];
+    for (int i = 0; i < value.length; i++) {
+      data[i * 2] = value[i].getX();
+      data[i * 2 + 1] = value[i].getY();
+    }
+    recordOutput(key, data);
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The translation is logged as a double array (x, y)
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, Translation2d value) {
+    recordOutput(key, new Translation2d[] { value });
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The translations are logged as a double array (x_1, y_1, z_1, ...)
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, Translation3d[] value) {
+    double[] data = new double[value.length * 3];
+    for (int i = 0; i < value.length; i++) {
+      data[i * 3] = value[i].getX();
+      data[i * 3 + 1] = value[i].getY();
+      data[i * 3 + 2] = value[i].getZ();
+    }
+    recordOutput(key, data);
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The translation is logged as a double array (x, y, z)
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, Translation3d value) {
+    recordOutput(key, new Translation3d[] { value });
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The poses are logged as a double array (x_1, y_1, rot, ...)
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, Pose2d[] value) {
+    double[] data = new double[value.length * 3];
+    for (int i = 0; i < value.length; i++) {
+      data[i * 3] = value[i].getX();
+      data[i * 3 + 1] = value[i].getY();
+      data[i * 3 + 2] = value[i].getRotation().getRadians();
+    }
+    recordOutput(key, data);
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The pose is logged as a double array (x, y, rot)
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, Pose2d value) {
+    recordOutput(key, new Pose2d[] { value });
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The poses are logged as a double array (x, y, z, w_rot, x_rot, y_rot,
+   * z_rot, ...)
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, Pose3d[] value) {
+    double[] data = new double[value.length * 7];
+    for (int i = 0; i < value.length; i++) {
+      data[i * 7] = value[i].getX();
+      data[i * 7 + 1] = value[i].getY();
+      data[i * 7 + 2] = value[i].getZ();
+      data[i * 7 + 3] = value[i].getRotation().getQuaternion().getW();
+      data[i * 7 + 4] = value[i].getRotation().getQuaternion().getX();
+      data[i * 7 + 5] = value[i].getRotation().getQuaternion().getY();
+      data[i * 7 + 6] = value[i].getRotation().getQuaternion().getZ();
+    }
+    recordOutput(key, data);
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The pose is logged as a double array (x, y, z, w_rot, x_rot, y_rot,
+   * z_rot)
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, Pose3d value) {
+    recordOutput(key, new Pose3d[] { value });
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The modules are logged as a double array (angle_1, speed_1, angle_2, speed_2,
+   * ...)
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, SwerveModuleState[] value) {
+    double[] data = new double[value.length * 2];
+    for (int i = 0; i < value.length; i++) {
+      data[i * 2] = value[i].angle.getRadians();
+      data[i * 2 + 1] = value[i].speedMetersPerSecond;
+    }
+    recordOutput(key, data);
   }
 }
