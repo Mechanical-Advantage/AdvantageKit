@@ -219,7 +219,7 @@ http_archive(
 http_archive(
     name = "athena_toolchain_linux_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_linux_x64_files.BUILD",
-#    sha256 = "b27cde302e46d11524aedf664129bc3ac7df02a78d0f9e4ab3f1feb40d667ab4",
+    sha256 = "56bd5b53a4149b06fd4cf675dc0596668af47ca8da72c461b7d772ada35cbdc5",
     urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2023-5/cortexa9_vfpv3-roborio-academic-2023-x86_64-linux-gnu-Toolchain-12.1.0.tgz"],
 )
 
@@ -227,7 +227,7 @@ http_archive(
 http_archive(
     name = "athena_toolchain_windows_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_windows_x64_files.BUILD",
-#    sha256 = "3a8815d9c715e7f0f5d2106e4f16282863a3ff63121d259703b281881daea683",
+    sha256 = "04049728801e97fa41a8aa0837e40103c89391d0479f106aad6f959bbccd9da5",
     urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2023-5/cortexa9_vfpv3-roborio-academic-2023-x86_64-w64-mingw32-Toolchain-12.1.0.zip"],
 )
 
@@ -235,7 +235,7 @@ http_archive(
 http_archive(
     name = "athena_toolchain_macos_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_macos_x64_files.BUILD",
-#    sha256 = "47d29989d2618c0fc439b72e8d3d734b93952da4136dd05a7648af19662700b7",
+    sha256 = "511a64461bfdec00bacb9abe1470f1c112fc9773b29dbb275b1dc9560b973146",
     urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2023-5/cortexa9_vfpv3-roborio-academic-2023-x86_64-apple-darwin-Toolchain-12.1.0.tgz"],
 )
 
