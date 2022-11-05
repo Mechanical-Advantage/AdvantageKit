@@ -8,7 +8,7 @@ on:
 jobs:
   athena:
     name: Build for Athena
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: 'Checkout repository'
         uses: actions/checkout@v2
@@ -72,7 +72,7 @@ jobs:
       matrix:
         host:
           - {os: macos-latest, displayName: "macOS"}
-          - {os: ubuntu-latest, displayName: "Linux"}
+          - {os: ubuntu-22.04, displayName: "Linux"}
           - {os: windows-latest, displayName: "Windows"}
 
     name: Build for ${{ matrix.host.displayName }}
