@@ -219,24 +219,24 @@ http_archive(
 http_archive(
     name = "athena_toolchain_linux_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_linux_x64_files.BUILD",
-    sha256 = "b27cde302e46d11524aedf664129bc3ac7df02a78d0f9e4ab3f1feb40d667ab4",
-    urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2022-1/FRC-2022-Linux-Toolchain-7.3.0.tar.gz"],
+#    sha256 = "b27cde302e46d11524aedf664129bc3ac7df02a78d0f9e4ab3f1feb40d667ab4",
+    urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2023-5/cortexa9_vfpv3-roborio-academic-2023-x86_64-linux-gnu-Toolchain-12.1.0.tgz"],
 )
 
 # Same as above for win32 (also supports 64 bit)
 http_archive(
     name = "athena_toolchain_windows_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_windows_x64_files.BUILD",
-    sha256 = "3a8815d9c715e7f0f5d2106e4f16282863a3ff63121d259703b281881daea683",
-    urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2022-1/FRC-2022-Windows64-Toolchain-7.3.0.zip"],
+#    sha256 = "3a8815d9c715e7f0f5d2106e4f16282863a3ff63121d259703b281881daea683",
+    urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2023-5/cortexa9_vfpv3-roborio-academic-2023-x86_64-w64-mingw32-Toolchain-12.1.0.zip"],
 )
 
 # Same as above for macOS (currently only supports x86_64, native support for arm64 (M1) coming soon? for now use Rosetta 2)
 http_archive(
     name = "athena_toolchain_macos_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_macos_x64_files.BUILD",
-    sha256 = "47d29989d2618c0fc439b72e8d3d734b93952da4136dd05a7648af19662700b7",
-    urls = ["https://github.com/wpilibsuite/roborio-toolchain/releases/download/v2022-1/FRC-2022-Mac-Toolchain-7.3.0.tar.gz"],
+#    sha256 = "47d29989d2618c0fc439b72e8d3d734b93952da4136dd05a7648af19662700b7",
+    urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2023-5/cortexa9_vfpv3-roborio-academic-2023-x86_64-apple-darwin-Toolchain-12.1.0.tgz"],
 )
 
 # Toolchains for compiling flatbuffers (.fbs) to generated source files
