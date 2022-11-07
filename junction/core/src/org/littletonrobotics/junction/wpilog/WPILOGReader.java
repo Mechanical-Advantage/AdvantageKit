@@ -90,6 +90,7 @@ public class WPILOGReader implements LogReplaySource {
             }
 
           } else if (timestamp != null && record.getTimestamp() == timestamp) {
+            entry = entry.substring(1); // Remove leading slash
             switch (entryTypes.get(record.getEntry())) {
               case Raw:
                 table.put(entry, record.getRaw());
