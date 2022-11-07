@@ -8,11 +8,11 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 
 /**
- * TimedRobot implements the IterativeRobotBase robot program framework.
+ * LoggedRobot implements the IterativeRobotBase robot program framework.
  *
  * <p>
- * The TimedRobot class is intended to be subclassed by a user creating a robot
- * program.
+ * The LoggedRobot class is intended to be subclassed by a user creating a robot
+ * program, and will call all required AdvantageKit periodic methods.
  *
  * <p>
  * periodic() functions from the base class are called on an interval by a
@@ -20,28 +20,26 @@ import edu.wpi.first.hal.NotifierJNI;
  */
 public class LoggedRobot extends IterativeRobotBase {
 
-  public static final double defaultPeriod = 0.02;
-
+  public static final double defaultPeriodSecs = 0.02;
   private final int notifier = NotifierJNI.initializeNotifier();
+  private final long periodUs;
+  private final long nextCycleUs = 0;
 
-  private final double period;
-
-  private long nextCycle;
   private boolean useTiming = true;
 
   /** Constructor for LoggedRobot. */
   protected LoggedRobot() {
-    this(defaultPeriod);
+    this(defaultPeriodSecs);
   }
 
   /**
-   * Constructor for TimedRobot.
+   * Constructor for LoggedRobot.
    *
    * @param period Period in seconds.
    */
   protected LoggedRobot(double period) {
     super(period);
-    this.period = period;
+    this.periodUs = (long) (period * 1000000);
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
@@ -72,15 +70,18 @@ public class LoggedRobot extends IterativeRobotBase {
     DriverStationJNI.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
-    nextCycle = Logger.getInstance().getRealTimestamp();
     while (true) {
       if (useTiming) {
-        NotifierJNI.updateNotifierAlarm(notifier, nextCycle);
-        long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
-        if (curTime == 0) {
-          break;
+        long currentTimeUs = Logger.getInstance().getRealTimestamp();
+        if (nextCycleUs < currentTimeUs) {
+          // Loop overrun, start next cycle immediately
+          nextCycleUs = currentTimeUs;
+        } else {
+          // Wait before next cycle
+          NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
+          NotifierJNI.waitForNotifierAlarm(notifier);
         }
-        nextCycle += period * 1000000.0;
+        nextCycleUs += periodUs;
       }
 
       long loopCycleStart = Logger.getInstance().getRealTimestamp();
@@ -100,11 +101,6 @@ public class LoggedRobot extends IterativeRobotBase {
   @Override
   public void endCompetition() {
     NotifierJNI.stopNotifier(notifier);
-  }
-
-  /** Get time period between calls to Periodic() functions. */
-  public double getPeriod() {
-    return period;
   }
 
   /** Sets whether to use standard timing or run as fast as possible. */
