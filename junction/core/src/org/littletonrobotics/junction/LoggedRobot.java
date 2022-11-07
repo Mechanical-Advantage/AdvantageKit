@@ -23,7 +23,7 @@ public class LoggedRobot extends IterativeRobotBase {
   public static final double defaultPeriodSecs = 0.02;
   private final int notifier = NotifierJNI.initializeNotifier();
   private final long periodUs;
-  private final long nextCycleUs = 0;
+  private long nextCycleUs = 0;
 
   private boolean useTiming = true;
 
