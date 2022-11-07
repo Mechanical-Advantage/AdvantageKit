@@ -1,6 +1,8 @@
 package org.littletonrobotics.junction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -13,6 +15,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 import org.littletonrobotics.junction.inputs.LoggedDriverStation;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.inputs.LoggedSystemStats;
+import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
 
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -35,6 +38,7 @@ public class Logger {
   private LogTable outputTable;
   private Map<String, String> metadata = new HashMap<>();
   private ConsoleSource console;
+  private List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
 
   private LogReplaySource replaySource;
   private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
@@ -69,6 +73,14 @@ public class Logger {
     if (!running) {
       receiverThread.addDataReceiver(dataReceiver);
     }
+  }
+
+  /**
+   * Registers a new dashboard input to be included in the periodic loop. This
+   * function should not be called by the user.
+   */
+  public void registerDashboardInput(LoggedDashboardInput dashboardInput) {
+    dashboardInputs.add(dashboardInput);
   }
 
   /**
@@ -181,13 +193,6 @@ public class Logger {
       // Set mock time for WPIUtil
       WPIUtilJNI.setMockTime(entry.getTimestamp());
 
-      // Update console output
-      long consoleCaptureStart = getRealTimestamp();
-      String consoleData = console.getNewData();
-      if (!consoleData.isEmpty()) {
-        recordOutput("Console", consoleData.trim());
-      }
-
       // Update default inputs
       long saveDataStart = getRealTimestamp();
       LoggedDriverStation.getInstance().periodic();
@@ -196,12 +201,14 @@ public class Logger {
       if (loggedPowerDistribution != null) {
         loggedPowerDistribution.periodic();
       }
-      long periodicEnd = getRealTimestamp();
+      for (int i = 0; i < dashboardInputs.size(); i++) {
+        dashboardInputs.get(i).periodic();
+      }
+      long saveDataEnd = getRealTimestamp();
 
       // Log output data
       recordOutput("Logger/ConduitPeriodicMS", (conduitCaptureEnd - conduitCaptureStart) / 1000.0);
-      recordOutput("Logger/ConsolePeriodicMS", (saveDataStart - consoleCaptureStart) / 1000.0);
-      recordOutput("Logger/SavePeriodicMS", (periodicEnd - saveDataStart) / 1000.0);
+      recordOutput("Logger/SavePeriodicMS", (saveDataEnd - saveDataStart) / 1000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
     } else {
       // Retrieve new data even if logger is disabled
@@ -223,6 +230,15 @@ public class Logger {
   void periodicAfterUser() {
     if (running) {
       try {
+        // Update console output
+        long consoleCaptureStart = getRealTimestamp();
+        String consoleData = console.getNewData();
+        if (!consoleData.isEmpty()) {
+          recordOutput("Console", consoleData.trim());
+        }
+        long consoleCaptureEnd = getRealTimestamp();
+        recordOutput("Logger/ConsolePeriodicMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
+
         // Send a copy of the data to the receivers. The original object will be
         // kept and updated with the next timestamp (and new data if replaying).
         receiverQueue.add(LogTable.clone(entry));

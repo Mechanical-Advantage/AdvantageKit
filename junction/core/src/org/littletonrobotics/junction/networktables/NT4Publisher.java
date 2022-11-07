@@ -1,4 +1,4 @@
-package org.littletonrobotics.junction.nt4;
+package org.littletonrobotics.junction.networktables;
 
 import java.util.HashMap;
 import java.util.Map;
