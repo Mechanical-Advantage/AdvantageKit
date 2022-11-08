@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include <cstdint>
+#include <iostream>
 
 #include "conduit/conduit_schema_generated.h"
 #include "conduit/wpilibio/include/ds_reader.h"
@@ -28,6 +29,8 @@ schema::SystemData* sys_view;
 DsReader ds_reader;
 PDPReader pdp_reader;
 SystemReader sys_reader;
+
+void start() { ds_reader.start(); }
 
 void make_buffer() {
   // Allocate shared buffer
