@@ -272,8 +272,8 @@ public class LogTable {
     }
   }
 
-  /** Reads a Double value from the table. */
-  public float getDouble(String key, float defaultValue) {
+  /** Reads a Float value from the table. */
+  public float getFloat(String key, float defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getFloat(defaultValue);
     } else {
