@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LoggableType;
+import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogReplaySource;
 
 import edu.wpi.first.util.datalog.DataLogIterator;
@@ -80,7 +81,7 @@ public class WPILOGReader implements LogReplaySource {
       } else {
         String entry = entryIDs.get(record.getEntry());
         if (entry != null) {
-          if (entry.equals(WPILOGConstants.timestampKey)) {
+          if (entry.equals(LogDataReceiver.timestampKey)) {
             boolean firstTimestamp = timestamp == null;
             timestamp = record.getInteger();
             if (firstTimestamp) {

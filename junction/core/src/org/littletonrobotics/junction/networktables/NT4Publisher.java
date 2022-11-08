@@ -13,13 +13,19 @@ import edu.wpi.first.networktables.*;
 public class NT4Publisher implements LogDataReceiver {
   private final NetworkTable akitTable;
   private LogTable lastTable = new LogTable(0);
+  private final IntegerPublisher timestampPublisher;
   private final Map<String, GenericPublisher> publishers = new HashMap<>();
 
   public NT4Publisher() {
     akitTable = NetworkTableInstance.getDefault().getTable("/AdvantageKit");
+    timestampPublisher = akitTable.getIntegerTopic(timestampKey.substring(1)).publish(PubSubOption.sendAll(true));
   }
 
   public void putTable(LogTable table) {
+    // Send timestamp
+    timestampPublisher.set(table.getTimestamp(), table.getTimestamp());
+
+    // Get old and new data
     Map<String, LogValue> newMap = table.getAll(false);
     Map<String, LogValue> oldMap = lastTable.getAll(false);
 

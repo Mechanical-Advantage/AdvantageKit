@@ -64,7 +64,7 @@ public class WPILOGWriter implements LogDataReceiver {
 
     // Create new log
     log = new DataLog(folder, filename, writePeriodSecs, WPILOGConstants.extraHeader);
-    timestampID = log.start(WPILOGConstants.timestampKey, LoggableType.Integer.getWPILOGType(),
+    timestampID = log.start(timestampKey, LoggableType.Integer.getWPILOGType(),
         WPILOGConstants.entryMetadata, 0);
     lastTable = new LogTable(0);
 

@@ -4,6 +4,8 @@ package org.littletonrobotics.junction;
  * Receives entries from the logging system during real operation or simulation.
  */
 public interface LogDataReceiver {
+  /** Data receivers may optionally log the current timestamp using this key. */
+  public static final String timestampKey = "/Timestamp";
 
   /**
    * Called before the logging system begins reporting data. This should be used
