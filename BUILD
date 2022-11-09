@@ -55,4 +55,5 @@ vendordep_json(
         "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
     ],
     uuid = "d820cc26-74e3-11ec-90d6-0242ac120003",
+    visibility = ["//visibility:public"],
 )

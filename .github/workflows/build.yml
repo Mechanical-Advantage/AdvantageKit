@@ -3,36 +3,39 @@ name: Build
 on:
   push:
   release:
-    types: [released, prereleased]
+    types: [published]
 
 jobs:
   athena:
     name: Build for Athena
     runs-on: ubuntu-22.04
     steps:
-      - name: 'Checkout repository'
+      # Job setup & initial build
+      - name: "Checkout repository"
         uses: actions/checkout@v2
-      - name: 'Setup Java'
+      - name: "Setup Java"
         uses: actions/setup-java@v2
         with:
-          distribution: 'temurin'
-          java-version: '11'
-      - name: 'Build all'
+          distribution: "temurin"
+          java-version: "11"
+      - name: "Build all"
         run: bazelisk build --config=athena --verbose_failures ...
-      - name: 'Release: Get version number'
+      - name: "Release: Get version number"
         id: get_version
         if: github.event_name == 'release'
         uses: battila7/get-version-action@v2
-      - name: 'Release: Get release info'
+      - name: "Release: Get release info"
         id: get_release_info
         if: github.event_name == 'release'
         uses: bruceadams/get-release@v1.2.3
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - name: 'Release: Generate vendordep'
+
+      # Upload vendordep
+      - name: "Release: Generate vendordep"
         if: github.event_name == 'release'
         run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //:vendordep
-      - name: 'Release: Upload vendordep'
+      - name: "Release: Upload vendordep"
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
         env:
@@ -42,6 +45,33 @@ jobs:
           asset_path: bazel-bin/AdvantageKit.json
           asset_name: AdvantageKit.json
           asset_content_type: application/json
+
+      # Upload example projects
+      - name: "Release: Generate example projects"
+        if: github.event_name == 'release'
+        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //example_projects
+      - name: "Release: Upload example project (skeleton)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: bazel-bin/example_projects/skeleton.zip
+          asset_name: AdvantageKit_SkeletonProject.zip
+          asset_content_type: application/zip
+      - name: "Release: Upload example project (command)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: bazel-bin/example_projects/command.zip
+          asset_name: AdvantageKit_CommandBasedProject.zip
+          asset_content_type: application/zip
+
+      # Upload conduit build
       - name: 'Release: Upload "conduit/wpilibio:nativezip"'
         if: github.event_name == 'release'
         run: bazelisk run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
@@ -54,6 +84,8 @@ jobs:
         env:
           GITHUB_ACTOR: Mechanical-Advantage
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload Java packages
       - name: 'Release: Upload "conduit/api"'
         if: github.event_name == 'release'
         run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/api:api-export.publish
@@ -66,37 +98,40 @@ jobs:
       - name: 'Release: Upload "junction/shims/wpilib"'
         if: github.event_name == 'release'
         run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/shims/wpilib:wpilib-export.publish
-     
+
   desktop:
     strategy:
       matrix:
         host:
-          - {os: macos-latest, displayName: "macOS"}
-          - {os: ubuntu-22.04, displayName: "Linux"}
-          - {os: windows-latest, displayName: "Windows"}
+          - { os: macos-latest, displayName: "macOS" }
+          - { os: ubuntu-22.04, displayName: "Linux" }
+          - { os: windows-latest, displayName: "Windows" }
 
     name: Build for ${{ matrix.host.displayName }}
     runs-on: ${{ matrix.host.os }}
 
     steps:
-    - name: 'Checkout repository'
-      uses: actions/checkout@v2
-    - name: 'Setup Java'
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '11'
-    - name: 'Build all'
-      run: bazelisk build --verbose_failures ...
-    - name: 'Test all'
-      run: bazelisk test ...
-    - name: 'Release: Get version number'
-      id: get_version
-      if: github.event_name == 'release'
-      uses: battila7/get-version-action@v2
-    - name: 'Release: Upload "conduit/wpilibio:nativezip"'
-      if: github.event_name == 'release'
-      run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
-      env:
-        GITHUB_ACTOR: Mechanical-Advantage
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Job setup & initial build
+      - name: "Checkout repository"
+        uses: actions/checkout@v2
+      - name: "Setup Java"
+        uses: actions/setup-java@v2
+        with:
+          distribution: "temurin"
+          java-version: "11"
+      - name: "Build all"
+        run: bazelisk build --verbose_failures ...
+      - name: "Test all"
+        run: bazelisk test ...
+      - name: "Release: Get version number"
+        id: get_version
+        if: github.event_name == 'release'
+        uses: battila7/get-version-action@v2
+
+      # Upload conduit build
+      - name: 'Release: Upload "conduit/wpilibio:nativezip"'
+        if: github.event_name == 'release'
+        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
+        env:
+          GITHUB_ACTOR: Mechanical-Advantage
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
