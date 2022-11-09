@@ -35,7 +35,7 @@ Looking to get started quickly? Here are some example projects to check out:
 
     - [junction/shims/wpilib](/junction/shims/wpilib) - Replaces WPILib components to read data from `junction` instead of the HAL.
 
-  - [junction/autlog](/junction/autolog) - Annotation procesor for creating log input classes.
+  - [junction/autolog](/junction/autolog) - Annotation procesor for creating log input classes.
 
 - [conduit](/conduit) - Transfers data between `junction` and the WPILib HAL efficiently. _Written in C++ and Java._
 
