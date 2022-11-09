@@ -1,19 +1,21 @@
 # Byte Format for Robot Logs (.rlog)
 
+> Note: AdvantageKit v2 (2023) replaced RLOG with WPILOG as its preferred logging format. RLOG continues to be supported by AdvantageScope to interact with older code.
+
 ## Log Revisions
 
 The first byte represents the log format revision. The decoding device should always check whether it supports the specified revision before continuing. Below is a list of possible revisions:
 
-* 0x00 = Invalid file. This is the first byte of logs produced before a revision number was included.
-* 0x01 = Current revision. The log follows the specification described below.
+- 0x00 = Invalid file. This is the first byte of logs produced before a revision number was included.
+- 0x01 = Current revision. The log follows the specification described below.
 
 ## Message Types
 
 The next byte represents the which of 3 message types are being used:
 
-* 0x00 = Timestamp (start of a new cycle)
-* 0x01 = Key (defines string value for a key ID)
-* 0x02 = Field (value of a single field)
+- 0x00 = Timestamp (start of a new cycle)
+- 0x01 = Key (defines string value for a key ID)
+- 0x02 = Field (value of a single field)
 
 ## Timestamp
 
