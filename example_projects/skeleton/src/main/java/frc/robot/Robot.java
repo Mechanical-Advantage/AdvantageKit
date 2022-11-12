@@ -53,13 +53,13 @@ public class Robot extends LoggedRobot {
 
     // Set up data receivers & replay source
     if (isReal()) {
-      logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
-      logger.addDataReceiver(new NT4Publisher());
+      logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+      logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     } else {
       setUseTiming(false); // Run as fast as possible
-      String logPath = LogFileUtil.findReplayLog();
-      logger.setReplaySource(new WPILOGReader(logPath));
-      logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+      logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
     }
 
     // Start AdvantageKit logger

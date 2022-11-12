@@ -96,7 +96,7 @@ class MyInputsAutoLogged extends MyInputs implements LoggableInputs {
 }
 ```
 
-The `@AutoLog` annotation included in the AdvantageKit example projects. To add this feature to an existing project, see the AdvantageKit [installation guide](INSTALLATION.md).
+The `@AutoLog` annotation is included in the AdvantageKit example projects. To add this feature to an existing project, see the AdvantageKit [installation guide](INSTALLATION.md).
 
 ## Geometry Logging Methods
 
