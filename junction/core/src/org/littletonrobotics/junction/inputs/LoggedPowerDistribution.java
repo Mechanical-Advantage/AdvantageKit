@@ -33,6 +33,10 @@ public class LoggedPowerDistribution {
   }
 
   public static LoggedPowerDistribution getInstance() {
+    if (instance == null) {
+      instance = new LoggedPowerDistribution();
+    }
+
     return instance;
   }
 
