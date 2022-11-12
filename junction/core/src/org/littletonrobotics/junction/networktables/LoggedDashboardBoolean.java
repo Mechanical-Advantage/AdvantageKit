@@ -57,7 +57,7 @@ public class LoggedDashboardBoolean implements LoggedDashboardInput {
   }
 
   /**
-   * Publishes a new value. Note that the value will be returned by
+   * Publishes a new value. Note that the value will not be returned by
    * {@link #get()} until the next cycle.
    */
   public void set(boolean value) {
