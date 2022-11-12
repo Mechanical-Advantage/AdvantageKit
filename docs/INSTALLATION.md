@@ -41,7 +41,7 @@ https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest/download/Ad
 
 ### Robot Configuration
 
-The main `Robot` class must inherit from `LoggedRobot` (see below). `LoggedRobot` performs the same functions as `TimedRobot`, with some exceptions:
+The main `Robot` class **must inherit from `LoggedRobot`** (see below). `LoggedRobot` performs the same functions as `TimedRobot`, with some exceptions:
 
 - It does not support adding extra periodic functions.
 - The method `setUseTiming` allows the user code to disable periodic timing and run cycles as fast as possible during replay. The timestamp read by methods like `Timer.getFPGATimstamp()` will still match the timestamp from the real robot.
@@ -60,6 +60,7 @@ Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metada
 if (isReal()) {
     logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
     logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
 } else {
     setUseTiming(false); // Run as fast as possible
     String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
@@ -71,6 +72,26 @@ Logger.getInstance().start(); // Start logging! No more data receivers, replay s
 ```
 
 This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required.
+
+### `@AutoLog` Annotation
+
+The [`@AutoLog` annotation](CODE-STRUCTURE.md#autolog-annotation) automatically generates classes for input logging from subsystems. To install `@AutoLog`, modify your `build.gradle` to include:
+
+```groovy
+sourceSets {
+    main {
+        java {
+            srcDirs "src/main/java"
+            srcDirs "build/generated/sources/annotationProcessor/java/main"
+        }
+    }
+}
+
+dependencies {
+    // ...
+    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:<version>"
+}
+```
 
 ### Gversion Plugin (Git Metadata)
 
@@ -101,24 +122,4 @@ You should also add the `BuildConstants.java` file to the repository `.gitignore
 
 ```
 src/main/java/frc/robot/BuildConstants.java
-```
-
-### `@AutoLog` Annotation
-
-The [`@AutoLog` annotation](CODE-STRUCTURE.md#autolog-annotation) automatically generates classes for input logging from subsystems. To install `@AutoLog`, modify your `build.gradle` to include:
-
-```groovy
-sourceSets {
-    main {
-        java {
-            srcDirs "src/main/java"
-            srcDirs "build/generated/sources/annotationProcessor/java/main"
-        }
-    }
-}
-
-dependencies {
-    // ...
-    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:<version>"
-}
 ```
