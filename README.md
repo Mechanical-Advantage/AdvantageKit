@@ -19,8 +19,8 @@ Looking to get started quickly? Here are some example projects to check out:
 
 - [AdvantageKit Skeleton Template](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest) - Simple `TimedRobot` style template project. The zip is attached to the latest release.
 - [AdvantageKit Command-Based Example](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest) - Example command based project with a tank drive and closed-loop flywheel, including sim support. The zip is attached to the latest release.
+- [Team 6328's 2022 Swerve Code](https://github.com/Mechanical-Advantage/SwerveDevelopment) - Swerve drive code built with AdvantageKit v2 (2023).
 - [Team 6328's 2022 Competition Code](https://github.com/Mechanical-Advantage/RobotCode2022) - Full robot code built with AdvantageKit v1 (2022).
-- [Team 6328's 2022 Swerve Code](https://github.com/Mechanical-Advantage/SwerveDevelopment) - Swerve drive code built with AdvantageKit v1 (2022).
 - [Team 4099's 2022 Competition Code](https://github.com/team4099/RapidReact-2022) - Kotlin robot code built with AdvantageKit v1 (2022).
 
 ## Repository Structure
