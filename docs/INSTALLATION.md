@@ -58,14 +58,14 @@ The user program is responsible for configuring and initializing the logging fra
 Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
 if (isReal()) {
-    logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
-    logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+    Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
 } else {
     setUseTiming(false); // Run as fast as possible
     String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-    logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-    logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
+    Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
 }
 
 Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
