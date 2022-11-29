@@ -18,6 +18,11 @@ constraint_value(
     constraint_setting = ":device",
 )
 
+constraint_value(
+    name = "pi_sbc",
+    constraint_setting = ":device",
+)
+
 # This defines the platform, which ties together multiple constraint values
 # to define a complete platform.  In this case, "Athena" (the codename for the roboRIO)
 # is a platform that runs Linux, has an ARMv7 CPU, and has a device type of roboRIO.
@@ -30,6 +35,15 @@ platform(
     ],
 )
 
+platform(
+    name = "pi",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+        ":pi_sbc"
+    ],
+)
+
 config_setting(
     name = "is_athena",
     constraint_values = [":roborio"],
@@ -37,8 +51,14 @@ config_setting(
 )
 
 config_setting(
+    name = "is_pi",
+    constraint_values = [":pi_sbc"],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
     name = "is_linux",
-    constraint_values = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
+    constraint_values = ["@platforms//os:linux"],
     visibility = ["//visibility:public"],
 )
 

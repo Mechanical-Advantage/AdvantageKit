@@ -1,0 +1,97 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+common_cache_entries = {
+    "BUILD_LIST": "core,highgui,imgcodecs,imgproc,calib3d,videoio",
+    "VIDEOIO_PLUGINS_LIST": "gstreamer",
+    "OPENCV_FORCE_3RDPARTY_BUILD": "ON",
+    "CMAKE_CXX_STANDARD": "17",
+    "BUILD_TESTS": "OFF",
+    "BUILD_PERF_TESTS": "OFF",
+    "BUILD_EXAMPLES": "OFF",
+    "BUILD_opencv_apps": "OFF",
+    "BUILD_opencv_python2": "OFF",
+    "BUILD_opencv_python3": "OFF",
+    "BUILD_opencv_java": "OFF",
+    "WITH_CUDA": "OFF",
+    "WITH_IPP": "OFF",
+    "WITH_ITT": "OFF",
+    "WITH_FFMPEG": "OFF",
+    "WITH_OPENEXR": "OFF",
+    "WITH_GSTREAMER": "ON",
+    "WITH_1394": "OFF",
+    "WITH_JASPER": "OFF",
+    "WITH_TIFF": "OFF",
+    "BUILD_JPEG": "ON",
+    "BUILD_OPENJPEG": "ON",
+    "BUILD_PNG": "ON",
+    "BUILD_ZLIB": "ON",
+    "CMAKE_BUILD_WITH_INSTALL_RPATH": "ON",
+    "BUILD_SHARED_LIBS": "OFF",
+}
+
+cmake(
+    name = "opencv",
+    cache_entries = select({
+        "//build_tools/platforms:is_pi": dict(
+            common_cache_entries,
+            CMAKE_SYSTEM_NAME = "Linux",
+            CMAKE_SYSTEM_PROCESSOR = "aarch64",
+            WITH_GTK = "OFF",
+        ),
+        "//conditions:default": common_cache_entries,
+    }),
+    copts = [
+        "-Wno-c11-extensions",
+        "-Wno-gnu-zero-variadic-macro-arguments",
+        "-Wno-format-pedantic",
+        "-Wno-implicit-function-declaration",
+        "-Wno-c++17-attribute-extensions",
+    ],
+    env = select({
+        "//build_tools/platforms:is_pi": {
+            "PKG_CONFIG_SYSROOT_DIR": "$$EXT_BUILD_ROOT/external/arm64_debian_rootfs",
+            "PKG_CONFIG_PATH": "",
+            "PKG_CONFIG_LIBDIR": "$$EXT_BUILD_ROOT/external/arm64_debian_rootfs/usr/lib/aarch64-linux-gnu/pkgconfig",
+        },
+        "//conditions:default": {},
+    }),
+    generate_args = [
+        "-GNinja",
+    ],
+    lib_source = ":all_srcs",
+    out_include_dir = "include/opencv4",
+    # out_shared_libs = [
+    #     "libopencv_calib3d.so.406",
+    #     "libopencv_core.so.406",
+    #     "libopencv_features2d.so.406",
+    #     "libopencv_flann.so.406",
+    #     "libopencv_highgui.so.406",
+    #     "libopencv_imgcodecs.so.406",
+    #     "libopencv_imgproc.so.406",
+    #     "libopencv_videoio.so.406"
+    # ],
+    out_static_libs = [
+        "opencv4/3rdparty/liblibjpeg-turbo.a",
+        "opencv4/3rdparty/liblibopenjp2.a",
+        "opencv4/3rdparty/liblibpng.a",
+        "opencv4/3rdparty/liblibwebp.a",
+        "opencv4/3rdparty/libzlib.a",
+        "libopencv_calib3d.a",
+        "libopencv_core.a",
+        "libopencv_features2d.a",
+        "libopencv_flann.a",
+        "libopencv_highgui.a",
+        "libopencv_imgcodecs.a",
+        "libopencv_imgproc.a",
+        "libopencv_videoio.a",
+    ] + select({
+        "//build_tools/platforms:is_pi": ["opencv4/3rdparty/libtegra_hal.a"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+)

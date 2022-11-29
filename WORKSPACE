@@ -58,11 +58,13 @@ rules_pkg_dependencies()
 
 # Hedron's Compile Commands Extractor for Bazel
 # https://github.com/hedronvision/bazel-compile-commands-extractor
+HEDRON_COMPILE_COMMANDS_COMMIT = "5ceebcf367f51c6a18fffe726755951a43b50e45"
+
 http_archive(
     name = "hedron_compile_commands",
-    sha256 = "512da68b344a8e66e598ff647239a6ab39b6330c0c4152183410bd65326c7923",
-    strip_prefix = "bazel-compile-commands-extractor-e704e82375048df67200b96f83e3e5e7bda8897e",
-    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/e704e82375048df67200b96f83e3e5e7bda8897e.tar.gz",
+    sha256 = "4deb7cd90ba69983ec7734c0dcc7071828ebdc430a69f82ddbccf698018b9c04",
+    strip_prefix = "bazel-compile-commands-extractor-%s" % HEDRON_COMPILE_COMMANDS_COMMIT,
+    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/%s.tar.gz" % HEDRON_COMPILE_COMMANDS_COMMIT,
 )
 
 load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
@@ -171,22 +173,41 @@ load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
 
 llvm_toolchain(
     name = "llvm_toolchain",
-    llvm_version = "13.0.0",
-    stdlib = {
-        "linux-x86_64": "stdc++",
-        "linux-aarch64": "stdc++",
-    },
+    llvm_version = "14.0.0",
 )
 
 load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
 
 llvm_register_toolchains()
 
+# http_archive(
+#     name = "arm64_debian_rootfs",
+#     build_file = "@//:debian_rootfs.BUILD",
+#     sha256 = "f723daf306b504a35fd59597545b5551963c5cedaff580202ea75ee7eafe84a8",
+#     url = "file:///home/cameron/Desktop/rpi_bazel/2022-10-12-sysroot.tar.gz",
+# )
+
+# llvm_toolchain(
+#     name = "llvm_aarch64",
+#     llvm_version = "14.0.0",
+#     sysroot = {
+#         "": "",
+#         "linux-aarch64": "@arm64_debian_rootfs//:sysroot_files",
+#     },
+#     stdlib = {
+#         "linux-x86_64": "stdc++",
+#         "linux-aarch64": "stdc++",
+#     },
+#     toolchain_roots = {
+#         "": "@llvm_toolchain_llvm//",
+#     },
+# )
+
 http_archive(
     name = "rules_foreign_cc",
-    sha256 = "6041f1374ff32ba711564374ad8e007aef77f71561a7ce784123b9b4b88614fc",
-    strip_prefix = "rules_foreign_cc-0.8.0",
-    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.8.0.tar.gz",
+    sha256 = "2a4d07cd64b0719b39a7c12218a3e507672b82a97b98c6a89d38565894cf7c51",
+    strip_prefix = "rules_foreign_cc-0.9.0",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/refs/tags/0.9.0.tar.gz",
 )
 
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")

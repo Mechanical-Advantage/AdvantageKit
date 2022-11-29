@@ -1,0 +1,9 @@
+imports:
+  opencv: p3p/opencv
+
+
+git module opencv:
+  url: https://github.com/opencv/opencv
+  rev: 4.6.0
+  drop:
+    - .gitignore

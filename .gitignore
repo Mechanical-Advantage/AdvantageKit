@@ -5,6 +5,11 @@
 /.cache
 user.bazelrc
 
+# Peru metadata + pulled peru deps
+.peru
+/p3p/*/**
+!/p3p/*/BUILD.bazel
+
 /dev_sandbox
 
 # Bazel for IntelliJ
