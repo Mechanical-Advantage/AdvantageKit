@@ -1,3 +1,4 @@
+load("@bazel_skylib//lib:selects.bzl", "selects")
 package(default_visibility = ["//visibility:public"])
 
 # Creates a new "constraint" category, which can have one or more "values"
@@ -57,15 +58,24 @@ config_setting(
 )
 
 config_setting(
-    name = "is_linux",
-    constraint_values = ["@platforms//os:linux"],
+    name = "is_linux_x64",
+    constraint_values = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
     visibility = ["//visibility:public"],
 )
 
 config_setting(
+    name = "is_linux_arm64",
+    constraint_values = ["@platforms//os:linux", "@platforms//cpu:arm64"]
+)
+
+selects.config_setting_group(
+    name = "is_linux",
+    match_any = [":is_linux_x64", ":is_linux_arm64"],
+)
+
+selects.config_setting_group(
     name = "is_linux_any",
-    constraint_values = ["@platforms//os:linux"],
-    visibility = ["//visibility:public"],
+    match_any = [":is_linux_x64", ":is_linux_arm64", ":is_athena", ":is_pi"]
 )
 
 config_setting(
