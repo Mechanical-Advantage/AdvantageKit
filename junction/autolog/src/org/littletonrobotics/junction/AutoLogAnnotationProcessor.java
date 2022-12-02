@@ -6,6 +6,7 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
+import javax.lang.model.type.TypeKind;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.HashMap;
@@ -69,6 +70,9 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
 
     TypeElement annotation = annotationOptional.get();
     roundEnv.getElementsAnnotatedWith(annotation).forEach(classElement -> {
+      String autologgedClassName = classElement.getSimpleName() + "AutoLogged";
+      String autologgedPackage = getPackageName(classElement);
+
       MethodSpec.Builder toLogBuilder = MethodSpec.methodBuilder("toLog")
           .addAnnotation(Override.class)
           .addModifiers(Modifier.PUBLIC)
@@ -77,6 +81,10 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
           .addAnnotation(Override.class)
           .addModifiers(Modifier.PUBLIC)
           .addParameter(LOG_TABLE_TYPE, "table");
+      MethodSpec.Builder cloneBuilder = MethodSpec.methodBuilder("clone")
+          .addModifiers(Modifier.PUBLIC)
+          .addCode("$L copy = new $L();\n", autologgedClassName, autologgedClassName)
+          .returns(ClassName.get(autologgedPackage, autologgedClassName));
 
       classElement.getEnclosedElements().stream().filter(f -> f.getKind().equals(ElementKind.FIELD))
           .forEach(fieldElement -> {
@@ -100,19 +108,29 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
               String getterName = "get" + logType;
               toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
               fromLogBuilder.addCode("$L = table.$L($S, $L);\n", simpleName, getterName, logName, simpleName);
+              // Need to deep copy arrays
+              if (fieldElement.asType().getKind().equals(TypeKind.ARRAY)) {
+                cloneBuilder.addCode("copy.$L = this.$L.clone();\n", simpleName, simpleName);
+              } else {
+                cloneBuilder.addCode("copy.$L = this.$L;\n", simpleName, simpleName);
+              }
             }
           });
 
+      cloneBuilder.addCode("return copy;\n");
+
       TypeSpec type = TypeSpec
-          .classBuilder(classElement.getSimpleName() + "AutoLogged")
+          .classBuilder(autologgedClassName)
           .addModifiers(Modifier.PUBLIC)
           .addSuperinterface(LOGGABLE_INPUTS_TYPE)
+          .addSuperinterface(ClassName.get("java.lang", "Cloneable"))
           .superclass(classElement.asType())
           .addMethod(toLogBuilder.build())
           .addMethod(fromLogBuilder.build())
+          .addMethod(cloneBuilder.build())
           .build();
 
-      JavaFile file = JavaFile.builder(getPackageName(classElement), type).build();
+      JavaFile file = JavaFile.builder(autologgedPackage, type).build();
       try {
         file.writeTo(processingEnv.getFiler());
       } catch (IOException e) {
