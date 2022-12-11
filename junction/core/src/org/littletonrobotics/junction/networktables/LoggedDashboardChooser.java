@@ -62,6 +62,14 @@ public class LoggedDashboardChooser<V> implements LoggedDashboardInput {
     return options.get(selectedValue);
   }
 
+  /**
+   * Returns the internal sendable chooser object, for use when setting up
+   * dashboard layouts. Do not read data from the sendable chooser directly.
+   */
+  public SendableChooser<String> getSendableChooser() {
+    return sendableChooser;
+  }
+
   public void periodic() {
     if (!Logger.getInstance().hasReplaySource()) {
       selectedValue = sendableChooser.getSelected();
