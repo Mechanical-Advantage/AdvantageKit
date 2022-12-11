@@ -43,6 +43,15 @@ public final class RobotController {
   }
 
   /**
+   * Return the serial number of the roboRIO.
+   *
+   * @return The serial number of the roboRIO.
+   */
+  public static String getSerialNumber() {
+    return HALUtil.getSerialNumber();
+  }
+
+  /**
    * Read the microsecond timer from the FPGA.
    * 
    * Patched by AdvantageKit to read the syncronized timestamp. To access the real
