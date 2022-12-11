@@ -33,13 +33,13 @@ public class Drive extends SubsystemBase {
 
   /** Run open loop at the specified percentage. */
   public void drivePercent(double leftPercent, double rightPercent) {
-    io.setVoltage(leftPercent, rightPercent);
+    io.setVoltage(leftPercent * 12.0, rightPercent * 12.0);
   }
 
   /** Run open loop based on stick positions. */
   public void driveArcade(double xSpeed, double zRotation) {
     var speeds = DifferentialDrive.arcadeDriveIK(xSpeed, zRotation, true);
-    io.setVoltage(speeds.left, speeds.right);
+    io.setVoltage(speeds.left * 12.0, speeds.right * 12.0);
   }
 
   /** Stops the drive. */
