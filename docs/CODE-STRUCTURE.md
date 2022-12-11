@@ -73,7 +73,7 @@ AdvantageKit provides several solutions to deal with this issue:
 Example use of `LoggedDashboardChooser` for auto routines in a command-based project:
 
 ```java
-private final LoggedDashboardChooser<AutoRoutine> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
+private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
 
 public RobotContainer() {
     // ...
@@ -112,23 +112,29 @@ Logger.getInstance().recordOutput("Drive/CalculatedLeftVolts", leftVolts);
 
 > Note: This data is automatically saved to the `RealOutputs` or `ReplayOutputs` table, and it can be divided further into subtables using slashes (as seen above).
 
-Logging geometry objects like `Translation2d`, `Pose2d`, `Pose3d`, etc. is common in robot code. AdvantageKit includes the following functions to easily log these objects in the formats expected by AdvantageScope:
+Logging geometry objects like `Pose2d`, `Trajectory`, etc. is common in robot code. AdvantageKit includes the following functions to easily log these objects in the formats expected by AdvantageScope:
 
 ```java
-// 2D geometry (for odometry view)
-Logger.getInstance().recordOutput("MyTranslation2d", new Translation2d());
-Logger.getInstance().recordOutput("MyTranslation2dArray", new Translation2d[] {});
-Logger.getInstance().recordOutput("MyPose2d", new Pose2d());
-Logger.getInstance().recordOutput("MyPose2dArray", new Pose2d[] {});
+// Pose2d
+Pose2d poseA, poseB, poseC;
+Logger.getInstance().recordOutput("MyPose2d", poseA);
+Logger.getInstance().recordOutput("MyPose2dArray", poseA, poseB);
+Logger.getInstance().recordOutput("MyPose2dArray", new Pose2d[] { poseA, poseB });
 
-// 3D geometry (for 3D field view)
-Logger.getInstance().recordOutput("MyTranslation3d", new Translation3d());
-Logger.getInstance().recordOutput("MyTranslation3dArray", new Translation3d[] {});
-Logger.getInstance().recordOutput("MyPose3d", new Pose3d());
-Logger.getInstance().recordOutput("MyPose3dArray", new Pose3d[] {});
+// Pose3d
+Pose3d poseA, poseB, poseC;
+Logger.getInstance().recordOutput("MyPose3d", poseA);
+Logger.getInstance().recordOutput("MyPose3dArray", poseA, poseB);
+Logger.getInstance().recordOutput("MyPose3dArray", new Pose3d[] { poseA, poseB });
 
-// Swerve module states (for swerve visualization)
-Logger.getInstance().recordOutput("MySwerveModuleStates", new SwerveModuleState[] {});
+// Trajectory
+Trajectory trajectory;
+Logger.getInstance().recordOutput("MyTrajectory", trajectory);
+
+// SwerveModuleState
+SwerveModuleState stateA, stateB, stateC, stateD;
+Logger.getInstance().recordOutput("MySwerveModuleStates", stateA, stateB, stateC, stateD);
+Logger.getInstance().recordOutput("MySwerveModuleStates", new SwerveModuleState[] { stateA, stateB, stateC, stateD });
 ```
 
 ## `@AutoLog` Annotation
