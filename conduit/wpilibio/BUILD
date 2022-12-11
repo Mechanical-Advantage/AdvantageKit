@@ -42,13 +42,13 @@ pkg_zip(
         "//build_tools/platforms:is_athena": "/linux/athena/shared",
         "//build_tools/platforms:is_linux": "/linux/x86-64/shared",
         "//build_tools/platforms:is_windows": "/windows/x86-64/shared",
-        "//build_tools/platforms:is_macos": "/osx/x86-64/shared",
+        "//build_tools/platforms:is_macos": "/osx/universal/shared",
     }),
     package_file_name = select({
         "//build_tools/platforms:is_athena": "wpilibio-{publishing_version}-linuxathena.zip",
         "//build_tools/platforms:is_linux": "wpilibio-{publishing_version}-linuxx86-64.zip",
         "//build_tools/platforms:is_windows": "wpilibio-{publishing_version}-windowsx86-64.zip",
-        "//build_tools/platforms:is_macos": "wpilibio-{publishing_version}-osxx86-64.zip",
+        "//build_tools/platforms:is_macos": "wpilibio-{publishing_version}-osxuniversal.zip",
     }),
     package_variables = "//build_tools/zip:version",
 )
@@ -59,7 +59,7 @@ maven_publish_zip(
         "//build_tools/platforms:is_athena": "linuxathena",
         "//build_tools/platforms:is_linux": "linuxx86-64",
         "//build_tools/platforms:is_windows": "windowsx86-64",
-        "//build_tools/platforms:is_macos": "osxx86-64",
+        "//build_tools/platforms:is_macos": "osxuniversal",
     }),
     coordinates = "org.littletonrobotics.akit.conduit:conduit-wpilibio:{publishing_version}",
     tags = [

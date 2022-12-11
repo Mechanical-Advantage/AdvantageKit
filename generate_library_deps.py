@@ -22,7 +22,7 @@ FRC_ARTIFACTORY_URL = "https://frcmaven.wpi.edu/artifactory"
 
 # Version of WPILib dependencies to use
 NI_VERSION = "2023.1.0"
-WPILIB_VERSION = "2023.1.1-beta-3"
+WPILIB_VERSION = "2023.1.1-beta-6"
 
 # --- Artifacts and versions ---
 # Dependencies to pull from standard maven repositories (currently just central)
@@ -55,7 +55,7 @@ NATIVE_PLATFORM_ATHENA = ("athena", "linuxathena")
 NATIVE_PLATFORM_DESKTOP = [
     ("linux_x64", "linuxx86-64"),
     ("windows_x64", "windowsx86-64"),
-    ("macos_x64", "osxx86-64")
+    ("macos_x64", "osxuniversal")
 ]
 
 

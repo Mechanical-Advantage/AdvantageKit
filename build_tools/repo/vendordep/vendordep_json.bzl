@@ -16,7 +16,7 @@ _JNI_DEP_TEMPLATE = """
                 "linuxathena",
                 "windowsx86-64",
                 "linuxx86-64",
-                "osxx86-64"
+                "osxuniversal"
             ]
         }}{comma}"""
 
@@ -66,7 +66,7 @@ def _impl(ctx):
     )
 
     return DefaultInfo(
-        files = depset([json])
+        files = depset([json]),
     )
 
 vendordep_json = rule(

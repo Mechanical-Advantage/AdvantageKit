@@ -14,7 +14,7 @@ public class Drive extends SubsystemBase {
 
   private final DriveIO io;
   private final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
-  private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(new Rotation2d());
+  private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(new Rotation2d(), 0.0, 0.0);
 
   /** Creates a new Drive. */
   public Drive(DriveIO io) {
