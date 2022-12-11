@@ -103,7 +103,7 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
               }
               System.err.println(
                   "[AutoLog] Unkonwn type for \"" + simpleName + "\" from \"" + classElement.getSimpleName()
-                      + " (" + extraText + ")");
+                      + "\" (" + extraText + ")");
             } else {
               String getterName = "get" + logType;
               toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
