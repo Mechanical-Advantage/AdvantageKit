@@ -18,9 +18,8 @@ import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
 
 import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.util.WPIUtilJNI;
@@ -455,80 +454,13 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
-   * The translations are logged as a double array (x_1, y_1, ...)
+   * The poses are logged as a double array (x_1, y_1, rot_1, ...)
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Translation2d[] value) {
-    double[] data = new double[value.length * 2];
-    for (int i = 0; i < value.length; i++) {
-      data[i * 2] = value[i].getX();
-      data[i * 2 + 1] = value[i].getY();
-    }
-    recordOutput(key, data);
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * The translation is logged as a double array (x, y)
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public void recordOutput(String key, Translation2d value) {
-    recordOutput(key, new Translation2d[] { value });
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * The translations are logged as a double array (x_1, y_1, z_1, ...)
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public void recordOutput(String key, Translation3d[] value) {
-    double[] data = new double[value.length * 3];
-    for (int i = 0; i < value.length; i++) {
-      data[i * 3] = value[i].getX();
-      data[i * 3 + 1] = value[i].getY();
-      data[i * 3 + 2] = value[i].getZ();
-    }
-    recordOutput(key, data);
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * The translation is logged as a double array (x, y, z)
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public void recordOutput(String key, Translation3d value) {
-    recordOutput(key, new Translation3d[] { value });
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * The poses are logged as a double array (x_1, y_1, rot, ...)
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public void recordOutput(String key, Pose2d[] value) {
+  public void recordOutput(String key, Pose2d... value) {
     double[] data = new double[value.length * 3];
     for (int i = 0; i < value.length; i++) {
       data[i * 3] = value[i].getX();
@@ -542,20 +474,6 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
-   * The pose is logged as a double array (x, y, rot)
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public void recordOutput(String key, Pose2d value) {
-    recordOutput(key, new Pose2d[] { value });
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
    * The poses are logged as a double array (x, y, z, w_rot, x_rot, y_rot,
    * z_rot, ...)
    * 
@@ -563,7 +481,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Pose3d[] value) {
+  public void recordOutput(String key, Pose3d... value) {
     double[] data = new double[value.length * 7];
     for (int i = 0; i < value.length; i++) {
       data[i * 7] = value[i].getX();
@@ -581,15 +499,14 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
-   * The pose is logged as a double array (x, y, z, w_rot, x_rot, y_rot,
-   * z_rot)
+   * The trajectory is logged as a series of poses.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Pose3d value) {
-    recordOutput(key, new Pose3d[] { value });
+  public void recordOutput(String key, Trajectory value) {
+    recordOutput(key, value.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new));
   }
 
   /**
@@ -603,7 +520,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, SwerveModuleState[] value) {
+  public void recordOutput(String key, SwerveModuleState... value) {
     double[] data = new double[value.length * 2];
     for (int i = 0; i < value.length; i++) {
       data[i * 2] = value[i].angle.getRadians();
