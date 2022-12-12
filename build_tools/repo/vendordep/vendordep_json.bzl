@@ -10,7 +10,7 @@ _JNI_DEP_TEMPLATE = """
             "groupId": "{groupId}",
             "artifactId": "{artifactId}",
             "version": "{version}",
-            "skipInvalidPlatforms": true,
+            "skipInvalidPlatforms": false,
             "isJar": false,
             "validPlatforms": [
                 "linuxathena",
