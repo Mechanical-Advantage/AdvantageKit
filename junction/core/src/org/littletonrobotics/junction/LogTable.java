@@ -126,7 +126,7 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.Raw)) {
       byte[] valueClone = new byte[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key, new LogValue(valueClone));
     }
   }
 
@@ -188,7 +188,7 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.BooleanArray)) {
       boolean[] valueClone = new boolean[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key, new LogValue(valueClone));
     }
   }
 
@@ -200,7 +200,7 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.IntegerArray)) {
       long[] valueClone = new long[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key, new LogValue(valueClone));
     }
   }
 
@@ -212,7 +212,7 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.FloatArray)) {
       float[] valueClone = new float[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key, new LogValue(valueClone));
     }
   }
 
@@ -224,7 +224,7 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.DoubleArray)) {
       double[] valueClone = new double[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key, new LogValue(valueClone));
     }
   }
 
@@ -236,7 +236,7 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.StringArray)) {
       String[] valueClone = new String[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key, new LogValue(valueClone));
     }
   }
 
