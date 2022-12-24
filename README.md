@@ -4,11 +4,11 @@
 
 AdvantageKit is a logging, telemetry, and replay framework developed by Team 6328. Please see the following guides to get started, or the README files for individual components.
 
-- [What's New For 2023?](/docs/NEW-FOR-2023.md)
 - [What is AdvantageKit?](/docs/WHAT-IS-ADVANTAGEKIT.md)
 - [Installing AdvantageKit](/docs/INSTALLATION.md)
 - [Understanding Data Flow](/docs/DATA-FLOW.md)
 - [Code Structure & IO Layers](/docs/CODE-STRUCTURE.md)
+- [What's New For 2023?](/docs/NEW-FOR-2023.md)
 - [Developing AdvantageKit](/docs/DEVELOPING.md)
 
 ## Example Projects
