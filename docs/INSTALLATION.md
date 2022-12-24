@@ -78,15 +78,6 @@ This setup enters replay mode for all simulator runs. If you need to run the sim
 The [`@AutoLog` annotation](CODE-STRUCTURE.md#autolog-annotation) automatically generates classes for input logging from subsystems. To install `@AutoLog`, modify your `build.gradle` to include:
 
 ```groovy
-sourceSets {
-    main {
-        java {
-            srcDirs "src/main/java"
-            srcDirs "build/generated/sources/annotationProcessor/java/main"
-        }
-    }
-}
-
 dependencies {
     // ...
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:<version>"

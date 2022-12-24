@@ -64,15 +64,6 @@ configurations.all {
     exclude group: "edu.wpi.first.wpilibj"
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs "src/main/java"
-            srcDirs "build/generated/sources/annotationProcessor/java/main"
-        }
-    }
-}
-
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 4.
 dependencies {
