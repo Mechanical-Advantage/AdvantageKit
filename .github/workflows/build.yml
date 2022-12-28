@@ -129,8 +129,14 @@ jobs:
         uses: battila7/get-version-action@v2
 
       # Upload conduit build
+      - name: 'Release: Upload "conduit/wpilibio:nativezip" for macOS'
+        if: github.event_name == 'release' && matrix.host.displayName == 'macOS'
+        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio/osxuniversal:nativezip.publish
+        env:
+          GITHUB_ACTOR: Mechanical-Advantage
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 'Release: Upload "conduit/wpilibio:nativezip"'
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' && matrix.host.displayName != 'macOS'
         run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
         env:
           GITHUB_ACTOR: Mechanical-Advantage

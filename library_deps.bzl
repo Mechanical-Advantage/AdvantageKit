@@ -327,7 +327,7 @@ filegroup(
     )
 
     http_archive(
-        name = "wpilib_wpiutil_macos_x64_files",
+        name = "wpilib_wpiutil_macos_universal_files",
         build_file_content = """
 filegroup(
     name = "binaries_files",
@@ -458,7 +458,7 @@ filegroup(
     )
 
     http_archive(
-        name = "wpilib_wpimath_macos_x64_files",
+        name = "wpilib_wpimath_macos_universal_files",
         build_file_content = """
 filegroup(
     name = "binaries_files",
@@ -589,7 +589,7 @@ filegroup(
     )
 
     http_archive(
-        name = "wpilib_ntcore_macos_x64_files",
+        name = "wpilib_ntcore_macos_universal_files",
         build_file_content = """
 filegroup(
     name = "binaries_files",
@@ -720,7 +720,7 @@ filegroup(
     )
 
     http_archive(
-        name = "wpilib_hal_macos_x64_files",
+        name = "wpilib_hal_macos_universal_files",
         build_file_content = """
 filegroup(
     name = "binaries_files",
@@ -795,7 +795,7 @@ filegroup(
     )
 
     http_archive(
-        name = "wpilib_halsim_gui_macos_x64_files",
+        name = "wpilib_halsim_gui_macos_universal_files",
         build_file_content = """
 filegroup(
     name = "binaries_files",
