@@ -15,6 +15,27 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
 
+# Apple support, used for universal binary generation
+http_archive(
+    name = "build_bazel_rules_apple",
+    sha256 = "f94e6dddf74739ef5cb30f000e13a2a613f6ebfa5e63588305a71fce8a8a9911",
+    url = "https://github.com/bazelbuild/rules_apple/releases/download/1.1.3/rules_apple.1.1.3.tar.gz",
+)
+
+load(
+    "@build_bazel_rules_apple//apple:repositories.bzl",
+    "apple_rules_dependencies",
+)
+
+apple_rules_dependencies()
+
+load(
+    "@build_bazel_apple_support//lib:repositories.bzl",
+    "apple_support_dependencies",
+)
+
+apple_support_dependencies()
+
 # This code loads the "rules_jvm_external" repository into our Bazel workspace.  This is copied in from
 # https://github.com/bazelbuild/rules_jvm_external/releases/tag/4.1
 
@@ -180,7 +201,7 @@ llvm_toolchain(
 
 load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
 
-llvm_register_toolchains()
+#llvm_register_toolchains()
 
 http_archive(
     name = "rules_foreign_cc",

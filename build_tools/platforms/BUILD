@@ -1,3 +1,5 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
 package(default_visibility = ["//visibility:public"])
 
 # Creates a new "constraint" category, which can have one or more "values"
@@ -30,6 +32,22 @@ platform(
     ],
 )
 
+platform(
+    name = "macos_x86_64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64"
+    ]
+)
+
+platform(
+    name = "macos_arm64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:arm64"
+    ]
+)
+
 config_setting(
     name = "is_athena",
     constraint_values = [":roborio"],
@@ -58,4 +76,16 @@ config_setting(
     name = "is_macos",
     constraint_values = ["@platforms//os:macos"],
     visibility = ["//visibility:public"],
+)
+
+bool_flag(
+    name = "enable_macos_universal_binaries",
+    build_setting_default = False
+)
+
+config_setting(
+    name = "macos_universal_binary_support",
+    flag_values = {
+        ":enable_macos_universal_binaries": "True",
+    }
 )

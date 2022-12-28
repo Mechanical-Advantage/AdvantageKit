@@ -55,7 +55,7 @@ NATIVE_PLATFORM_ATHENA = ("athena", "linuxathena")
 NATIVE_PLATFORM_DESKTOP = [
     ("linux_x64", "linuxx86-64"),
     ("windows_x64", "windowsx86-64"),
-    ("macos_x64", "osxuniversal")
+    ("macos_universal", "osxuniversal")
 ]
 
 
