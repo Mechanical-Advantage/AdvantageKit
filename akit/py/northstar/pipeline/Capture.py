@@ -1,8 +1,7 @@
 from typing import Tuple
 
 import cv2
-import numpy
-from northstar.config.config import ConfigStore
+from config.config import ConfigStore
 
 
 class Capture:

@@ -1,8 +1,8 @@
 from typing import List
 
 import cv2
-from northstar.config.config import ConfigStore
-from northstar.types import FiducialImageObservation
+from config.config import ConfigStore
+from vision_types import FiducialImageObservation
 
 
 class FiducialDetector:

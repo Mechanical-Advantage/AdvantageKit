@@ -1,7 +1,7 @@
 import cv2
 import numpy
-from northstar.config.config import ConfigStore
-from northstar.types import FiducialImageObservation, FiducialPoseObservation
+from config.config import ConfigStore
+from vision_types import FiducialImageObservation, FiducialPoseObservation
 
 
 class PoseEstimator:
