@@ -1,5 +1,6 @@
 package org.littletonrobotics.junction;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
@@ -527,5 +529,28 @@ public class Logger {
       data[i * 2 + 1] = value[i].speedMetersPerSecond;
     }
     recordOutput(key, data);
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * The current position of the Mechanism2d is logged once as a set of nested
+   * fields. If the position is updated, this method must be called again.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public void recordOutput(String key, Mechanism2d value) {
+    if (running) {
+      try {
+        // Use reflection because we don't explicitly depend on the shimmed classes
+        Mechanism2d.class.getMethod("akitLog", LogTable.class).invoke(value, outputTable.getSubtable(key));
+      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+          | SecurityException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

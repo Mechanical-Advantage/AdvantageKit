@@ -137,6 +137,13 @@ Logger.getInstance().recordOutput("MySwerveModuleStates", stateA, stateB, stateC
 Logger.getInstance().recordOutput("MySwerveModuleStates", new SwerveModuleState[] { stateA, stateB, stateC, stateD });
 ```
 
+AdvantageKit can also log [`Mechanism2d`](https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html) objects as outputs, which can be viewed using AdvantageScope. Note that the call below only records the current state of the `Mechanism2d`, so it must be called every loop cycle after the object is updated.
+
+```java
+Mechanism2d mechanism = new Mechanism2d(3, 3);
+Logger.getInstance().recordOutput("MyMechanism", mechanism);
+```
+
 ## `@AutoLog` Annotation
 
 As of version 1.8, a new `@AutoLog` annotation was added. By adding this annotation to your inputs class, AdvantageKit will automatically generate implementations of `toLog` and `fromLog` for your inputs.
