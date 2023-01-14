@@ -20,8 +20,9 @@ class SquareTargetPoseEstimator(PoseEstimator):
         fid_size = config_store.remote_config.fiducial_size_m
         object_points = numpy.array([[-fid_size / 2.0, fid_size / 2.0, 0.0],
                                      [fid_size / 2.0, fid_size / 2.0, 0.0],
-                                     [fid_size / 2.0, -fid_size / 2.0 , 0.0],
-                                     [-fid_size / 2.0, -fid_size / 2.0 , 0.0]])
+                                     [fid_size / 2.0, -fid_size / 2.0, 0.0],
+                                     [-fid_size / 2.0, -fid_size / 2.0, 0.0]])
 
-        _, rvec, tvec = cv2.solvePnP(object_points, image_observation.corners, config_store.local_config.camera_matrix, config_store.local_config.distortion_coefficients, flags=cv2.SOLVEPNP_IPPE_SQUARE)
-        return FiducialPoseObservation(image_observation.tag_id, tvec, rvec)
+        _, rvecs, tvecs, errors = cv2.solvePnPGeneric(object_points, image_observation.corners, config_store.local_config.camera_matrix,
+                                                      config_store.local_config.distortion_coefficients, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+        return FiducialPoseObservation(image_observation.tag_id, tvecs[0], rvecs[0], errors[0][0], tvecs[1], rvecs[1], errors[1][0])

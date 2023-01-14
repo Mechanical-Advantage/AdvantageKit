@@ -12,5 +12,9 @@ class FiducialImageObservation:
 @dataclass(frozen=True)
 class FiducialPoseObservation:
     tag_id: int
-    tvec: numpy.typing.NDArray[numpy.float64]
-    rvec: numpy.typing.NDArray[numpy.float64]
+    tvec_0: numpy.typing.NDArray[numpy.float64]
+    rvec_0: numpy.typing.NDArray[numpy.float64]
+    error_0: float
+    tvec_1: numpy.typing.NDArray[numpy.float64]
+    rvec_1: numpy.typing.NDArray[numpy.float64]
+    error_1: float

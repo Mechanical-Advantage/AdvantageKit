@@ -2,25 +2,27 @@ from dataclasses import dataclass
 import numpy
 import numpy.typing
 
-@dataclass
-class RemoteConfig:
-    camera_id: int
-    camera_resolution_width: int
-    camera_resolution_height: int
-    camera_auto_exposure: int
-    camera_exposure: int
-    fiducial_size_m : float
-
 
 @dataclass
 class LocalConfig:
-    device_id: str
-    server_ip: str
-    camera_matrix: numpy.typing.NDArray[numpy.float64]
-    distortion_coefficients: numpy.typing.NDArray[numpy.float64]
+    device_id: str = ""
+    server_ip: str = ""
+    has_calibration: bool = False
+    camera_matrix: numpy.typing.NDArray[numpy.float64] = numpy.array([])
+    distortion_coefficients: numpy.typing.NDArray[numpy.float64] = numpy.array([])
+
+
+@dataclass
+class RemoteConfig:
+    camera_id: int = 0
+    camera_resolution_width: int = 0
+    camera_resolution_height: int = 0
+    camera_auto_exposure: int = 0
+    camera_exposure: int = 0
+    fiducial_size_m: float = 0
 
 
 @dataclass
 class ConfigStore:
-    remote_config: RemoteConfig
     local_config: LocalConfig
+    remote_config: RemoteConfig
