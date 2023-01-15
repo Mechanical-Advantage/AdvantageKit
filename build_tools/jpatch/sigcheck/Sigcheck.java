@@ -1,11 +1,7 @@
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
@@ -18,12 +14,12 @@ public class Sigcheck {
     private static boolean compareClasses(ClassInfo original, ClassInfo patch) {
         List<String> failures = new ArrayList<>();
         // Ensure patch class has same fields as original
-        for (FieldInfo originalField : original.getFieldInfo()) {
+        for (FieldInfo originalField : original.getDeclaredFieldInfo()) {
             if (!originalField.isPublic())
                 continue; // Skip non-public fields (not part of the API)
             // Check that the patch class has the field
 
-            FieldInfo patchField = patch.getFieldInfo(originalField.getName());
+            FieldInfo patchField = patch.getDeclaredFieldInfo(originalField.getName());
             if (patchField != null) {
                 List<String> fieldFailures = new ArrayList<>();
                 // Field is present, compare
@@ -51,12 +47,12 @@ public class Sigcheck {
         }
 
         // Ensure patch class has same methods as original
-        for (MethodInfo originalMethod : original.getMethodAndConstructorInfo()) {
+        for (MethodInfo originalMethod : original.getDeclaredMethodAndConstructorInfo()) {
             if (!originalMethod.isPublic())
                 continue; // Skip non-public methods (not part of the API)
             // Check that the patch class has the method
 
-            MethodInfo patchMethod = patch.getMethodInfo(originalMethod.getName()).stream()
+            MethodInfo patchMethod = patch.getDeclaredMethodInfo(originalMethod.getName()).stream()
                     .filter(originalMethod::equals).findFirst().orElse(null);
             if (patchMethod == null) {
                 failures.add("\t-> Missing method '" + originalMethod + "'");
@@ -65,14 +61,17 @@ public class Sigcheck {
                 // in the patch that aren't defined in the original
 
                 List<String> mismatchedMethods = new ArrayList<>();
-                for (MethodInfo m : patch.getMethodInfo(originalMethod.getName())) {
-                    if (!original.getMethodAndConstructorInfo().contains(m)) {
+                for (MethodInfo m : patch.getDeclaredMethodInfo(originalMethod.getName())) {
+                    if (!original.getDeclaredMethodAndConstructorInfo().contains(m)) {
                         mismatchedMethods.add("\t    -> '" + m + "'");
                     }
                 }
 
                 if (!mismatchedMethods.isEmpty()) {
-                    failures.add("\t  -> Found " + mismatchedMethods.size() + (mismatchedMethods.size() == 1 ? " method" : " methods") + " with same name in patch that " + (mismatchedMethods.size() == 1 ? "does" : "do") + " not match any original method signatures");
+                    failures.add("\t  -> Found " + mismatchedMethods.size()
+                            + (mismatchedMethods.size() == 1 ? " method" : " methods")
+                            + " with same name in patch that " + (mismatchedMethods.size() == 1 ? "does" : "do")
+                            + " not match any original method signatures");
                     failures.addAll(mismatchedMethods);
                 }
             }
@@ -119,9 +118,11 @@ public class Sigcheck {
             }
         }
 
-        System.out.println("Analyzed " + origClasses.size() + " original classes, " + patchClasses.size() + " patch classes");
+        System.out.println(
+                "Analyzed " + origClasses.size() + " original classes, " + patchClasses.size() + " patch classes");
         System.out.println(passes + " passed, " + failures + " failed");
 
-        if (failures != 0) System.exit(1);
+        if (failures != 0)
+            System.exit(1);
     }
 }
