@@ -1,4 +1,5 @@
 {
-    "device_id": "northstar_0",
-    "server_ip": "10.63.28.143"
+    "device_id": "northstar",
+    "server_ip": "10.63.28.143",
+    "stream_port": 8000
 }

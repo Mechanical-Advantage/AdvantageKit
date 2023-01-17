@@ -1,4 +1,3 @@
-import cv2
 import ntcore
 
 from config.config import ConfigStore

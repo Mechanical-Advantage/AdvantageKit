@@ -25,6 +25,7 @@ class FileConfigSource(ConfigSource):
             config_data = json.loads(config_file.read())
             config_store.local_config.device_id = config_data["device_id"]
             config_store.local_config.server_ip = config_data["server_ip"]
+            config_store.local_config.stream_port = config_data["stream_port"]
 
         # Get calibration
         calibration_store = cv2.FileStorage(self.CALIBRATION_FILENAME, cv2.FILE_STORAGE_READ)

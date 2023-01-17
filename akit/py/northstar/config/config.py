@@ -7,6 +7,7 @@ import numpy.typing
 class LocalConfig:
     device_id: str = ""
     server_ip: str = ""
+    stream_port: int = 8000
     has_calibration: bool = False
     camera_matrix: numpy.typing.NDArray[numpy.float64] = numpy.array([])
     distortion_coefficients: numpy.typing.NDArray[numpy.float64] = numpy.array([])

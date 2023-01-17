@@ -1,3 +1,4 @@
+import math
 from typing import List, Union
 
 import ntcore
@@ -36,4 +37,4 @@ class NTOutputPublisher(OutputPublisher):
             observation_data += [x[0] for x in observation.tvec_1]
             observation_data += [x[0] for x in observation.rvec_1]
             observation_data.append(observation.error_1)
-        self._observations_pub.set(",".join([str(x) for x in observation_data]))
+        self._observations_pub.set(",".join([str(x) for x in observation_data]), math.floor(timestamp * 1000000))

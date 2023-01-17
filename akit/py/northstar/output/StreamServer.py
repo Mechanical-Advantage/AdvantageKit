@@ -3,16 +3,18 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from io import BytesIO
-from typing import Union
 
 import cv2
 from PIL import Image
+
+from config.config import ConfigStore
 
 
 class StreamServer:
     """Interface for outputing camera frames."""
 
-    def __init__(self) -> None:
+    def start(self, config_store: ConfigStore) -> None:
+        """Starts the output stream."""
         raise NotImplementedError
 
     def set_frame(self, frame: cv2.Mat) -> None:
@@ -94,12 +96,12 @@ class MjpegServer(StreamServer):
         allow_reuse_address = True
         daemon_threads = True
 
-    def _run(self) -> None:
-        server = self.StreamingServer(("", 8000), self._make_handler())
+    def _run(self, port: int) -> None:
+        server = self.StreamingServer(("", port), self._make_handler())
         server.serve_forever()
 
-    def __init__(self) -> None:
-        threading.Thread(target=self._run, daemon=True).start()
+    def start(self, config_store: ConfigStore) -> None:
+        threading.Thread(target=self._run, daemon=True, args=(config_store.local_config.stream_port,)).start()
 
     def set_frame(self, frame: cv2.Mat) -> None:
         self._frame = frame.copy()

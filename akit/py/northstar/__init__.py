@@ -28,12 +28,13 @@ if __name__ == "__main__":
     fiducial_detector = ArucoFiducialDetector(cv2.aruco.DICT_APRILTAG_16h5)
     pose_estimator = SquareTargetPoseEstimator()
     output_publisher: OutputPublisher = NTOutputPublisher()
-    server = MjpegServer()
+    stream_server = MjpegServer()
     calibration_session = CalibrationSession()
 
     local_config_source.update(config)
     ntcore.NetworkTableInstance.getDefault().setServer(config.local_config.server_ip)
     ntcore.NetworkTableInstance.getDefault().startClient4(config.local_config.device_id)
+    stream_server.start(config)
 
     frame_count = 0
     last_print = 0
@@ -78,4 +79,4 @@ if __name__ == "__main__":
             print("No calibration found")
             time.sleep(0.5)
 
-        server.set_frame(image)
+        stream_server.set_frame(image)
