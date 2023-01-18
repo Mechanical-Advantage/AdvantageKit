@@ -13,7 +13,7 @@ class OutputPublisher:
 
 class NTOutputPublisher(OutputPublisher):
     _init_complete: bool = False
-    _observations_pub: ntcore.StringPublisher
+    _observations_pub: ntcore.DoubleArrayPublisher
     _fps_pub: ntcore.IntegerPublisher
 
     def send(self, config_store: ConfigStore, timestamp: float, observations: List[FiducialPoseObservation], fps: Union[int, None] = None) -> None:
@@ -21,7 +21,7 @@ class NTOutputPublisher(OutputPublisher):
         if not self._init_complete:
             nt_table = ntcore.NetworkTableInstance.getDefault().getTable(
                 "/" + config_store.local_config.device_id + "/output")
-            self._observations_pub = nt_table.getStringTopic("observations").publish(
+            self._observations_pub = nt_table.getDoubleArrayTopic("observations").publish(
                 ntcore.PubSubOptions(periodic=0, sendAll=True, keepDuplicates=True))
             self._fps_pub = nt_table.getIntegerTopic("fps").publish()
 
@@ -37,4 +37,4 @@ class NTOutputPublisher(OutputPublisher):
             observation_data += [x[0] for x in observation.tvec_1]
             observation_data += [x[0] for x in observation.rvec_1]
             observation_data.append(observation.error_1)
-        self._observations_pub.set(",".join([str(x) for x in observation_data]), math.floor(timestamp * 1000000))
+        self._observations_pub.set(observation_data, math.floor(timestamp * 1000000))
