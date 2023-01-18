@@ -44,7 +44,6 @@ if __name__ == "__main__":
         timestamp = time.time()
         success, image = capture.get_frame(config)
         if not success:
-            print("Failed to capture frame")
             time.sleep(0.5)
             continue
 

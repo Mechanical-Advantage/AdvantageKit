@@ -1,8 +1,10 @@
+import dataclasses
+import time
 from typing import Tuple
 
 import cv2
+import numpy
 from config.config import ConfigStore
-import dataclasses
 
 
 class Capture:
@@ -67,18 +69,30 @@ class GStreamerCapture(Capture):
 
     def get_frame(self, config_store: ConfigStore) -> Tuple[bool, cv2.Mat]:
         if self._video != None and self._config_changed(self._last_config, config_store):
-            print("Restarting capture session")
+            print("Config changed, stopping capture session")
             self._video.release()
             self._video = None
+            time.sleep(2)
 
         if self._video == None:
-            self._video = cv2.VideoCapture("v4l2src device=/dev/video" + str(config_store.remote_config.camera_id) + " extra_controls=\"c,auto_exposure=" + str(config_store.remote_config.camera_auto_exposure) + ",exposure_time_absolute=" + str(
-                config_store.remote_config.camera_exposure) + "\" ! image/jpeg,format=MJPG,width=" + str(config_store.remote_config.camera_resolution_width) + ",height=" + str(config_store.remote_config.camera_resolution_height) + " ! jpegdec ! video/x-raw ! appsink drop=1", cv2.CAP_GSTREAMER)
+            if config_store.remote_config.camera_id == -1:
+                print("No camera ID, waiting to start capture session")
+            else:
+                print("Starting capture session")
+                self._video = cv2.VideoCapture("v4l2src device=/dev/video" + str(config_store.remote_config.camera_id) + " extra_controls=\"c,exposure_auto=" + str(config_store.remote_config.camera_auto_exposure) + ",exposure_absolute=" + str(
+                    config_store.remote_config.camera_exposure) + "\" ! image/jpeg,format=MJPG,width=" + str(config_store.remote_config.camera_resolution_width) + ",height=" + str(config_store.remote_config.camera_resolution_height) + " ! jpegdec ! video/x-raw ! appsink drop=1", cv2.CAP_GSTREAMER)
+                print("Capture session ready")
 
         self._last_config = ConfigStore(dataclasses.replace(config_store.local_config),
                                         dataclasses.replace(config_store.remote_config))
 
-        retval, image = self._video.read()
-        if not retval:
-            self._video = None  # Force reconnect
-        return retval, image
+        if self._video != None:
+            retval, image = self._video.read()
+            if not retval:
+                print("Capture session failed, restarting")
+                self._video.release()
+                self._video = None  # Force reconnect
+                time.sleep(2)
+            return retval, image
+        else:
+            return False, cv2.Mat(numpy.ndarray([]))

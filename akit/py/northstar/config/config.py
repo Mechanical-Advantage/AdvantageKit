@@ -15,7 +15,7 @@ class LocalConfig:
 
 @dataclass
 class RemoteConfig:
-    camera_id: int = 0
+    camera_id: int = -1
     camera_resolution_width: int = 0
     camera_resolution_height: int = 0
     camera_auto_exposure: int = 0
