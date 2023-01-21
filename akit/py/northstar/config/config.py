@@ -20,6 +20,7 @@ class RemoteConfig:
     camera_resolution_height: int = 0
     camera_auto_exposure: int = 0
     camera_exposure: int = 0
+    camera_gain: int = 0
     fiducial_size_m: float = 0
 
 

@@ -45,6 +45,7 @@ class NTConfigSource(ConfigSource):
     _camera_resolution_height_sub: ntcore.IntegerSubscriber
     _camera_auto_exposure_sub: ntcore.IntegerSubscriber
     _camera_exposure_sub: ntcore.IntegerSubscriber
+    _camera_gain_sub: ntcore.IntegerSubscriber
     _fiducial_size_m_sub: ntcore.DoubleSubscriber
 
     def update(self, config_store: ConfigStore) -> None:
@@ -61,6 +62,8 @@ class NTConfigSource(ConfigSource):
                 "camera_auto_exposure").subscribe(RemoteConfig.camera_auto_exposure)
             self._camera_exposure_sub = nt_table.getIntegerTopic(
                 "camera_exposure").subscribe(RemoteConfig.camera_exposure)
+            self._camera_gain_sub = nt_table.getIntegerTopic(
+                "camera_gain").subscribe(RemoteConfig.camera_gain)
             self._fiducial_size_m_sub = nt_table.getDoubleTopic(
                 "fiducial_size_m").subscribe(RemoteConfig.fiducial_size_m)
             self._init_complete = True
@@ -71,4 +74,5 @@ class NTConfigSource(ConfigSource):
         config_store.remote_config.camera_resolution_height = self._camera_resolution_height_sub.get()
         config_store.remote_config.camera_auto_exposure = self._camera_auto_exposure_sub.get()
         config_store.remote_config.camera_exposure = self._camera_exposure_sub.get()
+        config_store.remote_config.camera_gain = self._camera_gain_sub.get()
         config_store.remote_config.fiducial_size_m = self._fiducial_size_m_sub.get()
