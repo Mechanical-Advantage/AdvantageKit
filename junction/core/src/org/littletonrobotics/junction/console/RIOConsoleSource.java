@@ -14,7 +14,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class RIOConsoleSource implements ConsoleSource {
   private static final String filePath = "/home/lvuser/FRC_UserProgram.log";
   private BufferedReader reader = null;
-  private String data = "";
+
+  private static final int bufferSize = 10240;
+  private int writePosition = 0;
+  private byte[] data = new byte[bufferSize];
 
   public RIOConsoleSource() {
     try {
@@ -37,19 +40,32 @@ public class RIOConsoleSource implements ConsoleSource {
       } catch (IOException e) {
         DriverStation.reportError("Failed to read console file \"" + filePath + "\"", true);
       }
-      if (nextChar == -1) {
-        break;
+      if (nextChar != -1) {
+        data[writePosition] = (byte) nextChar;
+        writePosition++;
+        if (writePosition >= bufferSize) {
+          // Too much data, save any full lines and continue on the next cycle
+          break;
+        }
       } else {
-        data += new String(new byte[] { (byte) nextChar });
+        break;
       }
     }
 
     // Read all complete lines
-    int lastNewline = data.lastIndexOf("\n");
-    String completeLines = "";
+    String dataStr = new String(data);
+    int lastNewline = dataStr.lastIndexOf("\n");
+    String completeLines;
     if (lastNewline != -1) {
-      completeLines = data.substring(0, lastNewline);
-      data = data.substring(lastNewline + 1);
+      completeLines = dataStr.substring(0, lastNewline);
+      byte[] trimmedData = new byte[bufferSize];
+      if (lastNewline < bufferSize - 1) {
+        System.arraycopy(data, lastNewline + 1, trimmedData, 0, bufferSize - lastNewline - 1);
+      }
+      data = trimmedData;
+      writePosition -= lastNewline + 1;
+    } else {
+      completeLines = "";
     }
     return completeLines;
   }
