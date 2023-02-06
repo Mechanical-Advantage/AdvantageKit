@@ -33,7 +33,7 @@ configurations.all {
 }
 ```
 
-To install the main AdvantageKit packages, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" and paste in the URL below. The changelog for the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest)) includes the WPILib version on which it is based; **you must use the same version in your robot project**. You can check the selected version of WPILib at the top of `build.gradle` after "edu.wpi.first.GradleRIO".
+To install the main AdvantageKit packages, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" and paste in the URL below. The changelog for the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest) includes the WPILib version on which it is based; **you must use the same version in your robot project**. You can check the selected version of WPILib at the top of `build.gradle` after "edu.wpi.first.GradleRIO".
 
 ```
 https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest/download/AdvantageKit.json
