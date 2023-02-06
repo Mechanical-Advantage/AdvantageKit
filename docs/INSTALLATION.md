@@ -80,7 +80,8 @@ The [`@AutoLog` annotation](CODE-STRUCTURE.md#autolog-annotation) automatically 
 ```groovy
 dependencies {
     // ...
-    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:<version>"
+    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
 }
 ```
 
