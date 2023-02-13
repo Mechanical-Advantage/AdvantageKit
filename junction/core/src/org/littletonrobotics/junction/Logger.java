@@ -23,7 +23,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -140,10 +139,6 @@ public class Logger {
       // Start receiver thread
       receiverThread.start();
 
-      // Enable mock time for WPIUtil
-      WPIUtilJNI.setMockTime(getRealTimestamp());
-      WPIUtilJNI.enableMockTime();
-
       // Start first periodic cycle
       periodicBeforeUser();
     }
@@ -164,7 +159,6 @@ public class Logger {
         replaySource.end();
       }
       receiverThread.interrupt();
-      WPIUtilJNI.disableMockTime();
     }
   }
 
@@ -190,9 +184,6 @@ public class Logger {
           System.exit(0);
         }
       }
-
-      // Set mock time for WPIUtil
-      WPIUtilJNI.setMockTime(entry.getTimestamp());
 
       // Update default inputs
       long saveDataStart = getRealTimestamp();
