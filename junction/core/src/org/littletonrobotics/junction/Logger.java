@@ -39,6 +39,7 @@ public class Logger {
   private Map<String, String> metadata = new HashMap<>();
   private ConsoleSource console;
   private List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
+  private boolean deterministicTimestamps = true;
 
   private LogReplaySource replaySource;
   private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
@@ -94,6 +95,23 @@ public class Logger {
     if (!running) {
       metadata.put(key, value);
     }
+  }
+
+  /**
+   * Causes the timestamp returned by "Timer.getFPGATimestamp()" and similar to
+   * match the "real" time as reported by the FPGA instead of the logged time from
+   * AdvantageKit.
+   * 
+   * <p>
+   * Not recommended for most users as the behavior of the replayed
+   * code will NOT match the real robot. Only use this method if your control
+   * logic requires precise timestamps WITHIN a single cycle and you have no way
+   * to move timestamp-critical operations to an IO interface. Also consider using
+   * "getRealTimestamp()" for logic that doesn't need to match the replayed
+   * version (like for analyzing performance).
+   */
+  public void disableDeterministicTimestamps() {
+    deterministicTimestamps = false;
   }
 
   /**
@@ -251,11 +269,11 @@ public class Logger {
   }
 
   /**
-   * Returns the current FPGA timestamp in microseconds or replayed time based on
-   * the current log entry.
+   * Returns the current FPGA timestamp or replayed time based on the current log
+   * entry (microseconds).
    */
   public long getTimestamp() {
-    if (!running || entry == null) {
+    if (!running || entry == null || !deterministicTimestamps) {
       return getRealTimestamp();
     } else {
       return entry.getTimestamp();
