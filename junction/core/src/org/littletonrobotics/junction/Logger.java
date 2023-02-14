@@ -141,8 +141,10 @@ public class Logger {
       receiverThread.start();
 
       // Enable mock time for WPIUtil
-      WPIUtilJNI.setMockTime(getRealTimestamp());
-      WPIUtilJNI.enableMockTime();
+      if (hasReplaySource()) {
+        WPIUtilJNI.setMockTime(getRealTimestamp());
+        WPIUtilJNI.enableMockTime();
+      }
 
       // Start first periodic cycle
       periodicBeforeUser();
@@ -192,7 +194,9 @@ public class Logger {
       }
 
       // Set mock time for WPIUtil
-      WPIUtilJNI.setMockTime(entry.getTimestamp());
+      if (hasReplaySource()) {
+        WPIUtilJNI.setMockTime(entry.getTimestamp());
+      }
 
       // Update default inputs
       long saveDataStart = getRealTimestamp();
