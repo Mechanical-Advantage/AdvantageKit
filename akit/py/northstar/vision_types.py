@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import numpy
 import numpy.typing
+from wpimath.geometry import *
 
 
 @dataclass(frozen=True)
@@ -17,4 +18,12 @@ class FiducialPoseObservation:
     error_0: float
     tvec_1: numpy.typing.NDArray[numpy.float64]
     rvec_1: numpy.typing.NDArray[numpy.float64]
+    error_1: float
+
+
+@dataclass(frozen=True)
+class CameraPoseObservation:
+    pose_0: Pose3d
+    error_0: float
+    pose_1: Pose3d
     error_1: float
