@@ -1,5 +1,5 @@
 _TEMPLATE = """
-mvn deploy:deploy-file -DgroupId={group_id} -DartifactId={artifact_id} -Dversion={version} -DrepositoryId={repo_id} -Dpackaging=pom -Dfile={pom_file} -Durl={url} -DgeneratePom=false
+mvn deploy:deploy-file -Dmaven.wagon.http.pool=false -DgroupId={group_id} -DartifactId={artifact_id} -Dversion={version} -DrepositoryId={repo_id} -Dpackaging=pom -Dfile={pom_file} -Durl={url} -DgeneratePom=false
 """
 
 def _pom_file_impl(ctx):
