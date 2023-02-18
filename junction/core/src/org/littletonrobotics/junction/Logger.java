@@ -327,7 +327,7 @@ public class Logger {
 
           @Override
           public double getTimestamp() {
-            return (mocked ? getTimestamp() : getRealTimestamp()) * 1.0e-6;
+            return (mocked ? Logger.getInstance().getTimestamp() : Logger.getInstance().getRealTimestamp()) * 1.0e-6;
           }
         });
   }

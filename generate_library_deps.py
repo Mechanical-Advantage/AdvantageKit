@@ -22,7 +22,7 @@ FRC_ARTIFACTORY_URL = "https://frcmaven.wpi.edu/artifactory"
 
 # Version of WPILib dependencies to use
 NI_VERSION = "2023.3.0"
-WPILIB_VERSION = "2023.3.2"
+WPILIB_VERSION = "2023.4.1"
 
 # --- Artifacts and versions ---
 # Dependencies to pull from standard maven repositories (currently just central)
