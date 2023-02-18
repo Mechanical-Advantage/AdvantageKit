@@ -18,12 +18,17 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
 
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.math.MathShared;
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -40,6 +45,7 @@ public class Logger {
   private Map<String, String> metadata = new HashMap<>();
   private ConsoleSource console;
   private List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
+  private boolean deterministicTimestamps = true;
 
   private LogReplaySource replaySource;
   private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
@@ -98,6 +104,23 @@ public class Logger {
   }
 
   /**
+   * Causes the timestamp returned by "Timer.getFPGATimestamp()" and similar to
+   * match the "real" time as reported by the FPGA instead of the logged time from
+   * AdvantageKit.
+   * 
+   * <p>
+   * Not recommended for most users as the behavior of the replayed
+   * code will NOT match the real robot. Only use this method if your control
+   * logic requires precise timestamps WITHIN a single cycle and you have no way
+   * to move timestamp-critical operations to an IO interface. Also consider using
+   * "getRealTimestamp()" for logic that doesn't need to match the replayed
+   * version (like for analyzing performance).
+   */
+  public void disableDeterministicTimestamps() {
+    deterministicTimestamps = false;
+  }
+
+  /**
    * Returns whether a replay source is currently being used.
    */
   public boolean hasReplaySource() {
@@ -140,11 +163,8 @@ public class Logger {
       // Start receiver thread
       receiverThread.start();
 
-      // Enable mock time for WPIUtil
-      if (hasReplaySource()) {
-        WPIUtilJNI.setMockTime(getRealTimestamp());
-        WPIUtilJNI.enableMockTime();
-      }
+      // Update MathShared to mock timestamp
+      setMathShared(true);
 
       // Start first periodic cycle
       periodicBeforeUser();
@@ -166,7 +186,7 @@ public class Logger {
         replaySource.end();
       }
       receiverThread.interrupt();
-      WPIUtilJNI.disableMockTime();
+      setMathShared(false);
     }
   }
 
@@ -191,11 +211,6 @@ public class Logger {
           end();
           System.exit(0);
         }
-      }
-
-      // Set mock time for WPIUtil
-      if (hasReplaySource()) {
-        WPIUtilJNI.setMockTime(entry.getTimestamp());
       }
 
       // Update default inputs
@@ -256,6 +271,68 @@ public class Logger {
   }
 
   /**
+   * Updates the MathShared object for wpimath to enable or disable AdvantageKit's
+   * mocked timestamps.
+   */
+  private void setMathShared(boolean mocked) {
+    MathSharedStore.setMathShared(
+        new MathShared() {
+          @Override
+          public void reportError(String error, StackTraceElement[] stackTrace) {
+            DriverStation.reportError(error, stackTrace);
+          }
+
+          @Override
+          public void reportUsage(MathUsageId id, int count) {
+            switch (id) {
+              case kKinematics_DifferentialDrive:
+                HAL.report(
+                    tResourceType.kResourceType_Kinematics,
+                    tInstances.kKinematics_DifferentialDrive);
+                break;
+              case kKinematics_MecanumDrive:
+                HAL.report(
+                    tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
+                break;
+              case kKinematics_SwerveDrive:
+                HAL.report(
+                    tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
+                break;
+              case kTrajectory_TrapezoidProfile:
+                HAL.report(tResourceType.kResourceType_TrapezoidProfile, count);
+                break;
+              case kFilter_Linear:
+                HAL.report(tResourceType.kResourceType_LinearFilter, count);
+                break;
+              case kOdometry_DifferentialDrive:
+                HAL.report(
+                    tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
+                break;
+              case kOdometry_SwerveDrive:
+                HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
+                break;
+              case kOdometry_MecanumDrive:
+                HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
+                break;
+              case kController_PIDController2:
+                HAL.report(tResourceType.kResourceType_PIDController2, count);
+                break;
+              case kController_ProfiledPIDController:
+                HAL.report(tResourceType.kResourceType_ProfiledPIDController, count);
+                break;
+              default:
+                break;
+            }
+          }
+
+          @Override
+          public double getTimestamp() {
+            return (mocked ? Logger.getInstance().getTimestamp() : Logger.getInstance().getRealTimestamp()) * 1.0e-6;
+          }
+        });
+  }
+
+  /**
    * Returns the state of the receiver queue fault. This is tripped when the
    * receiver queue fills up, meaning that data is no longer being saved.
    */
@@ -264,11 +341,11 @@ public class Logger {
   }
 
   /**
-   * Returns the current FPGA timestamp in microseconds or replayed time based on
-   * the current log entry.
+   * Returns the current FPGA timestamp or replayed time based on the current log
+   * entry (microseconds).
    */
   public long getTimestamp() {
-    if (!running || entry == null) {
+    if (!running || entry == null || !deterministicTimestamps) {
       return getRealTimestamp();
     } else {
       return entry.getTimestamp();

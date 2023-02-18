@@ -68,6 +68,7 @@ if (isReal()) {
     Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
 }
 
+// Logger.getInstance().disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
 Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 ```
 
