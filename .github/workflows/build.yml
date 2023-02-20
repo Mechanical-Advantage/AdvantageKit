@@ -12,9 +12,9 @@ jobs:
     steps:
       # Job setup & initial build
       - name: "Checkout repository"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: "Setup Java"
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: "temurin"
           java-version: "11"
@@ -72,12 +72,15 @@ jobs:
           asset_content_type: application/zip
 
       # Upload conduit build
+      - name: 'Release: Install Dependencies'
+        if: github.event_name == 'release'
+        run: pip3 install requests
+      - name: 'Release: Build "conduit/wpilibio:nativezip"'
+        if: github.event_name == 'release'
+        run: bazelisk build --config=athena --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip
       - name: 'Release: Upload "conduit/wpilibio:nativezip"'
         if: github.event_name == 'release'
-        run: bazelisk run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
-        env:
-          GITHUB_ACTOR: Mechanical-Advantage
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier linuxathena --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version-without-v }}-linuxathena.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
       - name: 'Release: Upload "conduit/wpilibio:pom"'
         if: github.event_name == 'release'
         run: bazelisk run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:pom.publish
@@ -103,9 +106,9 @@ jobs:
     strategy:
       matrix:
         host:
-          - { os: macos-latest, displayName: "macOS" }
-          - { os: ubuntu-22.04, displayName: "Linux" }
-          - { os: windows-latest, displayName: "Windows" }
+          - { os: macos-latest, displayName: "macOS", classifier: "osxuniversal" }
+          - { os: ubuntu-22.04, displayName: "Linux", classifier: "linuxx86-64" }
+          - { os: windows-2022, displayName: "Windows", classifier: "windowsx86-64" }
 
     name: Build for ${{ matrix.host.displayName }}
     runs-on: ${{ matrix.host.os }}
@@ -113,9 +116,9 @@ jobs:
     steps:
       # Job setup & initial build
       - name: "Checkout repository"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: "Setup Java"
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: "temurin"
           java-version: "11"
@@ -129,15 +132,18 @@ jobs:
         uses: battila7/get-version-action@v2
 
       # Upload conduit build
+      - name: 'Release: Install Dependencies'
+        if: github.event_name == 'release'
+        run: pip3 install requests
+      - name: 'Release: Build "conduit/wpilibio:nativezip" for macOS'
+        if: github.event_name == 'release' && matrix.host.displayName == 'macOS'
+        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio/osxuniversal:nativezip
       - name: 'Release: Upload "conduit/wpilibio:nativezip" for macOS'
         if: github.event_name == 'release' && matrix.host.displayName == 'macOS'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio/osxuniversal:nativezip.publish
-        env:
-          GITHUB_ACTOR: Mechanical-Advantage
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.host.classifier }} --file_path bazel-bin/conduit/wpilibio/osxuniversal/wpilibio-${{ steps.get_version.outputs.version-without-v }}-${{ matrix.host.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Release: Build "conduit/wpilibio:nativezip"'
+        if: github.event_name == 'release' && matrix.host.displayName != 'macOS'
+        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip
       - name: 'Release: Upload "conduit/wpilibio:nativezip"'
         if: github.event_name == 'release' && matrix.host.displayName != 'macOS'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip.publish
-        env:
-          GITHUB_ACTOR: Mechanical-Advantage
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.host.classifier }} --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version-without-v }}-${{ matrix.host.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
