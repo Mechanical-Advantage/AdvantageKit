@@ -1,4 +1,5 @@
 import dataclasses
+import sys
 import time
 from typing import Tuple
 
@@ -93,7 +94,7 @@ class GStreamerCapture(Capture):
                 print("Capture session failed, restarting")
                 self._video.release()
                 self._video = None  # Force reconnect
-                time.sleep(2)
+                sys.exit(1)
             return retval, image
         else:
             return False, cv2.Mat(numpy.ndarray([]))
