@@ -17,7 +17,6 @@ from output.StreamServer import MjpegServer
 from pipeline.CameraPoseEstimator import MultiTargetCameraPoseEstimator
 from pipeline.Capture import GStreamerCapture
 from pipeline.FiducialDetector import ArucoFiducialDetector
-from pipeline.PoseEstimator import SquareTargetPoseEstimator
 
 if __name__ == "__main__":
     config = ConfigStore(LocalConfig(), RemoteConfig())
@@ -69,11 +68,9 @@ if __name__ == "__main__":
         elif config.local_config.has_calibration:
             # Normal mode
             image_observations = fiducial_detector.detect_fiducials(image, config)
-            # pose_observations = [pose_estimator.solve_fiducial_pose(x, config) for x in image_observations]
+            pose_observation = pose_estimator.solve_camera_pose(image_observations, config)
             [overlay_image_observation(image, x) for x in image_observations]
-            # [overlay_pose_observation(image, config, x) for x in pose_observations]
-            # output_publisher.send(config, timestamp, pose_observations, fps)
-            pose_estimator.solve_camera_pose(image_observations, config)
+            output_publisher.send(config, timestamp, pose_observation, fps)
 
         else:
             # No calibration
