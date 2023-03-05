@@ -84,8 +84,11 @@ class MultiTargetCameraPoseEstimator(CameraPoseEstimator):
                                          [fid_size / 2.0, fid_size / 2.0, 0.0],
                                          [fid_size / 2.0, -fid_size / 2.0, 0.0],
                                          [-fid_size / 2.0, -fid_size / 2.0, 0.0]])
-            _, rvecs, tvecs, errors = cv2.solvePnPGeneric(object_points, numpy.array(image_points),
+            try:
+                _, rvecs, tvecs, errors = cv2.solvePnPGeneric(object_points, numpy.array(image_points),
                                                           config_store.local_config.camera_matrix, config_store.local_config.distortion_coefficients, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+            except:
+                return None
 
             # Calculate WPILib camera poses
             field_to_tag_pose = tag_poses[0]
@@ -104,8 +107,11 @@ class MultiTargetCameraPoseEstimator(CameraPoseEstimator):
         # Multi-tag, return one pose
         else:
             # Run SolvePNP with all tags
-            _, rvecs, tvecs, errors = cv2.solvePnPGeneric(numpy.array(object_points), numpy.array(image_points),
-                                                          config_store.local_config.camera_matrix, config_store.local_config.distortion_coefficients, flags=cv2.SOLVEPNP_SQPNP)
+            try:
+                _, rvecs, tvecs, errors = cv2.solvePnPGeneric(numpy.array(object_points), numpy.array(image_points),
+                                                            config_store.local_config.camera_matrix, config_store.local_config.distortion_coefficients, flags=cv2.SOLVEPNP_SQPNP)
+            except:
+                return None
 
             # Calculate WPILib camera pose
             camera_to_field_pose = openCvPoseToWpilib(tvecs[0], rvecs[0])
