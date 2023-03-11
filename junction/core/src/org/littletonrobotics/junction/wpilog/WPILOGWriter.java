@@ -15,11 +15,13 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
+import edu.wpi.first.wpilibj.RobotBase;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
   private static final double writePeriodSecs = 0.25;
-  private static final double timestampUpdateDelay = 3.0; // Wait several seconds to ensure timezone is updated
+  private static final double timestampUpdateDelay = 8.0; // Wait several seconds after DS attached to ensure
+                                                          // timestamp/timezone is updated
 
   private String folder;
   private String filename;
@@ -27,7 +29,7 @@ public class WPILOGWriter implements LogDataReceiver {
   private boolean autoRename;
   private boolean updatedTime;
   private boolean updatedMatch;
-  private Double firstUpdatedTime;
+  private Double dsAttachedTime;
 
   private DataLog log;
   private LogTable lastTable;
@@ -73,7 +75,7 @@ public class WPILOGWriter implements LogDataReceiver {
     entryTypes = new HashMap<>();
     updatedTime = false;
     updatedMatch = false;
-    firstUpdatedTime = null;
+    dsAttachedTime = null;
   }
 
   public void end() {
@@ -86,13 +88,16 @@ public class WPILOGWriter implements LogDataReceiver {
 
       // Update timestamp
       if (!updatedTime) {
-        if (System.currentTimeMillis() > 1638334800000L) { // 12/1/2021, the RIO 2 defaults to 7/1/2021
-          if (firstUpdatedTime == null) {
-            firstUpdatedTime = Logger.getInstance().getRealTimestamp() / 1000000.0;
-          } else if (Logger.getInstance().getRealTimestamp() / 1000000.0 - firstUpdatedTime > timestampUpdateDelay) {
+        if (DriverStation.isDSAttached() || RobotBase.isSimulation()) {
+          if (dsAttachedTime == null) {
+            dsAttachedTime = Logger.getInstance().getRealTimestamp() / 1000000.0;
+          } else if (Logger.getInstance().getRealTimestamp() / 1000000.0 - dsAttachedTime > timestampUpdateDelay
+              || RobotBase.isSimulation()) {
             log.setFilename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.wpilog'").format(new Date()));
             updatedTime = true;
           }
+        } else {
+          dsAttachedTime = null;
         }
 
         // Update match
