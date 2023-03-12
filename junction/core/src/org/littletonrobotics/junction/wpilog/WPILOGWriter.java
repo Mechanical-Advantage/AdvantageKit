@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
@@ -25,10 +26,11 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private String folder;
   private String filename;
+  private final String randomIdentifier;
 
   private boolean autoRename;
-  private boolean updatedTime;
-  private boolean updatedMatch;
+  private Date logDate;
+  private String logMatchText;
   private Double dsAttachedTime;
 
   private DataLog log;
@@ -45,6 +47,15 @@ public class WPILOGWriter implements LogDataReceiver {
    *             number (if applicable).
    */
   public WPILOGWriter(String path) {
+    // Create random identifier
+    Random random = new Random();
+    StringBuilder randomIdentifierBuilder = new StringBuilder();
+    for (int i = 0; i < 4; i++) {
+      randomIdentifierBuilder.append(String.format("%04x", random.nextInt(0x10000)));
+    }
+    randomIdentifier = randomIdentifierBuilder.toString();
+
+    // Set up folder and filename
     if (path.endsWith(".wpilog")) {
       File pathFile = new File(path);
       folder = pathFile.getParent();
@@ -52,7 +63,7 @@ public class WPILOGWriter implements LogDataReceiver {
       autoRename = false;
     } else {
       folder = path;
-      filename = "temp.wpilog";
+      filename = "temp_" + randomIdentifier + ".wpilog";
       autoRename = true;
     }
   }
@@ -73,8 +84,8 @@ public class WPILOGWriter implements LogDataReceiver {
     // Reset data
     entryIDs = new HashMap<>();
     entryTypes = new HashMap<>();
-    updatedTime = false;
-    updatedMatch = false;
+    logDate = null;
+    logMatchText = null;
     dsAttachedTime = null;
   }
 
@@ -87,38 +98,55 @@ public class WPILOGWriter implements LogDataReceiver {
     if (autoRename) {
 
       // Update timestamp
-      if (!updatedTime) {
+      if (logDate == null) {
         if (DriverStation.isDSAttached() || RobotBase.isSimulation()) {
           if (dsAttachedTime == null) {
             dsAttachedTime = Logger.getInstance().getRealTimestamp() / 1000000.0;
           } else if (Logger.getInstance().getRealTimestamp() / 1000000.0 - dsAttachedTime > timestampUpdateDelay
               || RobotBase.isSimulation()) {
-            log.setFilename(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss'.wpilog'").format(new Date()));
-            updatedTime = true;
+            logDate = new Date();
           }
         } else {
           dsAttachedTime = null;
         }
+      }
 
-        // Update match
-      } else if (DriverStation.getMatchType() != MatchType.None && !updatedMatch) {
-        String matchText = "";
+      // Update match
+      if (logMatchText == null && DriverStation.getMatchType() != MatchType.None) {
+        logMatchText = "";
         switch (DriverStation.getMatchType()) {
           case Practice:
-            matchText = "p";
+            logMatchText = "p";
             break;
           case Qualification:
-            matchText = "q";
+            logMatchText = "q";
             break;
           case Elimination:
-            matchText = "e";
+            logMatchText = "e";
             break;
           default:
             break;
         }
-        matchText += Integer.toString(DriverStation.getMatchNumber());
-        log.setFilename(filename.substring(0, filename.length() - 7) + "_" + matchText + ".wpilog");
-        updatedMatch = true;
+        logMatchText += Integer.toString(DriverStation.getMatchNumber());
+      }
+
+      // Update filename
+      StringBuilder newFilenameBuilder = new StringBuilder();
+      if (logDate == null) {
+        newFilenameBuilder.append("temp_");
+        newFilenameBuilder.append(randomIdentifier);
+      } else {
+        newFilenameBuilder.append(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss").format(logDate));
+      }
+      if (logMatchText != null) {
+        newFilenameBuilder.append("_");
+        newFilenameBuilder.append(logMatchText);
+      }
+      newFilenameBuilder.append(".wpilog");
+      String newFilename = newFilenameBuilder.toString();
+      if (!newFilename.equals(filename)) {
+        log.setFilename(newFilename);
+        filename = newFilename;
       }
     }
 
