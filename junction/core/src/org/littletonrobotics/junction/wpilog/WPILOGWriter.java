@@ -63,7 +63,7 @@ public class WPILOGWriter implements LogDataReceiver {
       autoRename = false;
     } else {
       folder = path;
-      filename = "temp_" + randomIdentifier + ".wpilog";
+      filename = "Log_" + randomIdentifier + ".wpilog";
       autoRename = true;
     }
   }
@@ -132,11 +132,11 @@ public class WPILOGWriter implements LogDataReceiver {
 
       // Update filename
       StringBuilder newFilenameBuilder = new StringBuilder();
+      newFilenameBuilder.append("Log_");
       if (logDate == null) {
-        newFilenameBuilder.append("temp_");
         newFilenameBuilder.append(randomIdentifier);
       } else {
-        newFilenameBuilder.append(new SimpleDateFormat("'Log'_yy-MM-dd_HH-mm-ss").format(logDate));
+        newFilenameBuilder.append(new SimpleDateFormat("yy-MM-dd_HH-mm-ss").format(logDate));
       }
       if (logMatchText != null) {
         newFilenameBuilder.append("_");
