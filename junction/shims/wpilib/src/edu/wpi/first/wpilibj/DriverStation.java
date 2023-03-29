@@ -487,6 +487,17 @@ public class DriverStation {
   }
 
   /**
+   * Gets a value indicating whether the Driver Station requires the robot to be
+   * running in Test
+   * mode and enabled.
+   *
+   * @return True if test mode should be set and the robot should be enabled.
+   */
+  public static boolean isTestEnabled() {
+    return logDS.getDSData().test && logDS.getDSData().enabled;
+  }
+
+  /**
    * Gets a value indicating whether the Driver Station is attached.
    *
    * @return True if Driver Station is attached, false otherwise.
