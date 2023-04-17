@@ -1,6 +1,7 @@
 package org.littletonrobotics.junction.inputs;
 
 import org.littletonrobotics.conduit.ConduitApi;
+import org.littletonrobotics.junction.LoadMonitor;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 
@@ -45,6 +46,9 @@ public class LoggedSystemStats {
     public boolean systemActive;
     public CANStatus canStatus = new CANStatus();
     public long epochTime;
+    public double cpuUtilization;
+    public double memoryUtilization;
+    public double jvmMemoryUtilization;
 
     @Override
     public void toLog(LogTable table) {
@@ -75,6 +79,10 @@ public class LoggedSystemStats {
       table.put("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount);
       table.put("CANBus/TransmitErrorCount", canStatus.transmitErrorCount);
       table.put("EpochTimeMicros", epochTime);
+
+      table.put("Load/CPU", cpuUtilization);
+      table.put("Load/SystemMemoryUsage", memoryUtilization);
+      table.put("Load/JVMMemoryUsage", jvmMemoryUtilization);
     }
 
     @Override
@@ -107,6 +115,10 @@ public class LoggedSystemStats {
           (int) table.getInteger("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount),
           (int) table.getInteger("CANBus/TransmitErrorCount", canStatus.transmitErrorCount));
       epochTime = table.getInteger("EpochTimeMicros", epochTime);
+
+      cpuUtilization = table.getDouble("Load/CPU", cpuUtilization);
+      memoryUtilization = table.getDouble("Load/SystemMemoryUsage", memoryUtilization);
+      jvmMemoryUtilization = table.getDouble("Load/JVMMemoryUsage", jvmMemoryUtilization);
     }
   }
 
@@ -142,6 +154,10 @@ public class LoggedSystemStats {
           (int) conduit.getReceiveErrorCount(),
           (int) conduit.getTransmitErrorCount());
       sysInputs.epochTime = conduit.getEpochTime();
+
+      sysInputs.cpuUtilization = LoadMonitor.getInstance().getCPUUtilization();
+      sysInputs.memoryUtilization = LoadMonitor.getInstance().getSystemMemoryUtilization();
+      sysInputs.jvmMemoryUtilization = LoadMonitor.getInstance().getJVMMemoryUtilization();
     }
 
     logger.processInputs("SystemStats", sysInputs);
