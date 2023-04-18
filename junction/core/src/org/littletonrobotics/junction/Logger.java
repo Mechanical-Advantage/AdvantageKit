@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
-  private static final int receiverQueueCapcity = 500; // 10s at 50Hz
+  private static final int receiverQueueCapacity = 500; // 10s at 50Hz
 
   private static Logger instance;
 
@@ -48,7 +48,7 @@ public class Logger {
   private boolean deterministicTimestamps = true;
 
   private LogReplaySource replaySource;
-  private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<>(receiverQueueCapcity);
+  private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<>(receiverQueueCapacity);
   private final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
   private boolean receiverQueueFault = false;
 
@@ -242,7 +242,7 @@ public class Logger {
   /**
    * Periodic method to be called after robotInit and each loop cycle. Sends data
    * to data receivers. Running this after user code allows IO operations to
-   * occur between cycles rather than interferring with the main thread.
+   * occur between cycles rather than interfering with the main thread.
    */
   void periodicAfterUser() {
     if (running) {

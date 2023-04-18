@@ -41,7 +41,7 @@ public class RLOGServer implements LogDataReceiver {
   }
 
   private static class ServerThread extends Thread {
-    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if hearbeat not received for this length
+    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if heartbeat not received for this length
 
     ServerSocket server;
     final RLOGEncoder encoder = new RLOGEncoder();
