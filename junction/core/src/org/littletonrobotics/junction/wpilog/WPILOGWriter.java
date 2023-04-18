@@ -24,11 +24,11 @@ public class WPILOGWriter implements LogDataReceiver {
   private static final double timestampUpdateDelay = 8.0; // Wait several seconds after DS attached to ensure
                                                           // timestamp/timezone is updated
 
-  private String folder;
+  private final String folder;
   private String filename;
   private final String randomIdentifier;
 
-  private boolean autoRename;
+  private final boolean autoRename;
   private Date logDate;
   private String logMatchText;
   private Double dsAttachedTime;

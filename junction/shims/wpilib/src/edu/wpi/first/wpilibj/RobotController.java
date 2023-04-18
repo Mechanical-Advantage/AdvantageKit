@@ -39,7 +39,7 @@ public final class RobotController {
    */
   @SuppressWarnings("AbbreviationAsWordInName")
   public static long getFPGARevision() {
-    return (long) HALUtil.getFPGARevision();
+    return HALUtil.getFPGARevision();
   }
 
   /**

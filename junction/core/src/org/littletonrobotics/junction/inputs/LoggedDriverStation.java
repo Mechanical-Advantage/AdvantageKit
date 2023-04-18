@@ -180,7 +180,7 @@ public class LoggedDriverStation {
     // Send/receive log data
     logger.processInputs("DriverStation", dsInputs);
     for (int id = 0; id < joystickInputs.length; id++) {
-      logger.processInputs("DriverStation/Joystick" + Integer.toString(id), joystickInputs[id]);
+      logger.processInputs("DriverStation/Joystick" + id, joystickInputs[id]);
     }
 
     // Update FMSInfo table
@@ -209,16 +209,16 @@ public class LoggedDriverStation {
    * original DriverStation.
    */
   private static class MatchDataSender {
-    NetworkTable table;
-    StringPublisher typeMetadata;
-    StringPublisher gameSpecificMessage;
-    StringPublisher eventName;
-    IntegerPublisher matchNumber;
-    IntegerPublisher replayNumber;
-    IntegerPublisher matchType;
-    BooleanPublisher alliance;
-    IntegerPublisher station;
-    IntegerPublisher controlWord;
+    final NetworkTable table;
+    final StringPublisher typeMetadata;
+    final StringPublisher gameSpecificMessage;
+    final StringPublisher eventName;
+    final IntegerPublisher matchNumber;
+    final IntegerPublisher replayNumber;
+    final IntegerPublisher matchType;
+    final BooleanPublisher alliance;
+    final IntegerPublisher station;
+    final IntegerPublisher controlWord;
     boolean oldIsRedAlliance = true;
     long oldStationNumber = 1;
     String oldEventName = "";

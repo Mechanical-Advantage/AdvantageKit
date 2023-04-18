@@ -40,15 +40,15 @@ public class Logger {
   private static Logger instance;
 
   private boolean running = false;
-  private LogTable entry = new LogTable(0);
+  private final LogTable entry = new LogTable(0);
   private LogTable outputTable;
-  private Map<String, String> metadata = new HashMap<>();
+  private final Map<String, String> metadata = new HashMap<>();
   private ConsoleSource console;
-  private List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
+  private final List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
   private boolean deterministicTimestamps = true;
 
   private LogReplaySource replaySource;
-  private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
+  private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<>(receiverQueueCapcity);
   private final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
   private boolean receiverQueueFault = false;
 
@@ -221,8 +221,8 @@ public class Logger {
       if (loggedPowerDistribution != null) {
         loggedPowerDistribution.periodic();
       }
-      for (int i = 0; i < dashboardInputs.size(); i++) {
-        dashboardInputs.get(i).periodic();
+      for (LoggedDashboardInput dashboardInput : dashboardInputs) {
+        dashboardInput.periodic();
       }
       long saveDataEnd = getRealTimestamp();
 
@@ -234,10 +234,7 @@ public class Logger {
       // Retrieve new data even if logger is disabled
       ConduitApi.getInstance().captureData();
       LoggedDriverStation.getInstance().periodic();
-      LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
-      if (loggedPowerDistribution != null) {
-        loggedPowerDistribution.periodic();
-      }
+      LoggedPowerDistribution.getInstance().periodic();
       LoggedSystemStats.getInstance().periodic();
     }
   }

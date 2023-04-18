@@ -103,9 +103,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The current of the channel in Amperes
    */
   public double getCurrent(int channel) {
-    double current = LoggedPowerDistribution.getInstance().getInputs().pdpChannelCurrents[channel];
-
-    return current;
+    return LoggedPowerDistribution.getInstance().getInputs().pdpChannelCurrents[channel];
   }
 
   /**
@@ -244,7 +242,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
         "TotalCurrent", () -> LoggedPowerDistribution.getInstance().getInputs().pdpTotalCurrent, null);
     builder.addBooleanProperty(
         "SwitchableChannel",
-        () -> getSwitchableChannel(),
-        value -> setSwitchableChannel(value));
+            this::getSwitchableChannel,
+            this::setSwitchableChannel
+    );
   }
 }

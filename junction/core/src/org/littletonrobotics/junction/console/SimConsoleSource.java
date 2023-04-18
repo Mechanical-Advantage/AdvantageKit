@@ -21,8 +21,14 @@ public class SimConsoleSource implements ConsoleSource {
   public SimConsoleSource() {
     originalStdout = System.out;
     originalStderr = System.err;
-    System.setOut(new PrintStream(new SplitStream(originalStdout, customStdout)));
-    System.setErr(new PrintStream(new SplitStream(originalStderr, customStderr)));
+    System.setOut(new PrintStream(new SplitStream(
+            originalStdout,
+            customStdout
+    )));
+    System.setErr(new PrintStream(new SplitStream(
+            originalStderr,
+            customStderr
+    )));
   }
 
   @Override
@@ -39,12 +45,12 @@ public class SimConsoleSource implements ConsoleSource {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     System.setOut(originalStdout);
     System.setOut(originalStderr);
   }
 
-  private class SplitStream extends OutputStream {
+  private static class SplitStream extends OutputStream {
     private final OutputStream[] streams;
 
     public SplitStream(OutputStream... streams) {
@@ -53,8 +59,8 @@ public class SimConsoleSource implements ConsoleSource {
 
     @Override
     public void write(int b) throws IOException {
-      for (int i = 0; i < streams.length; i++) {
-        streams[i].write(b);
+      for (OutputStream stream : streams) {
+        stream.write(b);
       }
     }
   }

@@ -10,10 +10,10 @@ public interface LoggableInputs {
   /**
    * Updates a LogTable with the data to log.
    */
-  public void toLog(LogTable table);
+  void toLog(LogTable table);
 
   /**
    * Updates data based on a LogTable.
    */
-  public void fromLog(LogTable table);
+  void fromLog(LogTable table);
 }

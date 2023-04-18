@@ -17,8 +17,8 @@ public class LoggedPowerDistribution {
 
   private final PowerDistributionInputs pdpInputs = new PowerDistributionInputs();
 
-  private int moduleID;
-  private int moduleType;
+  private final int moduleID;
+  private final int moduleType;
 
   private LoggedPowerDistribution(int moduleID, PowerDistribution.ModuleType moduleType) {
     this.moduleID = moduleID;

@@ -5,21 +5,21 @@ package org.littletonrobotics.junction;
  */
 public interface LogDataReceiver {
   /** Data receivers may optionally log the current timestamp using this key. */
-  public static final String timestampKey = "/Timestamp";
+  String timestampKey = "/Timestamp";
 
   /**
    * Called before the logging system begins reporting data. This should be used
    * to connect to files, find network devices, start threads, etc.
    */
-  public default void start() {
-  };
+  default void start() {
+  }
 
   /**
    * Called when the code shuts down cleanly. Note that this will NOT be called
    * when the robot is powered off.
    */
-  public default void end() {
-  };
+  default void end() {
+  }
 
   /**
    * Called every loop cycle when a new table is complete. This data can be
@@ -27,5 +27,5 @@ public interface LogDataReceiver {
    * 
    * @param table A copy of the data to save.
    */
-  public void putTable(LogTable table);
+  void putTable(LogTable table);
 }

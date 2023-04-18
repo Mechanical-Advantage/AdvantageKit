@@ -64,7 +64,7 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     Optional<? extends TypeElement> annotationOptional = annotations.stream()
         .filter((te) -> te.getSimpleName().toString().equals("AutoLog")).findFirst();
-    if (!annotationOptional.isPresent()) {
+    if (annotationOptional.isEmpty()) {
       return false;
     }
 
@@ -95,7 +95,7 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
             String logType = LOGGABLE_TYPES_LOOKUP.get(fieldType);
             if (logType == null) {
               String typeSuggestion = UNLOGGABLE_TYPES_SUGGESTIONS.get(fieldType);
-              String extraText = "";
+              String extraText;
               if (typeSuggestion != null) {
                 extraText = "Did you mean to use \"" + typeSuggestion + "\" instead?";
               } else {

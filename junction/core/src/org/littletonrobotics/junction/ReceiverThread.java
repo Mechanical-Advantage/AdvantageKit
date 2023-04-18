@@ -7,7 +7,7 @@ import java.util.concurrent.BlockingQueue;
 public class ReceiverThread extends Thread {
 
   private final BlockingQueue<LogTable> queue;
-  private List<LogDataReceiver> dataReceivers = new ArrayList<>();
+  private final List<LogDataReceiver> dataReceivers = new ArrayList<>();
 
   ReceiverThread(BlockingQueue<LogTable> queue) {
     super("LogReceiver");
@@ -21,8 +21,8 @@ public class ReceiverThread extends Thread {
 
   public void run() {
     // Start data receivers
-    for (int i = 0; i < dataReceivers.size(); i++) {
-      dataReceivers.get(i).start();
+    for (LogDataReceiver dataReceiver : dataReceivers) {
+      dataReceiver.start();
     }
 
     try {
@@ -30,15 +30,15 @@ public class ReceiverThread extends Thread {
         LogTable entry = queue.take(); // Wait for data
 
         // Send data to receivers
-        for (int i = 0; i < dataReceivers.size(); i++) {
-          dataReceivers.get(i).putTable(entry);
+        for (LogDataReceiver dataReceiver : dataReceivers) {
+          dataReceiver.putTable(entry);
         }
       }
     } catch (InterruptedException exception) {
 
       // End all data receivers
-      for (int i = 0; i < dataReceivers.size(); i++) {
-        dataReceivers.get(i).end();
+      for (LogDataReceiver dataReceiver : dataReceivers) {
+        dataReceiver.end();
       }
     }
   }

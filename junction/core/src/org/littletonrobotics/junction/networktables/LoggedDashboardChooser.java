@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class LoggedDashboardChooser<V> implements LoggedDashboardInput {
   private final String key;
   private String selectedValue = null;
-  private SendableChooser<String> sendableChooser = new SendableChooser<>();
-  private Map<String, V> options = new HashMap<>();
+  private final SendableChooser<String> sendableChooser = new SendableChooser<>();
+  private final Map<String, V> options = new HashMap<>();
 
   private final LoggableInputs inputs = new LoggableInputs() {
     public void toLog(LogTable table) {
