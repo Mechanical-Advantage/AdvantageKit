@@ -3,6 +3,7 @@ package org.littletonrobotics.junction;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class LogFileUtil {
@@ -57,5 +58,19 @@ public class LogFileUtil {
       filename = filename.substring(1, filename.length() - 1);
     }
     return filename;
+  }
+
+  /**
+   * Get the path of the USB drive if it is plugged into the roboRIO. If one isn't found, it will
+   * return empty.
+   *
+   * @return path of the USB drive.
+   */
+  public static Optional<Path> getUSBPath() {
+    try {
+      return Optional.of(Path.of("/u").toRealPath());
+    } catch (IOException e) {
+      return Optional.empty();
+    }
   }
 }
