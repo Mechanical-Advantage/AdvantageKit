@@ -42,9 +42,9 @@ public class LoadMonitor {
      */
     public LoadMonitor() {
         if(!OS.contains("nix") && !OS.contains("nux") && !OS.contains("aix")){
-            System.out.println("WARNING: LoadMonitor is only supported for the RoboRIO & other linux based " +
+            System.out.println("Advantage Kit LoadMonitor is only supported for the RoboRIO & other linux based " +
                     "operating systems. LoadMonitor will not be active.");
-            return; // nothing to do.
+            return;
         }
 
         //Reset give up flag
