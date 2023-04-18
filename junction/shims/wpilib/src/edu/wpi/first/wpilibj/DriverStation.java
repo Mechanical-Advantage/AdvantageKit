@@ -396,7 +396,7 @@ public class DriverStation {
    * Returns if a joystick is connected to the Driver Station.
    *
    * <p>
-   * This makes a best effort guess by looking at the reported number of axis,
+   * This makes the best effort guess by looking at the reported number of axis,
    * buttons, and POVs attached.
    *
    * @param stick The joystick port number

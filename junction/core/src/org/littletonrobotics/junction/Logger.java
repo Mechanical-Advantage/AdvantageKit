@@ -111,7 +111,7 @@ public class Logger {
    * <p>
    * Not recommended for most users as the behavior of the replayed
    * code will NOT match the real robot. Only use this method if your control
-   * logic requires precise timestamps WITHIN a single cycle and you have no way
+   * logic requires precise timestamps WITHIN a single cycle, and you have no way
    * to move timestamp-critical operations to an IO interface. Also consider using
    * "getRealTimestamp()" for logic that doesn't need to match the replayed
    * version (like for analyzing performance).

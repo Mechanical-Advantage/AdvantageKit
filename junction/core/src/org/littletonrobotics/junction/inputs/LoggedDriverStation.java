@@ -89,7 +89,7 @@ public class LoggedDriverStation {
   }
 
   /**
-   * All of the required inputs for a single joystick.
+   * All the required inputs for a single joystick.
    */
   public static class JoystickInputs implements LoggableInputs {
     public String name = "";
