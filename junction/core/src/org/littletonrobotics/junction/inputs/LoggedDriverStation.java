@@ -250,6 +250,7 @@ public class LoggedDriverStation {
       controlWord.set(0);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     private void sendMatchData(DriverStationInputs dsInputs) {
       boolean isRedAlliance = false;
       int stationNumber = 1;

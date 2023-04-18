@@ -1,6 +1,5 @@
 package org.littletonrobotics.junction.rlog;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

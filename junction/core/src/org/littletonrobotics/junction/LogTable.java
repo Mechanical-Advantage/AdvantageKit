@@ -379,13 +379,13 @@ public class LogTable {
           output.append(value.getBoolean() ? "true" : "false");
           break;
         case Integer:
-          output.append(Long.toString(value.getInteger()));
+          output.append(value.getInteger());
           break;
         case Float:
-          output.append(Float.toString(value.getFloat()));
+          output.append(value.getFloat());
           break;
         case Double:
-          output.append(Double.toString(value.getDouble()));
+          output.append(value.getDouble());
           break;
         case String:
           output.append("\"").append(value.getString()).append("\"");
