@@ -82,6 +82,14 @@ brew install bazel
 
 > If you are on an Apple Silicon Mac, please do not use Homebrew to install Bazel and instead use the above instructions to ensure an x86_64 version of Bazel is installed.
 
+## OS Agnostic Bazelisk
+To install bazelisk to handle automatically grabbing the correct bazel version for the project install node js for your platform and then run the following command:
+
+```
+npm install -g @bazel/bazelisk
+```
+You will need to manually install the correct JDK for your platform & the platform specific c++ build tools.
+
 # IDE Setup
 
 ## VSCode
