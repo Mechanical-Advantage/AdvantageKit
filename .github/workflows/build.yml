@@ -108,7 +108,7 @@ jobs:
         host:
           - { os: macos-latest, displayName: "macOS", classifier: "osxuniversal" }
           - { os: ubuntu-22.04, displayName: "Linux", classifier: "linuxx86-64" }
-          - { os: windows-2022, displayName: "Windows", classifier: "windowsx86-64" }
+          - { os: windows-2019, displayName: "Windows", classifier: "windowsx86-64" }
 
     name: Build for ${{ matrix.host.displayName }}
     runs-on: ${{ matrix.host.os }}
