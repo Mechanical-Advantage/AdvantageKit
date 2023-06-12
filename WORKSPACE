@@ -172,14 +172,14 @@ http_archive(
 #    remote = "https://github.com/wpilibsuite/allwpilib"
 #)
 
-BAZEL_TOOLCHAIN_TAG = "0.7.2"
+BAZEL_TOOLCHAIN_TAG = "ceeedcc4464322e05fe5b8df3749cc02273ee083"
 
 BAZEL_TOOLCHAIN_SHA = "f7aa8e59c9d3cafde6edb372d9bd25fb4ee7293ab20b916d867cd0baaa642529"
 
 http_archive(
     name = "com_grail_bazel_toolchain",
     canonical_id = BAZEL_TOOLCHAIN_TAG,
-    sha256 = BAZEL_TOOLCHAIN_SHA,
+    #sha256 = BAZEL_TOOLCHAIN_SHA,
     strip_prefix = "bazel-toolchain-{tag}".format(tag = BAZEL_TOOLCHAIN_TAG),
     url = "https://github.com/grailbio/bazel-toolchain/archive/{tag}.tar.gz".format(tag = BAZEL_TOOLCHAIN_TAG),
 )
@@ -192,7 +192,11 @@ load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
 
 llvm_toolchain(
     name = "llvm_toolchain",
-    llvm_version = "13.0.0",
+    llvm_versions = {
+        "": "15.0.6",
+        "darwin-aarch64": "15.0.7",
+        "darwin-x86_64": "15.0.7"
+    },
     stdlib = {
         "linux-x86_64": "stdc++",
         "linux-aarch64": "stdc++",
