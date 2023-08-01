@@ -1,7 +1,6 @@
-
-
 import sys
 import time
+from typing import Union
 
 import cv2
 import ntcore
@@ -17,6 +16,9 @@ from output.StreamServer import MjpegServer
 from pipeline.CameraPoseEstimator import MultiTargetCameraPoseEstimator
 from pipeline.Capture import GStreamerCapture
 from pipeline.FiducialDetector import ArucoFiducialDetector
+from pipeline.PoseEstimator import SquareTargetPoseEstimator
+
+DEMO_ID = 29
 
 if __name__ == "__main__":
     config = ConfigStore(LocalConfig(), RemoteConfig())
@@ -26,7 +28,8 @@ if __name__ == "__main__":
 
     capture = GStreamerCapture()
     fiducial_detector = ArucoFiducialDetector(cv2.aruco.DICT_APRILTAG_16h5)
-    pose_estimator = MultiTargetCameraPoseEstimator()
+    camera_pose_estimator = MultiTargetCameraPoseEstimator()
+    tag_pose_estimator = SquareTargetPoseEstimator()
     output_publisher: OutputPublisher = NTOutputPublisher()
     stream_server = MjpegServer()
     calibration_session = CalibrationSession()
@@ -68,9 +71,14 @@ if __name__ == "__main__":
         elif config.local_config.has_calibration:
             # Normal mode
             image_observations = fiducial_detector.detect_fiducials(image, config)
-            pose_observation = pose_estimator.solve_camera_pose(image_observations, config)
             [overlay_image_observation(image, x) for x in image_observations]
-            output_publisher.send(config, timestamp, pose_observation, fps)
+            camera_pose_observation = camera_pose_estimator.solve_camera_pose(
+                [x for x in image_observations if x.tag_id != DEMO_ID], config)
+            demo_image_observations = [x for x in image_observations if x.tag_id == DEMO_ID]
+            demo_pose_observation: Union[FiducialPoseObservation, None] = None
+            if len(demo_image_observations) > 0:
+                demo_pose_observation = tag_pose_estimator.solve_fiducial_pose(demo_image_observations[0], config)
+            output_publisher.send(config, timestamp, camera_pose_observation, demo_pose_observation, fps)
 
         else:
             # No calibration

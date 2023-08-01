@@ -86,7 +86,7 @@ class MultiTargetCameraPoseEstimator(CameraPoseEstimator):
                                          [-fid_size / 2.0, -fid_size / 2.0, 0.0]])
             try:
                 _, rvecs, tvecs, errors = cv2.solvePnPGeneric(object_points, numpy.array(image_points),
-                                                          config_store.local_config.camera_matrix, config_store.local_config.distortion_coefficients, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+                                                              config_store.local_config.camera_matrix, config_store.local_config.distortion_coefficients, flags=cv2.SOLVEPNP_IPPE_SQUARE)
             except:
                 return None
 
@@ -102,14 +102,14 @@ class MultiTargetCameraPoseEstimator(CameraPoseEstimator):
             field_to_camera_pose_1 = Pose3d(field_to_camera_1.translation(), field_to_camera_1.rotation())
 
             # Return result
-            return CameraPoseObservation(field_to_camera_pose_0, errors[0][0], field_to_camera_pose_1, errors[1][0], tag_ids)
+            return CameraPoseObservation(tag_ids, field_to_camera_pose_0, errors[0][0], field_to_camera_pose_1, errors[1][0])
 
         # Multi-tag, return one pose
         else:
             # Run SolvePNP with all tags
             try:
                 _, rvecs, tvecs, errors = cv2.solvePnPGeneric(numpy.array(object_points), numpy.array(image_points),
-                                                            config_store.local_config.camera_matrix, config_store.local_config.distortion_coefficients, flags=cv2.SOLVEPNP_SQPNP)
+                                                              config_store.local_config.camera_matrix, config_store.local_config.distortion_coefficients, flags=cv2.SOLVEPNP_SQPNP)
             except:
                 return None
 
@@ -120,4 +120,4 @@ class MultiTargetCameraPoseEstimator(CameraPoseEstimator):
             field_to_camera_pose = Pose3d(field_to_camera.translation(), field_to_camera.rotation())
 
             # Return result
-            return CameraPoseObservation(field_to_camera_pose, errors[0][0], None, None, tag_ids)
+            return CameraPoseObservation(tag_ids, field_to_camera_pose, errors[0][0], None, None)
