@@ -1,4 +1,4 @@
-# AdvantageKit
+# ![AdvantageKit](/banner.png)
 
 [![Build](https://github.com/Mechanical-Advantage/AdvantageKit/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/Mechanical-Advantage/AdvantageKit/actions/workflows/build.yml)
 
