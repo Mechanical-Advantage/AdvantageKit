@@ -140,6 +140,9 @@ Logging of system stats and power distribution data has been moved into conduit,
 - CAN status:
   - Utilization, TxFullCount, ReceiveErrorCount, TransmitErrorCount, OffCount
 - EpochTimeMicros
+- CPU usage
+- Memory usage
+- JVM memory usage
 
 ### PowerDistribution
 

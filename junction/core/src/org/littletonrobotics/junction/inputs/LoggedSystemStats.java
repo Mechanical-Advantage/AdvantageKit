@@ -1,6 +1,7 @@
 package org.littletonrobotics.junction.inputs;
 
 import org.littletonrobotics.conduit.ConduitApi;
+import org.littletonrobotics.junction.LoadMonitor;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 
@@ -45,6 +46,9 @@ public class LoggedSystemStats {
     public boolean systemActive;
     public CANStatus canStatus = new CANStatus();
     public long epochTime;
+    public double cpuUtilizationPercent;
+    public double memoryUtilizationPercent;
+    public double jvmMemoryUtilizationPercent;
 
     @Override
     public void toLog(LogTable table) {
@@ -75,6 +79,10 @@ public class LoggedSystemStats {
       table.put("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount);
       table.put("CANBus/TransmitErrorCount", canStatus.transmitErrorCount);
       table.put("EpochTimeMicros", epochTime);
+
+      table.put("LoadMonitor/CPUUsagePercent", cpuUtilizationPercent);
+      table.put("LoadMonitor/SystemMemoryUsagePercent", memoryUtilizationPercent);
+      table.put("LoadMonitor/JVMMemoryUsagePercent", jvmMemoryUtilizationPercent);
     }
 
     @Override
@@ -107,6 +115,10 @@ public class LoggedSystemStats {
           (int) table.getInteger("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount),
           (int) table.getInteger("CANBus/TransmitErrorCount", canStatus.transmitErrorCount));
       epochTime = table.getInteger("EpochTimeMicros", epochTime);
+
+      cpuUtilizationPercent = table.getDouble("LoadMonitor/CPUUsagePercent", cpuUtilizationPercent);
+      memoryUtilizationPercent = table.getDouble("LoadMonitor/SystemMemoryUsagePercent", memoryUtilizationPercent);
+      jvmMemoryUtilizationPercent = table.getDouble("LoadMonitor/JVMMemoryUsagePercent", jvmMemoryUtilizationPercent);
     }
   }
 
@@ -142,6 +154,10 @@ public class LoggedSystemStats {
           (int) conduit.getReceiveErrorCount(),
           (int) conduit.getTransmitErrorCount());
       sysInputs.epochTime = conduit.getEpochTime();
+
+      sysInputs.cpuUtilizationPercent = LoadMonitor.getInstance().getCPUUtilization();
+      sysInputs.memoryUtilizationPercent = LoadMonitor.getInstance().getSystemMemoryUtilization();
+      sysInputs.jvmMemoryUtilizationPercent = LoadMonitor.getInstance().getJVMMemoryUtilization();
     }
 
     logger.processInputs("SystemStats", sysInputs);
