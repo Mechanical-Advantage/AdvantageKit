@@ -58,7 +58,7 @@ The user program is responsible for configuring and initializing the logging fra
 Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
 if (isReal()) {
-    Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+    Logger.getInstance().addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
     Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
 } else {

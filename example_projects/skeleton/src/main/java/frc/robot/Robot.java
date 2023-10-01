@@ -53,7 +53,7 @@ public class Robot extends LoggedRobot {
 
     // Set up data receivers & replay source
     if (isReal()) {
-      logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+      logger.addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
       logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     } else {
       setUseTiming(false); // Run as fast as possible
