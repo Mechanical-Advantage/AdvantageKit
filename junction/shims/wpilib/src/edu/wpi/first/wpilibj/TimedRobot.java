@@ -5,11 +5,13 @@
 package edu.wpi.first.wpilibj;
 
 /**
- * @Deprecated The main robot class should inherit from LoggedRobot instead of
- *             TimedRobot when using AdvantageKit's WPILib shims.
+ * @Deprecated The main robot class must inherit from LoggedRobot instead of
+ *             TimedRobot when using AdvantageKit's WPILib shims. For more
+ *             details, check the AdvantageKit installation documentation:
+ *             https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/docs/INSTALLATION.md
  */
 @Deprecated
-public final class TimedRobot {
+public class TimedRobot extends IterativeRobotBase {
   static class Callback implements Comparable<Callback> {
     public Runnable func;
     public double period;
@@ -37,9 +39,15 @@ public final class TimedRobot {
   public static final double kDefaultPeriod = 0.02;
 
   protected TimedRobot() {
+    this(kDefaultPeriod);
   }
 
   protected TimedRobot(double period) {
+    super(period);
+    DriverStation.reportError(
+        "The main robot class must inherit from LoggedRobot when using AdvantageKit's WPILib shims. For more details, check the AdvantageKit installation documentation: https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/docs/INSTALLATION.md\n\n*** EXITING DUE TO INVALID ADVANTAGEKIT INSTALLATION, SEE ABOVE. ***",
+        false);
+    System.exit(1);
   }
 
   public void close() {

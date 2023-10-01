@@ -5,14 +5,17 @@
 package edu.wpi.first.wpilibj;
 
 /**
- * @Deprecated The main robot class should inherit from LoggedRobot instead of
- *             TimesliceRobot when using AdvantageKit's WPILib shims.
+ * @Deprecated The main robot class must inherit from LoggedRobot instead of
+ *             TimesliceRobot when using AdvantageKit's WPILib shims. For more
+ *             details, check the AdvantageKit installation documentation:
+ *             https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/docs/INSTALLATION.md
  */
 @Deprecated
-public final class TimesliceRobot {
-    public TimesliceRobot(double robotPeriodicAllocation, double controllerPeriod) {
-    }
+public class TimesliceRobot extends TimedRobot {
+  public TimesliceRobot(double robotPeriodicAllocation, double controllerPeriod) {
+    super();
+  }
 
-    public void schedule(Runnable func, double allocation) {
-    }
+  public void schedule(Runnable func, double allocation) {
+  }
 }
