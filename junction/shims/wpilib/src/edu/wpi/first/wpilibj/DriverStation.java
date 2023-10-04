@@ -34,12 +34,12 @@ public class DriverStation {
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
   private static double m_nextMessageTime;
 
-  private static LoggedDriverStation logDS = LoggedDriverStation.getInstance();
-  private static EventVector m_refreshEvents = new EventVector();
+  private static final LoggedDriverStation logDS = LoggedDriverStation.getInstance();
+  private static final EventVector m_refreshEvents = new EventVector();
 
   // Joystick button rising/falling edge flags
-  private static int[] m_lastJoystickButtonsPressed = new int[kJoystickPorts];
-  private static int[] m_lastJoystickButtonsReleased = new int[kJoystickPorts];
+  private static final int[] m_lastJoystickButtonsPressed = new int[kJoystickPorts];
+  private static final int[] m_lastJoystickButtonsReleased = new int[kJoystickPorts];
 
   private static boolean m_silenceJoystickWarning;
 
@@ -396,7 +396,7 @@ public class DriverStation {
    * Returns if a joystick is connected to the Driver Station.
    *
    * <p>
-   * This makes a best effort guess by looking at the reported number of axis,
+   * This makes the best effort guess by looking at the reported number of axis,
    * buttons, and POVs attached.
    *
    * @param stick The joystick port number

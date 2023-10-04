@@ -22,9 +22,11 @@ public class LogFileUtil {
 
   /**
    * Finds the path to a log file for replay, using the following priorities:
-   * 
+   * <p>
    * 1. The value of the "AKIT_LOG_PATH" environment variable, if set
+   * <p>
    * 2. The file currently open in AdvantageScope, if available
+   * <p>
    * 3. The result of the prompt displayed to the user
    */
   public static String findReplayLog() {
@@ -40,8 +42,7 @@ public class LogFileUtil {
     String advantageScopeLogPath = null;
     try (Scanner fileScanner = new Scanner(advantageScopeTempPath)) {
       advantageScopeLogPath = fileScanner.nextLine();
-    } catch (IOException e) {
-    }
+    } catch (IOException ignored) {}
     if (advantageScopeLogPath != null) {
       System.out.println("Using log from AdvantageScope - \"" + advantageScopeLogPath + "\"");
       return advantageScopeLogPath;

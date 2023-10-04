@@ -43,7 +43,7 @@ public class LoggedSystemStats {
     public int userCurrentFaults6v;
     public boolean brownedOut;
     public boolean systemActive;
-    public CANStatus canStatus = new CANStatus();
+    public final CANStatus canStatus = new CANStatus();
     public long epochTime;
 
     @Override

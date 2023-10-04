@@ -111,6 +111,9 @@ Temporary Items
 !.vscode/extensions.json
 !.vscode/style.xml
 
+# Jetbrains IDEs
+.idea
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db

@@ -35,20 +35,20 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
-  private static final int receiverQueueCapcity = 500; // 10s at 50Hz
+  private static final int receiverQueueCapacity = 500; // 10s at 50Hz
 
   private static Logger instance;
 
   private boolean running = false;
-  private LogTable entry = new LogTable(0);
+  private final LogTable entry = new LogTable(0);
   private LogTable outputTable;
-  private Map<String, String> metadata = new HashMap<>();
+  private final Map<String, String> metadata = new HashMap<>();
   private ConsoleSource console;
-  private List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
+  private final List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
   private boolean deterministicTimestamps = true;
 
   private LogReplaySource replaySource;
-  private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
+  private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<>(receiverQueueCapacity);
   private final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
   private boolean receiverQueueFault = false;
 
@@ -111,7 +111,7 @@ public class Logger {
    * <p>
    * Not recommended for most users as the behavior of the replayed
    * code will NOT match the real robot. Only use this method if your control
-   * logic requires precise timestamps WITHIN a single cycle and you have no way
+   * logic requires precise timestamps WITHIN a single cycle, and you have no way
    * to move timestamp-critical operations to an IO interface. Also consider using
    * "getRealTimestamp()" for logic that doesn't need to match the replayed
    * version (like for analyzing performance).
@@ -221,8 +221,8 @@ public class Logger {
       if (loggedPowerDistribution != null) {
         loggedPowerDistribution.periodic();
       }
-      for (int i = 0; i < dashboardInputs.size(); i++) {
-        dashboardInputs.get(i).periodic();
+      for (LoggedDashboardInput dashboardInput : dashboardInputs) {
+        dashboardInput.periodic();
       }
       long saveDataEnd = getRealTimestamp();
 
@@ -234,10 +234,7 @@ public class Logger {
       // Retrieve new data even if logger is disabled
       ConduitApi.getInstance().captureData();
       LoggedDriverStation.getInstance().periodic();
-      LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
-      if (loggedPowerDistribution != null) {
-        loggedPowerDistribution.periodic();
-      }
+      LoggedPowerDistribution.getInstance().periodic();
       LoggedSystemStats.getInstance().periodic();
     }
   }
@@ -245,7 +242,7 @@ public class Logger {
   /**
    * Periodic method to be called after robotInit and each loop cycle. Sends data
    * to data receivers. Running this after user code allows IO operations to
-   * occur between cycles rather than interferring with the main thread.
+   * occur between cycles rather than interfering with the main thread.
    */
   void periodicAfterUser() {
     if (running) {
@@ -345,7 +342,7 @@ public class Logger {
    * entry (microseconds).
    */
   public long getTimestamp() {
-    if (!running || entry == null || !deterministicTimestamps) {
+    if (!running || !deterministicTimestamps) {
       return getRealTimestamp();
     } else {
       return entry.getTimestamp();

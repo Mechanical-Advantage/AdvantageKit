@@ -40,8 +40,8 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   private final Tracer m_tracer;
 
   private static final PriorityQueue<Watchdog> m_watchdogs = new PriorityQueue<>();
-  private static ReentrantLock m_queueMutex = new ReentrantLock();
-  private static int m_notifier;
+  private static final ReentrantLock m_queueMutex = new ReentrantLock();
+  private static final int m_notifier;
 
   static {
     m_notifier = NotifierJNI.initializeNotifier();

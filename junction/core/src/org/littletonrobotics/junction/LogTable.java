@@ -17,7 +17,7 @@ public class LogTable {
 
   /** Timestamp wrapper to enable passing by reference to subtables. */
   private static class SharedTimestamp {
-    public long value = 0;
+    public long value;
 
     public SharedTimestamp(long value) {
       this.value = value;
@@ -35,7 +35,8 @@ public class LogTable {
    * Creates a new LogTable, to serve as the root table.
    */
   public LogTable(long timestamp) {
-    this("/", new SharedTimestamp(timestamp), new HashMap<String, LogValue>());
+    this("/", new SharedTimestamp(timestamp),
+            new HashMap<>());
   }
 
   /**
@@ -50,8 +51,7 @@ public class LogTable {
    * table can be safely modified without affecting the copy.
    */
   public static LogTable clone(LogTable source) {
-    Map<String, LogValue> data = new HashMap<String, LogValue>();
-    data.putAll(source.data);
+    Map<String, LogValue> data = new HashMap<>(source.data);
     return new LogTable(source.prefix, new SharedTimestamp(source.timestamp.value), data);
 
   }
@@ -91,7 +91,7 @@ public class LogTable {
    */
   public Map<String, LogValue> getAll(boolean subtableOnly) {
     if (subtableOnly) {
-      Map<String, LogValue> result = new HashMap<String, LogValue>();
+      Map<String, LogValue> result = new HashMap<>();
       for (Map.Entry<String, LogValue> field : data.entrySet()) {
         if (field.getKey().startsWith(prefix)) {
           result.put(field.getKey().substring(prefix.length()), field.getValue());
@@ -112,10 +112,7 @@ public class LogTable {
     if (currentValue == null) {
       return true;
     }
-    if (currentValue.type.equals(type)) {
-      return true;
-    }
-    return false;
+    return currentValue.type.equals(type);
   }
 
   /**
@@ -126,7 +123,9 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.Raw)) {
       byte[] valueClone = new byte[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
+      data.put(prefix + key,
+              new LogValue(valueClone)
+      );
     }
   }
 
@@ -136,7 +135,9 @@ public class LogTable {
    */
   public void put(String key, boolean value) {
     if (writeAllowed(key, LoggableType.Boolean)) {
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key,
+              new LogValue(value)
+      );
     }
   }
 
@@ -146,7 +147,9 @@ public class LogTable {
    */
   public void put(String key, long value) {
     if (writeAllowed(key, LoggableType.Integer)) {
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key,
+              new LogValue(value)
+      );
     }
   }
 
@@ -156,7 +159,9 @@ public class LogTable {
    */
   public void put(String key, float value) {
     if (writeAllowed(key, LoggableType.Float)) {
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key,
+              new LogValue(value)
+      );
     }
   }
 
@@ -166,7 +171,9 @@ public class LogTable {
    */
   public void put(String key, double value) {
     if (writeAllowed(key, LoggableType.Double)) {
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key,
+              new LogValue(value)
+      );
     }
   }
 
@@ -176,7 +183,9 @@ public class LogTable {
    */
   public void put(String key, String value) {
     if (writeAllowed(key, LoggableType.String)) {
-      data.put(prefix + key, new LogValue(value));
+      data.put(prefix + key,
+              new LogValue(value)
+      );
     }
   }
 
@@ -188,7 +197,9 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.BooleanArray)) {
       boolean[] valueClone = new boolean[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
+      data.put(prefix + key,
+              new LogValue(valueClone)
+      );
     }
   }
 
@@ -200,7 +211,9 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.IntegerArray)) {
       long[] valueClone = new long[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
+      data.put(prefix + key,
+              new LogValue(valueClone)
+      );
     }
   }
 
@@ -212,7 +225,9 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.FloatArray)) {
       float[] valueClone = new float[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
+      data.put(prefix + key,
+              new LogValue(valueClone)
+      );
     }
   }
 
@@ -224,7 +239,9 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.DoubleArray)) {
       double[] valueClone = new double[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
+      data.put(prefix + key,
+              new LogValue(valueClone)
+      );
     }
   }
 
@@ -236,7 +253,9 @@ public class LogTable {
     if (writeAllowed(key, LoggableType.StringArray)) {
       String[] valueClone = new String[value.length];
       System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
+      data.put(prefix + key,
+              new LogValue(valueClone)
+      );
     }
   }
 
@@ -346,63 +365,63 @@ public class LogTable {
 
   /** Returns a string representation of the table. */
   public String toString() {
-    String output = "Timestamp=" + Long.toString(timestamp.value) + "\n";
-    output += "Prefix=\"" + prefix + "\"\n";
-    output += "{\n";
+    StringBuilder output = new StringBuilder("Timestamp=" + timestamp.value + "\n");
+    output.append("Prefix=\"").append(prefix).append("\"\n");
+    output.append("{\n");
     for (Map.Entry<String, LogValue> field : getAll(true).entrySet()) {
-      output += "\t" + field.getKey() + "=";
+      output.append("\t").append(field.getKey()).append("=");
       LogValue value = field.getValue();
       switch (value.type) {
         case Raw:
-          output += Arrays.toString(value.getRaw());
+          output.append(Arrays.toString(value.getRaw()));
           break;
         case Boolean:
-          output += value.getBoolean() ? "true" : "false";
+          output.append(value.getBoolean() ? "true" : "false");
           break;
         case Integer:
-          output += Long.toString(value.getInteger());
+          output.append(value.getInteger());
           break;
         case Float:
-          output += Float.toString(value.getFloat());
+          output.append(value.getFloat());
           break;
         case Double:
-          output += Double.toString(value.getDouble());
+          output.append(value.getDouble());
           break;
         case String:
-          output += "\"" + value.getString() + "\"";
+          output.append("\"").append(value.getString()).append("\"");
           break;
         case BooleanArray:
-          output += Arrays.toString(value.getBooleanArray());
+          output.append(Arrays.toString(value.getBooleanArray()));
           break;
         case IntegerArray:
-          output += Arrays.toString(value.getIntegerArray());
+          output.append(Arrays.toString(value.getIntegerArray()));
           break;
         case FloatArray:
-          output += Arrays.toString(value.getFloatArray());
+          output.append(Arrays.toString(value.getFloatArray()));
           break;
         case DoubleArray:
-          output += Arrays.toString(value.getDoubleArray());
+          output.append(Arrays.toString(value.getDoubleArray()));
           break;
         case StringArray:
-          output += "[";
+          output.append("[");
           String[] stringArray = value.getStringArray();
           for (int i = 0; i < stringArray.length; i++) {
-            output += "\"" + stringArray[i] + "\"";
-            output += i < stringArray.length - 1 ? "," : "";
+            output.append("\"").append(stringArray[i]).append("\"");
+            output.append(i < stringArray.length - 1 ? "," : "");
           }
-          output += "]";
+          output.append("]");
           break;
       }
-      output += "\n";
+      output.append("\n");
     }
-    output += "}";
-    return output;
+    output.append("}");
+    return output.toString();
   }
 
   /**
    * Represents a value stored in a LogTable, including type and value.
    */
-  public class LogValue {
+  public static class LogValue {
     public final LoggableType type;
     private final Object value;
 
@@ -433,11 +452,10 @@ public class LogTable {
 
     LogValue(String value) {
       type = LoggableType.String;
-      if (value != null) {
-        this.value = value;
-      } else {
-        this.value = "";
-      }
+      this.value = Objects.requireNonNullElse(
+              value,
+              ""
+      );
     }
 
     LogValue(boolean[] value) {

@@ -24,7 +24,7 @@ public class RLOGServer implements LogDataReceiver {
   public void start() {
     thread = new ServerThread(port);
     thread.start();
-    System.out.println("Log server started on port " + Integer.toString(port));
+    System.out.println("Log server started on port " + port);
   }
 
   public void end() {
@@ -40,14 +40,14 @@ public class RLOGServer implements LogDataReceiver {
     }
   }
 
-  private class ServerThread extends Thread {
-    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if hearbeat not received for this length
+  private static class ServerThread extends Thread {
+    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if heartbeat not received for this length
 
     ServerSocket server;
-    RLOGEncoder encoder = new RLOGEncoder();
+    final RLOGEncoder encoder = new RLOGEncoder();
 
-    List<Socket> sockets = new ArrayList<>();
-    List<Double> lastHeartbeats = new ArrayList<>();
+    final List<Socket> sockets = new ArrayList<>();
+    final List<Double> lastHeartbeats = new ArrayList<>();
 
     public ServerThread(int port) {
       super("LogSocketServer");
