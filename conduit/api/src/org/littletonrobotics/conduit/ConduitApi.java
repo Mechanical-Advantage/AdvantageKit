@@ -192,6 +192,56 @@ public class ConduitApi {
     return pdp.totalEnergy();
   }
 
+  public int getFPGAVersion() {
+    return sys.fpgaVersion();
+  }
+
+  public int getFPGARevision() {
+    return sys.fpgaRevision();
+  }
+
+  public String getSerialNumber() {
+    byte[] bytes = new byte[sys.serialNumberSize()];
+    int i;
+    for (i = 0; i < bytes.length; i++) {
+      bytes[i] = (byte) sys.serialNumber(i);
+    }
+    return new String(bytes, 0, i, utf8Charset);
+  }
+
+  public String getComments() {
+    byte[] bytes = new byte[sys.commentsSize()];
+    int i;
+    for (i = 0; i < bytes.length; i++) {
+      bytes[i] = (byte) sys.comments(i);
+    }
+    return new String(bytes, 0, i, utf8Charset);
+  }
+
+  public int getTeamNumber() {
+    return sys.teamNumber();
+  }
+
+  public boolean getFPGAButton() {
+    return sys.fpgaButton() != 0;
+  }
+
+  public boolean getSystemActive() {
+    return sys.systemActive() != 0;
+  }
+
+  public boolean getBrownedOut() {
+    return sys.brownedOut() != 0;
+  }
+
+  public boolean getRSLState() {
+    return sys.rslState() != 0;
+  }
+
+  public boolean getSystemTimeValid() {
+    return sys.systemTimeValid() != 0;
+  }
+
   public double getVoltageVin() {
     return sys.voltageVin();
   }
@@ -248,12 +298,12 @@ public class ConduitApi {
     return sys.userCurrentFaults6v();
   }
 
-  public boolean getBrownedOut() {
-    return sys.brownedOut() != 0;
+  public double getBrownoutVoltage() {
+    return sys.brownoutVoltage();
   }
 
-  public boolean getSystemActive() {
-    return sys.systemActive() != 0;
+  public double getCPUTemp() {
+    return sys.cpuTemp();
   }
 
   public float getCANBusUtilization() {

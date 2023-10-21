@@ -109,7 +109,6 @@ Temporary Items
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-!.vscode/style.xml
 
 ### Windows ###
 # Windows thumbnail cache files
@@ -159,7 +158,17 @@ gradle-app.setting
 .settings/
 bin/
 
-# Simulation GUI and other tools window save files
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# Fleet
+.fleet
+
+# Simulation GUI and other tools window save file
 *-window.json
 simgui*.json
 

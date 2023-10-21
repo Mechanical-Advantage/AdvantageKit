@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
@@ -31,7 +32,6 @@ public class WPILOGWriter implements LogDataReceiver {
   private boolean autoRename;
   private Date logDate;
   private String logMatchText;
-  private Double dsAttachedTime;
 
   private DataLog log;
   private LogTable lastTable;
@@ -86,7 +86,6 @@ public class WPILOGWriter implements LogDataReceiver {
     entryTypes = new HashMap<>();
     logDate = null;
     logMatchText = null;
-    dsAttachedTime = null;
   }
 
   public void end() {
@@ -98,23 +97,29 @@ public class WPILOGWriter implements LogDataReceiver {
     if (autoRename) {
 
       // Update timestamp
-      if (logDate == null) {
-        if (DriverStation.isDSAttached() || RobotBase.isSimulation()) {
-          if (dsAttachedTime == null) {
-            dsAttachedTime = Logger.getInstance().getRealTimestamp() / 1000000.0;
-          } else if (Logger.getInstance().getRealTimestamp() / 1000000.0 - dsAttachedTime > timestampUpdateDelay
-              || RobotBase.isSimulation()) {
-            logDate = new Date();
-          }
-        } else {
-          dsAttachedTime = null;
-        }
+      if (logDate == null && table.get("SystemStats/SystemTimeValid", false)) {
+        logDate = new Date();
       }
 
       // Update match
-      if (logMatchText == null && DriverStation.getMatchType() != MatchType.None) {
+      MatchType matchType;
+      switch ((int) table.get("DriverStation/MatchType", 0)) {
+        case 1:
+          matchType = MatchType.Practice;
+          break;
+        case 2:
+          matchType = MatchType.Qualification;
+          break;
+        case 3:
+          matchType = MatchType.Elimination;
+          break;
+        default:
+          matchType = MatchType.None;
+          break;
+      }
+      if (logMatchText == null && matchType != MatchType.None) {
         logMatchText = "";
-        switch (DriverStation.getMatchType()) {
+        switch (matchType) {
           case Practice:
             logMatchText = "p";
             break;
@@ -127,7 +132,7 @@ public class WPILOGWriter implements LogDataReceiver {
           default:
             break;
         }
-        logMatchText += Integer.toString(DriverStation.getMatchNumber());
+        logMatchText += Long.toString(table.get("DriverStation/MatchNumber", 0));
       }
 
       // Update filename
@@ -164,8 +169,8 @@ public class WPILOGWriter implements LogDataReceiver {
       LoggableType type = field.getValue().type;
       boolean appendData = false;
       if (!entryIDs.containsKey(field.getKey())) { // New field
-        entryIDs.put(field.getKey(),
-            log.start(field.getKey(), type.getWPILOGType(), WPILOGConstants.entryMetadata, table.getTimestamp()));
+        entryIDs.put(field.getKey(), log.start(field.getKey(), field.getValue().getWPILOGType(),
+            WPILOGConstants.entryMetadata, table.getTimestamp()));
         entryTypes.put(field.getKey(), type);
         appendData = true;
       } else if (!field.getValue().equals(oldMap.get(field.getKey()))) { // Updated field

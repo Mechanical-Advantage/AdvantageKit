@@ -17,7 +17,7 @@ public class LoggedDashboardString implements LoggedDashboardInput {
     }
 
     public void fromLog(LogTable table) {
-      value = table.getString(key, defaultValue);
+      value = table.get(key, defaultValue);
     }
   };
 

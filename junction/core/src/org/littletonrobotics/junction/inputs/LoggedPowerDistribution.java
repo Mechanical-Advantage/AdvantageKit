@@ -81,16 +81,16 @@ public class LoggedPowerDistribution {
 
     @Override
     public void fromLog(LogTable table) {
-      pdpTemperature = table.getDouble("Temperature", pdpTemperature);
-      pdpVoltage = table.getDouble("Voltage", pdpVoltage);
-      pdpChannelCurrents = table.getDoubleArray("ChannelCurrent", pdpChannelCurrents);
-      pdpTotalCurrent = table.getDouble("TotalCurrent", pdpTotalCurrent);
-      pdpTotalPower = table.getDouble("TotalPower", pdpTotalPower);
-      pdpTotalEnergy = table.getDouble("TotalEnergy", pdpTotalEnergy);
+      pdpTemperature = table.get("Temperature", pdpTemperature);
+      pdpVoltage = table.get("Voltage", pdpVoltage);
+      pdpChannelCurrents = table.get("ChannelCurrent", pdpChannelCurrents);
+      pdpTotalCurrent = table.get("TotalCurrent", pdpTotalCurrent);
+      pdpTotalPower = table.get("TotalPower", pdpTotalPower);
+      pdpTotalEnergy = table.get("TotalEnergy", pdpTotalEnergy);
 
-      channelCount = (int) table.getInteger("ChannelCount", channelCount);
-      faults = table.getInteger("Faults", faults);
-      stickyFaults = table.getInteger("StickyFaults", stickyFaults);
+      channelCount = (int) table.get("ChannelCount", channelCount);
+      faults = table.get("Faults", faults);
+      stickyFaults = table.get("StickyFaults", stickyFaults);
     }
   }
 

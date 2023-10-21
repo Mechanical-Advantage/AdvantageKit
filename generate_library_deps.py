@@ -21,8 +21,8 @@ import os
 FRC_ARTIFACTORY_URL = "https://frcmaven.wpi.edu/artifactory"
 
 # Version of WPILib dependencies to use
-NI_VERSION = "2023.3.0"
-WPILIB_VERSION = "2023.4.3"
+NI_VERSION = "2024.1.1"
+WPILIB_VERSION = "2024.1.1-beta-2"
 
 # --- Artifacts and versions ---
 # Dependencies to pull from standard maven repositories (currently just central)
@@ -34,7 +34,8 @@ MAVEN_DEPS = [
     "org.ejml:ejml-simple:0.38",
     "org.ejml:ejml-core:0.38",
     "junit:junit:4.13.2",
-    "com.squareup:javapoet:1.13.0"
+    "com.squareup:javapoet:1.13.0",
+    "us.hebi.quickbuf:quickbuf-runtime:1.3.2"
 ]
 
 # WPILib dependencies to pull from frcmaven.  If no version is provided, the above version is used.
@@ -45,7 +46,7 @@ WPILIB_JAVA_DEPS = [
     "edu.wpi.first.ntcore:ntcore-java",
     "edu.wpi.first.cscore:cscore-java",
     "edu.wpi.first.cameraserver:cameraserver-java",
-    "edu.wpi.first.thirdparty.frc2023.opencv:opencv-java:4.6.0-2",
+    "edu.wpi.first.thirdparty.frc2024.opencv:opencv-java:4.8.0-1",
 ]
 
 # Platform string for athena: (ours, frcmaven's)

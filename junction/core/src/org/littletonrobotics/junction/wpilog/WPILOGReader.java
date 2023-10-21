@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogReplaySource;
@@ -25,6 +26,7 @@ public class WPILOGReader implements LogReplaySource {
   private Long timestamp;
   private Map<Integer, String> entryIDs;
   private Map<Integer, LoggableType> entryTypes;
+  private Map<Integer, String> entryCustomTypes;
 
   public WPILOGReader(String filename) {
     this.filename = filename;
@@ -54,6 +56,7 @@ public class WPILOGReader implements LogReplaySource {
     timestamp = null;
     entryIDs = new HashMap<>();
     entryTypes = new HashMap<>();
+    entryCustomTypes = new HashMap<>();
   }
 
   public boolean updateTable(LogTable table) {
@@ -74,7 +77,11 @@ public class WPILOGReader implements LogReplaySource {
         if (record.isStart()) { // Ignore other control records
           if (record.getStartData().metadata.equals(WPILOGConstants.entryMetadata)) {
             entryIDs.put(record.getStartData().entry, record.getStartData().name);
-            entryTypes.put(record.getStartData().entry, LoggableType.fromWPILOGType(record.getStartData().type));
+            String typeStr = record.getStartData().type;
+            entryTypes.put(record.getStartData().entry, LoggableType.fromWPILOGType(typeStr));
+            if (typeStr.startsWith("proto:") || typeStr.startsWith("struct:") || typeStr.equals("structschema")) {
+              entryCustomTypes.put(record.getStartData().entry, typeStr);
+            }
           }
         }
 
@@ -92,39 +99,40 @@ public class WPILOGReader implements LogReplaySource {
 
           } else if (timestamp != null && record.getTimestamp() == timestamp) {
             entry = entry.substring(1); // Remove leading slash
+            String customType = entryCustomTypes.get(record.getEntry());
             switch (entryTypes.get(record.getEntry())) {
               case Raw:
-                table.put(entry, record.getRaw());
+                table.put(entry, new LogValue(record.getRaw(), customType));
                 break;
               case Boolean:
-                table.put(entry, record.getBoolean());
+                table.put(entry, new LogValue(record.getBoolean(), customType));
                 break;
               case Integer:
-                table.put(entry, record.getInteger());
+                table.put(entry, new LogValue(record.getInteger(), customType));
                 break;
               case Float:
-                table.put(entry, record.getFloat());
+                table.put(entry, new LogValue(record.getFloat(), customType));
                 break;
               case Double:
-                table.put(entry, record.getDouble());
+                table.put(entry, new LogValue(record.getDouble(), customType));
                 break;
               case String:
-                table.put(entry, record.getString());
+                table.put(entry, new LogValue(record.getString(), customType));
                 break;
               case BooleanArray:
-                table.put(entry, record.getBooleanArray());
+                table.put(entry, new LogValue(record.getBooleanArray(), customType));
                 break;
               case IntegerArray:
-                table.put(entry, record.getIntegerArray());
+                table.put(entry, new LogValue(record.getIntegerArray(), customType));
                 break;
               case FloatArray:
-                table.put(entry, record.getFloatArray());
+                table.put(entry, new LogValue(record.getFloatArray(), customType));
                 break;
               case DoubleArray:
-                table.put(entry, record.getDoubleArray());
+                table.put(entry, new LogValue(record.getDoubleArray(), customType));
                 break;
               case StringArray:
-                table.put(entry, record.getStringArray());
+                table.put(entry, new LogValue(record.getStringArray(), customType));
                 break;
             }
           }

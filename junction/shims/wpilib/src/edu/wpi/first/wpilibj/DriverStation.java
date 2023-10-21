@@ -4,10 +4,15 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+
 import org.littletonrobotics.junction.inputs.LoggedDriverStation;
 
-import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.ControlWord;
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.EventVector;
 import edu.wpi.first.util.datalog.DataLog;
@@ -24,7 +29,7 @@ public class DriverStation {
 
   /** The robot alliance that the robot is a part of. */
   public enum Alliance {
-    Red, Blue, Invalid
+    Red, Blue
   }
 
   public enum MatchType {
@@ -67,6 +72,7 @@ public class DriverStation {
    * Report error to Driver Station. Optionally appends Stack trace to error
    * message.
    *
+   * @param error      The error to report.
    * @param printTrace If true, append stack trace to error string
    */
   public static void reportError(String error, boolean printTrace) {
@@ -77,6 +83,7 @@ public class DriverStation {
    * Report error to Driver Station. Appends provided stack trace to error
    * message.
    *
+   * @param error      The error to report.
    * @param stackTrace The stack trace to append
    */
   public static void reportError(String error, StackTraceElement[] stackTrace) {
@@ -87,6 +94,7 @@ public class DriverStation {
    * Report warning to Driver Station. Optionally appends Stack trace to warning
    * message.
    *
+   * @param warning    The warning to report.
    * @param printTrace If true, append stack trace to warning string
    */
   public static void reportWarning(String error, boolean printTrace) {
@@ -97,6 +105,7 @@ public class DriverStation {
    * Report warning to Driver Station. Appends provided stack trace to warning
    * message.
    *
+   * @param warning    The warning to report.
    * @param stackTrace The stack trace to append
    */
   public static void reportWarning(String error, StackTraceElement[] stackTrace) {
@@ -581,50 +590,99 @@ public class DriverStation {
     return (int) logDS.getDSData().replayNumber;
   }
 
+  private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap = Map.of(
+      AllianceStationID.Unknown, Optional.empty(),
+      AllianceStationID.Red1, Optional.of(Alliance.Red),
+      AllianceStationID.Red2, Optional.of(Alliance.Red),
+      AllianceStationID.Red3, Optional.of(Alliance.Red),
+      AllianceStationID.Blue1, Optional.of(Alliance.Blue),
+      AllianceStationID.Blue2, Optional.of(Alliance.Blue),
+      AllianceStationID.Blue3, Optional.of(Alliance.Blue));
+
+  private static Map<AllianceStationID, OptionalInt> m_stationMap = Map.of(
+      AllianceStationID.Unknown, OptionalInt.empty(),
+      AllianceStationID.Red1, OptionalInt.of(1),
+      AllianceStationID.Red2, OptionalInt.of(2),
+      AllianceStationID.Red3, OptionalInt.of(3),
+      AllianceStationID.Blue1, OptionalInt.of(1),
+      AllianceStationID.Blue2, OptionalInt.of(2),
+      AllianceStationID.Blue3, OptionalInt.of(3));
+
   /**
    * Get the current alliance from the FMS.
    *
+   * <p>
+   * If the FMS is not connected, it is set from the team alliance setting on the
+   * driver station.
+   *
    * @return the current alliance
    */
-  public static Alliance getAlliance() {
+  public static Optional<Alliance> getAlliance() {
+    AllianceStationID allianceStationID = getRawAllianceStation();
+    if (allianceStationID == null) {
+      allianceStationID = AllianceStationID.Unknown;
+    }
+
+    return m_allianceMap.get(allianceStationID);
+  }
+
+  /**
+   * Gets the location of the team's driver station controls from the FMS.
+   *
+   * <p>
+   * If the FMS is not connected, it is set from the team alliance setting on the
+   * driver station.
+   *
+   * @return the location of the team's driver station controls: 1, 2, or 3
+   */
+  public static OptionalInt getLocation() {
+    AllianceStationID allianceStationID = getRawAllianceStation();
+    if (allianceStationID == null) {
+      allianceStationID = AllianceStationID.Unknown;
+    }
+
+    return m_stationMap.get(allianceStationID);
+  }
+
+  /**
+   * Gets the raw alliance station of the teams driver station.
+   *
+   * <p>
+   * This returns the raw low level value. Prefer getLocation or getAlliance
+   * unless necessary for performance.
+   *
+   * @return The raw alliance station id.
+   */
+  public static AllianceStationID getRawAllianceStation() {
     switch ((int) logDS.getDSData().allianceStation) {
-      case 0:
-      case 1:
-      case 2:
-        return Alliance.Red;
-
-      case 3:
-      case 4:
-      case 5:
-        return Alliance.Blue;
-
+      case DriverStationJNI.kUnknownAllianceStation:
+        return AllianceStationID.Unknown;
+      case DriverStationJNI.kRed1AllianceStation:
+        return AllianceStationID.Red1;
+      case DriverStationJNI.kRed2AllianceStation:
+        return AllianceStationID.Red2;
+      case DriverStationJNI.kRed3AllianceStation:
+        return AllianceStationID.Red3;
+      case DriverStationJNI.kBlue1AllianceStation:
+        return AllianceStationID.Blue1;
+      case DriverStationJNI.kBlue2AllianceStation:
+        return AllianceStationID.Blue2;
+      case DriverStationJNI.kBlue3AllianceStation:
+        return AllianceStationID.Blue3;
       default:
-        return Alliance.Invalid;
+        return null;
     }
   }
 
   /**
-   * Gets the location of the team's driver station controls.
+   * Wait for a DS connection. This method has been patched by AdvantageKit and is
+   * nonfunctional (the return value is always false).
    *
-   * @return the location of the team's driver station controls: 1, 2, or 3
+   * @param timeoutSeconds timeout in seconds. 0 for infinite.
+   * @return true if connected, false if timeout
    */
-  public static int getLocation() {
-    switch ((int) logDS.getDSData().allianceStation) {
-      case 0:
-      case 3:
-        return 1;
-
-      case 1:
-      case 4:
-        return 2;
-
-      case 2:
-      case 5:
-        return 3;
-
-      default:
-        return 0;
-    }
+  public static boolean waitForDsConnection(double timeoutSeconds) {
+    return false;
   }
 
   /**
@@ -632,9 +690,22 @@ public class DriverStation {
    * time to the robots, but does send an approximate match time. The value will
    * count down the time remaining in the current period (auto or teleop).
    * Warning: This is not an official time (so it cannot be used to dispute ref
-   * calls or guarantee that a function will trigger before the match ends) The
-   * Practice Match function of the DS approximates the behavior seen on the
-   * field.
+   * calls or guarantee that a function will trigger before the match ends).
+   *
+   * <p>
+   * When connected to the real field, this number only changes in full integer
+   * increments, and always counts down.
+   *
+   * <p>
+   * When the DS is in practice mode, this number is a floating point number, and
+   * counts down.
+   *
+   * <p>
+   * When the DS is in teleop or autonomous mode, this number is a floating point
+   * number, and counts up.
+   *
+   * <p>
+   * Simulation matches DS behavior without an FMS connected.
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */

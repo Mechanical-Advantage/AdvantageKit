@@ -61,7 +61,7 @@ def _impl(ctx):
     tool_paths = [
         tool_path(
             name = name,
-            path = "roborio-academic/bin/arm-frc2023-linux-gnueabi-{}{}".format(name, exec_extension),
+            path = "roborio-academic/bin/arm-frc2024-linux-gnueabi-{}{}".format(name, exec_extension),
         )
         for name in [
             "ar",
