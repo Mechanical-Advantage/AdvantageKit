@@ -1,5 +1,6 @@
 package org.littletonrobotics.junction;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,10 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.struct.Struct;
+import us.hebi.quickbuf.ProtoMessage;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
@@ -537,45 +542,104 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
-   * The poses are logged as a double array (x_1, y_1, rot_1, ...)
+   * <p>
+   * This method serializes a single object as a struct. Example usage:
+   * {@code recordOutput("MyPose", Pose2d.struct, new Pose2d())}
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Pose2d... value) {
-    double[] data = new double[value.length * 3];
-    for (int i = 0; i < value.length; i++) {
-      data[i * 3] = value[i].getX();
-      data[i * 3 + 1] = value[i].getY();
-      data[i * 3 + 2] = value[i].getRotation().getRadians();
+  public <T> void recordOutput(String key, Struct<T> struct, T value) {
+    if (running) {
+      outputTable.put(key, struct, value);
     }
-    recordOutput(key, data);
   }
 
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
-   * The poses are logged as a double array (x, y, z, w_rot, x_rot, y_rot,
-   * z_rot, ...)
+   * <p>
+   * This method serializes an array of objects as a struct. Example usage:
+   * {@code
+   * recordOutput("MyPoses", Pose2d.struct, new Pose2d(), new Pose2d());
+   * recordOutput("MyPoses", Pose2d.struct, new Pose2d[] {new Pose2d(), new
+   * Pose2d()});
+   * }
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Pose3d... value) {
-    double[] data = new double[value.length * 7];
-    for (int i = 0; i < value.length; i++) {
-      data[i * 7] = value[i].getX();
-      data[i * 7 + 1] = value[i].getY();
-      data[i * 7 + 2] = value[i].getZ();
-      data[i * 7 + 3] = value[i].getRotation().getQuaternion().getW();
-      data[i * 7 + 4] = value[i].getRotation().getQuaternion().getX();
-      data[i * 7 + 5] = value[i].getRotation().getQuaternion().getY();
-      data[i * 7 + 6] = value[i].getRotation().getQuaternion().getZ();
+  @SuppressWarnings("unchecked")
+  public <T> void recordOutput(String key, Struct<T> struct, T... value) {
+    if (running) {
+      outputTable.put(key, struct, value);
     }
-    recordOutput(key, data);
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method serializes a single object as a protobuf. Protobuf should only be
+   * used for objects that do not support struct serialization. Example usage:
+   * {@code recordOutput("MyPose", Pose2d.proto, new Pose2d())}
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  @SuppressWarnings("unchecked")
+  public <T, MessageType extends ProtoMessage<?>> void recordOutput(String key, Protobuf<T, MessageType> proto,
+      T value) {
+    if (running) {
+      outputTable.put(key, proto, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method serializes a single object as a struct or protobuf automatically
+   * by searching for a {@code struct} or {@code proto} field. Struct is preferred
+   * if both methods are supported.
+   * 
+   * @param T     The type
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> void recordOutput(String key, T value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method serializes an array of objects as a struct automatically
+   * by searching for a {@code struct} field. Top-level protobuf arrays are not
+   * supported.
+   * 
+   * @param T     The type
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> void recordOutput(String key, T... value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
   }
 
   /**
@@ -589,33 +653,26 @@ public class Logger {
    * @param value The value of the field.
    */
   public void recordOutput(String key, Trajectory value) {
-    recordOutput(key, value.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new));
+    recordOutput(key, Pose2d.struct, value.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new));
   }
 
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * The modules are logged as a double array (angle_1, speed_1, angle_2, speed_2,
-   * ...)
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
   public void recordOutput(String key, SwerveModuleState... value) {
-    double[] data = new double[value.length * 2];
-    for (int i = 0; i < value.length; i++) {
-      data[i * 2] = value[i].angle.getRadians();
-      data[i * 2 + 1] = value[i].speedMetersPerSecond;
-    }
-    recordOutput(key, data);
+    recordOutput(key, CustomStructs.swerveModuleState, value);
   }
 
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
+   * <p>
    * The current position of the Mechanism2d is logged once as a set of nested
    * fields. If the position is updated, this method must be called again.
    * 

@@ -22,7 +22,7 @@ public class LoggedDashboardChooser<V> implements LoggedDashboardInput {
     }
 
     public void fromLog(LogTable table) {
-      selectedValue = table.getString(key, selectedValue);
+      selectedValue = table.get(key, selectedValue);
     }
   };
 

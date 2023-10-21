@@ -19,6 +19,26 @@ using namespace std::chrono_literals;
 void SystemReader::read(schema::SystemData* system_buf) {
   std::int32_t status;
 
+  system_buf->mutate_fpga_version(HAL_GetFPGAVersion(&status));
+  system_buf->mutate_fpga_revision(HAL_GetFPGARevision(&status));
+
+  char serialNum[9];
+  size_t serialNumLen = HAL_GetSerialNumber(serialNum, sizeof(serialNum));
+  system_buf->mutate_serial_number_size(serialNumLen);
+  std::memcpy(system_buf->mutable_serial_number()->Data(), serialNum, system_buf->serial_number()->size());
+
+  char comments[65];
+  size_t commentsLen = HAL_GetComments(comments, sizeof(comments));
+  system_buf->mutate_comments_size(commentsLen);
+  std::memcpy(system_buf->mutable_comments()->Data(), comments, system_buf->comments()->size());
+
+  system_buf->mutate_team_number(HAL_GetTeamNumber());
+  system_buf->mutate_fpga_button(HAL_GetFPGAButton(&status));
+  system_buf->mutate_system_active(HAL_GetSystemActive(&status));
+  system_buf->mutate_browned_out(HAL_GetBrownedOut(&status));
+  system_buf->mutate_rsl_state(HAL_GetRSLState(&status));
+  system_buf->mutate_system_time_valid(HAL_GetSystemTimeValid(&status));
+
   system_buf->mutate_voltage_vin(HAL_GetVinVoltage(&status));
   system_buf->mutate_current_vin(HAL_GetVinCurrent(&status));
 
@@ -40,9 +60,8 @@ void SystemReader::read(schema::SystemData* system_buf) {
   system_buf->mutate_user_current_faults_6v(
       HAL_GetUserCurrentFaults6V(&status));
 
-  system_buf->mutate_browned_out(HAL_GetBrownedOut(&status));
-  system_buf->mutate_system_active(HAL_GetSystemActive(&status));
-  system_buf->mutate_epoch_time(wpi::GetSystemTime());
+  system_buf->mutate_brownout_voltage(HAL_GetBrownoutVoltage(&status));
+  system_buf->mutate_cpu_temp(HAL_GetCPUTemp(&status));
 
   float percent_bus_utilization = 0;
   uint32_t bus_off_count = 0;
@@ -60,4 +79,6 @@ void SystemReader::read(schema::SystemData* system_buf) {
       receive_error_count);
   system_buf->mutable_can_status().mutate_transmit_error_count(
       transmit_error_count);
+
+  system_buf->mutate_epoch_time(wpi::GetSystemTime());
 }

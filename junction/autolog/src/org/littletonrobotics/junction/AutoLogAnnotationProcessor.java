@@ -9,6 +9,7 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.tools.Diagnostic;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -93,27 +94,30 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
 
             String fieldType = fieldElement.asType().toString();
             String logType = LOGGABLE_TYPES_LOOKUP.get(fieldType);
-            if (logType == null) {
-              String typeSuggestion = UNLOGGABLE_TYPES_SUGGESTIONS.get(fieldType);
+            String typeSuggestion = UNLOGGABLE_TYPES_SUGGESTIONS.get(fieldType);
+
+            // Check for unloggable types
+            if (typeSuggestion != null || (logType == null && fieldType.startsWith("java"))) {
               String extraText = "";
               if (typeSuggestion != null) {
                 extraText = "Did you mean to use \"" + typeSuggestion + "\" instead?";
               } else {
                 extraText = "\"" + fieldType + "\" is not supported";
               }
-              System.err.println(
-                  "[AutoLog] Unkonwn type for \"" + simpleName + "\" from \"" + classElement.getSimpleName()
+              throw new RuntimeException(
+                  "[AutoLog] Unkonwn type for \"" + simpleName + "\" from \"" +
+                      classElement.getSimpleName()
                       + "\" (" + extraText + ")");
-            } else {
-              String getterName = "get" + logType;
-              toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
-              fromLogBuilder.addCode("$L = table.$L($S, $L);\n", simpleName, getterName, logName, simpleName);
+            }
+
+            // Log data (might be serialized)
+            toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
+            fromLogBuilder.addCode("$L = table.get($S, $L);\n", simpleName, logName, simpleName);
+            if (fieldElement.asType().getKind().equals(TypeKind.ARRAY)) {
               // Need to deep copy arrays
-              if (fieldElement.asType().getKind().equals(TypeKind.ARRAY)) {
-                cloneBuilder.addCode("copy.$L = this.$L.clone();\n", simpleName, simpleName);
-              } else {
-                cloneBuilder.addCode("copy.$L = this.$L;\n", simpleName, simpleName);
-              }
+              cloneBuilder.addCode("copy.$L = this.$L.clone();\n", simpleName, simpleName);
+            } else {
+              cloneBuilder.addCode("copy.$L = this.$L;\n", simpleName, simpleName);
             }
           });
 

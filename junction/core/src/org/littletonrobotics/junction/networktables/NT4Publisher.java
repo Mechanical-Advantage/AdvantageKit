@@ -41,8 +41,7 @@ public class NT4Publisher implements LogDataReceiver {
       String key = field.getKey().substring(1);
       GenericPublisher publisher = publishers.get(key);
       if (publisher == null) {
-        publisher = akitTable.getTopic(key).genericPublish(field.getValue().type.getNT4Type(),
-            PubSubOption.sendAll(true));
+        publisher = akitTable.getTopic(key).genericPublish(field.getValue().getNT4Type(), PubSubOption.sendAll(true));
         publishers.put(key, publisher);
       }
 

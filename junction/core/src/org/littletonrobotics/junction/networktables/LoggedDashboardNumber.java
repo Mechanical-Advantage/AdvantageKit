@@ -17,7 +17,7 @@ public class LoggedDashboardNumber implements LoggedDashboardInput {
     }
 
     public void fromLog(LogTable table) {
-      value = table.getDouble(key, defaultValue);
+      value = table.get(key, defaultValue);
     }
   };
 

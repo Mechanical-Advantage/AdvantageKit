@@ -17,7 +17,7 @@ public class LoggedDashboardBoolean implements LoggedDashboardInput {
     }
 
     public void fromLog(LogTable table) {
-      value = table.getBoolean(key, defaultValue);
+      value = table.get(key, defaultValue);
     }
   };
 

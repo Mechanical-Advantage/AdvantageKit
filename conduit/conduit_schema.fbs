@@ -60,6 +60,18 @@ struct CANStatus {
 }
 
 struct SystemData {
+    fpga_version:int32;
+    fpga_revision:int32;
+    serial_number_size:uint16;
+    serial_number:[uint8:8];
+    comments_size:uint16;
+    comments:[uint8:64];
+    team_number:int32;
+    fpga_button:int32;
+    system_active:int32;
+    browned_out:int32;
+    rsl_state:int32;
+    system_time_valid:int32;
     voltage_vin:float64;
     current_vin:float64;
     user_voltage_3v3:float64;
@@ -74,8 +86,8 @@ struct SystemData {
     user_current_6v:float64;
     user_active_6v:int32;
     user_current_faults_6v:int32;
-    browned_out:int32;
-    system_active:int32;
+    brownout_voltage:float64;
+    cpu_temp:float64;
     can_status:CANStatus;
     epoch_time:uint64;
 }

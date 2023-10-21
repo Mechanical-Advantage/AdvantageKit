@@ -8,7 +8,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2023-22.04
+    container: wpilib/roborio-cross-ubuntu:2024-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2

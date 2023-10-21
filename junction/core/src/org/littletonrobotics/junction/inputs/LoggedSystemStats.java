@@ -27,6 +27,16 @@ public class LoggedSystemStats {
   }
 
   public static class SystemStatsInputs implements LoggableInputs {
+    public int fpgaVersion;
+    public int fpgaRevision;
+    public String serialNumber;
+    public String comments;
+    public int teamNumber;
+    public boolean fpgaButton;
+    public boolean systemActive;
+    public boolean brownedOut;
+    public boolean rslState;
+    public boolean systemTimeValid;
     public double voltageVin;
     public double currentVin;
     public double userVoltage3v3;
@@ -41,13 +51,23 @@ public class LoggedSystemStats {
     public double userCurrent6v;
     public boolean userActive6v;
     public int userCurrentFaults6v;
-    public boolean brownedOut;
-    public boolean systemActive;
+    public double brownoutVoltage;
+    public double cpuTemp;
     public CANStatus canStatus = new CANStatus();
     public long epochTime;
 
     @Override
     public void toLog(LogTable table) {
+      table.put("FPGAVersion", fpgaVersion);
+      table.put("FPGARevision", fpgaRevision);
+      table.put("SerialNumber", serialNumber);
+      table.put("Comments", comments);
+      table.put("FPGAButton", fpgaButton);
+      table.put("SystemActive", systemActive);
+      table.put("BrownedOut", brownedOut);
+      table.put("RSLState", rslState);
+      table.put("SystemTimeValid", systemTimeValid);
+
       table.put("BatteryVoltage", voltageVin);
       table.put("BatteryCurrent", currentVin);
 
@@ -66,47 +86,59 @@ public class LoggedSystemStats {
       table.put("6vRail/Active", userActive6v);
       table.put("6vRail/CurrentFaults", userCurrentFaults6v);
 
-      table.put("BrownedOut", brownedOut);
-      table.put("SystemActive", systemActive);
+      table.put("BrownoutVoltage", brownoutVoltage);
+      table.put("CPUTempCelcius", cpuTemp);
 
       table.put("CANBus/Utilization", canStatus.percentBusUtilization);
       table.put("CANBus/OffCount", canStatus.busOffCount);
       table.put("CANBus/TxFullCount", canStatus.txFullCount);
       table.put("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount);
       table.put("CANBus/TransmitErrorCount", canStatus.transmitErrorCount);
+
       table.put("EpochTimeMicros", epochTime);
     }
 
     @Override
     public void fromLog(LogTable table) {
-      voltageVin = table.getDouble("BatteryVoltage", voltageVin);
-      currentVin = table.getDouble("BatteryCurrent", currentVin);
+      fpgaVersion = (int) table.get("FPGAVersion", fpgaVersion);
+      fpgaRevision = (int) table.get("FPGARevision", fpgaRevision);
+      serialNumber = table.get("SerialNumber", serialNumber);
+      comments = table.get("Comments", comments);
+      fpgaButton = table.get("FPGAButton", fpgaButton);
+      systemActive = table.get("SystemActive", systemActive);
+      brownedOut = table.get("BrownedOut", brownedOut);
+      rslState = table.get("RSLState", rslState);
+      systemTimeValid = table.get("SystemTimeValid", systemTimeValid);
 
-      userVoltage3v3 = table.getDouble("3v3Rail/Voltage", userVoltage3v3);
-      userCurrent3v3 = table.getDouble("3v3Rail/Current", userCurrent3v3);
-      userActive3v3 = table.getBoolean("3v3Rail/Active", userActive3v3);
-      userCurrentFaults3v3 = (int) table.getInteger("3v3Rail/CurrentFaults", userCurrentFaults3v3);
+      voltageVin = table.get("BatteryVoltage", voltageVin);
+      currentVin = table.get("BatteryCurrent", currentVin);
 
-      userVoltage5v = table.getDouble("5vRail/Voltage", userVoltage5v);
-      userCurrent5v = table.getDouble("5vRail/Current", userCurrent5v);
-      userActive5v = table.getBoolean("5vRail/Active", userActive5v);
-      userCurrentFaults5v = (int) table.getInteger("5vRail/CurrentFaults", userCurrentFaults5v);
+      userVoltage3v3 = table.get("3v3Rail/Voltage", userVoltage3v3);
+      userCurrent3v3 = table.get("3v3Rail/Current", userCurrent3v3);
+      userActive3v3 = table.get("3v3Rail/Active", userActive3v3);
+      userCurrentFaults3v3 = (int) table.get("3v3Rail/CurrentFaults", userCurrentFaults3v3);
 
-      userVoltage6v = table.getDouble("6vRail/Voltage", userVoltage6v);
-      userCurrent6v = table.getDouble("6vRail/Current", userCurrent6v);
-      userActive6v = table.getBoolean("6vRail/Active", userActive6v);
-      userCurrentFaults6v = (int) table.getInteger("6vRail/CurrentFaults", userCurrentFaults6v);
+      userVoltage5v = table.get("5vRail/Voltage", userVoltage5v);
+      userCurrent5v = table.get("5vRail/Current", userCurrent5v);
+      userActive5v = table.get("5vRail/Active", userActive5v);
+      userCurrentFaults5v = (int) table.get("5vRail/CurrentFaults", userCurrentFaults5v);
 
-      brownedOut = table.getBoolean("BrownedOut", brownedOut);
-      systemActive = table.getBoolean("SystemActive", systemActive);
+      userVoltage6v = table.get("6vRail/Voltage", userVoltage6v);
+      userCurrent6v = table.get("6vRail/Current", userCurrent6v);
+      userActive6v = table.get("6vRail/Active", userActive6v);
+      userCurrentFaults6v = (int) table.get("6vRail/CurrentFaults", userCurrentFaults6v);
+
+      brownoutVoltage = table.get("BrownoutVoltage", brownoutVoltage);
+      cpuTemp = table.get("CPUTempCelcius", cpuTemp);
 
       canStatus.setStatus(
-          table.getDouble("CANBus/Utilization", canStatus.percentBusUtilization),
-          (int) table.getInteger("CANBus/OffCount", canStatus.busOffCount),
-          (int) table.getInteger("CANBus/TxFullCount", canStatus.txFullCount),
-          (int) table.getInteger("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount),
-          (int) table.getInteger("CANBus/TransmitErrorCount", canStatus.transmitErrorCount));
-      epochTime = table.getInteger("EpochTimeMicros", epochTime);
+          table.get("CANBus/Utilization", canStatus.percentBusUtilization),
+          (int) table.get("CANBus/OffCount", canStatus.busOffCount),
+          (int) table.get("CANBus/TxFullCount", canStatus.txFullCount),
+          (int) table.get("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount),
+          (int) table.get("CANBus/TransmitErrorCount", canStatus.transmitErrorCount));
+
+      epochTime = table.get("EpochTimeMicros", epochTime);
     }
   }
 
@@ -114,6 +146,17 @@ public class LoggedSystemStats {
     // Update inputs from conduit
     if (!logger.hasReplaySource()) {
       ConduitApi conduit = ConduitApi.getInstance();
+
+      sysInputs.fpgaVersion = conduit.getFPGAVersion();
+      sysInputs.fpgaRevision = conduit.getFPGARevision();
+      sysInputs.serialNumber = conduit.getSerialNumber();
+      sysInputs.comments = conduit.getComments();
+      sysInputs.teamNumber = conduit.getTeamNumber();
+      sysInputs.fpgaButton = conduit.getFPGAButton();
+      sysInputs.systemActive = conduit.getSystemActive();
+      sysInputs.brownedOut = conduit.getBrownedOut();
+      sysInputs.rslState = conduit.getRSLState();
+      sysInputs.systemTimeValid = conduit.getSystemTimeValid();
 
       sysInputs.voltageVin = conduit.getVoltageVin();
       sysInputs.currentVin = conduit.getCurrentVin();
@@ -133,14 +176,15 @@ public class LoggedSystemStats {
       sysInputs.userActive6v = conduit.getUserActive6v();
       sysInputs.userCurrentFaults6v = conduit.getUserCurrentFaults6v();
 
-      sysInputs.brownedOut = conduit.getBrownedOut();
-      sysInputs.systemActive = conduit.getSystemActive();
+      sysInputs.cpuTemp = conduit.getCPUTemp();
+
       sysInputs.canStatus.setStatus(
           conduit.getCANBusUtilization(),
           (int) conduit.getBusOffCount(),
           (int) conduit.getTxFullCount(),
           (int) conduit.getReceiveErrorCount(),
           (int) conduit.getTransmitErrorCount());
+
       sysInputs.epochTime = conduit.getEpochTime();
     }
 

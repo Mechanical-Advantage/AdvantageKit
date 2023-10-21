@@ -27,7 +27,7 @@ public final class RobotController {
    */
   @SuppressWarnings("AbbreviationAsWordInName")
   public static int getFPGAVersion() {
-    return HALUtil.getFPGAVersion();
+    return LoggedSystemStats.getInstance().getInputs().fpgaVersion;
   }
 
   /**
@@ -39,7 +39,7 @@ public final class RobotController {
    */
   @SuppressWarnings("AbbreviationAsWordInName")
   public static long getFPGARevision() {
-    return (long) HALUtil.getFPGARevision();
+    return (long) LoggedSystemStats.getInstance().getInputs().fpgaRevision;
   }
 
   /**
@@ -48,7 +48,7 @@ public final class RobotController {
    * @return The serial number of the roboRIO.
    */
   public static String getSerialNumber() {
-    return HALUtil.getSerialNumber();
+    return LoggedSystemStats.getInstance().getInputs().serialNumber;
   }
 
   /**
@@ -62,7 +62,16 @@ public final class RobotController {
    * @return the comments from the roboRIO web interface.
    */
   public static String getComments() {
-    return HALUtil.getComments();
+    return LoggedSystemStats.getInstance().getInputs().comments;
+  }
+
+  /**
+   * Returns the team number configured for the robot controller.
+   *
+   * @return team number, or 0 if not found.
+   */
+  public static int getTeamNumber() {
+    return LoggedSystemStats.getInstance().getInputs().teamNumber;
   }
 
   /**
@@ -84,7 +93,7 @@ public final class RobotController {
    * @return true if the button is currently pressed down
    */
   public static boolean getUserButton() {
-    return HALUtil.getFPGAButton();
+    return LoggedSystemStats.getInstance().getInputs().fpgaButton;
   }
 
   /**
@@ -114,6 +123,24 @@ public final class RobotController {
    */
   public static boolean isBrownedOut() {
     return LoggedSystemStats.getInstance().getInputs().brownedOut;
+  }
+
+  /**
+   * Gets the current state of the Robot Signal Light (RSL).
+   *
+   * @return The current state of the RSL- true if on, false if off
+   */
+  public static boolean getRSLState() {
+    return LoggedSystemStats.getInstance().getInputs().rslState;
+  }
+
+  /**
+   * Gets if the system time is valid.
+   *
+   * @return True if the system time is valid, false otherwise
+   */
+  public static boolean isSystemTimeValid() {
+    return LoggedSystemStats.getInstance().getInputs().systemTimeValid;
   }
 
   /**
@@ -150,6 +177,15 @@ public final class RobotController {
    */
   public static double getCurrent3V3() {
     return LoggedSystemStats.getInstance().getInputs().userCurrent3v3;
+  }
+
+  /**
+   * Enables or disables the 3.3V rail.
+   *
+   * @param enabled whether to enable the 3.3V rail.
+   */
+  public static void setEnabled3V3(boolean enabled) {
+    PowerJNI.setUserEnabled3V3(enabled);
   }
 
   /**
@@ -191,6 +227,15 @@ public final class RobotController {
   }
 
   /**
+   * Enables or disables the 5V rail.
+   *
+   * @param enabled whether to enable the 5V rail.
+   */
+  public static void setEnabled5V(boolean enabled) {
+    PowerJNI.setUserEnabled5V(enabled);
+  }
+
+  /**
    * Get the enabled state of the 5V rail. The rail may be disabled due to a
    * controller brownout, a short circuit on the rail, or controller over-voltage.
    *
@@ -229,6 +274,15 @@ public final class RobotController {
   }
 
   /**
+   * Enables or disables the 6V rail.
+   *
+   * @param enabled whether to enable the 6V rail.
+   */
+  public static void setEnabled6V(boolean enabled) {
+    PowerJNI.setUserEnabled6V(enabled);
+  }
+
+  /**
    * Get the enabled state of the 6V rail. The rail may be disabled due to a
    * controller brownout, a short circuit on the rail, or controller over-voltage.
    *
@@ -254,7 +308,7 @@ public final class RobotController {
    * @return The brownout voltage
    */
   public static double getBrownoutVoltage() {
-    return PowerJNI.getBrownoutVoltage();
+    return LoggedSystemStats.getInstance().getInputs().brownoutVoltage;
   }
 
   /**
@@ -268,6 +322,15 @@ public final class RobotController {
    */
   public static void setBrownoutVoltage(double brownoutVoltage) {
     PowerJNI.setBrownoutVoltage(brownoutVoltage);
+  }
+
+  /**
+   * Get the current CPU temperature in degrees Celsius.
+   *
+   * @return current CPU temperature in degrees Celsius
+   */
+  public static double getCPUTemp() {
+    return LoggedSystemStats.getInstance().getInputs().cpuTemp;
   }
 
   /**

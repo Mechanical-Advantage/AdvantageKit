@@ -71,20 +71,20 @@ public class LoggedDriverStation {
     }
 
     public void fromLog(LogTable table) {
-      allianceStation = table.getInteger("AllianceStation", allianceStation);
-      eventName = table.getString("EventName", eventName);
-      gameSpecificMessage = table.getString("GameSpecificMessage", gameSpecificMessage);
-      matchNumber = table.getInteger("MatchNumber", matchNumber);
-      replayNumber = table.getInteger("ReplayNumber", replayNumber);
-      matchType = table.getInteger("MatchType", matchType);
-      matchTime = table.getDouble("MatchTime", matchTime);
+      allianceStation = table.get("AllianceStation", allianceStation);
+      eventName = table.get("EventName", eventName);
+      gameSpecificMessage = table.get("GameSpecificMessage", gameSpecificMessage);
+      matchNumber = table.get("MatchNumber", matchNumber);
+      replayNumber = table.get("ReplayNumber", replayNumber);
+      matchType = table.get("MatchType", matchType);
+      matchTime = table.get("MatchTime", matchTime);
 
-      enabled = table.getBoolean("Enabled", enabled);
-      autonomous = table.getBoolean("Autonomous", autonomous);
-      test = table.getBoolean("Test", test);
-      emergencyStop = table.getBoolean("EmergencyStop", emergencyStop);
-      fmsAttached = table.getBoolean("FMSAttached", fmsAttached);
-      dsAttached = table.getBoolean("DSAttached", dsAttached);
+      enabled = table.get("Enabled", enabled);
+      autonomous = table.get("Autonomous", autonomous);
+      test = table.get("Test", test);
+      emergencyStop = table.get("EmergencyStop", emergencyStop);
+      fmsAttached = table.get("FMSAttached", fmsAttached);
+      dsAttached = table.get("DSAttached", dsAttached);
     }
   }
 
@@ -113,14 +113,14 @@ public class LoggedDriverStation {
     }
 
     public void fromLog(LogTable table) {
-      name = table.getString("Name", name);
-      type = table.getInteger("Type", type);
-      xbox = table.getBoolean("Xbox", xbox);
-      buttonCount = table.getInteger("ButtonCount", buttonCount);
-      buttonValues = table.getInteger("ButtonValues", buttonValues);
-      povs = table.getIntegerArray("POVs", povs);
-      axisValues = table.getFloatArray("AxisValues", axisValues);
-      axisTypes = table.getIntegerArray("AxisTypes", axisTypes);
+      name = table.get("Name", name);
+      type = table.get("Type", type);
+      xbox = table.get("Xbox", xbox);
+      buttonCount = table.get("ButtonCount", buttonCount);
+      buttonValues = table.get("ButtonValues", buttonValues);
+      povs = table.get("POVs", povs);
+      axisValues = table.get("AxisValues", axisValues);
+      axisTypes = table.get("AxisTypes", axisTypes);
     }
   }
 

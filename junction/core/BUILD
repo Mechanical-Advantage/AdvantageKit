@@ -8,6 +8,7 @@ java_library(
     deps = [
         "//conduit/api:api-export",
         "//third_party/wpilib:wpilibj-compileonly",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
 

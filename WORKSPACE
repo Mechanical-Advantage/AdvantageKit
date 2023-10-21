@@ -195,7 +195,7 @@ llvm_toolchain(
     llvm_versions = {
         "": "15.0.6",
         "darwin-aarch64": "15.0.7",
-        "darwin-x86_64": "15.0.7"
+        "darwin-x86_64": "15.0.7",
     },
     stdlib = {
         "linux-x86_64": "stdc++",
@@ -244,24 +244,24 @@ http_archive(
 http_archive(
     name = "athena_toolchain_linux_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_linux_x64_files.BUILD",
-    sha256 = "56bd5b53a4149b06fd4cf675dc0596668af47ca8da72c461b7d772ada35cbdc5",
-    urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2023-5/cortexa9_vfpv3-roborio-academic-2023-x86_64-linux-gnu-Toolchain-12.1.0.tgz"],
+    sha256 = "10349791e4f9fa33100ee52a84e7f9ba4df581963818334771253369b0d12061",
+    urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2024-1/cortexa9_vfpv3-roborio-academic-2024-x86_64-linux-gnu-Toolchain-12.1.0.tgz"],
 )
 
 # Same as above for win32 (also supports 64 bit)
 http_archive(
     name = "athena_toolchain_windows_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_windows_x64_files.BUILD",
-    sha256 = "04049728801e97fa41a8aa0837e40103c89391d0479f106aad6f959bbccd9da5",
-    urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2023-5/cortexa9_vfpv3-roborio-academic-2023-x86_64-w64-mingw32-Toolchain-12.1.0.zip"],
+    sha256 = "b367ab5d451603a97cd18a76193e860640230013a99baf216bb97dda1c353990",
+    urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2024-1/cortexa9_vfpv3-roborio-academic-2024-x86_64-w64-mingw32-Toolchain-12.1.0.zip"],
 )
 
 # Same as above for macOS (currently only supports x86_64, native support for arm64 (M1) coming soon? for now use Rosetta 2)
 http_archive(
     name = "athena_toolchain_macos_x64_files",
     build_file = "@//:build_tools/toolchain/athena_toolchain_macos_x64_files.BUILD",
-    sha256 = "511a64461bfdec00bacb9abe1470f1c112fc9773b29dbb275b1dc9560b973146",
-    urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2023-5/cortexa9_vfpv3-roborio-academic-2023-x86_64-apple-darwin-Toolchain-12.1.0.tgz"],
+    sha256 = "95eed7503f92e17f0e93ed6e5412d3ac6297b6a15773c90ef1a590f47f6fa467",
+    urls = ["https://github.com/wpilibsuite/opensdk/releases/download/v2024-1/cortexa9_vfpv3-roborio-academic-2024-x86_64-apple-darwin-Toolchain-12.1.0.tgz"],
 )
 
 # Toolchains for compiling flatbuffers (.fbs) to generated source files

@@ -1,10 +1,24 @@
 package org.littletonrobotics.junction;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+
+import org.littletonrobotics.junction.LogTable.LogValue;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.protobuf.ProtobufBuffer;
+import edu.wpi.first.util.struct.Struct;
+import us.hebi.quickbuf.ProtoMessage;
 
 /**
  * A table of logged data in allowable types. Can reference another higher level
@@ -14,6 +28,10 @@ public class LogTable {
   private final String prefix;
   private final SharedTimestamp timestamp;
   private final Map<String, LogValue> data;
+  private final Map<String, StructBuffer<?>> structBuffers;
+  private final Map<String, ProtobufBuffer<?, ?>> protoBuffers;
+  private final Map<String, Struct<?>> structTypeCache;
+  private final Map<String, Protobuf<?, ?>> protoTypeCache;
 
   /** Timestamp wrapper to enable passing by reference to subtables. */
   private static class SharedTimestamp {
@@ -25,24 +43,32 @@ public class LogTable {
   }
 
   /** Creates a new LogTable. */
-  private LogTable(String prefix, SharedTimestamp timestamp, Map<String, LogValue> data) {
+  private LogTable(String prefix, SharedTimestamp timestamp, Map<String, LogValue> data,
+      Map<String, StructBuffer<?>> structBuffers, Map<String, ProtobufBuffer<?, ?>> protoBuffers,
+      Map<String, Struct<?>> structTypeCache, Map<String, Protobuf<?, ?>> protoTypeCache) {
     this.prefix = prefix;
     this.timestamp = timestamp;
     this.data = data;
+    this.structBuffers = structBuffers;
+    this.protoBuffers = protoBuffers;
+    this.structTypeCache = structTypeCache;
+    this.protoTypeCache = protoTypeCache;
   }
 
   /**
    * Creates a new LogTable, to serve as the root table.
    */
   public LogTable(long timestamp) {
-    this("/", new SharedTimestamp(timestamp), new HashMap<String, LogValue>());
+    this("/", new SharedTimestamp(timestamp), new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(),
+        new HashMap<>());
   }
 
   /**
    * Creates a new LogTable, to reference a subtable.
    */
   private LogTable(String prefix, LogTable parent) {
-    this(prefix, parent.timestamp, parent.data);
+    this(prefix, parent.timestamp, parent.data, parent.structBuffers, parent.protoBuffers, parent.structTypeCache,
+        parent.protoTypeCache);
   }
 
   /**
@@ -52,7 +78,8 @@ public class LogTable {
   public static LogTable clone(LogTable source) {
     Map<String, LogValue> data = new HashMap<String, LogValue>();
     data.putAll(source.data);
-    return new LogTable(source.prefix, new SharedTimestamp(source.timestamp.value), data);
+    return new LogTable(source.prefix, new SharedTimestamp(source.timestamp.value), data, new HashMap<>(),
+        new HashMap<>(), new HashMap<>(), new HashMap<>());
 
   }
 
@@ -108,7 +135,7 @@ public class LogTable {
    * exist or is already the correct type).
    */
   private boolean writeAllowed(String key, LoggableType type) {
-    LogValue currentValue = data.get(key);
+    LogValue currentValue = data.get(prefix + key);
     if (currentValue == null) {
       return true;
     }
@@ -119,15 +146,23 @@ public class LogTable {
   }
 
   /**
+   * Writes a new generic value to the table. Skipped if the key already exists
+   * as a different type.
+   */
+  public void put(String key, LogValue value) {
+    if (writeAllowed(key, value.type)) {
+      data.put(prefix + key, value);
+    }
+  }
+
+  /**
    * Writes a new Raw value to the table. Skipped if the key already exists
    * as a different type.
    */
   public void put(String key, byte[] value) {
-    if (writeAllowed(key, LoggableType.Raw)) {
-      byte[] valueClone = new byte[value.length];
-      System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
-    }
+    byte[] valueClone = new byte[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    put(key, new LogValue(valueClone, null));
   }
 
   /**
@@ -135,9 +170,7 @@ public class LogTable {
    * a different type.
    */
   public void put(String key, boolean value) {
-    if (writeAllowed(key, LoggableType.Boolean)) {
-      data.put(prefix + key, new LogValue(value));
-    }
+    put(key, new LogValue(value, null));
   }
 
   /**
@@ -145,9 +178,7 @@ public class LogTable {
    * a different type.
    */
   public void put(String key, long value) {
-    if (writeAllowed(key, LoggableType.Integer)) {
-      data.put(prefix + key, new LogValue(value));
-    }
+    put(key, new LogValue(value, null));
   }
 
   /**
@@ -155,9 +186,7 @@ public class LogTable {
    * a different type.
    */
   public void put(String key, float value) {
-    if (writeAllowed(key, LoggableType.Float)) {
-      data.put(prefix + key, new LogValue(value));
-    }
+    put(key, new LogValue(value, null));
   }
 
   /**
@@ -165,9 +194,7 @@ public class LogTable {
    * a different type.
    */
   public void put(String key, double value) {
-    if (writeAllowed(key, LoggableType.Double)) {
-      data.put(prefix + key, new LogValue(value));
-    }
+    put(key, new LogValue(value, null));
   }
 
   /**
@@ -175,9 +202,7 @@ public class LogTable {
    * a different type.
    */
   public void put(String key, String value) {
-    if (writeAllowed(key, LoggableType.String)) {
-      data.put(prefix + key, new LogValue(value));
-    }
+    put(key, new LogValue(value, null));
   }
 
   /**
@@ -185,11 +210,9 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, boolean[] value) {
-    if (writeAllowed(key, LoggableType.BooleanArray)) {
-      boolean[] valueClone = new boolean[value.length];
-      System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
-    }
+    boolean[] valueClone = new boolean[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    put(key, new LogValue(valueClone, null));
   }
 
   /**
@@ -197,11 +220,9 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, long[] value) {
-    if (writeAllowed(key, LoggableType.IntegerArray)) {
-      long[] valueClone = new long[value.length];
-      System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
-    }
+    long[] valueClone = new long[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    put(key, new LogValue(valueClone, null));
   }
 
   /**
@@ -209,11 +230,9 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, float[] value) {
-    if (writeAllowed(key, LoggableType.FloatArray)) {
-      float[] valueClone = new float[value.length];
-      System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
-    }
+    float[] valueClone = new float[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    put(key, new LogValue(valueClone, null));
   }
 
   /**
@@ -221,11 +240,9 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, double[] value) {
-    if (writeAllowed(key, LoggableType.DoubleArray)) {
-      double[] valueClone = new double[value.length];
-      System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
-    }
+    double[] valueClone = new double[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    put(key, new LogValue(valueClone, null));
   }
 
   /**
@@ -233,10 +250,171 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, String[] value) {
-    if (writeAllowed(key, LoggableType.StringArray)) {
-      String[] valueClone = new String[value.length];
-      System.arraycopy(value, 0, valueClone, 0, value.length);
-      data.put(prefix + key, new LogValue(valueClone));
+    String[] valueClone = new String[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    put(key, new LogValue(valueClone, null));
+  }
+
+  private void addStructSchema(Struct<?> struct, Set<String> seen) {
+    String typeString = struct.getTypeString();
+    String key = "/.schema/" + typeString;
+    if (data.containsKey(key)) {
+      return;
+    }
+    if (!seen.add(typeString)) {
+      throw new UnsupportedOperationException(typeString + ": circular reference with " + seen);
+    }
+    try {
+      data.put(key, new LogValue(struct.getSchema().getBytes("UTF-8"), "structschema"));
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+    for (Struct<?> inner : struct.getNested()) {
+      addStructSchema(inner, seen);
+    }
+    seen.remove(typeString);
+  }
+
+  /**
+   * Writes a new struct value to the table. Skipped if the key already exists
+   * as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> void put(String key, Struct<T> struct, T value) {
+    if (writeAllowed(key, LoggableType.Raw)) {
+      addStructSchema(struct, new HashSet<>());
+      if (!structBuffers.containsKey(struct.getTypeString())) {
+        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
+      }
+      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+      ByteBuffer bb = buffer.write(value);
+      byte[] array = new byte[bb.position()];
+      bb.position(0);
+      bb.get(array);
+      put(key, new LogValue(array, struct.getTypeString()));
+    }
+  }
+
+  /**
+   * Writes a new struct array value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> void put(String key, Struct<T> struct, T... value) {
+    if (writeAllowed(key, LoggableType.Raw)) {
+      addStructSchema(struct, new HashSet<>());
+      if (!structBuffers.containsKey(struct.getTypeString())) {
+        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
+      }
+      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+      ByteBuffer bb = buffer.writeArray(value);
+      byte[] array = new byte[bb.position()];
+      bb.position(0);
+      bb.get(array);
+      put(key, new LogValue(array, struct.getTypeString() + "[]"));
+    }
+  }
+
+  /**
+   * Writes a new protobuf value to the table. Skipped if the key already exists
+   * as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T, MessageType extends ProtoMessage<?>> void put(String key, Protobuf<T, MessageType> proto, T value) {
+    if (writeAllowed(key, LoggableType.Raw)) {
+      proto.forEachDescriptor((name) -> data.containsKey("/.schema/" + name), (typeString, schema) -> data
+          .put("/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto")));
+      if (!protoBuffers.containsKey(proto.getTypeString())) {
+        protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
+      }
+      ProtobufBuffer<T, MessageType> buffer = (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
+      ByteBuffer bb;
+      try {
+        bb = buffer.write(value);
+        byte[] array = new byte[bb.position()];
+        bb.position(0);
+        bb.get(array);
+        put(key, new LogValue(array, proto.getTypeString()));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Struct<?> findStructType(Class<?> classObj) {
+    if (!structTypeCache.containsKey(classObj.getName())) {
+      structTypeCache.put(classObj.getName(), null);
+      Field field = null;
+      try {
+        field = classObj.getDeclaredField("struct");
+      } catch (NoSuchFieldException | SecurityException e) {
+      }
+      if (field != null) {
+        try {
+          structTypeCache.put(classObj.getName(), (Struct<?>) field.get(null));
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+        }
+      }
+    }
+    return structTypeCache.get(classObj.getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  private Protobuf<?, ?> findProtoType(Class<?> classObj) {
+    if (!protoTypeCache.containsKey(classObj.getName())) {
+      protoTypeCache.put(classObj.getName(), null);
+      Field field = null;
+      try {
+        field = classObj.getDeclaredField("proto");
+      } catch (NoSuchFieldException | SecurityException e) {
+      }
+      if (field != null) {
+        try {
+          protoTypeCache.put(classObj.getName(), (Protobuf<?, ?>) field.get(null));
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+        }
+      }
+    }
+    return protoTypeCache.get(classObj.getName());
+  }
+
+  /**
+   * Writes a new auto serializaed value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> void put(String key, T value) {
+    // If struct is supported, write as struct
+    Struct<T> struct = (Struct<T>) findStructType(value.getClass());
+    if (struct != null) {
+      put(key, struct, value);
+    } else {
+      // If protobuf is supported, write as proto
+      Protobuf<T, ?> proto = (Protobuf<T, ?>) findProtoType(value.getClass());
+      if (proto != null) {
+        put(key, proto, value);
+      } else {
+        DriverStation.reportError("Auto serialization is not supported for type " + value.getClass().getSimpleName(),
+            false);
+      }
+    }
+  }
+
+  /**
+   * Writes a new auto serializaed array value to the table. Skipped if the key
+   * already
+   * exists as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> void put(String key, T... value) {
+    // If struct is supported, write as struct
+    Struct<T> struct = (Struct<T>) findStructType(value.getClass().getComponentType());
+    if (struct != null) {
+      put(key, struct, value);
+    } else {
+      DriverStation.reportError("Auto serialization is not supported for type " + value.getClass().getSimpleName(),
+          false);
     }
   }
 
@@ -246,7 +424,7 @@ public class LogTable {
   }
 
   /** Reads a Raw value from the table. */
-  public byte[] getRaw(String key, byte[] defaultValue) {
+  public byte[] get(String key, byte[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getRaw(defaultValue);
     } else {
@@ -255,7 +433,7 @@ public class LogTable {
   }
 
   /** Reads a Boolean value from the table. */
-  public boolean getBoolean(String key, boolean defaultValue) {
+  public boolean get(String key, boolean defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getBoolean(defaultValue);
     } else {
@@ -264,7 +442,7 @@ public class LogTable {
   }
 
   /** Reads an Integer value from the table. */
-  public long getInteger(String key, long defaultValue) {
+  public long get(String key, long defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getInteger(defaultValue);
     } else {
@@ -273,7 +451,7 @@ public class LogTable {
   }
 
   /** Reads a Float value from the table. */
-  public float getFloat(String key, float defaultValue) {
+  public float get(String key, float defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getFloat(defaultValue);
     } else {
@@ -282,7 +460,7 @@ public class LogTable {
   }
 
   /** Reads a Double value from the table. */
-  public double getDouble(String key, double defaultValue) {
+  public double get(String key, double defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getDouble(defaultValue);
     } else {
@@ -291,7 +469,7 @@ public class LogTable {
   }
 
   /** Reads a String value from the table. */
-  public String getString(String key, String defaultValue) {
+  public String get(String key, String defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getString(defaultValue);
     } else {
@@ -300,7 +478,7 @@ public class LogTable {
   }
 
   /** Reads a BooleanArray value from the table. */
-  public boolean[] getBooleanArray(String key, boolean[] defaultValue) {
+  public boolean[] get(String key, boolean[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getBooleanArray(defaultValue);
     } else {
@@ -309,7 +487,7 @@ public class LogTable {
   }
 
   /** Reads a IntegerArray value from the table. */
-  public long[] getIntegerArray(String key, long[] defaultValue) {
+  public long[] get(String key, long[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getIntegerArray(defaultValue);
     } else {
@@ -318,7 +496,7 @@ public class LogTable {
   }
 
   /** Reads a FloatArray value from the table. */
-  public float[] getFloatArray(String key, float[] defaultValue) {
+  public float[] get(String key, float[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getFloatArray(defaultValue);
     } else {
@@ -327,7 +505,7 @@ public class LogTable {
   }
 
   /** Reads a DoubleArray value from the table. */
-  public double[] getDoubleArray(String key, double[] defaultValue) {
+  public double[] get(String key, double[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getDoubleArray(defaultValue);
     } else {
@@ -336,12 +514,95 @@ public class LogTable {
   }
 
   /** Reads a StringArray value from the table. */
-  public String[] getStringArray(String key, String[] defaultValue) {
+  public String[] get(String key, String[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getStringArray(defaultValue);
     } else {
       return defaultValue;
     }
+  }
+
+  /** Reads a struct value from the table. */
+  @SuppressWarnings("unchecked")
+  public <T> T get(String key, Struct<T> struct, T defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      if (!structBuffers.containsKey(struct.getTypeString())) {
+        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
+      }
+      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+      return buffer.read(get(key).getRaw());
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a struct array value from the table. */
+  @SuppressWarnings("unchecked")
+  public <T> T[] get(String key, Struct<T> struct, T... defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      if (!structBuffers.containsKey(struct.getTypeString())) {
+        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
+      }
+      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+      return buffer.readArray(get(key).getRaw());
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a protobuf value from the table. */
+  @SuppressWarnings("unchecked")
+  public <T, MessageType extends ProtoMessage<?>> T get(String key, Protobuf<T, MessageType> proto, T defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      if (!protoBuffers.containsKey(proto.getTypeString())) {
+        protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
+      }
+      ProtobufBuffer<T, MessageType> buffer = (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
+      try {
+        return buffer.read(get(key).getRaw());
+      } catch (IOException e) {
+        e.printStackTrace();
+        return defaultValue;
+      }
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a serialized (struct/protobuf) value from the table. */
+  @SuppressWarnings("unchecked")
+  public <T> T get(String key, T defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      String typeString = data.get(prefix + key).customTypeStr;
+      if (typeString.startsWith("struct:")) {
+        Struct<T> struct = (Struct<T>) findStructType(defaultValue.getClass());
+        if (struct != null) {
+          return get(key, struct, defaultValue);
+        }
+      }
+      if (typeString.startsWith("proto:")) {
+        Protobuf<T, ?> proto = (Protobuf<T, ?>) findProtoType(defaultValue.getClass());
+        if (proto != null) {
+          return get(key, proto, defaultValue);
+        }
+      }
+    }
+    return defaultValue;
+  }
+
+  /** Reads a serialized (struct) array value from the table. */
+  @SuppressWarnings("unchecked")
+  public <T> T[] get(String key, T... defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      String typeString = data.get(prefix + key).customTypeStr;
+      if (typeString.startsWith("struct:")) {
+        Struct<T> struct = (Struct<T>) findStructType(defaultValue.getClass().getComponentType());
+        if (struct != null) {
+          return get(key, struct, defaultValue);
+        }
+      }
+    }
+    return defaultValue;
   }
 
   /** Returns a string representation of the table. */
@@ -350,7 +611,12 @@ public class LogTable {
     output += "Prefix=\"" + prefix + "\"\n";
     output += "{\n";
     for (Map.Entry<String, LogValue> field : getAll(true).entrySet()) {
-      output += "\t" + field.getKey() + "=";
+      output += "\t" + field.getKey() + "[" + field.getValue().type.toString();
+      if (field.getValue().customTypeStr != null) {
+        output += ","
+            + field.getValue().customTypeStr.toString();
+      }
+      output += "]=";
       LogValue value = field.getValue();
       switch (value.type) {
         case Raw:
@@ -402,37 +668,44 @@ public class LogTable {
   /**
    * Represents a value stored in a LogTable, including type and value.
    */
-  public class LogValue {
+  public static class LogValue {
     public final LoggableType type;
+    public final String customTypeStr;
     private final Object value;
 
-    LogValue(byte[] value) {
+    public LogValue(byte[] value, String typeStr) {
       type = LoggableType.Raw;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
-    LogValue(boolean value) {
+    public LogValue(boolean value, String typeStr) {
       type = LoggableType.Boolean;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
-    LogValue(long value) {
+    public LogValue(long value, String typeStr) {
       type = LoggableType.Integer;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
-    LogValue(float value) {
+    public LogValue(float value, String typeStr) {
       type = LoggableType.Float;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
-    LogValue(double value) {
+    public LogValue(double value, String typeStr) {
       type = LoggableType.Double;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
-    LogValue(String value) {
+    public LogValue(String value, String typeStr) {
       type = LoggableType.String;
+      customTypeStr = typeStr;
       if (value != null) {
         this.value = value;
       } else {
@@ -440,28 +713,33 @@ public class LogTable {
       }
     }
 
-    LogValue(boolean[] value) {
+    public LogValue(boolean[] value, String typeStr) {
       type = LoggableType.BooleanArray;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
-    LogValue(long[] value) {
+    public LogValue(long[] value, String typeStr) {
       type = LoggableType.IntegerArray;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
-    LogValue(float[] value) {
+    public LogValue(float[] value, String typeStr) {
       type = LoggableType.FloatArray;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
-    LogValue(double[] value) {
+    public LogValue(double[] value, String typeStr) {
       type = LoggableType.DoubleArray;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
-    LogValue(String[] value) {
+    public LogValue(String[] value, String typeStr) {
       type = LoggableType.StringArray;
+      customTypeStr = typeStr;
       this.value = value;
     }
 
@@ -553,6 +831,30 @@ public class LogTable {
       return type == LoggableType.StringArray ? (String[]) value : defaultValue;
     }
 
+    /**
+     * Returns the standard string type for WPILOGs. Returns the custom type string
+     * if not null.
+     */
+    public String getWPILOGType() {
+      if (customTypeStr == null) {
+        return type.getWPILOGType();
+      } else {
+        return customTypeStr;
+      }
+    }
+
+    /**
+     * Returns the standard string type for NT4. Returns the custom type string if
+     * not null.
+     */
+    public String getNT4Type() {
+      if (customTypeStr == null) {
+        return type.getNT4Type();
+      } else {
+        return customTypeStr;
+      }
+    }
+
     @Override
     public boolean equals(Object other) {
       if (other instanceof LogValue) {
@@ -585,7 +887,7 @@ public class LogTable {
 
     @Override
     public int hashCode() {
-      return Objects.hash(type, value);
+      return Objects.hash(type, customTypeStr, value);
     }
   }
 
@@ -624,7 +926,7 @@ public class LogTable {
       if (wpilogTypes.contains(type)) {
         return LoggableType.values()[wpilogTypes.indexOf(type)];
       } else {
-        return null;
+        return LoggableType.Raw;
       }
     }
 
@@ -635,7 +937,7 @@ public class LogTable {
       if (nt4Types.contains(type)) {
         return LoggableType.values()[nt4Types.indexOf(type)];
       } else {
-        return null;
+        return LoggableType.Raw;
       }
     }
   }
