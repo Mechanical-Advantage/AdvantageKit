@@ -60,19 +60,29 @@ jobs:
           asset_path: bazel-bin/example_projects/skeleton.zip
           asset_name: AdvantageKit_SkeletonProject.zip
           asset_content_type: application/zip
-      - name: "Release: Upload example project (command)"
+      - name: "Release: Upload example project (diff_drive)"
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-          asset_path: bazel-bin/example_projects/command.zip
-          asset_name: AdvantageKit_CommandBasedProject.zip
+          asset_path: bazel-bin/example_projects/diff_drive.zip
+          asset_name: AdvantageKit_DiffDriveProject.zip
+          asset_content_type: application/zip
+      - name: "Release: Upload example project (swerve_drive)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: bazel-bin/example_projects/swerve_drive.zip
+          asset_name: AdvantageKit_SwerveDriveProject.zip
           asset_content_type: application/zip
 
       # Upload conduit build
-      - name: 'Release: Install Dependencies'
+      - name: "Release: Install Dependencies"
         if: github.event_name == 'release'
         run: pip3 install requests
       - name: 'Release: Build "conduit/wpilibio:nativezip"'
@@ -106,9 +116,21 @@ jobs:
     strategy:
       matrix:
         host:
-          - { os: macos-latest, displayName: "macOS", classifier: "osxuniversal" }
-          - { os: ubuntu-22.04, displayName: "Linux", classifier: "linuxx86-64" }
-          - { os: windows-2019, displayName: "Windows", classifier: "windowsx86-64" }
+          - {
+              os: macos-latest,
+              displayName: "macOS",
+              classifier: "osxuniversal",
+            }
+          - {
+              os: ubuntu-22.04,
+              displayName: "Linux",
+              classifier: "linuxx86-64",
+            }
+          - {
+              os: windows-2019,
+              displayName: "Windows",
+              classifier: "windowsx86-64",
+            }
 
     name: Build for ${{ matrix.host.displayName }}
     runs-on: ${{ matrix.host.os }}
@@ -132,7 +154,7 @@ jobs:
         uses: battila7/get-version-action@v2
 
       # Upload conduit build
-      - name: 'Release: Install Dependencies'
+      - name: "Release: Install Dependencies"
         if: github.event_name == 'release'
         run: pip3 install requests
       - name: 'Release: Build "conduit/wpilibio:nativezip" for macOS'
