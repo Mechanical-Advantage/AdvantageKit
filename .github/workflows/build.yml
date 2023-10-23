@@ -116,11 +116,7 @@ jobs:
     strategy:
       matrix:
         host:
-          - {
-              os: macos-latest,
-              displayName: "macOS",
-              classifier: "osxuniversal",
-            }
+          - { os: macos-12, displayName: "macOS", classifier: "osxuniversal" }
           - {
               os: ubuntu-22.04,
               displayName: "Linux",
