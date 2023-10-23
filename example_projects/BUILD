@@ -39,17 +39,35 @@ pkg_zip(
 )
 
 pkg_files(
-    name = "command_files",
+    name = "diff_drive_files",
     srcs = glob(
-        ["command/**/*"],
+        ["diff_drive/**/*"],
     ),
-    strip_prefix = strip_prefix.from_pkg("command"),
+    strip_prefix = strip_prefix.from_pkg("diff_drive"),
 )
 
 pkg_zip(
-    name = "command",
+    name = "diff_drive",
     srcs = [
-        "command_files",
+        "diff_drive_files",
+        "template_build_file",
+        "template_files",
+        "template_vendordep",
+    ],
+)
+
+pkg_files(
+    name = "swerve_drive_files",
+    srcs = glob(
+        ["swerve_drive/**/*"],
+    ),
+    strip_prefix = strip_prefix.from_pkg("swerve_drive"),
+)
+
+pkg_zip(
+    name = "swerve_drive",
+    srcs = [
+        "swerve_drive_files",
         "template_build_file",
         "template_files",
         "template_vendordep",
@@ -59,7 +77,8 @@ pkg_zip(
 filegroup(
     name = "example_projects",
     srcs = [
-        "command",
+        "diff_drive",
         "skeleton",
+        "swerve_drive",
     ],
 )

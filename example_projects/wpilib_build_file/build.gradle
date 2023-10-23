@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "{wpilib_version}"
     id "com.peterabeles.gversion" version "1.10"
+    id "com.diffplug.spotless" version "6.12.0"
 }
 
 java {
@@ -88,6 +89,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 
+    implementation "gov.nist.math:jama:1.0.3"
+
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
 }
@@ -122,12 +125,53 @@ tasks.withType(JavaCompile) {
 }
 
 // Create version file
-project.compileJava.dependsOn(createVersionFile)
 gversion {
-  srcDir       = "src/main/java/"
-  classPackage = "frc.robot"
-  className    = "BuildConstants"
-  dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-  timeZone     = "America/New_York"
-  indent       = "  "
+    srcDir       = "src/main/java/"
+    classPackage = "frc.robot"
+    className    = "BuildConstants"
+    dateFormat   = "yyyy-MM-dd HH:mm:ss z"
+    timeZone     = "America/New_York"
+    indent       = "  "
+}
+
+// Spotless formatting
+project.compileJava.dependsOn(spotlessApply)
+spotless {
+    java {
+        target fileTree(".") {
+            include "**/*.java"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        toggleOffOn()
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    groovyGradle {
+        target fileTree(".") {
+            include "**/*.gradle"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    json {
+        target fileTree(".") {
+            include "**/*.json"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        gson().indentWithSpaces(2)
+    }
+    format "misc", {
+        target fileTree(".") {
+            include "**/*.md", "**/.gitignore"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
 }
