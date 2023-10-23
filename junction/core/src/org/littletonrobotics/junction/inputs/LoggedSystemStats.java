@@ -62,6 +62,7 @@ public class LoggedSystemStats {
       table.put("FPGARevision", fpgaRevision);
       table.put("SerialNumber", serialNumber);
       table.put("Comments", comments);
+      table.put("TeamNumber", teamNumber);
       table.put("FPGAButton", fpgaButton);
       table.put("SystemActive", systemActive);
       table.put("BrownedOut", brownedOut);
@@ -104,6 +105,7 @@ public class LoggedSystemStats {
       fpgaRevision = (int) table.get("FPGARevision", fpgaRevision);
       serialNumber = table.get("SerialNumber", serialNumber);
       comments = table.get("Comments", comments);
+      teamNumber = (int) table.get("TeamNumber", teamNumber);
       fpgaButton = table.get("FPGAButton", fpgaButton);
       systemActive = table.get("SystemActive", systemActive);
       brownedOut = table.get("BrownedOut", brownedOut);
