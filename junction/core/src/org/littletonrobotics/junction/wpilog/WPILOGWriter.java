@@ -13,7 +13,6 @@ import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
@@ -21,7 +20,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
-  private static final double writePeriodSecs = 0.25;
+  private static final double writePeriodSecs = 0.1;
   private static final double timestampUpdateDelay = 8.0; // Wait several seconds after DS attached to ensure
                                                           // timestamp/timezone is updated
 
