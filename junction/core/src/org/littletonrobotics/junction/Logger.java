@@ -42,28 +42,27 @@ import us.hebi.quickbuf.ProtoMessage;
 public class Logger {
   private static final int receiverQueueCapcity = 500; // 10s at 50Hz
 
-  private static Logger instance;
+  private static boolean running = false;
+  private static LogTable entry = new LogTable(0);
+  private static LogTable outputTable;
+  private static Map<String, String> metadata = new HashMap<>();
+  private static ConsoleSource console;
+  private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
+  private static boolean deterministicTimestamps = true;
 
-  private boolean running = false;
-  private LogTable entry = new LogTable(0);
-  private LogTable outputTable;
-  private Map<String, String> metadata = new HashMap<>();
-  private ConsoleSource console;
-  private List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
-  private boolean deterministicTimestamps = true;
-
-  private LogReplaySource replaySource;
-  private final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
-  private final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
-  private boolean receiverQueueFault = false;
+  private static LogReplaySource replaySource;
+  private static final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
+  private static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
+  private static boolean receiverQueueFault = false;
 
   private Logger() {
   }
 
+  private static Logger instance = new Logger();
+
+  /** @deprecated Call the static methods directly. */
+  @Deprecated
   public static Logger getInstance() {
-    if (instance == null) {
-      instance = new Logger();
-    }
     return instance;
   }
 
@@ -71,9 +70,9 @@ public class Logger {
    * Sets the source to use for replaying data. Use null to disable replay. This
    * method only works during setup before starting to log.
    */
-  public void setReplaySource(LogReplaySource replaySource) {
+  public static void setReplaySource(LogReplaySource replaySource) {
     if (!running) {
-      this.replaySource = replaySource;
+      Logger.replaySource = replaySource;
     }
   }
 
@@ -81,7 +80,7 @@ public class Logger {
    * Adds a new data receiver to process real or replayed data. This method only
    * works during setup before starting to log.
    */
-  public void addDataReceiver(LogDataReceiver dataReceiver) {
+  public static void addDataReceiver(LogDataReceiver dataReceiver) {
     if (!running) {
       receiverThread.addDataReceiver(dataReceiver);
     }
@@ -91,7 +90,7 @@ public class Logger {
    * Registers a new dashboard input to be included in the periodic loop. This
    * function should not be called by the user.
    */
-  public void registerDashboardInput(LoggedDashboardInput dashboardInput) {
+  public static void registerDashboardInput(LoggedDashboardInput dashboardInput) {
     dashboardInputs.add(dashboardInput);
   }
 
@@ -102,7 +101,7 @@ public class Logger {
    * @param key   The name used to identify this metadata field.
    * @param value The value of the metadata field.
    */
-  public void recordMetadata(String key, String value) {
+  public static void recordMetadata(String key, String value) {
     if (!running) {
       metadata.put(key, value);
     }
@@ -121,14 +120,14 @@ public class Logger {
    * "getRealTimestamp()" for logic that doesn't need to match the replayed
    * version (like for analyzing performance).
    */
-  public void disableDeterministicTimestamps() {
+  public static void disableDeterministicTimestamps() {
     deterministicTimestamps = false;
   }
 
   /**
    * Returns whether a replay source is currently being used.
    */
-  public boolean hasReplaySource() {
+  public static boolean hasReplaySource() {
     return replaySource != null;
   }
 
@@ -136,7 +135,7 @@ public class Logger {
    * Starts running the logging system, including any data receivers or the replay
    * source.
    */
-  public void start() {
+  public static void start() {
     if (!running) {
       running = true;
 
@@ -179,7 +178,7 @@ public class Logger {
   /**
    * Ends the logging system, including any data receivers or the replay source.
    */
-  public void end() {
+  public static void end() {
     if (running) {
       running = false;
       try {
@@ -199,7 +198,7 @@ public class Logger {
    * Periodic method to be called before robotInit and each loop cycle. Updates
    * timestamp and globally logged data.
    */
-  void periodicBeforeUser() {
+  static void periodicBeforeUser() {
     if (running) {
 
       // Capture conduit data
@@ -220,8 +219,8 @@ public class Logger {
 
       // Update default inputs
       long saveDataStart = getRealTimestamp();
-      LoggedDriverStation.getInstance().periodic();
-      LoggedSystemStats.getInstance().periodic();
+      LoggedDriverStation.periodic();
+      LoggedSystemStats.periodic();
       LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
       if (loggedPowerDistribution != null) {
         loggedPowerDistribution.periodic();
@@ -238,12 +237,12 @@ public class Logger {
     } else {
       // Retrieve new data even if logger is disabled
       ConduitApi.getInstance().captureData();
-      LoggedDriverStation.getInstance().periodic();
+      LoggedDriverStation.periodic();
       LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
       if (loggedPowerDistribution != null) {
         loggedPowerDistribution.periodic();
       }
-      LoggedSystemStats.getInstance().periodic();
+      LoggedSystemStats.periodic();
     }
   }
 
@@ -252,7 +251,7 @@ public class Logger {
    * to data receivers. Running this after user code allows IO operations to
    * occur between cycles rather than interferring with the main thread.
    */
-  void periodicAfterUser() {
+  static void periodicAfterUser() {
     if (running) {
       try {
         // Update console output
@@ -279,7 +278,7 @@ public class Logger {
    * Updates the MathShared object for wpimath to enable or disable AdvantageKit's
    * mocked timestamps.
    */
-  private void setMathShared(boolean mocked) {
+  private static void setMathShared(boolean mocked) {
     MathSharedStore.setMathShared(
         new MathShared() {
           @Override
@@ -332,7 +331,7 @@ public class Logger {
 
           @Override
           public double getTimestamp() {
-            return (mocked ? Logger.getInstance().getTimestamp() : Logger.getInstance().getRealTimestamp()) * 1.0e-6;
+            return (mocked ? Logger.getTimestamp() : Logger.getRealTimestamp()) * 1.0e-6;
           }
         });
   }
@@ -341,7 +340,7 @@ public class Logger {
    * Returns the state of the receiver queue fault. This is tripped when the
    * receiver queue fills up, meaning that data is no longer being saved.
    */
-  public boolean getReceiverQueueFault() {
+  public static boolean getReceiverQueueFault() {
     return receiverQueueFault;
   }
 
@@ -349,7 +348,7 @@ public class Logger {
    * Returns the current FPGA timestamp or replayed time based on the current log
    * entry (microseconds).
    */
-  public long getTimestamp() {
+  public static long getTimestamp() {
     if (!running || entry == null || !deterministicTimestamps) {
       return getRealTimestamp();
     } else {
@@ -362,7 +361,7 @@ public class Logger {
    * used for logging. Useful for analyzing performance. DO NOT USE this method
    * for any logic which might need to be replayed.
    */
-  public long getRealTimestamp() {
+  public static long getRealTimestamp() {
     return HALUtil.getFPGATime();
   }
 
@@ -374,7 +373,7 @@ public class Logger {
    * @param key    The name used to identify this set of inputs.
    * @param inputs The inputs to log or update.
    */
-  public void processInputs(String key, LoggableInputs inputs) {
+  public static void processInputs(String key, LoggableInputs inputs) {
     if (running) {
       if (replaySource == null) {
         inputs.toLog(entry.getSubtable(key));
@@ -392,7 +391,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, byte[] value) {
+  public static void recordOutput(String key, byte[] value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -406,7 +405,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, boolean value) {
+  public static void recordOutput(String key, boolean value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -420,7 +419,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, long value) {
+  public static void recordOutput(String key, long value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -434,7 +433,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, float value) {
+  public static void recordOutput(String key, float value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -448,7 +447,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, double value) {
+  public static void recordOutput(String key, double value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -462,7 +461,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, String value) {
+  public static void recordOutput(String key, String value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -476,7 +475,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, boolean[] value) {
+  public static void recordOutput(String key, boolean[] value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -490,7 +489,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, long[] value) {
+  public static void recordOutput(String key, long[] value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -504,7 +503,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, float[] value) {
+  public static void recordOutput(String key, float[] value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -518,7 +517,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, double[] value) {
+  public static void recordOutput(String key, double[] value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -532,7 +531,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, String[] value) {
+  public static void recordOutput(String key, String[] value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -550,7 +549,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public <T> void recordOutput(String key, Struct<T> struct, T value) {
+  public static <T> void recordOutput(String key, Struct<T> struct, T value) {
     if (running) {
       outputTable.put(key, struct, value);
     }
@@ -573,7 +572,7 @@ public class Logger {
    * @param value The value of the field.
    */
   @SuppressWarnings("unchecked")
-  public <T> void recordOutput(String key, Struct<T> struct, T... value) {
+  public static <T> void recordOutput(String key, Struct<T> struct, T... value) {
     if (running) {
       outputTable.put(key, struct, value);
     }
@@ -593,7 +592,7 @@ public class Logger {
    * @param value The value of the field.
    */
   @SuppressWarnings("unchecked")
-  public <T, MessageType extends ProtoMessage<?>> void recordOutput(String key, Protobuf<T, MessageType> proto,
+  public static <T, MessageType extends ProtoMessage<?>> void recordOutput(String key, Protobuf<T, MessageType> proto,
       T value) {
     if (running) {
       outputTable.put(key, proto, value);
@@ -615,7 +614,7 @@ public class Logger {
    * @param value The value of the field.
    */
   @SuppressWarnings("unchecked")
-  public <T> void recordOutput(String key, T value) {
+  public static <T> void recordOutput(String key, T value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -636,7 +635,7 @@ public class Logger {
    * @param value The value of the field.
    */
   @SuppressWarnings("unchecked")
-  public <T> void recordOutput(String key, T... value) {
+  public static <T> void recordOutput(String key, T... value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -652,7 +651,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Trajectory value) {
+  public static void recordOutput(String key, Trajectory value) {
     recordOutput(key, Pose2d.struct, value.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new));
   }
 
@@ -664,7 +663,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, SwerveModuleState... value) {
+  public static void recordOutput(String key, SwerveModuleState... value) {
     recordOutput(key, CustomStructs.swerveModuleState, value);
   }
 
@@ -680,7 +679,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public void recordOutput(String key, Mechanism2d value) {
+  public static void recordOutput(String key, Mechanism2d value) {
     if (running) {
       try {
         // Use reflection because we don't explicitly depend on the shimmed classes

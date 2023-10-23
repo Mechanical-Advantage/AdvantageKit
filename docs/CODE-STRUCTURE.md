@@ -24,7 +24,7 @@ The IO layer includes a single method (`updateInputs`) for updating all of the i
 
 ```java
 io.updateInputs(inputs); // Update input data from the IO layer
-Logger.getInstance().processInputs("ExampleSubsystem", inputs); // Send input data to the logging framework (or update from the log during replay)
+Logger.processInputs("ExampleSubsystem", inputs); // Send input data to the logging framework (or update from the log during replay)
 ```
 
 The rest of the subsystem then reads data from this inputs object rather than directly from the IO layer. This structure ensures that:
@@ -105,9 +105,9 @@ Output data consists of any calculated values which could be recreated in the si
 The logging framework supports recording this output data on the real robot and during replay. Essential data like the odometry pose are recorded on the real robot for convenience; even if it can be recreated in a simulator, that's often not a viable option in the rush to fix a problem between matches. During replay, recording extra output data is the primary method of debugging the code - logging calls can be added anywhere as they don't interfere with the replayed control logic. Any loggable data type [(see here)](DATA-FLOW.md) can be saved as an output like so:
 
 ```java
-Logger.getInstance().recordOutput("Flywheel/Setpoint", setpointSpeed);
-Logger.getInstance().recordOutput("FeederState", "IDLE");
-Logger.getInstance().recordOutput("Drive/CalculatedLeftVolts", leftVolts);
+Logger.recordOutput("Flywheel/Setpoint", setpointSpeed);
+Logger.recordOutput("FeederState", "IDLE");
+Logger.recordOutput("Drive/CalculatedLeftVolts", leftVolts);
 ```
 
 > Note: This data is automatically saved to the `RealOutputs` or `ReplayOutputs` table, and it can be divided further into subtables using slashes (as seen above).
@@ -117,31 +117,31 @@ Logging geometry objects like `Pose2d`, `Trajectory`, etc. is common in robot co
 ```java
 // Pose2d
 Pose2d poseA, poseB, poseC;
-Logger.getInstance().recordOutput("MyPose2d", poseA);
-Logger.getInstance().recordOutput("MyPose2dArray", poseA, poseB);
-Logger.getInstance().recordOutput("MyPose2dArray", new Pose2d[] { poseA, poseB });
+Logger.recordOutput("MyPose2d", poseA);
+Logger.recordOutput("MyPose2dArray", poseA, poseB);
+Logger.recordOutput("MyPose2dArray", new Pose2d[] { poseA, poseB });
 
 // Pose3d
 Pose3d poseA, poseB, poseC;
-Logger.getInstance().recordOutput("MyPose3d", poseA);
-Logger.getInstance().recordOutput("MyPose3dArray", poseA, poseB);
-Logger.getInstance().recordOutput("MyPose3dArray", new Pose3d[] { poseA, poseB });
+Logger.recordOutput("MyPose3d", poseA);
+Logger.recordOutput("MyPose3dArray", poseA, poseB);
+Logger.recordOutput("MyPose3dArray", new Pose3d[] { poseA, poseB });
 
 // Trajectory
 Trajectory trajectory;
-Logger.getInstance().recordOutput("MyTrajectory", trajectory);
+Logger.recordOutput("MyTrajectory", trajectory);
 
 // SwerveModuleState
 SwerveModuleState stateA, stateB, stateC, stateD;
-Logger.getInstance().recordOutput("MySwerveModuleStates", stateA, stateB, stateC, stateD);
-Logger.getInstance().recordOutput("MySwerveModuleStates", new SwerveModuleState[] { stateA, stateB, stateC, stateD });
+Logger.recordOutput("MySwerveModuleStates", stateA, stateB, stateC, stateD);
+Logger.recordOutput("MySwerveModuleStates", new SwerveModuleState[] { stateA, stateB, stateC, stateD });
 ```
 
 AdvantageKit can also log [`Mechanism2d`](https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html) objects as outputs, which can be viewed using AdvantageScope. Note that the call below only records the current state of the `Mechanism2d`, so it must be called every loop cycle after the object is updated.
 
 ```java
 Mechanism2d mechanism = new Mechanism2d(3, 3);
-Logger.getInstance().recordOutput("MyMechanism", mechanism);
+Logger.recordOutput("MyMechanism", mechanism);
 ```
 
 ## `@AutoLog` Annotation

@@ -28,11 +28,11 @@ public class LocalADStarAK implements Pathfinder {
    */
   @Override
   public boolean isNewPathAvailable() {
-    if (Logger.getInstance().hasReplaySource()) {
+    if (Logger.hasReplaySource()) {
       io.updateIsNewPathAvailable();
     }
 
-    Logger.getInstance().processInputs("LocalADStarAK", io);
+    Logger.processInputs("LocalADStarAK", io);
 
     return io.isNewPathAvailable;
   }
@@ -46,11 +46,11 @@ public class LocalADStarAK implements Pathfinder {
    */
   @Override
   public PathPlannerPath getCurrentPath(PathConstraints constraints, GoalEndState goalEndState) {
-    if (Logger.getInstance().hasReplaySource()) {
+    if (Logger.hasReplaySource()) {
       io.updateCurrentPathPoints(constraints, goalEndState);
     }
 
-    Logger.getInstance().processInputs("LocalADStarAK", io);
+    Logger.processInputs("LocalADStarAK", io);
 
     if (io.currentPathPoints.isEmpty()) {
       return null;
@@ -67,7 +67,7 @@ public class LocalADStarAK implements Pathfinder {
    */
   @Override
   public void setStartPosition(Translation2d startPosition) {
-    if (Logger.getInstance().hasReplaySource()) {
+    if (Logger.hasReplaySource()) {
       io.adStar.setStartPosition(startPosition);
     }
   }
@@ -80,7 +80,7 @@ public class LocalADStarAK implements Pathfinder {
    */
   @Override
   public void setGoalPosition(Translation2d goalPosition) {
-    if (Logger.getInstance().hasReplaySource()) {
+    if (Logger.hasReplaySource()) {
       io.adStar.setGoalPosition(goalPosition);
     }
   }

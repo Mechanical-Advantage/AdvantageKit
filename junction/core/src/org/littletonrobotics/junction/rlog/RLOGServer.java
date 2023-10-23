@@ -68,7 +68,7 @@ public class RLOGServer implements LogDataReceiver {
           Socket socket = server.accept();
           socket.getOutputStream().write(encodeData(encoder.getNewcomerData().array()));
           sockets.add(socket);
-          lastHeartbeats.add(Logger.getInstance().getRealTimestamp() / 1000000.0);
+          lastHeartbeats.add(Logger.getRealTimestamp() / 1000000.0);
           System.out.println("Connected to log client - " + socket.getInetAddress().getHostAddress());
         } catch (IOException e) {
           e.printStackTrace();
@@ -94,11 +94,11 @@ public class RLOGServer implements LogDataReceiver {
           InputStream inputStream = socket.getInputStream();
           if (inputStream.available() > 0) {
             inputStream.skip(inputStream.available());
-            lastHeartbeats.set(i, Logger.getInstance().getRealTimestamp() / 1000000.0);
+            lastHeartbeats.set(i, Logger.getRealTimestamp() / 1000000.0);
           }
 
           // Close connection if socket timed out
-          if (Logger.getInstance().getRealTimestamp() / 1000000.0 - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
+          if (Logger.getRealTimestamp() / 1000000.0 - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
             socket.close();
             printDisconnectMessage(socket, "timeout");
           } else {

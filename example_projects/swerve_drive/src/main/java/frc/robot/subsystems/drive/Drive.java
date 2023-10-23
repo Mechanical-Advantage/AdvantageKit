@@ -59,19 +59,18 @@ public class Drive extends SubsystemBase {
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
-          Logger.getInstance()
-              .recordOutput(
-                  "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+          Logger.recordOutput(
+              "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
         });
     PathPlannerLogging.setLogTargetPoseCallback(
         (targetPose) -> {
-          Logger.getInstance().recordOutput("Odometry/TrajectorySetpoint", targetPose);
+          Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
   }
 
   public void periodic() {
     gyroIO.updateInputs(gyroInputs);
-    Logger.getInstance().processInputs("Drive/Gyro", gyroInputs);
+    Logger.processInputs("Drive/Gyro", gyroInputs);
     for (var module : modules) {
       module.periodic();
     }
@@ -84,13 +83,12 @@ public class Drive extends SubsystemBase {
     }
 
     // Log measured states
-    Logger.getInstance().recordOutput("SwerveStates/Measured", getModuleStates());
+    Logger.recordOutput("SwerveStates/Measured", getModuleStates());
 
     // Log empty setpoint states when disabled
     if (DriverStation.isDisabled()) {
-      Logger.getInstance().recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-      Logger.getInstance()
-          .recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+      Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
+      Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
     // Update odometry
@@ -112,7 +110,7 @@ public class Drive extends SubsystemBase {
     }
     // Apply the twist (change since last loop cycle) to the current pose
     pose = pose.exp(twist);
-    Logger.getInstance().recordOutput("Odometry/Robot", getPose());
+    Logger.recordOutput("Odometry/Robot", getPose());
   }
 
   /**
@@ -134,8 +132,8 @@ public class Drive extends SubsystemBase {
     }
 
     // Log setpoint states
-    Logger.getInstance().recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+    Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
   }
 
   /** Stops the drive. */

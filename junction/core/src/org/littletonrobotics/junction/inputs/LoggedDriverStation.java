@@ -15,23 +15,13 @@ import edu.wpi.first.networktables.StringPublisher;
  * joysticks, etc.)
  */
 public class LoggedDriverStation {
-
-  private static LoggedDriverStation instance;
-  private static final Logger logger = Logger.getInstance();
-
-  private final DriverStationInputs dsInputs = new DriverStationInputs();
-  private final JoystickInputs[] joystickInputs = { new JoystickInputs(), new JoystickInputs(), new JoystickInputs(),
+  private static final DriverStationInputs dsInputs = new DriverStationInputs();
+  private static final JoystickInputs[] joystickInputs = { new JoystickInputs(), new JoystickInputs(),
+      new JoystickInputs(),
       new JoystickInputs(), new JoystickInputs(), new JoystickInputs() };
-  private final MatchDataSender matchDataSender = new MatchDataSender();
+  private static final MatchDataSender matchDataSender = new MatchDataSender();
 
   private LoggedDriverStation() {
-  }
-
-  public static LoggedDriverStation getInstance() {
-    if (instance == null) {
-      instance = new LoggedDriverStation();
-    }
-    return instance;
   }
 
   /**
@@ -127,9 +117,9 @@ public class LoggedDriverStation {
   /**
    * Records inputs from the real driver station via conduit
    */
-  public void periodic() {
+  public static void periodic() {
     // Update inputs from conduit
-    if (!logger.hasReplaySource()) {
+    if (!Logger.hasReplaySource()) {
       ConduitApi conduit = ConduitApi.getInstance();
 
       dsInputs.allianceStation = conduit.getAllianceStation();
@@ -178,9 +168,9 @@ public class LoggedDriverStation {
     }
 
     // Send/receive log data
-    logger.processInputs("DriverStation", dsInputs);
+    Logger.processInputs("DriverStation", dsInputs);
     for (int id = 0; id < joystickInputs.length; id++) {
-      logger.processInputs("DriverStation/Joystick" + Integer.toString(id), joystickInputs[id]);
+      Logger.processInputs("DriverStation/Joystick" + Integer.toString(id), joystickInputs[id]);
     }
 
     // Update FMSInfo table
@@ -191,7 +181,7 @@ public class LoggedDriverStation {
    * Returns a reference to an object containing all driver station data other
    * than joysticks.
    */
-  public DriverStationInputs getDSData() {
+  public static DriverStationInputs getDSData() {
     return dsInputs;
   }
 
@@ -200,7 +190,7 @@ public class LoggedDriverStation {
    * 
    * @param id ID of the joystick to read(0-6)
    */
-  public JoystickInputs getJoystickData(int id) {
+  public static JoystickInputs getJoystickData(int id) {
     return joystickInputs[id];
   }
 

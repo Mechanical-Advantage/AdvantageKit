@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import org.littletonrobotics.junction.LogFileUtil;
@@ -31,23 +27,21 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
-    Logger logger = Logger.getInstance();
-
     // Record metadata
-    logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-    logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-    logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-    logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-    logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
     switch (BuildConstants.DIRTY) {
       case 0:
-        logger.recordMetadata("GitDirty", "All changes committed");
+        Logger.recordMetadata("GitDirty", "All changes committed");
         break;
       case 1:
-        logger.recordMetadata("GitDirty", "Uncomitted changes");
+        Logger.recordMetadata("GitDirty", "Uncomitted changes");
         break;
       default:
-        logger.recordMetadata("GitDirty", "Unknown");
+        Logger.recordMetadata("GitDirty", "Unknown");
         break;
     }
 
@@ -55,29 +49,29 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick
-        logger.addDataReceiver(new WPILOGWriter("/U"));
-        logger.addDataReceiver(new NT4Publisher());
+        Logger.addDataReceiver(new WPILOGWriter("/U"));
+        Logger.addDataReceiver(new NT4Publisher());
         break;
 
       case SIM:
         // Running a physics simulator, log to NT
-        logger.addDataReceiver(new NT4Publisher());
+        Logger.addDataReceiver(new NT4Publisher());
         break;
 
       case REPLAY:
         // Replaying a log, set up replay source
         setUseTiming(false); // Run as fast as possible
         String logPath = LogFileUtil.findReplayLog();
-        logger.setReplaySource(new WPILOGReader(logPath));
-        logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
         break;
     }
 
     // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
-    // Logger.getInstance().disableDeterministicTimestamps()
+    // Logger.disableDeterministicTimestamps()
 
     // Start AdvantageKit logger
-    logger.start();
+    Logger.start();
 
     // Initialize auto chooser
     chooser.addDefaultOption("Default Auto", defaultAuto);

@@ -24,11 +24,11 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.getInstance().processInputs("Drive", inputs);
+    Logger.processInputs("Drive", inputs);
 
     // Update odometry and log the new pose
     odometry.update(inputs.gyroYaw, getLeftPositionMeters(), getRightPositionMeters());
-    Logger.getInstance().recordOutput("Odometry", getPose());
+    Logger.recordOutput("Odometry", getPose());
   }
 
   /** Run open loop at the specified percentage. */

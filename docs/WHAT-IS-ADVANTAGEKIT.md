@@ -29,7 +29,7 @@ First, we need to run the replay using the same version of code that generated t
 Next, we can return to the correct commit using git (`git checkout ab12cf`...) and add the following line to the odometry subsystem:
 
 ```java
-Logger.getInstance().recordOutput("TargetDistanceMeters", latestPose.getTranslation().getDistance(FieldConstants.hubCenter));
+Logger.recordOutput("TargetDistanceMeters", latestPose.getTranslation().getDistance(FieldConstants.hubCenter));
 ```
 
 This line doesn't change the behavior of the robot code, but it logs extra "output" data every cycle. Recall that because...

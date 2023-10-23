@@ -27,7 +27,7 @@ public final class RobotController {
    */
   @SuppressWarnings("AbbreviationAsWordInName")
   public static int getFPGAVersion() {
-    return LoggedSystemStats.getInstance().getInputs().fpgaVersion;
+    return LoggedSystemStats.getInputs().fpgaVersion;
   }
 
   /**
@@ -39,7 +39,7 @@ public final class RobotController {
    */
   @SuppressWarnings("AbbreviationAsWordInName")
   public static long getFPGARevision() {
-    return (long) LoggedSystemStats.getInstance().getInputs().fpgaRevision;
+    return (long) LoggedSystemStats.getInputs().fpgaRevision;
   }
 
   /**
@@ -48,7 +48,7 @@ public final class RobotController {
    * @return The serial number of the roboRIO.
    */
   public static String getSerialNumber() {
-    return LoggedSystemStats.getInstance().getInputs().serialNumber;
+    return LoggedSystemStats.getInputs().serialNumber;
   }
 
   /**
@@ -62,7 +62,7 @@ public final class RobotController {
    * @return the comments from the roboRIO web interface.
    */
   public static String getComments() {
-    return LoggedSystemStats.getInstance().getInputs().comments;
+    return LoggedSystemStats.getInputs().comments;
   }
 
   /**
@@ -71,7 +71,7 @@ public final class RobotController {
    * @return team number, or 0 if not found.
    */
   public static int getTeamNumber() {
-    return LoggedSystemStats.getInstance().getInputs().teamNumber;
+    return LoggedSystemStats.getInputs().teamNumber;
   }
 
   /**
@@ -79,12 +79,12 @@ public final class RobotController {
    * 
    * Patched by AdvantageKit to read the syncronized timestamp. To access the real
    * FPGA time for performance analysis, call
-   * {@code Logger.getInstance().getRealTimestamp()} instead.
+   * {@code Logger.getRealTimestamp()} instead.
    *
    * @return The current time in microseconds according to the FPGA.
    */
   public static long getFPGATime() {
-    return Logger.getInstance().getTimestamp();
+    return Logger.getTimestamp();
   }
 
   /**
@@ -93,7 +93,7 @@ public final class RobotController {
    * @return true if the button is currently pressed down
    */
   public static boolean getUserButton() {
-    return LoggedSystemStats.getInstance().getInputs().fpgaButton;
+    return LoggedSystemStats.getInputs().fpgaButton;
   }
 
   /**
@@ -102,7 +102,7 @@ public final class RobotController {
    * @return The battery voltage in Volts.
    */
   public static double getBatteryVoltage() {
-    return LoggedSystemStats.getInstance().getInputs().voltageVin;
+    return LoggedSystemStats.getInputs().voltageVin;
   }
 
   /**
@@ -113,7 +113,7 @@ public final class RobotController {
    * @return True if the FPGA outputs are enabled.
    */
   public static boolean isSysActive() {
-    return LoggedSystemStats.getInstance().getInputs().systemActive;
+    return LoggedSystemStats.getInputs().systemActive;
   }
 
   /**
@@ -122,7 +122,7 @@ public final class RobotController {
    * @return True if the system is browned out
    */
   public static boolean isBrownedOut() {
-    return LoggedSystemStats.getInstance().getInputs().brownedOut;
+    return LoggedSystemStats.getInputs().brownedOut;
   }
 
   /**
@@ -131,7 +131,7 @@ public final class RobotController {
    * @return The current state of the RSL- true if on, false if off
    */
   public static boolean getRSLState() {
-    return LoggedSystemStats.getInstance().getInputs().rslState;
+    return LoggedSystemStats.getInputs().rslState;
   }
 
   /**
@@ -140,7 +140,7 @@ public final class RobotController {
    * @return True if the system time is valid, false otherwise
    */
   public static boolean isSystemTimeValid() {
-    return LoggedSystemStats.getInstance().getInputs().systemTimeValid;
+    return LoggedSystemStats.getInputs().systemTimeValid;
   }
 
   /**
@@ -149,7 +149,7 @@ public final class RobotController {
    * @return The controller input voltage value in Volts
    */
   public static double getInputVoltage() {
-    return LoggedSystemStats.getInstance().getInputs().voltageVin;
+    return LoggedSystemStats.getInputs().voltageVin;
   }
 
   /**
@@ -158,7 +158,7 @@ public final class RobotController {
    * @return The controller input current value in Amps
    */
   public static double getInputCurrent() {
-    return LoggedSystemStats.getInstance().getInputs().currentVin;
+    return LoggedSystemStats.getInputs().currentVin;
   }
 
   /**
@@ -167,7 +167,7 @@ public final class RobotController {
    * @return The controller 3.3V rail voltage value in Volts
    */
   public static double getVoltage3V3() {
-    return LoggedSystemStats.getInstance().getInputs().userVoltage3v3;
+    return LoggedSystemStats.getInputs().userVoltage3v3;
   }
 
   /**
@@ -176,7 +176,7 @@ public final class RobotController {
    * @return The controller 3.3V rail output current value in Amps
    */
   public static double getCurrent3V3() {
-    return LoggedSystemStats.getInstance().getInputs().userCurrent3v3;
+    return LoggedSystemStats.getInputs().userCurrent3v3;
   }
 
   /**
@@ -195,7 +195,7 @@ public final class RobotController {
    * @return The controller 3.3V rail enabled value
    */
   public static boolean getEnabled3V3() {
-    return LoggedSystemStats.getInstance().getInputs().userActive3v3;
+    return LoggedSystemStats.getInputs().userActive3v3;
   }
 
   /**
@@ -205,7 +205,7 @@ public final class RobotController {
    * @return The number of faults
    */
   public static int getFaultCount3V3() {
-    return LoggedSystemStats.getInstance().getInputs().userCurrentFaults3v3;
+    return LoggedSystemStats.getInputs().userCurrentFaults3v3;
   }
 
   /**
@@ -214,7 +214,7 @@ public final class RobotController {
    * @return The controller 5V rail voltage value in Volts
    */
   public static double getVoltage5V() {
-    return LoggedSystemStats.getInstance().getInputs().userVoltage5v;
+    return LoggedSystemStats.getInputs().userVoltage5v;
   }
 
   /**
@@ -223,7 +223,7 @@ public final class RobotController {
    * @return The controller 5V rail output current value in Amps
    */
   public static double getCurrent5V() {
-    return LoggedSystemStats.getInstance().getInputs().userCurrent5v;
+    return LoggedSystemStats.getInputs().userCurrent5v;
   }
 
   /**
@@ -242,7 +242,7 @@ public final class RobotController {
    * @return The controller 5V rail enabled value
    */
   public static boolean getEnabled5V() {
-    return LoggedSystemStats.getInstance().getInputs().userActive5v;
+    return LoggedSystemStats.getInputs().userActive5v;
   }
 
   /**
@@ -252,7 +252,7 @@ public final class RobotController {
    * @return The number of faults
    */
   public static int getFaultCount5V() {
-    return LoggedSystemStats.getInstance().getInputs().userCurrentFaults5v;
+    return LoggedSystemStats.getInputs().userCurrentFaults5v;
   }
 
   /**
@@ -261,7 +261,7 @@ public final class RobotController {
    * @return The controller 6V rail voltage value in Volts
    */
   public static double getVoltage6V() {
-    return LoggedSystemStats.getInstance().getInputs().userVoltage6v;
+    return LoggedSystemStats.getInputs().userVoltage6v;
   }
 
   /**
@@ -270,7 +270,7 @@ public final class RobotController {
    * @return The controller 6V rail output current value in Amps
    */
   public static double getCurrent6V() {
-    return LoggedSystemStats.getInstance().getInputs().userCurrent6v;
+    return LoggedSystemStats.getInputs().userCurrent6v;
   }
 
   /**
@@ -289,7 +289,7 @@ public final class RobotController {
    * @return The controller 6V rail enabled value
    */
   public static boolean getEnabled6V() {
-    return LoggedSystemStats.getInstance().getInputs().userActive6v;
+    return LoggedSystemStats.getInputs().userActive6v;
   }
 
   /**
@@ -299,7 +299,7 @@ public final class RobotController {
    * @return The number of faults
    */
   public static int getFaultCount6V() {
-    return LoggedSystemStats.getInstance().getInputs().userCurrentFaults6v;
+    return LoggedSystemStats.getInputs().userCurrentFaults6v;
   }
 
   /**
@@ -308,7 +308,7 @@ public final class RobotController {
    * @return The brownout voltage
    */
   public static double getBrownoutVoltage() {
-    return LoggedSystemStats.getInstance().getInputs().brownoutVoltage;
+    return LoggedSystemStats.getInputs().brownoutVoltage;
   }
 
   /**
@@ -330,7 +330,7 @@ public final class RobotController {
    * @return current CPU temperature in degrees Celsius
    */
   public static double getCPUTemp() {
-    return LoggedSystemStats.getInstance().getInputs().cpuTemp;
+    return LoggedSystemStats.getInputs().cpuTemp;
   }
 
   /**
@@ -339,6 +339,6 @@ public final class RobotController {
    * @return The status of the CAN bus
    */
   public static CANStatus getCANStatus() {
-    return LoggedSystemStats.getInstance().getInputs().canStatus;
+    return LoggedSystemStats.getInputs().canStatus;
   }
 }

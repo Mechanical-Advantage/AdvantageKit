@@ -63,7 +63,7 @@ public class LoggedRobot extends IterativeRobotBase {
     }
 
     // Save data from init cycle
-    Logger.getInstance().periodicAfterUser();
+    Logger.periodicAfterUser();
 
     // Tell the DS that the robot is ready to be enabled
     System.out.println("********** Robot program startup complete **********");
@@ -72,7 +72,7 @@ public class LoggedRobot extends IterativeRobotBase {
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
       if (useTiming) {
-        long currentTimeUs = Logger.getInstance().getRealTimestamp();
+        long currentTimeUs = Logger.getRealTimestamp();
         if (nextCycleUs < currentTimeUs) {
           // Loop overrun, start next cycle immediately
           nextCycleUs = currentTimeUs;
@@ -84,16 +84,16 @@ public class LoggedRobot extends IterativeRobotBase {
         nextCycleUs += periodUs;
       }
 
-      long loopCycleStart = Logger.getInstance().getRealTimestamp();
-      Logger.getInstance().periodicBeforeUser();
-      long userCodeStart = Logger.getInstance().getRealTimestamp();
+      long loopCycleStart = Logger.getRealTimestamp();
+      Logger.periodicBeforeUser();
+      long userCodeStart = Logger.getRealTimestamp();
       loopFunc();
-      long loopCycleEnd = Logger.getInstance().getRealTimestamp();
-      Logger.getInstance().recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) / 1000.0);
-      Logger.getInstance().recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) / 1000.0);
-      Logger.getInstance().recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) / 1000.0);
+      long loopCycleEnd = Logger.getRealTimestamp();
+      Logger.recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) / 1000.0);
+      Logger.recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) / 1000.0);
+      Logger.recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) / 1000.0);
 
-      Logger.getInstance().periodicAfterUser(); // Save data
+      Logger.periodicAfterUser(); // Save data
     }
   }
 

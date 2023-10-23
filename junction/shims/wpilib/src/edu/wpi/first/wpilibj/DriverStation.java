@@ -39,7 +39,6 @@ public class DriverStation {
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
   private static double m_nextMessageTime;
 
-  private static LoggedDriverStation logDS = LoggedDriverStation.getInstance();
   private static EventVector m_refreshEvents = new EventVector();
 
   // Joystick button rising/falling edge flags
@@ -160,8 +159,8 @@ public class DriverStation {
       return false;
     }
 
-    if (button <= logDS.getJoystickData(stick).buttonCount) {
-      return (logDS.getJoystickData(stick).buttonValues & (1 << (button - 1))) != 0;
+    if (button <= LoggedDriverStation.getJoystickData(stick).buttonCount) {
+      return (LoggedDriverStation.getJoystickData(stick).buttonValues & (1 << (button - 1))) != 0;
     }
 
     reportJoystickUnpluggedWarning(
@@ -186,8 +185,8 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
 
-    if (button <= logDS.getJoystickData(stick).buttonCount) {
-      if ((logDS.getJoystickData(stick).buttonValues & (1 << (button - 1))) != 0) { // Currently pressed
+    if (button <= LoggedDriverStation.getJoystickData(stick).buttonCount) {
+      if ((LoggedDriverStation.getJoystickData(stick).buttonValues & (1 << (button - 1))) != 0) { // Currently pressed
         if ((~m_lastJoystickButtonsPressed[stick] & (1 << (button - 1))) != 0) { // Released last time
           m_lastJoystickButtonsPressed[stick] |= (1 << (button - 1));
           return true;
@@ -222,8 +221,8 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
 
-    if (button <= logDS.getJoystickData(stick).buttonCount) {
-      if ((logDS.getJoystickData(stick).buttonValues & (1 << (button - 1))) != 0) {
+    if (button <= LoggedDriverStation.getJoystickData(stick).buttonCount) {
+      if ((LoggedDriverStation.getJoystickData(stick).buttonValues & (1 << (button - 1))) != 0) {
         m_lastJoystickButtonsReleased[stick] |= (1 << (button - 1)); // Currently pressed, reset flag
         return false;
       } else { // Currently released
@@ -257,8 +256,8 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
-    if (axis < logDS.getJoystickData(stick).axisValues.length) {
-      return logDS.getJoystickData(stick).axisValues[axis];
+    if (axis < LoggedDriverStation.getJoystickData(stick).axisValues.length) {
+      return LoggedDriverStation.getJoystickData(stick).axisValues[axis];
     }
 
     reportJoystickUnpluggedWarning(
@@ -279,8 +278,8 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick POV is out of range");
     }
 
-    if (pov < logDS.getJoystickData(stick).povs.length) {
-      return (int) logDS.getJoystickData(stick).povs[pov];
+    if (pov < LoggedDriverStation.getJoystickData(stick).povs.length) {
+      return (int) LoggedDriverStation.getJoystickData(stick).povs[pov];
     }
 
     reportJoystickUnpluggedWarning(
@@ -299,7 +298,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
 
-    return (int) logDS.getJoystickData(stick).buttonValues;
+    return (int) LoggedDriverStation.getJoystickData(stick).buttonValues;
   }
 
   /**
@@ -313,7 +312,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return logDS.getJoystickData(stick).axisValues.length;
+    return LoggedDriverStation.getJoystickData(stick).axisValues.length;
   }
 
   /**
@@ -327,7 +326,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return logDS.getJoystickData(stick).povs.length;
+    return LoggedDriverStation.getJoystickData(stick).povs.length;
   }
 
   /**
@@ -341,7 +340,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return (int) logDS.getJoystickData(stick).buttonCount;
+    return (int) LoggedDriverStation.getJoystickData(stick).buttonCount;
   }
 
   /**
@@ -355,7 +354,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return logDS.getJoystickData(stick).xbox;
+    return LoggedDriverStation.getJoystickData(stick).xbox;
   }
 
   /**
@@ -369,7 +368,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return (int) logDS.getJoystickData(stick).type;
+    return (int) LoggedDriverStation.getJoystickData(stick).type;
   }
 
   /**
@@ -383,7 +382,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return logDS.getJoystickData(stick).name;
+    return LoggedDriverStation.getJoystickData(stick).name;
   }
 
   /**
@@ -398,7 +397,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return (int) logDS.getJoystickData(stick).axisTypes[axis];
+    return (int) LoggedDriverStation.getJoystickData(stick).axisTypes[axis];
   }
 
   /**
@@ -422,7 +421,7 @@ public class DriverStation {
    * @return True if the robot is enabled, false otherwise.
    */
   public static boolean isEnabled() {
-    return logDS.getDSData().enabled && logDS.getDSData().dsAttached;
+    return LoggedDriverStation.getDSData().enabled && LoggedDriverStation.getDSData().dsAttached;
   }
 
   /**
@@ -441,7 +440,7 @@ public class DriverStation {
    * @return True if the robot is e-stopped, false otherwise.
    */
   public static boolean isEStopped() {
-    return logDS.getDSData().emergencyStop;
+    return LoggedDriverStation.getDSData().emergencyStop;
   }
 
   /**
@@ -451,7 +450,7 @@ public class DriverStation {
    * @return True if autonomous mode should be enabled, false otherwise.
    */
   public static boolean isAutonomous() {
-    return logDS.getDSData().autonomous;
+    return LoggedDriverStation.getDSData().autonomous;
   }
 
   /**
@@ -461,7 +460,7 @@ public class DriverStation {
    * @return True if autonomous should be set and the robot should be enabled.
    */
   public static boolean isAutonomousEnabled() {
-    return logDS.getDSData().autonomous && logDS.getDSData().enabled;
+    return LoggedDriverStation.getDSData().autonomous && LoggedDriverStation.getDSData().enabled;
   }
 
   /**
@@ -482,7 +481,8 @@ public class DriverStation {
    *         be enabled.
    */
   public static boolean isTeleopEnabled() {
-    return !logDS.getDSData().autonomous && !logDS.getDSData().test && logDS.getDSData().enabled;
+    return !LoggedDriverStation.getDSData().autonomous && !LoggedDriverStation.getDSData().test
+        && LoggedDriverStation.getDSData().enabled;
   }
 
   /**
@@ -492,7 +492,7 @@ public class DriverStation {
    * @return True if test mode should be enabled, false otherwise.
    */
   public static boolean isTest() {
-    return logDS.getDSData().test;
+    return LoggedDriverStation.getDSData().test;
   }
 
   /**
@@ -503,7 +503,7 @@ public class DriverStation {
    * @return True if test mode should be set and the robot should be enabled.
    */
   public static boolean isTestEnabled() {
-    return logDS.getDSData().test && logDS.getDSData().enabled;
+    return LoggedDriverStation.getDSData().test && LoggedDriverStation.getDSData().enabled;
   }
 
   /**
@@ -512,7 +512,7 @@ public class DriverStation {
    * @return True if Driver Station is attached, false otherwise.
    */
   public static boolean isDSAttached() {
-    return logDS.getDSData().dsAttached;
+    return LoggedDriverStation.getDSData().dsAttached;
   }
 
   /**
@@ -532,7 +532,7 @@ public class DriverStation {
    *         Management System
    */
   public static boolean isFMSAttached() {
-    return logDS.getDSData().fmsAttached;
+    return LoggedDriverStation.getDSData().fmsAttached;
   }
 
   /**
@@ -541,7 +541,7 @@ public class DriverStation {
    * @return the game specific message
    */
   public static String getGameSpecificMessage() {
-    return logDS.getDSData().gameSpecificMessage;
+    return LoggedDriverStation.getDSData().gameSpecificMessage;
   }
 
   /**
@@ -550,7 +550,7 @@ public class DriverStation {
    * @return the event name
    */
   public static String getEventName() {
-    return logDS.getDSData().eventName;
+    return LoggedDriverStation.getDSData().eventName;
   }
 
   /**
@@ -559,7 +559,7 @@ public class DriverStation {
    * @return the match type
    */
   public static MatchType getMatchType() {
-    int matchType = (int) logDS.getDSData().matchType;
+    int matchType = (int) LoggedDriverStation.getDSData().matchType;
     switch (matchType) {
       case 1:
         return MatchType.Practice;
@@ -578,7 +578,7 @@ public class DriverStation {
    * @return the match number
    */
   public static int getMatchNumber() {
-    return (int) logDS.getDSData().matchNumber;
+    return (int) LoggedDriverStation.getDSData().matchNumber;
   }
 
   /**
@@ -587,7 +587,7 @@ public class DriverStation {
    * @return the replay number
    */
   public static int getReplayNumber() {
-    return (int) logDS.getDSData().replayNumber;
+    return (int) LoggedDriverStation.getDSData().replayNumber;
   }
 
   private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap = Map.of(
@@ -654,7 +654,7 @@ public class DriverStation {
    * @return The raw alliance station id.
    */
   public static AllianceStationID getRawAllianceStation() {
-    switch ((int) logDS.getDSData().allianceStation) {
+    switch ((int) LoggedDriverStation.getDSData().allianceStation) {
       case DriverStationJNI.kUnknownAllianceStation:
         return AllianceStationID.Unknown;
       case DriverStationJNI.kRed1AllianceStation:
@@ -710,7 +710,7 @@ public class DriverStation {
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
   public static double getMatchTime() {
-    return logDS.getDSData().matchTime;
+    return LoggedDriverStation.getDSData().matchTime;
   }
 
   /**

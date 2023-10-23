@@ -42,7 +42,7 @@ public class Tracer {
 
   /** Restarts the epoch timer. */
   public void resetTimer() {
-    m_startTime = Logger.getInstance().getRealTimestamp();
+    m_startTime = Logger.getRealTimestamp();
   }
 
   /**
@@ -60,7 +60,7 @@ public class Tracer {
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
-    long currentTime = Logger.getInstance().getRealTimestamp();
+    long currentTime = Logger.getRealTimestamp();
     m_epochs.put(epochName, currentTime - m_startTime);
     m_startTime = currentTime;
   }
@@ -80,7 +80,7 @@ public class Tracer {
    * @param output the stream that the output is sent to
    */
   public void printEpochs(Consumer<String> output) {
-    long now = Logger.getInstance().getRealTimestamp();
+    long now = Logger.getRealTimestamp();
     if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
       StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;

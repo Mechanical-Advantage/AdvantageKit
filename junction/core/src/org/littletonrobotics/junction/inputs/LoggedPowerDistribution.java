@@ -13,7 +13,6 @@ import edu.wpi.first.hal.PowerDistributionJNI;
 public class LoggedPowerDistribution {
 
   private static LoggedPowerDistribution instance;
-  private static final Logger logger = Logger.getInstance();
 
   private final PowerDistributionInputs pdpInputs = new PowerDistributionInputs();
 
@@ -36,7 +35,6 @@ public class LoggedPowerDistribution {
     if (instance == null) {
       instance = new LoggedPowerDistribution();
     }
-
     return instance;
   }
 
@@ -96,7 +94,7 @@ public class LoggedPowerDistribution {
 
   public void periodic() {
     // Update inputs from conduit
-    if (!logger.hasReplaySource()) {
+    if (!Logger.hasReplaySource()) {
       ConduitApi conduit = ConduitApi.getInstance();
       pdpInputs.pdpTemperature = conduit.getPDPTemperature();
       pdpInputs.pdpVoltage = conduit.getPDPVoltage();
@@ -114,7 +112,7 @@ public class LoggedPowerDistribution {
       pdpInputs.stickyFaults = conduit.getPDPStickyFaults();
     }
 
-    logger.processInputs("PowerDistribution", pdpInputs);
+    Logger.processInputs("PowerDistribution", pdpInputs);
   }
 
   public PowerDistributionInputs getInputs() {
