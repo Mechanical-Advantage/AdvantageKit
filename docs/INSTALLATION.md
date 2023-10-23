@@ -55,21 +55,21 @@ public class Robot extends LoggedRobot {
 The user program is responsible for configuring and initializing the logging framework. This setup should be placed in `robotInit()` _before any other initialization_. An example configuration is provided below:
 
 ```java
-Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
 if (isReal()) {
-    Logger.getInstance().addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
-    Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    Logger.addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
+    Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
 } else {
     setUseTiming(false); // Run as fast as possible
     String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-    Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
-    Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+    Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
 }
 
-// Logger.getInstance().disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
-Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+// Logger.disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
+Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 ```
 
 This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required.

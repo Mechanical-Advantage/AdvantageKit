@@ -48,7 +48,7 @@ public class LoggedDashboardNumber implements LoggedDashboardInput {
     this.value = defaultValue;
     SmartDashboard.putNumber(key, SmartDashboard.getNumber(key, defaultValue));
     periodic();
-    Logger.getInstance().registerDashboardInput(this);
+    Logger.registerDashboardInput(this);
   }
 
   /** Updates the default value, which is used if no value in NT is found. */
@@ -70,9 +70,9 @@ public class LoggedDashboardNumber implements LoggedDashboardInput {
   }
 
   public void periodic() {
-    if (!Logger.getInstance().hasReplaySource()) {
+    if (!Logger.hasReplaySource()) {
       value = SmartDashboard.getNumber(key, defaultValue);
     }
-    Logger.getInstance().processInputs(prefix, inputs);
+    Logger.processInputs(prefix, inputs);
   }
 }

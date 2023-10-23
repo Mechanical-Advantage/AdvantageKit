@@ -11,8 +11,6 @@ import org.littletonrobotics.junction.inputs.LoggedDriverStation;
  * support logging.
  */
 public class DSControlWord {
-  private static final LoggedDriverStation logDS = LoggedDriverStation.getInstance();
-
   private boolean enabled = false;
   private boolean autonomous = false;
   private boolean test = false;
@@ -33,12 +31,12 @@ public class DSControlWord {
 
   /** Update internal Driver Station control word. */
   public void refresh() {
-    enabled = logDS.getDSData().enabled;
-    autonomous = logDS.getDSData().autonomous;
-    test = logDS.getDSData().test;
-    emergencyStop = logDS.getDSData().emergencyStop;
-    fmsAttached = logDS.getDSData().fmsAttached;
-    dsAttached = logDS.getDSData().dsAttached;
+    enabled = LoggedDriverStation.getDSData().enabled;
+    autonomous = LoggedDriverStation.getDSData().autonomous;
+    test = LoggedDriverStation.getDSData().test;
+    emergencyStop = LoggedDriverStation.getDSData().emergencyStop;
+    fmsAttached = LoggedDriverStation.getDSData().fmsAttached;
+    dsAttached = LoggedDriverStation.getDSData().dsAttached;
   }
 
   /**

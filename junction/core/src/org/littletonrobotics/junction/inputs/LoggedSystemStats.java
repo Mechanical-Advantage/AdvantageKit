@@ -10,20 +10,9 @@ import edu.wpi.first.hal.can.CANStatus;
  * Manages logging general system data.
  */
 public class LoggedSystemStats {
-
-  private static LoggedSystemStats instance;
-  private static final Logger logger = Logger.getInstance();
-
-  private final SystemStatsInputs sysInputs = new SystemStatsInputs();
+  private static final SystemStatsInputs sysInputs = new SystemStatsInputs();
 
   private LoggedSystemStats() {
-  }
-
-  public static LoggedSystemStats getInstance() {
-    if (instance == null) {
-      instance = new LoggedSystemStats();
-    }
-    return instance;
   }
 
   public static class SystemStatsInputs implements LoggableInputs {
@@ -144,9 +133,9 @@ public class LoggedSystemStats {
     }
   }
 
-  public void periodic() {
+  public static void periodic() {
     // Update inputs from conduit
-    if (!logger.hasReplaySource()) {
+    if (!Logger.hasReplaySource()) {
       ConduitApi conduit = ConduitApi.getInstance();
 
       sysInputs.fpgaVersion = conduit.getFPGAVersion();
@@ -190,10 +179,10 @@ public class LoggedSystemStats {
       sysInputs.epochTime = conduit.getEpochTime();
     }
 
-    logger.processInputs("SystemStats", sysInputs);
+    Logger.processInputs("SystemStats", sysInputs);
   }
 
-  public SystemStatsInputs getInputs() {
+  public static SystemStatsInputs getInputs() {
     return sysInputs;
   }
 }

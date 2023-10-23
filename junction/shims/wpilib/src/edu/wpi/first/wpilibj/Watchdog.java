@@ -93,7 +93,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @return The time in seconds since the watchdog was last fed.
    */
   public double getTime() {
-    return Logger.getInstance().getRealTimestamp() / 1000000.0 - m_startTimeSeconds;
+    return Logger.getRealTimestamp() / 1000000.0 - m_startTimeSeconds;
   }
 
   /**
@@ -103,7 +103,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    *                       resolution.
    */
   public void setTimeout(double timeoutSeconds) {
-    m_startTimeSeconds = Logger.getInstance().getRealTimestamp() / 1000000.0;
+    m_startTimeSeconds = Logger.getRealTimestamp() / 1000000.0;
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();
@@ -179,7 +179,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   /** Enables the watchdog timer. */
   public void enable() {
-    m_startTimeSeconds = Logger.getInstance().getRealTimestamp() / 1000000.0;
+    m_startTimeSeconds = Logger.getRealTimestamp() / 1000000.0;
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();

@@ -36,10 +36,10 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.getInstance().processInputs("Flywheel", inputs);
+    Logger.processInputs("Flywheel", inputs);
 
     // Log flywheel speed in RPM
-    Logger.getInstance().recordOutput("FlywheelSpeedRPM", getVelocityRPM());
+    Logger.recordOutput("FlywheelSpeedRPM", getVelocityRPM());
   }
 
   /** Run closed loop at the specified velocity. */
@@ -48,7 +48,7 @@ public class Flywheel extends SubsystemBase {
     io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
 
     // Log flywheel setpoint
-    Logger.getInstance().recordOutput("FlywheelSetpointRPM", velocityRPM);
+    Logger.recordOutput("FlywheelSetpointRPM", velocityRPM);
   }
 
   /** Stops the flywheel. */

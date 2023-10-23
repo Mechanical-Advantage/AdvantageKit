@@ -33,10 +33,10 @@ Optionally, AdvantageKit allows you to disable these deterministic timestamps. T
 2. The sensor values used in the loop cannot be associated with timestamps in an IO implementation. For example, vision data from a coprocessor is usually transmitted over the network with an exact timestamp (read in an IO implementation). That timestamp can be passed as an input to the main control logic and used alongside AdvantageKit's standard deterministic timestamps.
 3. The IO (sensors, actuators, etc) involved in the loop are sufficiently low-latency that the exact timestamp on the RIO is significant. For example, CAN motor controllers are limited by the rate of their CAN frames, so the extra precision on the RIO is insignificant in most cases.
 
-Note that `Logger.getInstance().getRealTimestamp()` can always be used to access the "real" FPGA timestamp where necessary, like within IO implementations or for analyzing performance. AdvantageKit shims WPILib classes like `Watchdog` to use this method because they use the timestamp for analyzing performance and are not part of the robot's control logic.
+Note that `Logger.getRealTimestamp()` can always be used to access the "real" FPGA timestamp where necessary, like within IO implementations or for analyzing performance. AdvantageKit shims WPILib classes like `Watchdog` to use this method because they use the timestamp for analyzing performance and are not part of the robot's control logic.
 
-If you need to disable deterministic timestamps globally, add the following line to `robotInit()` before `Logger.getInstance().start()`:
+If you need to disable deterministic timestamps globally, add the following line to `robotInit()` before `Logger.start()`:
 
 ```java
-Logger.getInstance().disableDeterministicTimestamps();
+Logger.disableDeterministicTimestamps();
 ```

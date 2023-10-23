@@ -38,7 +38,7 @@ public class LoggedDashboardChooser<V> implements LoggedDashboardInput {
     this.key = key;
     SmartDashboard.putData(key, sendableChooser);
     periodic();
-    Logger.getInstance().registerDashboardInput(this);
+    Logger.registerDashboardInput(this);
   }
 
   /** Adds a new option to the chooser. */
@@ -71,9 +71,9 @@ public class LoggedDashboardChooser<V> implements LoggedDashboardInput {
   }
 
   public void periodic() {
-    if (!Logger.getInstance().hasReplaySource()) {
+    if (!Logger.hasReplaySource()) {
       selectedValue = sendableChooser.getSelected();
     }
-    Logger.getInstance().processInputs(prefix, inputs);
+    Logger.processInputs(prefix, inputs);
   }
 }

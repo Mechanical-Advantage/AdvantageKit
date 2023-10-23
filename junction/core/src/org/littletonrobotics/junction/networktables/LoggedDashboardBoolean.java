@@ -48,7 +48,7 @@ public class LoggedDashboardBoolean implements LoggedDashboardInput {
     this.value = defaultValue;
     SmartDashboard.putBoolean(key, SmartDashboard.getBoolean(key, defaultValue));
     periodic();
-    Logger.getInstance().registerDashboardInput(this);
+    Logger.registerDashboardInput(this);
   }
 
   /** Updates the default value, which is used if no value in NT is found. */
@@ -70,9 +70,9 @@ public class LoggedDashboardBoolean implements LoggedDashboardInput {
   }
 
   public void periodic() {
-    if (!Logger.getInstance().hasReplaySource()) {
+    if (!Logger.hasReplaySource()) {
       value = SmartDashboard.getBoolean(key, defaultValue);
     }
-    Logger.getInstance().processInputs(prefix, inputs);
+    Logger.processInputs(prefix, inputs);
   }
 }
