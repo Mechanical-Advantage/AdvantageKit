@@ -486,7 +486,7 @@ public class LogTable {
     }
   }
 
-  /** Reads a IntegerArray value from the table. */
+  /** Reads an IntegerArray value from the table. */
   public long[] get(String key, long[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getIntegerArray(defaultValue);
@@ -520,6 +520,128 @@ public class LogTable {
     } else {
       return defaultValue;
     }
+  }
+
+  /**
+   * Reads a Raw value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, byte[]) get(String, byte[])}
+   *             instead
+   */
+  @Deprecated
+  public byte[] getRaw(String key, byte[] defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads a Boolean value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, boolean) get(String, boolean)}
+   *             instead
+   */
+  @Deprecated
+  public boolean getBoolean(String key, boolean defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads an Integer value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, long) get(String, long)}
+   *             instead
+   */
+  @Deprecated
+  public long getInteger(String key, long defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads a Float value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, float) get(String, float)}
+   *             instead
+   */
+  @Deprecated
+  public float getFloat(String key, float defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads a Double value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, double) get(String, double)}
+   *             instead
+   */
+  @Deprecated
+  public double getDouble(String key, double defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads a String value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, String) get(String, String)}
+   *             instead
+   */
+  @Deprecated
+  public String getString(String key, String defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads a BooleanArray value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, boolean[]) get(String,
+   *             boolean[])}
+   *             instead
+   */
+  @Deprecated
+  public boolean[] getBooleanArray(String key, boolean[] defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads an IntegerArray value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, long[]) get(String, long[])}
+   *             instead
+   */
+  @Deprecated
+  public long[] getIntegerArray(String key, long[] defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads a FloatArray value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, float[]) get(String, float[])}
+   *             instead
+   */
+  @Deprecated
+  public float[] getFloatArray(String key, float[] defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads a DoubleArray value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, double[]) get(String, double[])}
+   *             instead
+   */
+  @Deprecated
+  public double[] getDoubleArray(String key, double[] defaultValue) {
+    return get(key, defaultValue);
+  }
+
+  /**
+   * Reads a StringArray value from the table.
+   * 
+   * @deprecated Use {@link LogTable#get(String, String[]) get(String, String[])}
+   *             instead
+   */
+  @Deprecated
+  public String[] getStringArray(String key, String[] defaultValue) {
+    return get(key, defaultValue);
   }
 
   /** Reads a struct value from the table. */
