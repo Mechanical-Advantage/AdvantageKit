@@ -15,9 +15,12 @@ public class ConduitApi {
   private static final int NUM_JOYSTICKS = 6;
   private static final int NUM_JOYSTICK_AXES = 12;
   private static final int NUM_JOYSTICK_POVS = 12;
-  private static final int JOYSTICK_NAME_LEN = 256;
-  private static final int EVENT_NAME_LEN = 64;
-  private static final int GAME_SPECIFIC_MESSAGE_LEN = 64;
+
+  private static final byte[] eventNameBytes = new byte[64];
+  private static final byte[] gameSpecificMessageBytes = new byte[64];
+  private static final byte[] joystickNameBytes = new byte[256];
+  private static final byte[] serialNumberBytes = new byte[8];
+  private static final byte[] commentsBytes = new byte[64];
 
   private static ConduitApi instance = null;
 
@@ -63,25 +66,23 @@ public class ConduitApi {
   }
 
   public String getEventName() {
-    byte[] bytes = new byte[EVENT_NAME_LEN];
     int i;
-    for (i = 0; i < EVENT_NAME_LEN; i++) {
-      bytes[i] = (byte) ds.eventName(i);
-      if (bytes[i] == 0)
+    for (i = 0; i < eventNameBytes.length; i++) {
+      eventNameBytes[i] = (byte) ds.eventName(i);
+      if (eventNameBytes[i] == 0)
         break;
     }
-    return new String(bytes, 0, i, utf8Charset);
+    return new String(eventNameBytes, 0, i, utf8Charset);
   }
 
   public String getGameSpecificMessage() {
-    byte[] bytes = new byte[GAME_SPECIFIC_MESSAGE_LEN];
     int i;
-    for (i = 0; i < GAME_SPECIFIC_MESSAGE_LEN; i++) {
-      bytes[i] = (byte) ds.gameSpecificMessage(i);
-      if (bytes[i] == 0)
+    for (i = 0; i < gameSpecificMessageBytes.length; i++) {
+      gameSpecificMessageBytes[i] = (byte) ds.gameSpecificMessage(i);
+      if (gameSpecificMessageBytes[i] == 0)
         break;
     }
-    return new String(bytes, 0, i, utf8Charset);
+    return new String(gameSpecificMessageBytes, 0, i, utf8Charset);
   }
 
   public int getGameSpecificMessageSize() {
@@ -109,15 +110,14 @@ public class ConduitApi {
   }
 
   public String getJoystickName(int joystickId) {
-    byte[] bytes = new byte[JOYSTICK_NAME_LEN];
     int i;
-    for (i = 0; i < JOYSTICK_NAME_LEN; i++) {
-      bytes[i] = (byte) joysticks[joystickId].name(i);
-      if (bytes[i] == 0)
+    for (i = 0; i < joystickNameBytes.length; i++) {
+      joystickNameBytes[i] = (byte) joysticks[joystickId].name(i);
+      if (joystickNameBytes[i] == 0)
         break;
     }
 
-    return new String(bytes, 0, i, utf8Charset);
+    return new String(joystickNameBytes, 0, i, utf8Charset);
   }
 
   public int getJoystickType(int joystickId) {
@@ -201,21 +201,19 @@ public class ConduitApi {
   }
 
   public String getSerialNumber() {
-    byte[] bytes = new byte[sys.serialNumberSize()];
     int i;
-    for (i = 0; i < bytes.length; i++) {
-      bytes[i] = (byte) sys.serialNumber(i);
+    for (i = 0; i < Math.min(serialNumberBytes.length, sys.serialNumberSize()); i++) {
+      serialNumberBytes[i] = (byte) sys.serialNumber(i);
     }
-    return new String(bytes, 0, i, utf8Charset);
+    return new String(serialNumberBytes, 0, i, utf8Charset);
   }
 
   public String getComments() {
-    byte[] bytes = new byte[sys.commentsSize()];
     int i;
-    for (i = 0; i < bytes.length; i++) {
-      bytes[i] = (byte) sys.comments(i);
+    for (i = 0; i < Math.min(commentsBytes.length, sys.commentsSize()); i++) {
+      commentsBytes[i] = (byte) sys.comments(i);
     }
-    return new String(bytes, 0, i, utf8Charset);
+    return new String(commentsBytes, 0, i, utf8Charset);
   }
 
   public int getTeamNumber() {
