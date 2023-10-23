@@ -8,6 +8,7 @@ AdvantageKit is a logging, telemetry, and replay framework developed by Team 632
 - [Installing AdvantageKit](/docs/INSTALLATION.md)
 - [Understanding Data Flow](/docs/DATA-FLOW.md)
 - [Code Structure & IO Layers](/docs/CODE-STRUCTURE.md)
+- [Common Issues (And How To Avoid Them)](/docs/COMMON-ISSUES.md)
 - [Developing AdvantageKit](/docs/DEVELOPING.md)
 
 ## Example Projects
@@ -25,19 +26,13 @@ Looking to get started quickly? Here are some example projects to check out:
 ### Logging
 
 - [junction](/junction) - Primary component of logging, manages the flow of data between user code, WPILib, log files, network clients, etc. _Written in Java._
-
   - [junction/core](/junction/core) - Central system for managing data, including reading and writing from log files and user code.
-
   - [junction/shims](/junction/shims) - Replaces components of other libraries (WPILib) to interact directly with `junction`.
-
     - [junction/shims/wpilib](/junction/shims/wpilib) - Replaces WPILib components to read data from `junction` instead of the HAL.
-
   - [junction/autolog](/junction/autolog) - Annotation procesor for creating log input classes.
-
 - [conduit](/conduit) - Transfers data between `junction` and the WPILib HAL efficiently. _Written in C++ and Java._
 
 ### General
 
 - [build_tools](/build_tools) - Utilities to assist with building in Bazel and interfacing with WPILib and the roboRIO.
-
 - [third_party](/third_party) - Tools for integrating third party libraries like WPILib.
