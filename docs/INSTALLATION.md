@@ -4,12 +4,15 @@
 
 For new projects, the easiest way to use AdvantageKit is to download one of the example projects attached to the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest). After downloading and unzipping the file, just adjust the team number in ".wpilib/wpilib_preferences.json" and get started!
 
-- **Skeleton Template:** Includes a basic `TimedRobot` style structure, which supports logging on a real robot and replay in simulation. This template is ideal if you prefer to start from a minimal project.
-- **Command-Based Example:** Example command based project with a tank drive and closed-loop flywheel, including support for both physics simulation and replay. To switch between modes, set the "mode" attribute in `Constants.java` to `REAL`, `SIM` (physics simulation), or `REPLAY`. This project is a good example of the [IO structure for subsystems](CODE-STRUCTURE.md).
+- **Skeleton Project:** Includes a basic `TimedRobot` style structure, which supports logging on a real robot, physics simulation, and replay in simulation. This template is ideal if you prefer to start from a minimal project.
+- **Swerve Drive Project:** Example command based project with a swerve drive and closed-loop flywheel, including support for physics simulation and replay. Additional features include odometry, field-oriented drive with joysticks, and auto paths with PathPlanner.
+- **Differential Drive Project:** Example command based project with an open-loop tank drive and closed-loop flywheel, including support for physics simulation and replay.
+
+> Note: To switch between modes, set the "mode" attribute in `Constants.java` to `REAL`, `SIM` (physics simulation), or `REPLAY`.
 
 ## Existing Projects
 
-AdvantageKit is available through GitHub Packages. To make our Maven repository available through Gradle, add the following block to the `build.gradle` file:
+AdvantageKit is available through GitHub Packages. To access our Maven repository through Gradle, add the following block to the `build.gradle` file:
 
 ```groovy
 repositories {
@@ -23,7 +26,9 @@ repositories {
 }
 ```
 
-Per [this issue](https://github.community/t/download-from-github-package-registry-without-authentication/14407), downloading packages from GitHub requires authentication, even for public repositories. The configuration above includes an access token so that anyone can download AdvantageKit. The obfuscation of the string hides it from GitHub's bot; **DO NOT INCLUDE THE PLAIN TEXT TOKEN IN ANY GITHUB REPOSITORY.** This will cause the token to be automatically revoked and prevent anyone from downloading AdvantageKit.
+Per [this issue](https://github.community/t/download-from-github-package-registry-without-authentication/14407), downloading packages from GitHub requires authentication, even for public repositories. The configuration above includes an access token so that anyone can download AdvantageKit. The obfuscation of the string hides it from GitHub's bot; **do not include the plain text token in any GitHub repository.** This will cause the token to be automatically revoked, requiring us to create and distribute a new token.
+
+> Note: A token for accessing GitHub packages and AdvantageKit can be created using any GitHub account. Under account settings, go to "Developer settings" > "Personal access token" > "Tokens (classic)" > "Generate new token" > "Generate new token (classic)" and enable the "read:packages" scope. Keep in mind that GitHub will revoke this token if the plaintext version appears in a GitHub repository.
 
 AdvantageKit uses WPILib shims to inject data. Add the following block to `build.gradle` to replace the default implementation. **This is required for the framework to function**
 
@@ -72,7 +77,7 @@ if (isReal()) {
 Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 ```
 
-This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required.
+This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required. See the example projects for one method of implementing this logic.
 
 ### `@AutoLog` Annotation
 

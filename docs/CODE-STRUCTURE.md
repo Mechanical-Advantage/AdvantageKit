@@ -16,7 +16,7 @@ Data logging of inputs should occur between the control logic and hardware inter
 
 ![Diagram of restructured subsystem](resources/subsystem-2.png)
 
-> Note: You can refer to the [AdvantageKit command-based example](INSTALLATION.md#new-projects) or [6328's 2022 robot code](https://github.com/Mechanical-Advantage/RobotCode2022/tree/main/src/main/java/frc/robot/subsystems) for some example IO interfaces and implementations.
+> Note: You can refer to the [AdvantageKit examples](INSTALLATION.md#new-projects) or [6328's 2022 robot code](https://github.com/Mechanical-Advantage/RobotCode2022/tree/main/src/main/java/frc/robot/subsystems) for some reference IO interfaces and implementations.
 
 Outputs (setting voltage, setpoint, PID constants, etc.) make use of simple methods for each command. Input data is more controlled such that it can be logged and replayed. Each IO interface defines a class with public attributes for all input data, along with methods for saving and replaying that data from a log (`toLog` and `fromLog`). We recommend using the [`@AutoLog`](#autolog-annotation) annotation to generate these methods automatically.
 
@@ -30,7 +30,6 @@ Logger.processInputs("ExampleSubsystem", inputs); // Send input data to the logg
 The rest of the subsystem then reads data from this inputs object rather than directly from the IO layer. This structure ensures that:
 
 - The logging framework has access to all of the data being logged and can insert data from the log during replay.
-
 - Throughout each cycle, all code making use of the input data reads the same values - the cache is never updated _during a cycle_. This means that the data replayed from the log appears identical to the data read on the real robot.
 
 All of the IO methods include a default implementation which is used during simulation. We suggest setting up each subsystem accept the IO object as a constructor argument, so that the central robot class (like `RobotContainer`) can decide whether or not to use real hardware:
@@ -52,6 +51,38 @@ public RobotContainer() {
 ```
 
 > Note: We suggest the use of an IO layer to minimize the chance of interacting with hardware that doesn't exist. However, any structure will work where all input data flows through an inputs object implementing `LoggableInputs` and the two methods `fromLog` and `toLog`. Feel free to make use of whatever structure best fits your own requirements.
+
+## `AutoLog` Annotation & Data Types
+
+By adding the `@AutoLog` annotation to your inputs class, AdvantageKit will automatically generate implementations of `toLog` and `fromLog` for your inputs. All simple data types (including single values and arrays) are supported. [Structured data types](DATA-FLOW.md#structured-data-types) are also supported, so geometry objects like `Rotation2d` and `Pose3d` can be directly used as inputs.
+
+For example:
+
+```java
+@AutoLog
+public class MyInputs {
+    public double myNumber = 0.0;
+    public Pose2d myPose = new Pose2d();
+}
+```
+
+This will generate the following class:
+
+```java
+class MyInputsAutoLogged extends MyInputs implements LoggableInputs {
+    public void toLog(LogTable table) {
+        table.put("MyNumber", myField);
+        table.put("MyPose", myPose);
+    }
+
+    public void fromLog(LogTable table) {
+        myNumber = table.get("MyNumber", myNumber);
+        myPose = table.get("MyPose", myPose);
+    }
+}
+```
+
+Note that you should use the `<className>AutoLogged` class, rather than your annotated class. The [AdvantageKit examples projects](INSTALLATION.md#new-projects) are a useful reference for how to use `@AutoLog` in a full project.
 
 ## Dashboard Options & NetworkTables Inputs
 
@@ -93,16 +124,12 @@ public Command getAutonomousCommand() {
 Output data consists of any calculated values which could be recreated in the simulator, including...
 
 - Odometry pose
-
 - Motor voltages
-
 - Pneumatics commands
-
 - Status data for drivers
-
 - Internal object state
 
-The logging framework supports recording this output data on the real robot and during replay. Essential data like the odometry pose are recorded on the real robot for convenience; even if it can be recreated in a simulator, that's often not a viable option in the rush to fix a problem between matches. During replay, recording extra output data is the primary method of debugging the code - logging calls can be added anywhere as they don't interfere with the replayed control logic. Any loggable data type [(see here)](DATA-FLOW.md) can be saved as an output like so:
+The logging framework supports recording this output data on the real robot and during replay. Essential data like the odometry pose are recorded on the real robot for convenience; even if it can be recreated in a simulator, that's often not a viable option in the rush to fix a problem between matches. During replay, recording extra output data is the primary method of debugging the code - logging calls can be added anywhere as they don't interfere with the replayed control logic. Any loggable data type ([see here](DATA-FLOW.md#simple-data-types)) can be saved as an output like so:
 
 ```java
 Logger.recordOutput("Flywheel/Setpoint", setpointSpeed);
@@ -112,7 +139,7 @@ Logger.recordOutput("Drive/CalculatedLeftVolts", leftVolts);
 
 > Note: This data is automatically saved to the `RealOutputs` or `ReplayOutputs` table, and it can be divided further into subtables using slashes (as seen above).
 
-Logging geometry objects like `Pose2d`, `Trajectory`, etc. is common in robot code. AdvantageKit includes the following functions to easily log these objects in the formats expected by AdvantageScope:
+Logging geometry objects like `Pose2d`, `Trajectory`, etc. is common in robot code. Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). These objects can be logged as single values or arrays:
 
 ```java
 // Pose2d
@@ -143,32 +170,3 @@ AdvantageKit can also log [`Mechanism2d`](https://docs.wpilib.org/en/stable/docs
 Mechanism2d mechanism = new Mechanism2d(3, 3);
 Logger.recordOutput("MyMechanism", mechanism);
 ```
-
-## `@AutoLog` Annotation
-
-As of version 1.8, a new `@AutoLog` annotation was added. By adding this annotation to your inputs class, AdvantageKit will automatically generate implementations of `toLog` and `fromLog` for your inputs.
-
-For example:
-
-```java
-@AutoLog
-public class MyInputs {
-    public double myField = 0;
-}
-```
-
-This will generate the following class:
-
-```java
-class MyInputsAutoLogged extends MyInputs implements LoggableInputs {
-    public void toLog(LogTable table) {
-        table.put("MyField", myField);
-    }
-
-    public void fromLog(LogTable table) {
-        myField = table.getDouble("MyField", myField);
-    }
-}
-```
-
-Note that you should use the `<className>AutoLogged` class, rather than your annotated class. The [AdvantageKit command-based project](INSTALLATION.md#new-projects) is a good example of the `@AutoLog` annotation in a full project.
