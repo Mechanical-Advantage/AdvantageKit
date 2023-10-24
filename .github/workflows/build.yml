@@ -23,7 +23,7 @@ jobs:
       - name: "Release: Get version number"
         id: get_version
         if: github.event_name == 'release'
-        uses: battila7/get-version-action@v2
+        run: echo "version=${GITHUB_REF_NAME:1}" >> "$GITHUB_OUTPUT"
       - name: "Release: Get release info"
         id: get_release_info
         if: github.event_name == 'release'
@@ -34,7 +34,7 @@ jobs:
       # Upload vendordep
       - name: "Release: Generate vendordep"
         if: github.event_name == 'release'
-        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //:vendordep
+        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version }}" //:vendordep
       - name: "Release: Upload vendordep"
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
@@ -49,7 +49,7 @@ jobs:
       # Upload example projects
       - name: "Release: Generate example projects"
         if: github.event_name == 'release'
-        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //example_projects
+        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version }}" //example_projects
       - name: "Release: Upload example project (skeleton)"
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
@@ -87,13 +87,13 @@ jobs:
         run: pip3 install requests
       - name: 'Release: Build "conduit/wpilibio:nativezip"'
         if: github.event_name == 'release'
-        run: bazelisk build --config=athena --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip
+        run: bazelisk build --config=athena --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/wpilibio:nativezip
       - name: 'Release: Upload "conduit/wpilibio:nativezip"'
         if: github.event_name == 'release'
-        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier linuxathena --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version-without-v }}-linuxathena.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
+        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version }} --classifier linuxathena --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version }}-linuxathena.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
       - name: 'Release: Upload "conduit/wpilibio:pom"'
         if: github.event_name == 'release'
-        run: bazelisk run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:pom.publish
+        run: bazelisk run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/wpilibio:pom.publish
         env:
           GITHUB_ACTOR: Mechanical-Advantage
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -101,16 +101,16 @@ jobs:
       # Upload Java packages
       - name: 'Release: Upload "conduit/api"'
         if: github.event_name == 'release'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/api:api-export.publish
+        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/api:api-export.publish
       - name: 'Release: Upload "junction/core"'
         if: github.event_name == 'release'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/core:core-export.publish
+        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //junction/core:core-export.publish
       - name: 'Release: Upload "junction/autolog"'
         if: github.event_name == 'release'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/autolog:autolog-export.publish
+        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //junction/autolog:autolog-export.publish
       - name: 'Release: Upload "junction/shims/wpilib"'
         if: github.event_name == 'release'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/shims/wpilib:wpilib-export.publish
+        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version }}" //junction/shims/wpilib:wpilib-export.publish
 
   desktop:
     strategy:
@@ -147,7 +147,7 @@ jobs:
       - name: "Release: Get version number"
         id: get_version
         if: github.event_name == 'release'
-        uses: battila7/get-version-action@v2
+        run: echo "version=${GITHUB_REF_NAME:1}" >> "$GITHUB_OUTPUT"
 
       # Upload conduit build
       - name: "Release: Install Dependencies"
@@ -155,13 +155,13 @@ jobs:
         run: pip3 install requests
       - name: 'Release: Build "conduit/wpilibio:nativezip" for macOS'
         if: github.event_name == 'release' && matrix.host.displayName == 'macOS'
-        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio/osxuniversal:nativezip
+        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/wpilibio/osxuniversal:nativezip
       - name: 'Release: Upload "conduit/wpilibio:nativezip" for macOS'
         if: github.event_name == 'release' && matrix.host.displayName == 'macOS'
-        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.host.classifier }} --file_path bazel-bin/conduit/wpilibio/osxuniversal/wpilibio-${{ steps.get_version.outputs.version-without-v }}-${{ matrix.host.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
+        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version }} --classifier ${{ matrix.host.classifier }} --file_path bazel-bin/conduit/wpilibio/osxuniversal/wpilibio-${{ steps.get_version.outputs.version }}-${{ matrix.host.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
       - name: 'Release: Build "conduit/wpilibio:nativezip"'
         if: github.event_name == 'release' && matrix.host.displayName != 'macOS'
-        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip
+        run: bazelisk build --define "publishing_version=${{ steps.get_version.outputs.version }}" //conduit/wpilibio:nativezip
       - name: 'Release: Upload "conduit/wpilibio:nativezip"'
         if: github.event_name == 'release' && matrix.host.displayName != 'macOS'
-        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.host.classifier }} --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version-without-v }}-${{ matrix.host.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
+        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version }} --classifier ${{ matrix.host.classifier }} --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version }}-${{ matrix.host.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
