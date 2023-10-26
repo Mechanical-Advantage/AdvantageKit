@@ -349,7 +349,7 @@ public class Logger {
    * entry (microseconds).
    */
   public static long getTimestamp() {
-    if (!running || entry == null || !deterministicTimestamps) {
+    if (!running || entry == null || (!deterministicTimestamps && !hasReplaySource())) {
       return getRealTimestamp();
     } else {
       return entry.getTimestamp();
