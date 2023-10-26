@@ -45,13 +45,15 @@ Where precise timestamps are required, the best solution is to record measuremen
 
 ### Solution #2
 
+`Logger.getRealTimestamp()` can always be used to access the "real" FPGA timestamp where necessary, like within IO implementations or for analyzing performance. This method is not affected by log replay (i.e. it will not reflect the accelerated rate of replay). One use case for this method is measuring code execution time, since those values don't need to be recreated during log replay. AdvantageKit shims WPILib classes like `Watchdog` to use this method because they use the timestamp for analyzing performance and are not part of the robot's control logic.
+
+### Solution #3
+
 Optionally, AdvantageKit allows you to disable deterministic timestamps. This reverts to the default WPILib behavior of reading from the FPGA for every method call, making the behavior of the robot code non-deterministic. The "output" values seen in simulation may be slightly different than they were on the real robot. This alternative mode should only be used when _all_ of the following are true:
 
 1. The control logic depends on the exact timestamp _within_ a single loop cycle, like a high precision control loop that is significantly affected by the precise time that it is executed within each (usually 20ms) loop cycle.
-2. The sensor values used in the loop cannot be associated with timestamps in an IO implementation. See the solution #1.
+2. The sensor values used in the loop cannot be associated with timestamps in an IO implementation. See solution #1.
 3. The IO (sensors, actuators, etc) involved in the loop are sufficiently low-latency that the exact timestamp on the RIO is significant. For example, CAN motor controllers are limited by the rate of their CAN frames, so the extra precision on the RIO is insignificant in most cases.
-
-Note that `Logger.getRealTimestamp()` can always be used to access the "real" FPGA timestamp where necessary, like within IO implementations or for analyzing performance. AdvantageKit shims WPILib classes like `Watchdog` to use this method because they use the timestamp for analyzing performance and are not part of the robot's control logic.
 
 If you need to disable deterministic timestamps globally, add the following line to `robotInit()` before `Logger.start()`:
 
