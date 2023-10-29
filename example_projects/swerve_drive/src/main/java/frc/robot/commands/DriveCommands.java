@@ -15,7 +15,6 @@ public class DriveCommands {
   private static final double DEADBAND = 0.1;
 
   private DriveCommands() {}
-  ;
 
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
