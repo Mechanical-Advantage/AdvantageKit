@@ -39,8 +39,7 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser =
-      new LoggedDashboardChooser<>("Auto Choices");
+  private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardNumber flywheelSpeedInput =
       new LoggedDashboardNumber("Flywheel Speed", 1500.0);
 
@@ -98,8 +97,7 @@ public class RobotContainer {
             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
 
     // Set up auto routines
-    autoChooser.addDefaultOption("Do Nothing", Commands.none());
-    autoChooser.addOption("Example Auto", new PathPlannerAuto("Example Auto"));
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up FF characterization routines
     autoChooser.addOption(

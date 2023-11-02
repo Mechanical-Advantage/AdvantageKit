@@ -119,6 +119,19 @@ public Command getAutonomousCommand() {
 }
 ```
 
+A `LoggedDashboardChooser` can also be constructed using an existing `SendableChooser`, which allows for compatibility PathPlanner's `AutoBuilder` API:
+
+```java
+private final LoggedDashboardChooser<Command> autoChooser;
+
+public RobotContainer() {
+    // ...
+
+    // buildAutoChooser() returns a SendableChooser
+    autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
+}
+```
+
 ## Logging Outputs
 
 Output data consists of any calculated values which could be recreated in the simulator, including...
