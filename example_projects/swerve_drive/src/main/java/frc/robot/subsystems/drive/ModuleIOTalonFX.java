@@ -42,8 +42,8 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnCurrent;
 
   // Gear ratios for SDS MK4i L2, adjust as necessary
-  private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
-  private final double turnAfterEncoderReduction = 150.0 / 7.0;
+  private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+  private final double TURN_GEAR_RATIO = 150.0 / 7.0;
 
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
@@ -132,9 +132,9 @@ public class ModuleIOTalonFX implements ModuleIO {
         turnCurrent);
 
     inputs.drivePositionRad =
-        Units.rotationsToRadians(drivePosition.getValueAsDouble()) / driveAfterEncoderReduction;
+        Units.rotationsToRadians(drivePosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
     inputs.driveVelocityRadPerSec =
-        Units.rotationsToRadians(driveVelocity.getValueAsDouble()) / driveAfterEncoderReduction;
+        Units.rotationsToRadians(driveVelocity.getValueAsDouble()) / DRIVE_GEAR_RATIO;
     inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
     inputs.driveCurrentAmps = new double[] {driveCurrent.getValueAsDouble()};
 
@@ -142,9 +142,9 @@ public class ModuleIOTalonFX implements ModuleIO {
         Rotation2d.fromRotations(turnAbsolutePosition.getValueAsDouble())
             .minus(absoluteEncoderOffset);
     inputs.turnPosition =
-        Rotation2d.fromRotations(turnPosition.getValueAsDouble() / turnAfterEncoderReduction);
+        Rotation2d.fromRotations(turnPosition.getValueAsDouble() / TURN_GEAR_RATIO);
     inputs.turnVelocityRadPerSec =
-        Units.rotationsToRadians(turnVelocity.getValueAsDouble()) / turnAfterEncoderReduction;
+        Units.rotationsToRadians(turnVelocity.getValueAsDouble()) / TURN_GEAR_RATIO;
     inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
     inputs.turnCurrentAmps = new double[] {turnCurrent.getValueAsDouble()};
   }
