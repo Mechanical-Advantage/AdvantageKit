@@ -1,12 +1,25 @@
+// Copyright 2021-2023 FRC 6328
+// http://github.com/Mechanical-Advantage
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+
 #include "conduit/wpilibio/include/system_reader.h"
 
-#include <hal/PowerDistribution.h>
-#include <hal/HALBase.h>
-#include <wpi/StackTrace.h>
-#include <hal/DriverStation.h>
-#include <wpi/timestamp.h>
 #include <hal/CAN.h>
+#include <hal/DriverStation.h>
+#include <hal/HALBase.h>
 #include <hal/Power.h>
+#include <hal/PowerDistribution.h>
+#include <wpi/StackTrace.h>
+#include <wpi/timestamp.h>
 
 #include <chrono>
 #include <cstdint>
@@ -25,12 +38,14 @@ void SystemReader::read(schema::SystemData* system_buf) {
   char serialNum[9];
   size_t serialNumLen = HAL_GetSerialNumber(serialNum, sizeof(serialNum));
   system_buf->mutate_serial_number_size(serialNumLen);
-  std::memcpy(system_buf->mutable_serial_number()->Data(), serialNum, system_buf->serial_number()->size());
+  std::memcpy(system_buf->mutable_serial_number()->Data(), serialNum,
+              system_buf->serial_number()->size());
 
   char comments[65];
   size_t commentsLen = HAL_GetComments(comments, sizeof(comments));
   system_buf->mutate_comments_size(commentsLen);
-  std::memcpy(system_buf->mutable_comments()->Data(), comments, system_buf->comments()->size());
+  std::memcpy(system_buf->mutable_comments()->Data(), comments,
+              system_buf->comments()->size());
 
   system_buf->mutate_team_number(HAL_GetTeamNumber());
   system_buf->mutate_fpga_button(HAL_GetFPGAButton(&status));

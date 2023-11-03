@@ -1,3 +1,16 @@
+// Copyright 2021-2023 FRC 6328
+// http://github.com/Mechanical-Advantage
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+
 #include <cstdint>
 
 #define PDP_STATUS_1 0x50
@@ -89,7 +102,6 @@ struct PdpStatus3Result {
   uint8_t temp;
 };
 
-
 union PdpStatusEnergy {
   uint8_t data[8];
   struct Bits {
@@ -113,7 +125,8 @@ struct PdpStatusEnergyResult {
   uint32_t totalEnergy;
 };
 
-void parseStatusFrame1(PdpStatus1 status1, PdpStatus1Result &result);
-void parseStatusFrame2(PdpStatus2 status2, PdpStatus2Result &result);
-void parseStatusFrame3(PdpStatus3 status3, PdpStatus3Result &result);
-void parseStatusFrameEnergy(PdpStatusEnergy energy, PdpStatusEnergyResult &result);
+void parseStatusFrame1(PdpStatus1 status1, PdpStatus1Result& result);
+void parseStatusFrame2(PdpStatus2 status2, PdpStatus2Result& result);
+void parseStatusFrame3(PdpStatus3 status3, PdpStatus3Result& result);
+void parseStatusFrameEnergy(PdpStatusEnergy energy,
+                            PdpStatusEnergyResult& result);

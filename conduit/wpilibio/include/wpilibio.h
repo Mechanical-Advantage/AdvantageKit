@@ -1,6 +1,20 @@
+// Copyright 2021-2023 FRC 6328
+// http://github.com/Mechanical-Advantage
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+
 #pragma once
-#include <cstdint>
 #include <jni.h>
+
+#include <cstdint>
 
 namespace akit {
 namespace conduit {
@@ -20,7 +34,7 @@ void make_buffer();
 // Captures data into the shared buffer
 void capture_data();
 
-void configurePDP(JNIEnv *env, jint moduleNumber, jint type);
+void configurePDP(JNIEnv* env, jint moduleNumber, jint type);
 
 }  // namespace wpilibio
 }  // namespace conduit
