@@ -68,6 +68,12 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   public void start() {
+    // Create folder if necessary
+    File logFolder = new File(folder);
+    if (!logFolder.exists()) {
+      logFolder.mkdirs();
+    }
+
     // Delete log if it already exists
     File logFile = new File(folder, filename);
     if (logFile.exists()) {
