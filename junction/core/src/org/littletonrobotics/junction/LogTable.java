@@ -27,10 +27,11 @@ import java.util.Set;
 
 import org.littletonrobotics.junction.LogTable.LogValue;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufBuffer;
+import edu.wpi.first.util.struct.StructBuffer;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.wpilibj.DriverStation;
 import us.hebi.quickbuf.ProtoMessage;
 
 /**
