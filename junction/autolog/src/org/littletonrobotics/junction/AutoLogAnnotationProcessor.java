@@ -1,3 +1,16 @@
+// Copyright 2021-2023 FRC 6328
+// http://github.com/Mechanical-Advantage
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+
 package org.littletonrobotics.junction;
 
 import com.squareup.javapoet.*;
@@ -30,33 +43,18 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
   private static final TypeName LOG_TABLE_TYPE = ClassName.get("org.littletonrobotics.junction", "LogTable");
   private static final TypeName LOGGABLE_INPUTS_TYPE = ClassName.get("org.littletonrobotics.junction.inputs",
       "LoggableInputs");
-  private static final Map<String, String> LOGGABLE_TYPES_LOOKUP = new HashMap<>();
   private static final Map<String, String> UNLOGGABLE_TYPES_SUGGESTIONS = new HashMap<>();
 
   static {
-    LOGGABLE_TYPES_LOOKUP.put("byte[]", "Raw");
-    LOGGABLE_TYPES_LOOKUP.put("boolean", "Boolean");
-    LOGGABLE_TYPES_LOOKUP.put("long", "Integer");
-    LOGGABLE_TYPES_LOOKUP.put("float", "Float");
-    LOGGABLE_TYPES_LOOKUP.put("double", "Double");
-    LOGGABLE_TYPES_LOOKUP.put("java.lang.String", "String");
-    LOGGABLE_TYPES_LOOKUP.put("boolean[]", "BooleanArray");
-    LOGGABLE_TYPES_LOOKUP.put("long[]", "IntegerArray");
-    LOGGABLE_TYPES_LOOKUP.put("float[]", "FloatArray");
-    LOGGABLE_TYPES_LOOKUP.put("double[]", "DoubleArray");
-    LOGGABLE_TYPES_LOOKUP.put("java.lang.String[]", "StringArray");
-
     UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Byte[]", "byte[]");
     UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Boolean", "boolean");
+    UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Integer", "int");
     UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Long", "long");
-    UNLOGGABLE_TYPES_SUGGESTIONS.put("int", "long");
-    UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Integer", "long");
     UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Float", "float");
     UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Double", "double");
     UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Boolean[]", "boolean[]");
+    UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Integer[]", "int[]");
     UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Long[]", "long[]");
-    UNLOGGABLE_TYPES_SUGGESTIONS.put("int[]", "long[]");
-    UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Integer[]", "long[]");
     UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Float[]", "float[]");
     UNLOGGABLE_TYPES_SUGGESTIONS.put("java.lang.Double[]", "double[]");
   }
@@ -93,11 +91,10 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
             String logName = simpleName.substring(0, 1).toUpperCase() + simpleName.substring(1);
 
             String fieldType = fieldElement.asType().toString();
-            String logType = LOGGABLE_TYPES_LOOKUP.get(fieldType);
             String typeSuggestion = UNLOGGABLE_TYPES_SUGGESTIONS.get(fieldType);
 
             // Check for unloggable types
-            if (typeSuggestion != null || (logType == null && fieldType.startsWith("java"))) {
+            if (typeSuggestion != null || (fieldType.startsWith("java") && !fieldType.startsWith("java.lang.String"))) {
               String extraText = "";
               if (typeSuggestion != null) {
                 extraText = "Did you mean to use \"" + typeSuggestion + "\" instead?";

@@ -432,6 +432,20 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
+  public static void recordOutput(String key, int value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
   public static void recordOutput(String key, long value) {
     if (running) {
       outputTable.put(key, value);
@@ -489,6 +503,20 @@ public class Logger {
    * @param value The value of the field.
    */
   public static void recordOutput(String key, boolean[] value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public static void recordOutput(String key, int[] value) {
     if (running) {
       outputTable.put(key, value);
     }

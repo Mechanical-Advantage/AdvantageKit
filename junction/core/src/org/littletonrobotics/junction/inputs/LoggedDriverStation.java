@@ -41,12 +41,12 @@ public class LoggedDriverStation {
    * General driver station data that needs to be updated throughout the match.
    */
   public static class DriverStationInputs implements LoggableInputs {
-    public long allianceStation = 0;
+    public int allianceStation = 0;
     public String eventName = "";
     public String gameSpecificMessage = "";
-    public long matchNumber = 0;
-    public long replayNumber = 0;
-    public long matchType = 0;
+    public int matchNumber = 0;
+    public int replayNumber = 0;
+    public int matchType = 0;
     public double matchTime = 0.00;
 
     public boolean enabled = false;
@@ -96,13 +96,13 @@ public class LoggedDriverStation {
    */
   public static class JoystickInputs implements LoggableInputs {
     public String name = "";
-    public long type = 0;
+    public int type = 0;
     public boolean xbox = false;
-    public long buttonCount = 0;
-    public long buttonValues = 0;
-    public long[] povs = {};
+    public int buttonCount = 0;
+    public int buttonValues = 0;
+    public int[] povs = {};
     public float[] axisValues = {};
-    public long[] axisTypes = {};
+    public int[] axisTypes = {};
 
     public void toLog(LogTable table) {
       table.put("Name", name);
@@ -162,7 +162,7 @@ public class LoggedDriverStation {
         // POVs
         int povCount = conduit.getPovCount(id);
         int[] povValues = conduit.getPovValues(id);
-        joystick.povs = new long[povCount];
+        joystick.povs = new int[povCount];
         for (int i = 0; i < povCount; i++) {
           joystick.povs[i] = povValues[i];
         }
@@ -172,7 +172,7 @@ public class LoggedDriverStation {
         float[] axisValues = conduit.getAxisValues(id);
         int[] axisTypes = conduit.getAxisTypes(id);
         joystick.axisValues = new float[axisCount];
-        joystick.axisTypes = new long[axisCount];
+        joystick.axisTypes = new int[axisCount];
         for (int i = 0; i < axisCount; i++) {
           joystick.axisValues[i] = axisValues[i];
           joystick.axisTypes[i] = axisTypes[i];
@@ -256,7 +256,7 @@ public class LoggedDriverStation {
     private void sendMatchData(DriverStationInputs dsInputs) {
       boolean isRedAlliance = false;
       int stationNumber = 1;
-      switch ((int) dsInputs.allianceStation) {
+      switch (dsInputs.allianceStation) {
         case 0:
           isRedAlliance = true;
           stationNumber = 1;

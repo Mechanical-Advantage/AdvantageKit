@@ -121,7 +121,7 @@ public class WPILOGWriter implements LogDataReceiver {
 
       // Update match
       MatchType matchType;
-      switch ((int) table.get("DriverStation/MatchType", 0)) {
+      switch (table.get("DriverStation/MatchType", 0)) {
         case 1:
           matchType = MatchType.Practice;
           break;
@@ -150,7 +150,7 @@ public class WPILOGWriter implements LogDataReceiver {
           default:
             break;
         }
-        logMatchText += Long.toString(table.get("DriverStation/MatchNumber", 0));
+        logMatchText += Integer.toString(table.get("DriverStation/MatchNumber", 0));
       }
 
       // Update filename

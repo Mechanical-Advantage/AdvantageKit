@@ -292,7 +292,7 @@ public class DriverStation {
     }
 
     if (pov < LoggedDriverStation.getJoystickData(stick).povs.length) {
-      return (int) LoggedDriverStation.getJoystickData(stick).povs[pov];
+      return LoggedDriverStation.getJoystickData(stick).povs[pov];
     }
 
     reportJoystickUnpluggedWarning(
@@ -311,7 +311,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
 
-    return (int) LoggedDriverStation.getJoystickData(stick).buttonValues;
+    return LoggedDriverStation.getJoystickData(stick).buttonValues;
   }
 
   /**
@@ -353,7 +353,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return (int) LoggedDriverStation.getJoystickData(stick).buttonCount;
+    return LoggedDriverStation.getJoystickData(stick).buttonCount;
   }
 
   /**
@@ -381,7 +381,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return (int) LoggedDriverStation.getJoystickData(stick).type;
+    return LoggedDriverStation.getJoystickData(stick).type;
   }
 
   /**
@@ -410,7 +410,7 @@ public class DriverStation {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return (int) LoggedDriverStation.getJoystickData(stick).axisTypes[axis];
+    return LoggedDriverStation.getJoystickData(stick).axisTypes[axis];
   }
 
   /**
@@ -572,7 +572,7 @@ public class DriverStation {
    * @return the match type
    */
   public static MatchType getMatchType() {
-    int matchType = (int) LoggedDriverStation.getDSData().matchType;
+    int matchType = LoggedDriverStation.getDSData().matchType;
     switch (matchType) {
       case 1:
         return MatchType.Practice;
@@ -591,7 +591,7 @@ public class DriverStation {
    * @return the match number
    */
   public static int getMatchNumber() {
-    return (int) LoggedDriverStation.getDSData().matchNumber;
+    return LoggedDriverStation.getDSData().matchNumber;
   }
 
   /**
@@ -600,7 +600,7 @@ public class DriverStation {
    * @return the replay number
    */
   public static int getReplayNumber() {
-    return (int) LoggedDriverStation.getDSData().replayNumber;
+    return LoggedDriverStation.getDSData().replayNumber;
   }
 
   private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap = Map.of(
@@ -667,7 +667,7 @@ public class DriverStation {
    * @return The raw alliance station id.
    */
   public static AllianceStationID getRawAllianceStation() {
-    switch ((int) LoggedDriverStation.getDSData().allianceStation) {
+    switch (LoggedDriverStation.getDSData().allianceStation) {
       case DriverStationJNI.kUnknownAllianceStation:
         return AllianceStationID.Unknown;
       case DriverStationJNI.kRed1AllianceStation:

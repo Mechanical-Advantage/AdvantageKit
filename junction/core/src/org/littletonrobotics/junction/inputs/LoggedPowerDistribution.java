@@ -86,8 +86,8 @@ public class LoggedPowerDistribution {
       table.put("TotalEnergy", pdpTotalEnergy);
 
       table.put("ChannelCount", channelCount);
-      table.put("Faults", (int) faults);
-      table.put("StickyFaults", (int) stickyFaults);
+      table.put("Faults", faults);
+      table.put("StickyFaults", stickyFaults);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class LoggedPowerDistribution {
       pdpTotalPower = table.get("TotalPower", pdpTotalPower);
       pdpTotalEnergy = table.get("TotalEnergy", pdpTotalEnergy);
 
-      channelCount = (int) table.get("ChannelCount", channelCount);
+      channelCount = table.get("ChannelCount", channelCount);
       faults = table.get("Faults", faults);
       stickyFaults = table.get("StickyFaults", stickyFaults);
     }

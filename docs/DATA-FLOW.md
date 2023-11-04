@@ -23,7 +23,7 @@ Below are definitions of each component:
 
 Data is stored using string keys where slashes are used to denote subtables (similar to NetworkTables). Each subsystem stores data in a separate subtable. Like NetworkTables, **all logged values are persistent (they will continue to appear on subsequent cycles until updated**). The following simple data types are currently supported:
 
-`boolean, long, float, double, String, boolean[], long[], float[], double[], String[], byte[]`
+`boolean, int, long, float, double, String, boolean[], int[], long[], float[], double[], String[], byte[]`
 
 ## Structured Data Types
 

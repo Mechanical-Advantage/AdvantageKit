@@ -103,11 +103,11 @@ public class LoggedSystemStats {
 
     @Override
     public void fromLog(LogTable table) {
-      fpgaVersion = (int) table.get("FPGAVersion", fpgaVersion);
-      fpgaRevision = (int) table.get("FPGARevision", fpgaRevision);
+      fpgaVersion = table.get("FPGAVersion", fpgaVersion);
+      fpgaRevision = table.get("FPGARevision", fpgaRevision);
       serialNumber = table.get("SerialNumber", serialNumber);
       comments = table.get("Comments", comments);
-      teamNumber = (int) table.get("TeamNumber", teamNumber);
+      teamNumber = table.get("TeamNumber", teamNumber);
       fpgaButton = table.get("FPGAButton", fpgaButton);
       systemActive = table.get("SystemActive", systemActive);
       brownedOut = table.get("BrownedOut", brownedOut);
@@ -120,27 +120,27 @@ public class LoggedSystemStats {
       userVoltage3v3 = table.get("3v3Rail/Voltage", userVoltage3v3);
       userCurrent3v3 = table.get("3v3Rail/Current", userCurrent3v3);
       userActive3v3 = table.get("3v3Rail/Active", userActive3v3);
-      userCurrentFaults3v3 = (int) table.get("3v3Rail/CurrentFaults", userCurrentFaults3v3);
+      userCurrentFaults3v3 = table.get("3v3Rail/CurrentFaults", userCurrentFaults3v3);
 
       userVoltage5v = table.get("5vRail/Voltage", userVoltage5v);
       userCurrent5v = table.get("5vRail/Current", userCurrent5v);
       userActive5v = table.get("5vRail/Active", userActive5v);
-      userCurrentFaults5v = (int) table.get("5vRail/CurrentFaults", userCurrentFaults5v);
+      userCurrentFaults5v = table.get("5vRail/CurrentFaults", userCurrentFaults5v);
 
       userVoltage6v = table.get("6vRail/Voltage", userVoltage6v);
       userCurrent6v = table.get("6vRail/Current", userCurrent6v);
       userActive6v = table.get("6vRail/Active", userActive6v);
-      userCurrentFaults6v = (int) table.get("6vRail/CurrentFaults", userCurrentFaults6v);
+      userCurrentFaults6v = table.get("6vRail/CurrentFaults", userCurrentFaults6v);
 
       brownoutVoltage = table.get("BrownoutVoltage", brownoutVoltage);
       cpuTemp = table.get("CPUTempCelcius", cpuTemp);
 
       canStatus.setStatus(
           table.get("CANBus/Utilization", canStatus.percentBusUtilization),
-          (int) table.get("CANBus/OffCount", canStatus.busOffCount),
-          (int) table.get("CANBus/TxFullCount", canStatus.txFullCount),
-          (int) table.get("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount),
-          (int) table.get("CANBus/TransmitErrorCount", canStatus.transmitErrorCount));
+          table.get("CANBus/OffCount", canStatus.busOffCount),
+          table.get("CANBus/TxFullCount", canStatus.txFullCount),
+          table.get("CANBus/ReceiveErrorCount", canStatus.receiveErrorCount),
+          table.get("CANBus/TransmitErrorCount", canStatus.transmitErrorCount));
 
       epochTime = table.get("EpochTimeMicros", epochTime);
     }

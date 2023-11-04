@@ -190,6 +190,14 @@ public class LogTable {
    * Writes a new Integer value to the table. Skipped if the key already exists as
    * a different type.
    */
+  public void put(String key, int value) {
+    put(key, (long) value);
+  }
+
+  /**
+   * Writes a new Integer value to the table. Skipped if the key already exists as
+   * a different type.
+   */
   public void put(String key, long value) {
     put(key, new LogValue(value, null));
   }
@@ -225,6 +233,18 @@ public class LogTable {
   public void put(String key, boolean[] value) {
     boolean[] valueClone = new boolean[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
+    put(key, new LogValue(valueClone, null));
+  }
+
+  /**
+   * Writes a new IntegerArray value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  public void put(String key, int[] value) {
+    long[] valueClone = new long[value.length];
+    for (int i = 0; i < value.length; i++) {
+      valueClone[i] = value[i];
+    }
     put(key, new LogValue(valueClone, null));
   }
 
@@ -455,6 +475,15 @@ public class LogTable {
   }
 
   /** Reads an Integer value from the table. */
+  public int get(String key, int defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      return (int) get(key).getInteger(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads an Integer value from the table. */
   public long get(String key, long defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getInteger(defaultValue);
@@ -494,6 +523,24 @@ public class LogTable {
   public boolean[] get(String key, boolean[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getBooleanArray(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads an IntegerArray value from the table. */
+  public int[] get(String key, int[] defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      long[] defaultValueLong = new long[defaultValue.length];
+      for (int i = 0; i < defaultValue.length; i++) {
+        defaultValueLong[i] = defaultValue[i];
+      }
+      long[] valueLong = get(key).getIntegerArray(defaultValueLong);
+      int[] valueInt = new int[valueLong.length];
+      for (int i = 0; i < valueLong.length; i++) {
+        valueInt[i] = (int) valueLong[i];
+      }
+      return valueInt;
     } else {
       return defaultValue;
     }
