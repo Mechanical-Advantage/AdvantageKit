@@ -14,6 +14,7 @@
 package org.littletonrobotics.junction.wpilog;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,6 +79,17 @@ public class WPILOGWriter implements LogDataReceiver {
       filename = "Log_" + randomIdentifier + ".wpilog";
       autoRename = true;
     }
+  }
+
+  /**
+   * Create a new WPILOGWriter for writing to a ".wpilog" file.
+   *
+   * @param path Path to log file or folder. If only a folder is provided, the
+   *             filename will be generated based on the current time and match
+   *             number (if applicable).
+   */
+  public WPILOGWriter(Path path) {
+    this(path.toString());
   }
 
   public void start() {
