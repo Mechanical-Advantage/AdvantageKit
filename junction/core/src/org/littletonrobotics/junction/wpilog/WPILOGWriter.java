@@ -33,13 +33,13 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
-  private static final double writePeriodSecs = 0.1;
   private static final double timestampUpdateDelay = 8.0; // Wait several seconds after DS attached to ensure
                                                           // timestamp/timezone is updated
 
   private String folder;
   private String filename;
   private final String randomIdentifier;
+  private final double writePeriodSecs;
 
   private boolean autoRename;
   private Date logDate;
@@ -57,8 +57,11 @@ public class WPILOGWriter implements LogDataReceiver {
    * @param path Path to log file or folder. If only a folder is provided, the
    *             filename will be generated based on the current time and match
    *             number (if applicable).
+   * @param writePeriodSecs Time between automatic flushes to the disk, in seconds
    */
-  public WPILOGWriter(String path) {
+  public WPILOGWriter(String path, double writePeriod) {
+    writePeriodSecs = writePeriod;
+
     // Create random identifier
     Random random = new Random();
     StringBuilder randomIdentifierBuilder = new StringBuilder();
@@ -78,6 +81,17 @@ public class WPILOGWriter implements LogDataReceiver {
       filename = "Log_" + randomIdentifier + ".wpilog";
       autoRename = true;
     }
+  }
+
+  /**
+   * Create a new WPILOGWriter for writing to a ".wpilog" file.
+   *
+   * @param path Path to log file or folder. If only a folder is provided, the
+   *             filename will be generated based on the current time and match
+   *             number (if applicable).
+   */
+  public WPILOGWriter(String path){
+    this(path, 0.1);
   }
 
   public void start() {
