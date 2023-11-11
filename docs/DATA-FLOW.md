@@ -1,4 +1,4 @@
-# Understanding Data Flow
+# Data Flow
 
 `Logger` is the primary class managing data flow for AdvantageKit. It functions in two possible modes depending on the environment:
 
@@ -11,8 +11,8 @@
 
 Below are definitions of each component:
 
-- **User inputs** - Input data from hardware managed by the user program. This primarily includes input data to subsystem classes. See ["Code Structure"](CODE-STRUCTURE.md) for how this component is implemented.
-- **User outputs** - Data produced by the user program based on the current inputs (odometry, calculated voltages, internal states, etc.). This data can be reproduced during replay, so it's the primary method of debugging code based on a log file. _Starting in 2023, user outputs also include any text sent to the console (logged automatically by AdvantageKit)._
+- **User inputs** - Input data from hardware managed by the user program. This primarily includes input data to subsystem classes. See [Recording Inputs](RECORDING-INPUTS.md) for details about how this component is implemented.
+- **User outputs** - Data produced by the user program based on the current inputs (odometry, calculated voltages, internal states, etc.). This data can be reproduced during replay, so it's the primary method of debugging code based on a log file. See [Recording Outputs](RECORDING-OUTPUTS.md) for details about how this component is implemented.
 - **Replay source** - Provides data from an external source for use during replay. This usually means reading data from a log file produced by the robot. A replay source only exists while in replay (never on the real robot).
 - **Data receiver** - Saves data to an external source in all modes. Multiple data receivers can be provided (or none at all). While data receivers can to a log file or send data over the network.
 - **LoggedDriverStation** _(Built-in input)_ - Internal class for recording and replaying driver station data (enabled state, joystick data, alliance color, etc).
@@ -29,7 +29,7 @@ Data is stored using string keys where slashes are used to denote subtables (sim
 
 Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). Supported classes include `Translation2d`, `Pose3d`, and `SwerveModuleState` with more coming soon. These classes can be logged as single values or arrays just like any simple type, and used as input or output fields.
 
-AdvantageKit also supports logging the state of a `Mechanism2d` object as an output. For details, see [here](CODE-STRUCTURE.md#logging-outputs).
+AdvantageKit also supports logging the state of a `Mechanism2d` object as an output. For details, see [here](RECORDING-OUTPUTS.md#mechanism2d).
 
 ## Deterministic Timestamps
 

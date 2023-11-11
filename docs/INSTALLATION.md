@@ -1,4 +1,4 @@
-# Installing AdvantageKit
+# Installation
 
 ## New Projects
 
@@ -81,7 +81,7 @@ This setup enters replay mode for all simulator runs. If you need to run the sim
 
 ### `@AutoLog` Annotation
 
-The [`@AutoLog` annotation](CODE-STRUCTURE.md#autolog-annotation) automatically generates classes for input logging from subsystems. To install `@AutoLog`, modify your `build.gradle` to include:
+The [`@AutoLog` annotation](RECORDING-INPUTS.md#autolog-annotation) automatically generates classes for input logging from subsystems. To install `@AutoLog`, modify your `build.gradle` to include:
 
 ```groovy
 dependencies {
