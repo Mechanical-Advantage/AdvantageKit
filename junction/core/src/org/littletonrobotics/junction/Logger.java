@@ -213,7 +213,6 @@ public class Logger {
    */
   static void periodicBeforeUser() {
     if (running) {
-
       // Capture conduit data
       ConduitApi conduit = ConduitApi.getInstance();
       long conduitCaptureStart = getRealTimestamp();
@@ -264,18 +263,27 @@ public class Logger {
    * to data receivers. Running this after user code allows IO operations to
    * occur between cycles rather than interferring with the main thread.
    */
-  static void periodicAfterUser() {
+  static void periodicAfterUser(long userCodeLength, long periodicBeforeLength) {
     if (running) {
-      try {
-        // Update console output
-        long consoleCaptureStart = getRealTimestamp();
-        String consoleData = console.getNewData();
-        if (!consoleData.isEmpty()) {
-          recordOutput("Console", consoleData.trim());
-        }
-        long consoleCaptureEnd = getRealTimestamp();
-        recordOutput("Logger/ConsolePeriodicMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
+      // Update final outputs
+      long autoLogStart = getRealTimestamp();
+      AutoLogOutputManager.periodic();
+      long consoleCaptureStart = getRealTimestamp();
+      String consoleData = console.getNewData();
+      if (!consoleData.isEmpty()) {
+        recordOutput("Console", consoleData.trim());
+      }
+      long consoleCaptureEnd = getRealTimestamp();
 
+      // Record timing data
+      recordOutput("Logger/AutoLogPeriodicMS", (consoleCaptureStart - autoLogStart) / 1000.0);
+      recordOutput("Logger/ConsolePeriodicMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
+      recordOutput("LoggedRobot/UserCodeMS", userCodeLength / 1000.0);
+      long periodicAfterLength = consoleCaptureEnd - autoLogStart;
+      recordOutput("LoggedRobot/LogPeriodicMS", (periodicBeforeLength + periodicAfterLength) / 1000.0);
+      recordOutput("LoggedRobot/FullCycleMS", (periodicBeforeLength + userCodeLength + periodicAfterLength) / 1000.0);
+
+      try {
         // Send a copy of the data to the receivers. The original object will be
         // kept and updated with the next timestamp (and new data if replaying).
         receiverQueue.add(LogTable.clone(entry));

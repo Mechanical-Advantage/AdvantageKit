@@ -69,14 +69,18 @@ public class LoggedRobot extends IterativeRobotBase {
   @Override
   @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
+    long initStart = Logger.getRealTimestamp();
     robotInit();
-
     if (isSimulation()) {
       simulationInit();
     }
+    long initEnd = Logger.getRealTimestamp();
+
+    // Register auto logged outputs
+    AutoLogOutputManager.registerFields(this);
 
     // Save data from init cycle
-    Logger.periodicAfterUser();
+    Logger.periodicAfterUser(initEnd - initStart, 0);
 
     // Tell the DS that the robot is ready to be enabled
     System.out.println("********** Robot program startup complete **********");
@@ -97,16 +101,13 @@ public class LoggedRobot extends IterativeRobotBase {
         nextCycleUs += periodUs;
       }
 
-      long loopCycleStart = Logger.getRealTimestamp();
+      long periodicBeforeStart = Logger.getRealTimestamp();
       Logger.periodicBeforeUser();
       long userCodeStart = Logger.getRealTimestamp();
       loopFunc();
-      long loopCycleEnd = Logger.getRealTimestamp();
-      Logger.recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) / 1000.0);
-      Logger.recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) / 1000.0);
-      Logger.recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) / 1000.0);
+      long userCodeEnd = Logger.getRealTimestamp();
 
-      Logger.periodicAfterUser(); // Save data
+      Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
     }
   }
 

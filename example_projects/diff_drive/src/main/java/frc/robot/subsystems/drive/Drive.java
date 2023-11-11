@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
@@ -39,9 +40,8 @@ public class Drive extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Drive", inputs);
 
-    // Update odometry and log the new pose
+    // Update odometry
     odometry.update(inputs.gyroYaw, getLeftPositionMeters(), getRightPositionMeters());
-    Logger.recordOutput("Odometry", getPose());
   }
 
   /** Run open loop at the specified percentage. */
@@ -61,6 +61,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the current odometry pose in meters. */
+  @AutoLogOutput
   public Pose2d getPose() {
     return odometry.getPoseMeters();
   }
@@ -71,21 +72,25 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the position of the left wheels in meters. */
+  @AutoLogOutput
   public double getLeftPositionMeters() {
     return inputs.leftPositionRad * WHEEL_RADIUS;
   }
 
   /** Returns the position of the right wheels in meters. */
+  @AutoLogOutput
   public double getRightPositionMeters() {
     return inputs.rightPositionRad * WHEEL_RADIUS;
   }
 
   /** Returns the velocity of the left wheels in meters/second. */
+  @AutoLogOutput
   public double getLeftVelocityMeters() {
     return inputs.leftVelocityRadPerSec * WHEEL_RADIUS;
   }
 
   /** Returns the velocity of the right wheels in meters/second. */
+  @AutoLogOutput
   public double getRightVelocityMeters() {
     return inputs.rightVelocityRadPerSec * WHEEL_RADIUS;
   }

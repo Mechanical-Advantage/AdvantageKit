@@ -17,6 +17,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
@@ -50,9 +51,6 @@ public class Flywheel extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Flywheel", inputs);
-
-    // Log flywheel speed in RPM
-    Logger.recordOutput("FlywheelSpeedRPM", getVelocityRPM());
   }
 
   /** Run closed loop at the specified velocity. */
@@ -61,7 +59,7 @@ public class Flywheel extends SubsystemBase {
     io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
 
     // Log flywheel setpoint
-    Logger.recordOutput("FlywheelSetpointRPM", velocityRPM);
+    Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM);
   }
 
   /** Stops the flywheel. */
@@ -70,6 +68,7 @@ public class Flywheel extends SubsystemBase {
   }
 
   /** Returns the current velocity in RPM. */
+  @AutoLogOutput
   public double getVelocityRPM() {
     return Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
   }

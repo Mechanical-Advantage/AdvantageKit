@@ -177,9 +177,33 @@ Logger.recordOutput("MySwerveModuleStates", stateA, stateB, stateC, stateD);
 Logger.recordOutput("MySwerveModuleStates", new SwerveModuleState[] { stateA, stateB, stateC, stateD });
 ```
 
-AdvantageKit can also log [`Mechanism2d`](https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html) objects as outputs, which can be viewed using AdvantageScope. Note that the call below only records the current state of the `Mechanism2d`, so it must be called every loop cycle after the object is updated.
+The `@AutoLogOutput` annotation can also be used to automatically log the value of a field or getter method as an output periodically (including private fields and methods). The key will be selected automatically, or it can be overriden using the `key` parameter. All data types are supported, including arrays and structured data types.
 
 ```java
-Mechanism2d mechanism = new Mechanism2d(3, 3);
-Logger.recordOutput("MyMechanism", mechanism);
+public class Example {
+    @AutoLogOutput // Logged as "Example/MyPose"
+    private Pose2d myPose = new Pose2d();
+
+    @AutoLogOutput(key = "Custom/Speeds")
+    public double[] getSpeeds() {
+        ...
+    }
+}
+```
+
+> Note: The parent class where `@AutoLogOutput` is used must be instantiated within the first loop cycle, be accessible by a recursive search of the fields of `Robot`, and be within the same package as `Robot` (or a subpackage). This feature is primarily intended to log outputs from subsystems and other similar classes. For classes that do not fit the criteria above, call `Logger.recordOutput` periodically to record outputs.
+
+AdvantageKit can also log [`Mechanism2d`](https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html) objects as outputs, which can be viewed using AdvantageScope. If not using `@AutoLogOutput`, note that the logging call only records the current state of the `Mechanism2d` and so it must be called periodically.
+
+```java
+public class Example {
+    @AutoLogOutput // Auto logged as "Example/Mechanism"
+    private Mechanism2d mechanism = new Mechanism2d(3, 3);
+
+    public void periodic() {
+        // Alternative approach if not using @AutoLogOutput
+        // (Must be called periodically)
+        Logger.recordOutput("Example/Mechanism", mechanism);
+    }
+}
 ```
