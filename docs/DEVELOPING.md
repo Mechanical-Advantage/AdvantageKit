@@ -43,7 +43,7 @@ build --features=compiler_param_file
 
 > These instructions are written assuming you are using Ubuntu/Debian or Ubuntu/Debian on WSL2, on a 64-bit machine. Other distros should work but may require different commands for installing packages. If you're using another distro, use whatever package management tools you are familiar with. If using another CPU architecture, make the appropriate substitution when downloading files described below.
 
-Update apt cache and install git, build-essential (C++ build tools), and the JDK (and sources):
+Update apt cache and install Git, build-essential (C++ build tools), and the JDK (and sources):
 
 ```console
 sudo apt update

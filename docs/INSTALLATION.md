@@ -93,7 +93,7 @@ dependencies {
 
 ### Gversion Plugin (Git Metadata)
 
-We recommend using the [gversion](https://github.com/lessthanoptimal/gversion-plugin) Gradle plugin to record metadata like the git hash and build date. To install it, add the plugin at the top of `build.gradle`:
+We recommend using the [Gversion](https://github.com/lessthanoptimal/gversion-plugin) Gradle plugin to record metadata like the Git hash and build date. For more details, see [Version Control](VERSION-CONTROL.md). To install it, add the plugin at the top of `build.gradle`:
 
 ```groovy
 plugins {

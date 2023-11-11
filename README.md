@@ -8,6 +8,7 @@ AdvantageKit is a logging, telemetry, and replay framework developed by Team 632
 - [Installing AdvantageKit](/docs/INSTALLATION.md)
 - [Understanding Data Flow](/docs/DATA-FLOW.md)
 - [Code Structure & IO Layers](/docs/CODE-STRUCTURE.md)
+- [Version Control](/docs/VERSION-CONTROL.md)
 - [Common Issues (And How To Avoid Them)](/docs/COMMON-ISSUES.md)
 - [Developing AdvantageKit](/docs/DEVELOPING.md)
 
