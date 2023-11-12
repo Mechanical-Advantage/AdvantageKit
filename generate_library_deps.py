@@ -47,7 +47,7 @@ WPILIB_JAVA_DEPS = [
     "edu.wpi.first.cscore:cscore-java",
     "edu.wpi.first.cameraserver:cameraserver-java",
     "edu.wpi.first.wpiunits:wpiunits-java",
-    "edu.wpi.first.thirdparty.frc2024.opencv:opencv-java:4.8.0-1",
+    "edu.wpi.first.thirdparty.frc2024.opencv:opencv-java:4.8.0-2",
 ]
 
 # Platform string for athena: (ours, frcmaven's)

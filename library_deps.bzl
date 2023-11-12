@@ -8,7 +8,7 @@ MAVEN_ARTIFACTS = ['io.github.classgraph:classgraph:4.8.128', 'com.fasterxml.jac
 
 WPILIB_VERSION = "2024.1.1-beta-3"
 
-FRCMAVEN_ARTIFACTS = ['edu.wpi.first.hal:hal-java:2024.1.1-beta-3', 'edu.wpi.first.wpiutil:wpiutil-java:2024.1.1-beta-3', 'edu.wpi.first.wpimath:wpimath-java:2024.1.1-beta-3', 'edu.wpi.first.ntcore:ntcore-java:2024.1.1-beta-3', 'edu.wpi.first.cscore:cscore-java:2024.1.1-beta-3', 'edu.wpi.first.cameraserver:cameraserver-java:2024.1.1-beta-3', 'edu.wpi.first.wpiunits:wpiunits-java:2024.1.1-beta-3', 'edu.wpi.first.thirdparty.frc2024.opencv:opencv-java:4.8.0-1']
+FRCMAVEN_ARTIFACTS = ['edu.wpi.first.hal:hal-java:2024.1.1-beta-3', 'edu.wpi.first.wpiutil:wpiutil-java:2024.1.1-beta-3', 'edu.wpi.first.wpimath:wpimath-java:2024.1.1-beta-3', 'edu.wpi.first.ntcore:ntcore-java:2024.1.1-beta-3', 'edu.wpi.first.cscore:cscore-java:2024.1.1-beta-3', 'edu.wpi.first.cameraserver:cameraserver-java:2024.1.1-beta-3', 'edu.wpi.first.wpiunits:wpiunits-java:2024.1.1-beta-3', 'edu.wpi.first.thirdparty.frc2024.opencv:opencv-java:4.8.0-2']
 
 def library_deps_setup():
 
