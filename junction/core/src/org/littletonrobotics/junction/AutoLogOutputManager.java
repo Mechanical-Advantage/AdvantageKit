@@ -81,10 +81,8 @@ class AutoLogOutputManager {
         }
 
         // Get key
-        String key = method.getAnnotation(AutoLogOutput.class).key();
-        if (key.length() == 0) {
-          key = makeKey(root.getClass().getSimpleName(), method.getName());
-        }
+        String keyParameter = method.getAnnotation(AutoLogOutput.class).key();
+        String key = makeKey(keyParameter, root, method.getName());
 
         // Register method
         registerField(
@@ -111,10 +109,8 @@ class AutoLogOutputManager {
       // If annotated, try to add
       if (field.isAnnotationPresent(AutoLogOutput.class)) {
         // Get key
-        String key = field.getAnnotation(AutoLogOutput.class).key();
-        if (key.length() == 0) {
-          key = makeKey(root.getClass().getSimpleName(), field.getName());
-        }
+        String keyParameter = field.getAnnotation(AutoLogOutput.class).key();
+        String key = makeKey(keyParameter, root, field.getName());
 
         // Register field
         registerField(
@@ -170,14 +166,52 @@ class AutoLogOutputManager {
     return fields;
   }
 
-  /** Generates a log key based on the field properties. */
-  private static String makeKey(String parentName, String valueName) {
-    String key = parentName + "/";
-    if (valueName.startsWith("get") && valueName.length() > 3) {
-      valueName = valueName.substring(3);
+  /**
+   * Generates a log key based on the field properties.
+   * 
+   * @param keyParameter The user-provided key from the annotation
+   * @param parent       The parent object
+   * @param valueName    The name of the field or method
+   */
+  private static String makeKey(String keyParameter, Object parent, String valueName) {
+    if (keyParameter.length() == 0) {
+      // Auto generate from parent and value
+      String key = parent.getClass().getSimpleName() + "/";
+      if (valueName.startsWith("get") && valueName.length() > 3) {
+        valueName = valueName.substring(3);
+      }
+      key += valueName.substring(0, 1).toUpperCase() + valueName.substring(1);
+      return key;
+    } else {
+      // Fill in field values
+      String key = keyParameter;
+      while (true) {
+        // Find field name
+        int openIndex = key.indexOf("{");
+        if (openIndex == -1)
+          break; // No more brackets
+        int closeIndex = key.indexOf("}", openIndex);
+        if (closeIndex == -1)
+          break; // No closing bracket
+        String fieldName = key.substring(openIndex + 1, closeIndex);
+
+        // Get field value
+        String fieldValue = "";
+        Field field;
+        try {
+          field = parent.getClass().getDeclaredField(fieldName);
+          field.setAccessible(true);
+          fieldValue = field.get(parent).toString();
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
+            | NullPointerException e) {
+          // Use default field value
+        }
+
+        // Replace in key
+        key = key.substring(0, openIndex) + fieldValue + key.substring(closeIndex + 1);
+      }
+      return key;
     }
-    key += valueName.substring(0, 1).toUpperCase() + valueName.substring(1);
-    return key;
   }
 
   /**

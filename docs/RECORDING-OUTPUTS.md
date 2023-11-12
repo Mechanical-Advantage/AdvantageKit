@@ -53,9 +53,22 @@ public class Example {
     private Pose2d myPose = new Pose2d();
 
     @AutoLogOutput(key = "Custom/Speeds")
-    public double[] getSpeeds() {
-        ...
-    }
+    public double[] getSpeeds() {...}
+}
+```
+
+The `key` parameter can reference other fields within the same class using the syntax shown below. This is useful to disambiguate classes with multiple instances, such as swerve modules. The value of the referenced field will not be updated after the first loop cycle. Any data type convertible to a string is supported, including numbers, booleans, and strings.
+
+```java
+public class SwerveModule {
+    private final int index; // 0, 1, 2, or 3
+    private final String descriptor; // "FL", "FR", "BL", "BR"
+
+    @AutoLogOutput(key = "Module{index}/Speed") // e.g. "Module0/Speed"
+    public double getSpeed() {...}
+
+    @AutoLogOutput(key = "Odometry/ModulePose{descriptor}") // e.g. "Odometry/ModulePoseFL"
+    public Pose2d getPose() {...}
 }
 ```
 
