@@ -27,6 +27,7 @@ java_import(
         "@frcmaven//:edu_wpi_first_ntcore_ntcore_java",
         "@frcmaven//:edu_wpi_first_thirdparty_frc2024_opencv_opencv_java",
         "@frcmaven//:edu_wpi_first_wpimath_wpimath_java",
+        "@frcmaven//:edu_wpi_first_wpiunits_wpiunits_java",
         "@frcmaven//:edu_wpi_first_wpiutil_wpiutil_java",
     ],
     deps = [
@@ -36,6 +37,7 @@ java_import(
         "@frcmaven//:edu_wpi_first_ntcore_ntcore_java",
         "@frcmaven//:edu_wpi_first_thirdparty_frc2024_opencv_opencv_java",
         "@frcmaven//:edu_wpi_first_wpimath_wpimath_java",
+        "@frcmaven//:edu_wpi_first_wpiunits_wpiunits_java",
         "@frcmaven//:edu_wpi_first_wpiutil_wpiutil_java",
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",
         "@maven//:com_fasterxml_jackson_core_jackson_core",

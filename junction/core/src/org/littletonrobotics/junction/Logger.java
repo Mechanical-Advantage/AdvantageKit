@@ -46,7 +46,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import us.hebi.quickbuf.ProtoMessage;
@@ -497,6 +498,20 @@ public class Logger {
    * @param value The value of the field.
    */
   public static void recordOutput(String key, String value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public static <U extends Unit<U>> void recordOutput(String key, Measure<U> value) {
     if (running) {
       outputTable.put(key, value);
     }

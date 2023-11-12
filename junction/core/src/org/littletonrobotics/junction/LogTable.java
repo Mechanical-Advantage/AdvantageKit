@@ -27,6 +27,9 @@ import java.util.Set;
 
 import org.littletonrobotics.junction.LogTable.LogValue;
 
+import edu.wpi.first.units.ImmutableMeasure;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufBuffer;
 import edu.wpi.first.util.struct.StructBuffer;
@@ -225,6 +228,14 @@ public class LogTable {
    */
   public void put(String key, String value) {
     put(key, new LogValue(value, null));
+  }
+
+  /**
+   * Writes a new Measure value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public <U extends Unit<U>> void put(String key, Measure<U> value) {
+    put(key, new LogValue(value.baseUnitMagnitude(), null));
   }
 
   /**
@@ -515,6 +526,16 @@ public class LogTable {
   public String get(String key, String defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getString(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a Measure value from the table. */
+  public <U extends Unit<U>> Measure<U> get(String key, Measure<U> defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      double value = get(key).getDouble(defaultValue.magnitude());
+      return ImmutableMeasure.ofBaseUnits(value, defaultValue.unit());
     } else {
       return defaultValue;
     }
