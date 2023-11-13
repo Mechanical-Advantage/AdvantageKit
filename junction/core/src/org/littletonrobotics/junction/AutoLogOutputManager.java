@@ -19,8 +19,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -67,7 +67,9 @@ class AutoLogOutputManager {
     }
 
     // Loop over declared methods
-    getAllMethods(root.getClass()).forEach((method) -> {
+    getAllMethods(root.getClass()).forEach((methodAndDeclaringClass) -> {
+      Method method = methodAndDeclaringClass.method;
+      Class<?> declaringClass = methodAndDeclaringClass.declaringClass;
       if (!method.trySetAccessible())
         return;
 
@@ -82,7 +84,7 @@ class AutoLogOutputManager {
 
         // Get key
         String keyParameter = method.getAnnotation(AutoLogOutput.class).key();
-        String key = makeKey(keyParameter, root, method.getName());
+        String key = makeKey(keyParameter, method.getName(), declaringClass, root);
 
         // Register method
         registerField(
@@ -102,7 +104,9 @@ class AutoLogOutputManager {
     });
 
     // Loop over declared fields
-    getAllFields(root.getClass()).forEach((field) -> {
+    getAllFields(root.getClass()).forEach((fieldAndDeclaringClass) -> {
+      Field field = fieldAndDeclaringClass.field;
+      Class<?> declaringClass = fieldAndDeclaringClass.declaringClass;
       if (!field.trySetAccessible())
         return;
 
@@ -110,7 +114,7 @@ class AutoLogOutputManager {
       if (field.isAnnotationPresent(AutoLogOutput.class)) {
         // Get key
         String keyParameter = field.getAnnotation(AutoLogOutput.class).key();
-        String key = makeKey(keyParameter, root, field.getName());
+        String key = makeKey(keyParameter, field.getName(), declaringClass, root);
 
         // Register field
         registerField(
@@ -144,39 +148,90 @@ class AutoLogOutputManager {
    * Returns the set of all methods on the class and its superclasses (public and
    * private).
    */
-  private static List<Method> getAllMethods(Class<?> type) {
-    List<Method> methods = new ArrayList<>();
+  private static List<MethodAndDeclaringClass> getAllMethods(Class<?> type) {
+    List<MethodAndDeclaringClass> methods = new ArrayList<>();
     while (type != null && type != Object.class) {
-      Collections.addAll(methods, type.getDeclaredMethods());
+      for (Method method : type.getDeclaredMethods()) {
+        methods.add(new MethodAndDeclaringClass(method, type));
+      }
       type = type.getSuperclass();
     }
     return methods;
   }
 
+  private static class MethodAndDeclaringClass {
+    public final Method method;
+    public final Class<?> declaringClass;
+
+    public MethodAndDeclaringClass(Method method, Class<?> declaringClass) {
+      this.method = method;
+      this.declaringClass = declaringClass;
+    }
+  };
+
   /**
    * Returns the set of all fields in the class and its superclasses (public and
    * private).
    */
-  private static List<Field> getAllFields(Class<?> type) {
-    List<Field> fields = new ArrayList<>();
+  private static List<FieldAndDeclaringClass> getAllFields(Class<?> type) {
+    List<FieldAndDeclaringClass> fields = new ArrayList<>();
     while (type != null && type != Object.class) {
-      Collections.addAll(fields, type.getDeclaredFields());
+      for (Field field : type.getDeclaredFields()) {
+        fields.add(new FieldAndDeclaringClass(field, type));
+      }
       type = type.getSuperclass();
     }
     return fields;
   }
 
+  private static class FieldAndDeclaringClass {
+    public final Field field;
+    public final Class<?> declaringClass;
+
+    public FieldAndDeclaringClass(Field field, Class<?> declaringClass) {
+      this.field = field;
+      this.declaringClass = declaringClass;
+    }
+  };
+
+  /**
+   * Finds the field in the provided class and its superclasses (must be publicor
+   * protected in superclasses). Returns null if the field cannot be found.
+   */
+  private static Field findField(Class<?> type, String fieldName) {
+    try {
+      return type.getDeclaredField(fieldName);
+    } catch (NoSuchFieldException e) {
+      // Not in original class, check superclasses
+      type = type.getSuperclass();
+      while (type != null && type != Object.class) {
+        try {
+          Field field = type.getDeclaredField(fieldName);
+          if (Modifier.isPublic(field.getModifiers()) || Modifier.isProtected(field.getModifiers())) {
+            return field;
+          }
+        } catch (NoSuchFieldException | SecurityException e1) {
+        }
+        type = type.getSuperclass();
+      }
+      return null;
+    } catch (SecurityException e) {
+      return null;
+    }
+  }
+
   /**
    * Generates a log key based on the field properties.
    * 
-   * @param keyParameter The user-provided key from the annotation
-   * @param parent       The parent object
-   * @param valueName    The name of the field or method
+   * @param keyParameter   The user-provided key from the annotation
+   * @param valueName      The name of the field or method
+   * @param declaringClass The class where this fields or method is declared
+   * @param parent         The parent object to read data from
    */
-  private static String makeKey(String keyParameter, Object parent, String valueName) {
+  private static String makeKey(String keyParameter, String valueName, Class<?> declaringClass, Object parent) {
     if (keyParameter.length() == 0) {
       // Auto generate from parent and value
-      String key = parent.getClass().getSimpleName() + "/";
+      String key = declaringClass.getSimpleName() + "/";
       if (valueName.startsWith("get") && valueName.length() > 3) {
         valueName = valueName.substring(3);
       }
@@ -199,11 +254,10 @@ class AutoLogOutputManager {
         String fieldValue = "";
         Field field;
         try {
-          field = parent.getClass().getDeclaredField(fieldName);
+          field = findField(declaringClass, fieldName);
           field.setAccessible(true);
           fieldValue = field.get(parent).toString();
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
-            | NullPointerException e) {
+        } catch (SecurityException | IllegalArgumentException | IllegalAccessException | NullPointerException e) {
           // Use default field value
         }
 
