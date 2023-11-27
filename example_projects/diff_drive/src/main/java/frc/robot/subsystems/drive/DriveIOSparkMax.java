@@ -83,7 +83,7 @@ public class DriveIOSparkMax implements DriveIO {
     inputs.leftCurrentAmps =
         new double[] {rightLeader.getOutputCurrent(), rightFollower.getOutputCurrent()};
 
-    inputs.gyroYaw = Rotation2d.fromDegrees(-yaw.refresh().getValueAsDouble());
+    inputs.gyroYaw = Rotation2d.fromDegrees(yaw.refresh().getValueAsDouble());
   }
 
   @Override
