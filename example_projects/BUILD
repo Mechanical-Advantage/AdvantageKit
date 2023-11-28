@@ -74,9 +74,28 @@ pkg_zip(
     ],
 )
 
+pkg_files(
+    name = "advanced_swerve_drive_files",
+    srcs = glob(
+        ["advanced_swerve_drive/**/*"],
+    ),
+    strip_prefix = strip_prefix.from_pkg("advanced_swerve_drive"),
+)
+
+pkg_zip(
+    name = "advanced_swerve_drive",
+    srcs = [
+        "advanced_swerve_drive_files",
+        "template_build_file",
+        "template_files",
+        "template_vendordep",
+    ],
+)
+
 filegroup(
     name = "example_projects",
     srcs = [
+        "advanced_swerve_drive",
         "diff_drive",
         "skeleton",
         "swerve_drive",
