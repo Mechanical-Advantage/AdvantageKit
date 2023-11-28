@@ -65,6 +65,12 @@ configurations.all {
     exclude group: "edu.wpi.first.wpilibj"
 }
 
+task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
+    mainClass = "org.littletonrobotics.junction.CheckInstall"
+    classpath = sourceSets.main.runtimeClasspath
+}
+compileJava.finalizedBy checkAkitInstall
+
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 4.
 dependencies {

@@ -69,6 +69,12 @@ public class LoggedRobot extends IterativeRobotBase {
   @Override
   @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
+    // Check for invalid AdvantageKit install in sim
+    if (isSimulation()) {
+      CheckInstall.run();
+    }
+
+    // Robot init methods
     long initStart = Logger.getRealTimestamp();
     robotInit();
     if (isSimulation()) {

@@ -13,7 +13,13 @@ For new projects, the easiest way to use AdvantageKit is to download one of the 
 
 ## Existing Projects
 
-AdvantageKit is available through GitHub Packages. To access our Maven repository through Gradle, add the following block to the `build.gradle` file:
+To install the AdvantageKit vendordep, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" and paste in the URL below. The changelog for the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest) includes the WPILib version on which it is based; **you must use the same version in your robot project**. You can check the selected version of WPILib at the top of `build.gradle` after "edu.wpi.first.GradleRIO".
+
+```
+https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest/download/AdvantageKit.json
+```
+
+Next, add the following blocks to the `build.gradle` file. Note that the lines under `dependencies` should be combined with the existing `dependencies` block.
 
 ```groovy
 repositories {
@@ -24,26 +30,29 @@ repositories {
             password = "\u0067\u0068\u0070\u005f\u006e\u0056\u0051\u006a\u0055\u004f\u004c\u0061\u0079\u0066\u006e\u0078\u006e\u0037\u0051\u0049\u0054\u0042\u0032\u004c\u004a\u006d\u0055\u0070\u0073\u0031\u006d\u0037\u004c\u005a\u0030\u0076\u0062\u0070\u0063\u0051"
         }
     }
+    mavenLocal()
 }
-```
 
-Per [this issue](https://github.community/t/download-from-github-package-registry-without-authentication/14407), downloading packages from GitHub requires authentication, even for public repositories. The configuration above includes an access token so that anyone can download AdvantageKit. The obfuscation of the string hides it from GitHub's bot; **do not include the plain text token in any GitHub repository.** This will cause the token to be automatically revoked, requiring us to create and distribute a new token.
-
-> Note: A token for accessing GitHub packages and AdvantageKit can be created using any GitHub account. Under account settings, go to "Developer settings" > "Personal access token" > "Tokens (classic)" > "Generate new token" > "Generate new token (classic)" and enable the "read:packages" scope. Keep in mind that GitHub will revoke this token if the plaintext version appears in a GitHub repository.
-
-AdvantageKit uses WPILib shims to inject data. Add the following block to `build.gradle` to replace the default implementation. **This is required for the framework to function**
-
-```groovy
 configurations.all {
     exclude group: "edu.wpi.first.wpilibj"
 }
+
+task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
+    mainClass = "org.littletonrobotics.junction.CheckInstall"
+    classpath = sourceSets.main.runtimeClasspath
+}
+compileJava.finalizedBy checkAkitInstall
+
+dependencies {
+    // ...
+    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
+}
 ```
 
-To install the main AdvantageKit packages, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" and paste in the URL below. The changelog for the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest) includes the WPILib version on which it is based; **you must use the same version in your robot project**. You can check the selected version of WPILib at the top of `build.gradle` after "edu.wpi.first.GradleRIO".
+AdvantageKit is available through GitHub Packages. Per [this issue](https://github.community/t/download-from-github-package-registry-without-authentication/14407), downloading packages from GitHub requires authentication, even for public repositories. The configuration above includes an access token so that anyone can download AdvantageKit. The obfuscation of the string hides it from GitHub's bot; **do not include the plain text token in any GitHub repository.** This will cause the token to be automatically revoked, requiring us to create and distribute a new token.
 
-```
-https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest/download/AdvantageKit.json
-```
+> Note: A token for accessing GitHub packages and AdvantageKit can be created using any GitHub account. Under account settings, go to "Developer settings" > "Personal access token" > "Tokens (classic)" > "Generate new token" > "Generate new token (classic)" and enable the "read:packages" scope. Keep in mind that GitHub will revoke this token if the plaintext version appears in a GitHub repository.
 
 ### Robot Configuration
 
@@ -79,18 +88,6 @@ Logger.start(); // Start logging! No more data receivers, replay sources, or met
 ```
 
 This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required. See the example projects for one method of implementing this logic.
-
-### `@AutoLog` Annotation
-
-The [`@AutoLog` annotation](RECORDING-INPUTS.md#autolog-annotation) automatically generates classes for input logging from subsystems. To install `@AutoLog`, modify your `build.gradle` to include:
-
-```groovy
-dependencies {
-    // ...
-    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
-    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
-}
-```
 
 ### Gversion Plugin (Git Metadata)
 
