@@ -30,7 +30,7 @@ To install the extension, search for "Event Deploy for WPILib" in the VSCode ext
 ### Usage
 
 1. Before the event, create and check out a branch that starts with "event" such as "event_nhgrs". We recommend creating a new branch for each event.
-2. When deploying, click "Deploy Robot Code (Event)" in the editor menu. This options appears directly under the normal "Deploy Robot Code" option from WPILib.
+2. When deploying, click "Deploy Robot Code (Event)" in the editor menu. This option appears directly under the normal "Deploy Robot Code" option from WPILib.
 3. A commit is automatically created with all changes since the last commit, and a deploy is started normally. The name of the commit includes the current timestamp (e.g. "Update at "1/31/2022, 8:30:00 AM").
 4. At the end of the event, the branch can be ["squashed and merged"](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) back to a normal development branch, keeping the Git history clean.
 5. When running log replay, find the commit hash in the log file metadata and run `git checkout` as described in the previous section. This will return to the exact version of code running on the robot (even if the commits were later squashed and merged). Since all of the changes were committed before each deploy, the simulated code is guaranteed to be identical to the original robot code.
