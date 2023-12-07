@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/Mechanical-Advantage/AdvantageKit/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/Mechanical-Advantage/AdvantageKit/actions/workflows/build.yml)
 
-AdvantageKit is a logging, telemetry, and replay framework developed by Team 6328. Please see the following guides to get started, or the README files for individual components.
+AdvantageKit is a logging, telemetry, and replay framework developed by Team 6328. AdvantageKit enables **log replay**, where the full state of the robot code can be replayed in simulation based on a log file ([What is AdvantageKit?](/docs/WHAT-IS-ADVANTAGEKIT.md)). Please see the following guides to get started:
 
 - [What is AdvantageKit?](/docs/WHAT-IS-ADVANTAGEKIT.md)
 - [Installation](/docs/INSTALLATION.md)
@@ -13,15 +13,17 @@ AdvantageKit is a logging, telemetry, and replay framework developed by Team 632
 - [Common Issues (And How To Avoid Them)](/docs/COMMON-ISSUES.md)
 - [Developing AdvantageKit](/docs/DEVELOPING.md)
 
-## Example Projects
+Feedback, feature requests, and bug reports are welcome on the [issues page](https://github.com/Mechanical-Advantage/AdvantageScope/issues). For non-public inquires, please send a message to software@team6328.org.
+
+## Sample Projects
 
 Looking to get started quickly? Here are some example projects to check out:
 
-- [AdvantageKit Skeleton Template](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest) - Simple `TimedRobot` style template project. The zip is attached to the latest release.
-- [AdvantageKit Command-Based Example](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest) - Example command based project with a tank drive and closed-loop flywheel, including sim support. The zip is attached to the latest release.
-- [Team 6328's 2022 Swerve Code](https://github.com/Mechanical-Advantage/SwerveDevelopment) - Swerve drive code built with AdvantageKit v2 (2023).
-- [Team 6328's 2022 Competition Code](https://github.com/Mechanical-Advantage/RobotCode2022) - Full robot code built with AdvantageKit v1 (2022).
-- [Team 4099's 2022 Competition Code](https://github.com/team4099/RapidReact-2022) - Kotlin robot code built with AdvantageKit v1 (2022).
+- [AdvantageKit Example Projects](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/docs/INSTALLATION.md#new-projects) - Example projects for differential and swerve drives, from minimal to advanced. Zip files for each project are attached to the latest release
+- [Team 6328's 2023 Competition Code](https://github.com/Mechanical-Advantage/RobotCode2023) - Java robot code built with AdvantageKit v2 (2023).
+- [Team 2910's 2023 Competition Code](https://github.com/FRCTeam2910/2023CompetitionRobot-Public) - Java robot code built with AdvantageKit v2 (2023).
+- [Team 4099's 2023 Competition Code](https://github.com/team4099/ChargedUp-2023/tree/main) - Kotlin robot code built with AdvantageKit v2 (2023).
+- [Team 6328's 2022 Competition Code](https://github.com/Mechanical-Advantage/RobotCode2022) - Java robot code built with AdvantageKit v1 (2022).
 
 ## Repository Structure
 
