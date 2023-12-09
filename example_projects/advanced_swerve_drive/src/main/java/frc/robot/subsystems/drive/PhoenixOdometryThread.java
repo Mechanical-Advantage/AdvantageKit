@@ -55,18 +55,19 @@ public class PhoenixOdometryThread extends Thread {
   }
 
   public Queue<Double> registerSignal(ParentDevice device, StatusSignal<Double> signal) {
-    isCANFD = Unmanaged.isNetworkFD(device.getNetwork());
     Queue<Double> queue = new ArrayBlockingQueue<>(100);
     signalsLock.lock();
+    Drive.odometryLock.lock();
     try {
+      isCANFD = Unmanaged.isNetworkFD(device.getNetwork());
       BaseStatusSignal[] newSignals = new BaseStatusSignal[signals.length + 1];
       System.arraycopy(signals, 0, newSignals, 0, signals.length);
       newSignals[signals.length] = signal;
       signals = newSignals;
       queues.add(queue);
-
     } finally {
       signalsLock.unlock();
+      Drive.odometryLock.unlock();
     }
     return queue;
   }
@@ -77,7 +78,7 @@ public class PhoenixOdometryThread extends Thread {
       // Wait for updates from all signals
       signalsLock.lock();
       try {
-        if (isCANFD && signals.length > 0) {
+        if (isCANFD) {
           BaseStatusSignal.waitForAll(2.0 / Module.ODOMETRY_FREQUENCY, signals);
         } else {
           // "waitForAll" does not support blocking on multiple
@@ -85,7 +86,7 @@ public class PhoenixOdometryThread extends Thread {
           // of Pro licensing. No reasoning for this behavior
           // is provided by the documentation.
           Thread.sleep((long) (1000.0 / Module.ODOMETRY_FREQUENCY));
-          BaseStatusSignal.refreshAll(signals);
+          if (signals.length > 0) BaseStatusSignal.refreshAll(signals);
         }
       } catch (InterruptedException e) {
         e.printStackTrace();
