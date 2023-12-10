@@ -12,8 +12,8 @@ The logging framework supports recording this output data on the real robot and 
 
 ```java
 Logger.recordOutput("Flywheel/Setpoint", setpointSpeed);
-Logger.recordOutput("FeederState", "IDLE");
-Logger.recordOutput("Drive/CalculatedLeftVolts", leftVolts);
+Logger.recordOutput("Drive/Pose", odometryPose);
+Logger.recordOutput("FeederState", FeederState.RUNNING);
 ```
 
 > Note: This data is automatically saved to the `RealOutputs` or `ReplayOutputs` table, and it can be divided further into subtables using slashes (as seen above).

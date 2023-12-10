@@ -232,6 +232,14 @@ public class LogTable {
   }
 
   /**
+   * Writes a new enum value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public <E extends Enum<E>> void put(String key, E value) {
+    put(key, new LogValue(value.name(), null));
+  }
+
+  /**
    * Writes a new Measure value to the table. Skipped if the key already exists as
    * a different type.
    */
@@ -527,6 +535,16 @@ public class LogTable {
   public String get(String key, String defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getString(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads an enum value from the table. */
+  public <E extends Enum<E>> E get(String key, E defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      String name = get(key).getString(defaultValue.name());
+      return (E) Enum.valueOf(defaultValue.getClass(), name);
     } else {
       return defaultValue;
     }

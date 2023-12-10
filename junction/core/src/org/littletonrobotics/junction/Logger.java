@@ -511,6 +511,20 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
+  public static <E extends Enum<E>> void recordOutput(String key, E value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
   public static <U extends Unit<U>> void recordOutput(String key, Measure<U> value) {
     if (running) {
       outputTable.put(key, value);

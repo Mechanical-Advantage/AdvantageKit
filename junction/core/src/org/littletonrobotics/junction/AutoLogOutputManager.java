@@ -388,6 +388,14 @@ class AutoLogOutputManager {
               if (value != null)
                 Logger.recordOutput(key, (String) value);
             });
+      } else if (type.isEnum()) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                // Cannot cast to enum subclass, log the name directly
+                Logger.recordOutput(key, ((Enum<?>) value).name());
+            });
       } else if (type.equals(Measure.class)) {
         callbacks.add(
             () -> {
