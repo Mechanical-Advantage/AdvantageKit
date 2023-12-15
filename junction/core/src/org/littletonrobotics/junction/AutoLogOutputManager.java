@@ -13,8 +13,6 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.proto.Trajectory;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.units.Measure;
 import java.lang.reflect.Field;
@@ -329,13 +327,6 @@ class AutoLogOutputManager {
               if (value != null)
                 Logger.recordOutput(key, (String[]) value);
             });
-      } else if (componentType.equals(SwerveModuleState.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (SwerveModuleState[]) value);
-            });
       } else {
         callbacks.add(
             () -> {
@@ -402,13 +393,6 @@ class AutoLogOutputManager {
               Object value = supplier.get();
               if (value != null)
                 Logger.recordOutput(key, (Measure<?>) value);
-            });
-      } else if (type.equals(Trajectory.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (Trajectory) value);
             });
       } else if (type.equals(Mechanism2d.class)) {
         callbacks.add(

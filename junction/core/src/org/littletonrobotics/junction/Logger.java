@@ -39,8 +39,6 @@ import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -717,32 +715,6 @@ public class Logger {
     if (running) {
       outputTable.put(key, value);
     }
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * The trajectory is logged as a series of poses.
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public static void recordOutput(String key, Trajectory value) {
-    recordOutput(key, Pose2d.struct, value.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new));
-  }
-
-  /**
-   * Records a single output field for easy access when viewing the log. On the
-   * simulator, use this method to record extra data based on the original inputs.
-   * 
-   * @param key   The name of the field to record. It will be stored under
-   *              "/RealOutputs" or "/ReplayOutputs"
-   * @param value The value of the field.
-   */
-  public static void recordOutput(String key, SwerveModuleState... value) {
-    recordOutput(key, CustomStructs.swerveModuleState, value);
   }
 
   /**
