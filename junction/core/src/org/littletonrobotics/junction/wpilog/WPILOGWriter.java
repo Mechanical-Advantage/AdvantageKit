@@ -38,6 +38,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 public class WPILOGWriter implements LogDataReceiver {
   private static final double timestampUpdateDelay = 5.0; // Wait several seconds after DS attached to ensure
                                                           // timestamp/timezone is updated
+  private static final String defaultPathRio = "/U/logs";
+  private static final String defaultPathSim = "logs";
   private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
 
   private String folder;
@@ -97,6 +99,18 @@ public class WPILOGWriter implements LogDataReceiver {
    */
   public WPILOGWriter(String path) {
     this(path, 0.1);
+  }
+
+  /**
+   * Create a new WPILOGWriter for writing to a ".wpilog" file.
+   *
+   * <p>
+   * The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The
+   * filename will be generated based on the current time and match number (if
+   * applicable).
+   */
+  public WPILOGWriter() {
+    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRio);
   }
 
   public void start() {
