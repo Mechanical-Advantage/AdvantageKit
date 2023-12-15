@@ -55,7 +55,7 @@ public class LoggedRobot extends IterativeRobotBase {
     this.periodUs = (long) (period * 1000000);
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
+    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_AdvantageKit);
   }
 
   @Override

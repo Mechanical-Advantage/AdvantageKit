@@ -4,6 +4,10 @@ import urllib.request
 import json
 import os
 
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
+
 # This script generates library_deps.bzl.  We use this script to fetch sha256 checksums of all dependencies
 # and capture them within the generated file.
 
@@ -21,18 +25,18 @@ import os
 FRC_ARTIFACTORY_URL = "https://frcmaven.wpi.edu/artifactory"
 
 # Version of WPILib dependencies to use
-NI_VERSION = "2024.1.1"
-WPILIB_VERSION = "2024.1.1-beta-3"
+NI_VERSION = "2024.2.1"
+WPILIB_VERSION = "2024.1.1-beta-4"
 
 # --- Artifacts and versions ---
 # Dependencies to pull from standard maven repositories (currently just central)
 MAVEN_DEPS = [
     "io.github.classgraph:classgraph:4.8.128",
-    "com.fasterxml.jackson.core:jackson-annotations:2.10.0",
-    "com.fasterxml.jackson.core:jackson-core:2.10.0",
-    "com.fasterxml.jackson.core:jackson-databind:2.10.0",
-    "org.ejml:ejml-simple:0.38",
-    "org.ejml:ejml-core:0.38",
+    "com.fasterxml.jackson.core:jackson-annotations:2.15.2",
+    "com.fasterxml.jackson.core:jackson-core:2.15.2",
+    "com.fasterxml.jackson.core:jackson-databind:2.15.2",
+    "org.ejml:ejml-simple:0.43.1",
+    "org.ejml:ejml-core:0.43.1",
     "junit:junit:4.13.2",
     "com.squareup:javapoet:1.13.0",
     "us.hebi.quickbuf:quickbuf-runtime:1.3.2"
