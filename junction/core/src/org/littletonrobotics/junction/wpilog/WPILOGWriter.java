@@ -15,6 +15,9 @@ package org.littletonrobotics.junction.wpilog;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,16 +36,18 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
-  private static final double timestampUpdateDelay = 8.0; // Wait several seconds after DS attached to ensure
+  private static final double timestampUpdateDelay = 5.0; // Wait several seconds after DS attached to ensure
                                                           // timestamp/timezone is updated
+  private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
 
   private String folder;
   private String filename;
   private final String randomIdentifier;
   private final double writePeriodSecs;
+  private Double dsAttachedTime;
 
   private boolean autoRename;
-  private Date logDate;
+  private LocalDateTime logDate;
   private String logMatchText;
 
   private DataLog log;
@@ -54,9 +59,9 @@ public class WPILOGWriter implements LogDataReceiver {
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    * 
-   * @param path Path to log file or folder. If only a folder is provided, the
-   *             filename will be generated based on the current time and match
-   *             number (if applicable).
+   * @param path            Path to log file or folder. If only a folder is
+   *                        provided, the filename will be generated based on the
+   *                        current time and match number (if applicable).
    * @param writePeriodSecs Time between automatic flushes to the disk, in seconds
    */
   public WPILOGWriter(String path, double writePeriod) {
@@ -90,7 +95,7 @@ public class WPILOGWriter implements LogDataReceiver {
    *             filename will be generated based on the current time and match
    *             number (if applicable).
    */
-  public WPILOGWriter(String path){
+  public WPILOGWriter(String path) {
     this(path, 0.1);
   }
 
@@ -129,8 +134,18 @@ public class WPILOGWriter implements LogDataReceiver {
     if (autoRename) {
 
       // Update timestamp
-      if (logDate == null && table.get("SystemStats/SystemTimeValid", false)) {
-        logDate = new Date();
+      if (logDate == null) {
+        if ((table.get("DriverStation/DSAttached", false) && table.get("SystemStats/SystemTimeValid", false))
+            || RobotBase.isSimulation()) {
+          if (dsAttachedTime == null) {
+            dsAttachedTime = Logger.getRealTimestamp() / 1000000.0;
+          } else if (Logger.getRealTimestamp() / 1000000.0 - dsAttachedTime > timestampUpdateDelay
+              || RobotBase.isSimulation()) {
+            logDate = LocalDateTime.now();
+          }
+        } else {
+          dsAttachedTime = null;
+        }
       }
 
       // Update match
@@ -173,7 +188,7 @@ public class WPILOGWriter implements LogDataReceiver {
       if (logDate == null) {
         newFilenameBuilder.append(randomIdentifier);
       } else {
-        newFilenameBuilder.append(new SimpleDateFormat("yy-MM-dd_HH-mm-ss").format(logDate));
+        newFilenameBuilder.append(timeFormatter.format(logDate));
       }
       if (logMatchText != null) {
         newFilenameBuilder.append("_");
