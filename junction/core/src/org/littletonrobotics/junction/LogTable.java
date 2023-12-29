@@ -434,7 +434,7 @@ public class LogTable {
   }
 
   /**
-   * Writes a new auto serializaed value to the table. Skipped if the key already
+   * Writes a new auto serialized value to the table. Skipped if the key already
    * exists as a different type.
    */
   @SuppressWarnings("unchecked")
@@ -456,7 +456,7 @@ public class LogTable {
   }
 
   /**
-   * Writes a new auto serializaed array value to the table. Skipped if the key
+   * Writes a new auto serialized array value to the table. Skipped if the key
    * already
    * exists as a different type.
    */
