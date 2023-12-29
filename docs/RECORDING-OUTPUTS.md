@@ -72,7 +72,13 @@ public class SwerveModule {
 }
 ```
 
-> Note: The parent class where `@AutoLogOutput` is used must be instantiated within the first loop cycle, be accessible by a recursive search of the fields of `Robot`, and be within the same package as `Robot` (or a subpackage). This feature is primarily intended to log outputs from subsystems and other similar classes. For classes that do not fit the criteria above, call `Logger.recordOutput` periodically to record outputs.
+By default, the parent class where `@AutoLogOutput` is used must be within the same package as `Robot` (or a subpackage). The following method can be called in `robotInit` to allow additional packages, such as a "lib" package outside of normal robot code:
+
+```java
+AutoLogOutputManager.addPackage("frc.lib");
+```
+
+> Note: The parent class where `@AutoLogOutput` is used must also be instantiated within the first loop cycle and be accessible by a recursive search of the fields of `Robot`. This feature is primarily intended to log outputs from subsystems and other similar classes. For classes that do not fit the criteria above, call `Logger.recordOutput` periodically to record outputs.
 
 ## Mechanism2d
 

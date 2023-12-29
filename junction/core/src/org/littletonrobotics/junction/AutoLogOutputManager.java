@@ -20,12 +20,30 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
-class AutoLogOutputManager {
+public class AutoLogOutputManager {
   private static final List<Runnable> callbacks = new ArrayList<>();
   private static final List<Integer> scannedObjectHashes = new ArrayList<>();
+  private static final Set<String> allowedPackages = new HashSet<>();
+
+  /**
+   * Adds a new allowed package to use when scanning for annotations. By default,
+   * the parent class where {@code @AutoLogOutput} is used must be within the same
+   * package as {@code Robot} (or a subpackage). Calling this method registers a
+   * new allowed package, such as a "lib" package outside of normal robot code.
+   * 
+   * <p>
+   * This method must be called within {@code robotInit}.
+   * 
+   * @param packageName The new allowed package name (e.g. "frc.lib")
+   */
+  public static void addPackage(String packageName) {
+    allowedPackages.add(packageName);
+  }
 
   /** Records values from all registered fields. */
   static void periodic() {
@@ -40,18 +58,29 @@ class AutoLogOutputManager {
    * @param root The object to scan recursively.
    */
   static void registerFields(Object root) {
-    registerFields(root, root.getClass().getPackageName());
+    allowedPackages.add(root.getClass().getPackageName());
+    registerFieldsImpl(root);
   }
 
   /**
    * Registers a root object, scanning for loggable fields recursively.
    *
-   * @param root        The object to scan recursively.
-   * @param packageName The required prefix for the package name.
+   * @param root The object to scan recursively.
    */
-  private static void registerFields(Object root, String packageName) {
-    if (!root.getClass().getPackageName().startsWith(packageName))
+  private static void registerFieldsImpl(Object root) {
+    // Check if package name is valid
+    String packageName = root.getClass().getPackageName();
+    boolean packageNameValid = false;
+    for (String allowedPackage : allowedPackages) {
+      if (packageName.startsWith(allowedPackage)) {
+        packageNameValid = true;
+        break;
+      }
+    }
+    if (!packageNameValid)
       return;
+
+    // Check if object has already been scanned
     if (scannedObjectHashes.contains(root.hashCode()))
       return;
     scannedObjectHashes.add(root.hashCode());
@@ -60,7 +89,7 @@ class AutoLogOutputManager {
     if (root.getClass().isArray()) {
       Object[] rootArray = (Object[]) root;
       for (Object item : rootArray) {
-        registerFields(item, packageName);
+        registerFieldsImpl(item);
       }
       return;
     }
@@ -138,7 +167,7 @@ class AutoLogOutputManager {
         return;
       }
       if (fieldValue != null) {
-        registerFields(fieldValue, packageName);
+        registerFieldsImpl(fieldValue);
       }
     });
   }
