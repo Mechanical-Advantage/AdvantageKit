@@ -87,6 +87,8 @@ if (isReal()) {
 Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 ```
 
+> Note: By default, the `WPILOGWriter` class writes to a USB stick when running on the roboRIO. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports**.
+
 This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required. See the example projects for one method of implementing this logic.
 
 ### Gversion Plugin (Git Metadata)
