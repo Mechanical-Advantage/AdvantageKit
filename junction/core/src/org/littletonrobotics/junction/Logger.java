@@ -15,14 +15,17 @@ package org.littletonrobotics.junction;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.conduit.ConduitApi;
+import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.console.ConsoleSource;
 import org.littletonrobotics.junction.console.RIOConsoleSource;
 import org.littletonrobotics.junction.console.SimConsoleSource;
@@ -60,6 +63,7 @@ public class Logger {
   private static Map<String, String> metadata = new HashMap<>();
   private static ConsoleSource console;
   private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
+  private static Supplier<ByteBuffer> unofficialREVLoggerSupplier = null;
   private static boolean deterministicTimestamps = true;
 
   private static LogReplaySource replaySource;
@@ -104,6 +108,20 @@ public class Logger {
    */
   public static void registerDashboardInput(LoggedDashboardInput dashboardInput) {
     dashboardInputs.add(dashboardInput);
+  }
+
+  /**
+   * Registers a log supplier for the <a href=
+   * "https://github.com/Mechanical-Advantage/UnofficialREVLogger">UnofficialREVLogger</a>.
+   * This method should be called during setup before starting to log. Example
+   * usage shown below.
+   * 
+   * <pre>
+   * <code>Logger.registerUnofficialREVLogger(UnofficialREVLogger.startAkit());</code>
+   * </pre>
+   */
+  public static void registerUnofficialREVLogger(Supplier<ByteBuffer> logSupplier) {
+    unofficialREVLoggerSupplier = logSupplier;
   }
 
   /**
@@ -238,6 +256,15 @@ public class Logger {
       }
       for (int i = 0; i < dashboardInputs.size(); i++) {
         dashboardInputs.get(i).periodic();
+      }
+      if (unofficialREVLoggerSupplier != null
+          && replaySource == null
+          && RobotBase.isReal()) {
+        ByteBuffer buffer = unofficialREVLoggerSupplier.get();
+        buffer.rewind();
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        entry.put("UnofficialREVLog", new LogValue(bytes, "unofficialrevlog"));
       }
       long saveDataEnd = getRealTimestamp();
 
