@@ -118,7 +118,7 @@ public class Logger {
    * usage shown below.
    * 
    * <pre>
-   * <code>Logger.registerURCL(URCL.startAkit());</code>
+   * <code>Logger.registerURCL(URCL.startExternal());</code>
    * </pre>
    */
   public static void registerURCL(Supplier<ByteBuffer> logSupplier) {
