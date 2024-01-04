@@ -63,7 +63,7 @@ public class Logger {
   private static Map<String, String> metadata = new HashMap<>();
   private static ConsoleSource console;
   private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
-  private static Supplier<ByteBuffer> unofficialREVLoggerSupplier = null;
+  private static Supplier<ByteBuffer> urclSupplier = null;
   private static boolean deterministicTimestamps = true;
 
   private static LogReplaySource replaySource;
@@ -111,17 +111,18 @@ public class Logger {
   }
 
   /**
-   * Registers a log supplier for the <a href=
-   * "https://github.com/Mechanical-Advantage/UnofficialREVLogger">UnofficialREVLogger</a>.
-   * This method should be called during setup before starting to log. Example
+   * Registers a log supplier for <a href=
+   * "https://github.com/Mechanical-Advantage/URCL">URCL</a> (Unofficial
+   * REV-Compatible Logger). This method should be called during setup before
+   * starting to log. Example
    * usage shown below.
    * 
    * <pre>
-   * <code>Logger.registerUnofficialREVLogger(UnofficialREVLogger.startAkit());</code>
+   * <code>Logger.registerURCL(URCL.startAkit());</code>
    * </pre>
    */
-  public static void registerUnofficialREVLogger(Supplier<ByteBuffer> logSupplier) {
-    unofficialREVLoggerSupplier = logSupplier;
+  public static void registerURCL(Supplier<ByteBuffer> logSupplier) {
+    urclSupplier = logSupplier;
   }
 
   /**
@@ -257,14 +258,14 @@ public class Logger {
       for (int i = 0; i < dashboardInputs.size(); i++) {
         dashboardInputs.get(i).periodic();
       }
-      if (unofficialREVLoggerSupplier != null
+      if (urclSupplier != null
           && replaySource == null
           && RobotBase.isReal()) {
-        ByteBuffer buffer = unofficialREVLoggerSupplier.get();
+        ByteBuffer buffer = urclSupplier.get();
         buffer.rewind();
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
-        entry.put("UnofficialREVLog", new LogValue(bytes, "unofficialrevlog"));
+        entry.put("URCL", new LogValue(bytes, "URCL"));
       }
       long saveDataEnd = getRealTimestamp();
 
