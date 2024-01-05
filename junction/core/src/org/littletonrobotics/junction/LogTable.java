@@ -35,6 +35,8 @@ import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufBuffer;
 import edu.wpi.first.util.struct.StructBuffer;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
+import edu.wpi.first.util.WPISerializable;
 import edu.wpi.first.wpilibj.DriverStation;
 import us.hebi.quickbuf.ProtoMessage;
 
@@ -438,7 +440,7 @@ public class LogTable {
    * exists as a different type.
    */
   @SuppressWarnings("unchecked")
-  public <T> void put(String key, T value) {
+  public <T extends WPISerializable> void put(String key, T value) {
     // If struct is supported, write as struct
     Struct<T> struct = (Struct<T>) findStructType(value.getClass());
     if (struct != null) {
@@ -457,17 +459,17 @@ public class LogTable {
 
   /**
    * Writes a new auto serialized array value to the table. Skipped if the key
-   * already
-   * exists as a different type.
+   * already exists as a different type.
    */
   @SuppressWarnings("unchecked")
-  public <T> void put(String key, T... value) {
+  public <T extends StructSerializable> void put(String key, T... value) {
     // If struct is supported, write as struct
     Struct<T> struct = (Struct<T>) findStructType(value.getClass().getComponentType());
     if (struct != null) {
       put(key, struct, value);
     } else {
-      DriverStation.reportError("Auto serialization is not supported for type " + value.getClass().getSimpleName(),
+      DriverStation.reportError(
+          "Auto serialization is not supported for array type " + value.getClass().getComponentType().getSimpleName(),
           false);
     }
   }
@@ -804,7 +806,7 @@ public class LogTable {
 
   /** Reads a serialized (struct/protobuf) value from the table. */
   @SuppressWarnings("unchecked")
-  public <T> T get(String key, T defaultValue) {
+  public <T extends WPISerializable> T get(String key, T defaultValue) {
     if (data.containsKey(prefix + key)) {
       String typeString = data.get(prefix + key).customTypeStr;
       if (typeString.startsWith("struct:")) {
@@ -825,7 +827,7 @@ public class LogTable {
 
   /** Reads a serialized (struct) array value from the table. */
   @SuppressWarnings("unchecked")
-  public <T> T[] get(String key, T... defaultValue) {
+  public <T extends StructSerializable> T[] get(String key, T... defaultValue) {
     if (data.containsKey(prefix + key)) {
       String typeString = data.get(prefix + key).customTypeStr;
       if (typeString.startsWith("struct:")) {

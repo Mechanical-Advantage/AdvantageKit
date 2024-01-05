@@ -51,6 +51,8 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
+import edu.wpi.first.util.WPISerializable;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** Central class for recording and replaying log data. */
@@ -708,9 +710,8 @@ public class Logger {
    * simulator, use this method to record extra data based on the original inputs.
    * 
    * <p>
-   * This method serializes a single object as a struct or protobuf automatically
-   * by searching for a {@code struct} or {@code proto} field. Struct is preferred
-   * if both methods are supported.
+   * This method serializes a single object as a struct or protobuf automatically.
+   * Struct is preferred if both methods are supported.
    * 
    * @param T     The type
    * @param key   The name of the field to record. It will be stored under
@@ -718,7 +719,7 @@ public class Logger {
    * @param value The value of the field.
    */
   @SuppressWarnings("unchecked")
-  public static <T> void recordOutput(String key, T value) {
+  public static <T extends WPISerializable> void recordOutput(String key, T value) {
     if (running) {
       outputTable.put(key, value);
     }
@@ -729,9 +730,8 @@ public class Logger {
    * simulator, use this method to record extra data based on the original inputs.
    * 
    * <p>
-   * This method serializes an array of objects as a struct automatically
-   * by searching for a {@code struct} field. Top-level protobuf arrays are not
-   * supported.
+   * This method serializes an array of objects as a struct automatically.
+   * Top-level protobuf arrays are not supported.
    * 
    * @param T     The type
    * @param key   The name of the field to record. It will be stored under
@@ -739,7 +739,7 @@ public class Logger {
    * @param value The value of the field.
    */
   @SuppressWarnings("unchecked")
-  public static <T> void recordOutput(String key, T... value) {
+  public static <T extends StructSerializable> void recordOutput(String key, T... value) {
     if (running) {
       outputTable.put(key, value);
     }

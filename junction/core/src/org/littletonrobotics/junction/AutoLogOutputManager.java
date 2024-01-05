@@ -15,10 +15,15 @@ package org.littletonrobotics.junction;
 
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.util.struct.StructSerializable;
+import edu.wpi.first.util.WPISerializable;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.ClassCastException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -360,8 +365,15 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (Object[]) value);
+              if (value != null) {
+                try {
+                  Logger.recordOutput(key, (StructSerializable[]) value);
+                } catch (ClassCastException e) {
+                  DriverStation.reportError(
+                      "Auto serialization is not supported for array type " + componentType.getSimpleName(),
+                      false);
+                }
+              }
             });
       }
     } else {
@@ -435,7 +447,13 @@ public class AutoLogOutputManager {
             () -> {
               Object value = supplier.get();
               if (value != null)
-                Logger.recordOutput(key, value);
+                try {
+                  Logger.recordOutput(key, (WPISerializable) value);
+                } catch (ClassCastException e) {
+                  DriverStation.reportError(
+                      "Auto serialization is not supported for type " + type.getSimpleName(),
+                      false);
+                }
             });
       }
     }
