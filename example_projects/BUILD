@@ -92,11 +92,30 @@ pkg_zip(
     ],
 )
 
+pkg_files(
+    name = "kitbot_2024_files",
+    srcs = glob(
+        ["kitbot_2024/**/*"],
+    ),
+    strip_prefix = strip_prefix.from_pkg("kitbot_2024"),
+)
+
+pkg_zip(
+    name = "kitbot_2024",
+    srcs = [
+        "kitbot_2024_files",
+        "template_build_file",
+        "template_files",
+        "template_vendordep",
+    ],
+)
+
 filegroup(
     name = "example_projects",
     srcs = [
         "advanced_swerve_drive",
         "diff_drive",
+        "kitbot_2024",
         "skeleton",
         "swerve_drive",
     ],

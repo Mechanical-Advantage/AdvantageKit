@@ -90,6 +90,16 @@ jobs:
           asset_path: bazel-bin/example_projects/advanced_swerve_drive.zip
           asset_name: AdvantageKit_AdvancedSwerveDriveProject.zip
           asset_content_type: application/zip
+      - name: "Release: Upload example project (kitbot_2024)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: bazel-bin/example_projects/kitbot_2024.zip
+          asset_name: AdvantageKit_KitBot2024.zip
+          asset_content_type: application/zip
 
       # Upload conduit build
       - name: "Release: Install Dependencies"
