@@ -166,19 +166,22 @@ jobs:
               os: macos-12, 
               displayName: "macOS", 
               classifier: "osxuniversal",
-              mavenLocal: "file://$HOME/maven_offline"
+              mavenLocal: "file://$HOME/maven_offline",
+              mavenLocalUpload: "../maven_offline"
             }
           - {
               os: ubuntu-22.04,
               displayName: "Linux",
               classifier: "linuxx86-64",
-              mavenLocal: "file://$HOME/maven_offline"
+              mavenLocal: "file://$HOME/maven_offline",
+              mavenLocalUpload: "../maven_offline"
             }
           - {
               os: windows-2019,
               displayName: "Windows",
               classifier: "windowsx86-64",
-              mavenLocal: "file://%userprofile%\\maven_offline"
+              mavenLocal: "file://%userprofile%\\maven_offline",
+              mavenLocalUpload: "..\\maven_offline"
             }
 
     name: Build for ${{ matrix.host.displayName }}
@@ -231,4 +234,4 @@ jobs:
         if: github.event_name == 'release'
         with:
           name: maven_${{ matrix.host.displayName }}
-          path: maven_offline
+          path: ${{ matrix.host.mavenLocalUpload }}
