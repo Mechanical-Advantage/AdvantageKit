@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: github.event_name == 'release'
         with:
-          name: maven_athena
+          name: maven_Athena
           path: ~/maven_offline/
 
   desktop:
@@ -167,18 +167,21 @@ jobs:
               displayName: "macOS", 
               classifier: "osxuniversal",
               mavenLocal: "file://$HOME/maven_offline",
+              mavenLocalUpload: "~/maven_offline"
             }
           - {
               os: ubuntu-22.04,
               displayName: "Linux",
               classifier: "linuxx86-64",
               mavenLocal: "file://$HOME/maven_offline",
+              mavenLocalUpload: "~/maven_offline"
             }
           - {
               os: windows-2019,
               displayName: "Windows",
               classifier: "windowsx86-64",
               mavenLocal: "file://%userprofile%\\maven_offline",
+              mavenLocalUpload: "%userprofile%/maven_offline"
             }
 
     name: Build for ${{ matrix.host.displayName }}
@@ -231,7 +234,7 @@ jobs:
         if: github.event_name == 'release'
         with:
           name: maven_${{ matrix.host.displayName }}
-          path: ~/maven_offline
+          path: ${{ matrix.host.mavenLocalUpload }}
 
   # combine:
   #   name: "Release: Combine Maven Offline"
@@ -240,4 +243,26 @@ jobs:
   #   needs: [athena, desktop]
 
   #   steps:
-  #     - 
+  #     - name: "Download Athena"
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: maven_Athena
+  #         path: maven_Athena
+  #     - name: "Download macOS"
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: maven_macOS
+  #         path: maven_macOS
+  #     - name: "Download Linux"
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: maven_Linux
+  #         path: maven_Linux
+  #     - name: "Download Windows"
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: maven_Windows
+  #         path: maven_Windows
+  #     - name: Combine
+  #       run: |
+  #         echo hi
