@@ -167,21 +167,18 @@ jobs:
               displayName: "macOS", 
               classifier: "osxuniversal",
               mavenLocal: "file://$HOME/maven_offline",
-              mavenLocalUpload: "../maven_offline"
             }
           - {
               os: ubuntu-22.04,
               displayName: "Linux",
               classifier: "linuxx86-64",
               mavenLocal: "file://$HOME/maven_offline",
-              mavenLocalUpload: "../maven_offline"
             }
           - {
               os: windows-2019,
               displayName: "Windows",
               classifier: "windowsx86-64",
               mavenLocal: "file://%userprofile%\\maven_offline",
-              mavenLocalUpload: "..\\maven_offline"
             }
 
     name: Build for ${{ matrix.host.displayName }}
@@ -234,4 +231,13 @@ jobs:
         if: github.event_name == 'release'
         with:
           name: maven_${{ matrix.host.displayName }}
-          path: ${{ matrix.host.mavenLocalUpload }}
+          path: ~/maven_offline
+
+  # combine:
+  #   name: "Release: Combine Maven Offline"
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'release'
+  #   needs: [athena, desktop]
+
+  #   steps:
+  #     - 
