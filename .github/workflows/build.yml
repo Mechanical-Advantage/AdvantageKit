@@ -231,4 +231,4 @@ jobs:
         if: github.event_name == 'release'
         with:
           name: maven_${{ matrix.host.displayName }}
-          path: ${{ matrix.host.mavenLocal }}
+          path: maven_offline
