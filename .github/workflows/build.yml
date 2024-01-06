@@ -236,33 +236,51 @@ jobs:
           name: maven_${{ matrix.host.displayName }}
           path: ${{ matrix.host.mavenLocalUpload }}
 
-  # combine:
-  #   name: "Release: Combine Maven Offline"
-  #   runs-on: ubuntu-latest
-  #   if: github.event_name == 'release'
-  #   needs: [athena, desktop]
+  combine:
+    name: "Release: Combine Maven Offline"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    needs: [athena, desktop]
 
-  #   steps:
-  #     - name: "Download Athena"
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: maven_Athena
-  #         path: maven_Athena
-  #     - name: "Download macOS"
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: maven_macOS
-  #         path: maven_macOS
-  #     - name: "Download Linux"
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: maven_Linux
-  #         path: maven_Linux
-  #     - name: "Download Windows"
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: maven_Windows
-  #         path: maven_Windows
-  #     - name: Combine
-  #       run: |
-  #         echo hi
+    steps:
+      - name: "Download Athena"
+        uses: actions/download-artifact@v3
+        with:
+          name: maven_Athena
+          path: maven_Athena
+      - name: "Download macOS"
+        uses: actions/download-artifact@v3
+        with:
+          name: maven_macOS
+          path: maven_macOS
+      - name: "Download Linux"
+        uses: actions/download-artifact@v3
+        with:
+          name: maven_Linux
+          path: maven_Linux
+      - name: "Download Windows"
+        uses: actions/download-artifact@v3
+        with:
+          name: maven_Windows
+          path: maven_Windows
+      - name: Combine
+        run: |
+          cp -RT maven_Athena maven_offline
+          cp -RT maven_macOS maven_offline
+          cp -RT maven_Linux maven_offline
+          cp -RT maven_Windows maven_offline
+          zip maven_offline.zip maven_offline/**/*
+      - name: "Get release info"
+        id: get_release_info
+        uses: bruceadams/get-release@v1.2.3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: "Upload Maven zip"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: maven_offline.zip
+          asset_name: maven_offline.zip
+          asset_content_type: application/zip
