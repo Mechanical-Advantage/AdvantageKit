@@ -269,7 +269,7 @@ jobs:
           rsync -a maven_macOS/* maven_offline
           rsync -a maven_Linux/* maven_offline
           rsync -a maven_Windows/* maven_offline
-          zip maven_offline.zip maven_offline/**/*
+          zip -r maven_offline.zip maven_offline
       - name: "Get release info"
         id: get_release_info
         uses: bruceadams/get-release@v1.2.3
