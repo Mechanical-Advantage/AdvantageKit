@@ -265,10 +265,10 @@ jobs:
           path: maven_Windows
       - name: Combine
         run: |
-          cp -RT maven_Athena maven_offline
-          cp -RT maven_macOS maven_offline
-          cp -RT maven_Linux maven_offline
-          cp -RT maven_Windows maven_offline
+          rsync -a maven_Athena/* maven_offline
+          rsync -a maven_macOS/* maven_offline
+          rsync -a maven_Linux/* maven_offline
+          rsync -a maven_Windows/* maven_offline
           zip maven_offline.zip maven_offline/**/*
       - name: "Get release info"
         id: get_release_info
