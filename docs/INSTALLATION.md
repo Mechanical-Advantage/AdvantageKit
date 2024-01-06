@@ -54,7 +54,14 @@ AdvantageKit is available through GitHub Packages. Per [this issue](https://gith
 
 > Note: A token for accessing GitHub packages and AdvantageKit can be created using any GitHub account. Under account settings, go to "Developer settings" > "Personal access token" > "Tokens (classic)" > "Generate new token" > "Generate new token (classic)" and enable the "read:packages" scope. Keep in mind that GitHub will revoke this token if the plaintext version appears in a GitHub repository.
 
-### Robot Configuration
+## Offline Installation
+
+Maven artifacts for AdvantageKit can be downloaded and installed for offline use. This allows AdvantageKit to be accessed even if GitHub Packages is blocked on school networks.
+
+1. Download the "maven_offline.zip" asset attached to the latest [GitHub release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest).
+2. Unzip the file into "C:\Users\Public\wpilib\YEAR\maven" on Windows or "~/wpilib/YEAR/maven" on macOS/Linux.
+
+## Robot Configuration
 
 The main `Robot` class **must inherit from `LoggedRobot`** (see below). `LoggedRobot` performs the same functions as `TimedRobot`, with some exceptions:
 
@@ -91,7 +98,7 @@ Logger.start(); // Start logging! No more data receivers, replay sources, or met
 
 This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required. See the example projects for one method of implementing this logic.
 
-### Gversion Plugin (Git Metadata)
+## Gversion Plugin (Git Metadata)
 
 We recommend using the [Gversion](https://github.com/lessthanoptimal/gversion-plugin) Gradle plugin to record metadata like the Git hash and build date. For more details, see [Version Control](VERSION-CONTROL.md). To install it, add the plugin at the top of `build.gradle`:
 
