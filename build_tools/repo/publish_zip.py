@@ -1,6 +1,7 @@
 import argparse
 import requests
 import hashlib
+import os
 
 # Parse command line arguments
 parser = argparse.ArgumentParser()
@@ -16,8 +17,6 @@ args = parser.parse_args()
 
 # GitHub Packages Maven URL
 url = f"{args.url}/{args.group_id.replace('.', '/')}/{args.artifact_id}/{args.version}/{args.artifact_id}-{args.version}-{args.classifier}.zip"
-
-print(url)
 
 # Read the contents of the zip file
 with open(args.file_path, "rb") as f:
@@ -35,36 +34,56 @@ sha256_content = sha256_hash.encode()
 # Create the contents of the md5 file
 md5_content = md5_hash.encode()
 
-# Set the headers for the HTTP requests
-headers = {
-    "Authorization": f"token {args.access_token}",
-    "Content-Type": "application/octet-stream",
-    "Accept": "application/vnd.github.v3+json"
-}
+file_prefix = "file://"
+if url.startswith(file_prefix):
+    # Write zip file
+    zip_path = url[len(file_prefix):]
+    dest_dir = os.path.dirname(zip_path)
+    os.makedirs(dest_dir, exist_ok=True)
+    with open(url[len(file_prefix):], "wb") as f:
+        f.write(zip_data)
 
-# Make the HTTP request to publish the zip file
-response_zip = requests.put(url, headers=headers, data=zip_data)
+    # Write sha256 file
+    sha256_path = url[len(file_prefix):] + ".sha256"
+    with open(sha256_path, "wb") as f:
+        f.write(sha256_content)
 
-# Check the status code of the response
-if response_zip.status_code == 200 or response_zip.status_code == 201:
-    print("Zip file published to GitHub Packages Maven.")
+    # Write md5 file
+    md5_path = url[len(file_prefix):] + ".md5"
+    with open(md5_path, "wb") as f:
+        f.write(md5_content)
+
 else:
-    print(f"Error: {response_zip.status_code} - {response_zip.content.decode()}")
+    # Set the headers for the HTTP requests
+    headers = {
+        "Authorization": f"token {args.access_token}",
+        "Content-Type": "application/octet-stream",
+        "Accept": "application/vnd.github.v3+json"
+    }
 
-# Make the HTTP request to publish the sha256 file
-response_sha256 = requests.put(f"{url}.sha256", headers=headers, data=sha256_content)
+    # Make the HTTP request to publish the zip file
+    response_zip = requests.put(url, headers=headers, data=zip_data)
 
-# Check the status code of the response
-if response_sha256.status_code == 200 or response_sha256.status_code == 201:
-    print("SHA-256 file published to GitHub Packages Maven.")
-else:
-    print(f"Error: {response_sha256.status_code} - {response_sha256.content.decode()}")
+    # Check the status code of the response
+    if response_zip.status_code == 200 or response_zip.status_code == 201:
+        print("Zip file published to GitHub Packages Maven.")
+    else:
+        print(f"Error: {response_zip.status_code} - {response_zip.content.decode()}")
 
-# Make the HTTP request to publish the md5 file
-response_md5 = requests.put(f"{url}.md5", headers=headers, data=md5_content)
+    # Make the HTTP request to publish the sha256 file
+    response_sha256 = requests.put(f"{url}.sha256", headers=headers, data=sha256_content)
 
-# Check the status code of the response
-if response_md5.status_code == 200 or response_md5.status_code == 201:
-    print("MD5 file published to GitHub Packages Maven.")
-else:
-    print(f"Error: {response_md5.status_code} - {response_md5.content.decode()}")
+    # Check the status code of the response
+    if response_sha256.status_code == 200 or response_sha256.status_code == 201:
+        print("SHA-256 file published to GitHub Packages Maven.")
+    else:
+        print(f"Error: {response_sha256.status_code} - {response_sha256.content.decode()}")
+
+    # Make the HTTP request to publish the md5 file
+    response_md5 = requests.put(f"{url}.md5", headers=headers, data=md5_content)
+
+    # Check the status code of the response
+    if response_md5.status_code == 200 or response_md5.status_code == 201:
+        print("MD5 file published to GitHub Packages Maven.")
+    else:
+        print(f"Error: {response_md5.status_code} - {response_md5.content.decode()}")

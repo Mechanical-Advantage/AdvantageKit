@@ -108,29 +108,55 @@ jobs:
       - name: 'Release: Build "conduit/wpilibio:nativezip"'
         if: github.event_name == 'release'
         run: bazelisk build --config=athena --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:nativezip
-      - name: 'Release: Upload "conduit/wpilibio:nativezip"'
+      - name: 'Release: Upload "conduit/wpilibio:nativezip" to local'
         if: github.event_name == 'release'
-        run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier linuxathena --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version-without-v }}-linuxathena.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
-      - name: 'Release: Upload "conduit/wpilibio:pom"'
+        run: python3 build_tools/repo/publish_zip.py --url file://$HOME/maven_offline --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier linuxathena --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version-without-v }}-linuxathena.zip
+      # - name: 'Release: Upload "conduit/wpilibio:nativezip" to GitHub'
+      #   if: github.event_name == 'release'
+      #   run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier linuxathena --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version-without-v }}-linuxathena.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Release: Upload "conduit/wpilibio:pom" to local'
         if: github.event_name == 'release'
-        run: bazelisk run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:pom.publish
+        run: bazelisk run --config=athena --define "maven_repo=file://$HOME/maven_offline" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:pom.publish
+      # - name: 'Release: Upload "conduit/wpilibio:pom" to GitHub'
+      #   if: github.event_name == 'release'
+      #   run: bazelisk run --config=athena --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/wpilibio:pom.publish
         env:
           GITHUB_ACTOR: Mechanical-Advantage
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Upload Java packages
-      - name: 'Release: Upload "conduit/api"'
+      - name: 'Release: Upload "conduit/api" to local'
         if: github.event_name == 'release'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/api:api-export.publish
-      - name: 'Release: Upload "junction/core"'
+        run: bazelisk run --define "maven_repo=file://$HOME/maven_offline" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/api:api-export.publish
+      # - name: 'Release: Upload "conduit/api" to GitHub'
+      #   if: github.event_name == 'release'
+      #   run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //conduit/api:api-export.publish
+      - name: 'Release: Upload "junction/core" to local'
         if: github.event_name == 'release'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/core:core-export.publish
-      - name: 'Release: Upload "junction/autolog"'
+        run: bazelisk run --define "maven_repo=file://$HOME/maven_offline" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/core:core-export.publish
+      # - name: 'Release: Upload "junction/core" to GitHub'
+      #   if: github.event_name == 'release'
+      #   run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/core:core-export.publish
+      - name: 'Release: Upload "junction/autolog" to local'
         if: github.event_name == 'release'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/autolog:autolog-export.publish
-      - name: 'Release: Upload "junction/shims/wpilib"'
+        run: bazelisk run --define "maven_repo=file://$HOME/maven_offline" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/autolog:autolog-export.publish
+      # - name: 'Release: Upload "junction/autolog" to GitHub'
+      #   if: github.event_name == 'release'
+      #   run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/autolog:autolog-export.publish
+      - name: 'Release: Upload "junction/shims/wpilib" to local'
         if: github.event_name == 'release'
-        run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/shims/wpilib:wpilib-export.publish
+        run: bazelisk run --define "maven_repo=file://$HOME/maven_offline" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/shims/wpilib:wpilib-export.publish
+      # - name: 'Release: Upload "junction/shims/wpilib" to GitHub'
+      #   if: github.event_name == 'release'
+      #   run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/shims/wpilib:wpilib-export.publish
+      
+      # Upload local repo
+      - name: 'Release: Upload local repo'
+        uses: actions/upload-artifact@v3
+        if: github.event_name == 'release'
+        with:
+          name: maven_athena
+          path: ~/maven_offline/
 
   desktop:
     strategy:
