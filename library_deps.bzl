@@ -15,14 +15,14 @@ def library_deps_setup():
     http_file(
         name = "wpilibj_jar_file",
         downloaded_file_path = "wpilibj.jar",  # java_import needs the filename to contain .jar
-        sha256 = "d88f13d6b428381e34d32efa4ccdcdc73afa0b7d0d455d11bfd5118ea7b48bd1",
+        sha256 = "540acaf821fbca6cfd98e8963c96ba0408232b51ecbf1b0682927b6fd5acf858",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/wpilibj-java/2024.1.1/wpilibj-java-2024.1.1.jar"],
     )
 
     http_file(
         name = "wpilibj_sources_jar_file",
         downloaded_file_path = "wpilibj_sources.jar",
-        sha256 = "86bbeef0c0378dde34fcf70fc294a948616c69828ffffe8ce7daa9301216bfca",
+        sha256 = "b6aefcf8fd2d726c21b3c4a9cb05fb2cce5fa76a042310ac1d3e9d7a239ee96a",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/wpilibj-java/2024.1.1/wpilibj-java-2024.1.1-sources.jar"],
     )
 
@@ -247,7 +247,7 @@ cc_library(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "ba30d7e5415188a22c6821935efc8d9a2d52c5889649eac7f084c991f033e81a",
+        sha256 = "313253874f331dcf9c156082c760d5c0cec9f3371ed6d79155ec63b2e17113e9",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/2024.1.1/wpiutil-cpp-2024.1.1-headers.zip"]
     )
 
@@ -272,7 +272,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "9dbaa28ec589fd52b237fd0bb1897dc8f5cc2bf802c742938d1370ac2bb6a669",
+        sha256 = "010cfcc98d21929a432da4fa0e5d8447dd676ae3e5df2186f4d579120d1c5af6",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/2024.1.1/wpiutil-cpp-2024.1.1-linuxathena.zip"]
     )
 
@@ -297,7 +297,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "179c21641cac0f8ed5c0de674086392a73c9f823dae52e893a1504869aef9119",
+        sha256 = "5d55a0fdb1f65ea6d571750a0afa293d5c677036d3332d286b1e983eb4952066",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/2024.1.1/wpiutil-cpp-2024.1.1-linuxx86-64.zip"]
     )
 
@@ -322,7 +322,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "1277fe0f6ce92b06b60412ec4af5cec6b90b8acaffc353cc83c0ca3926060a1c",
+        sha256 = "0d03e90f88a362734c3028de71a54cc42056f235ef396ccaf65e8ea97e486ee6",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/2024.1.1/wpiutil-cpp-2024.1.1-windowsx86-64.zip"]
     )
 
@@ -347,7 +347,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "5c92f6f7e772ab3d51993de1dcd24721231eff9fc5dabc82a4475124eae3c8e3",
+        sha256 = "7e423aef50168ca29817bf00edf2f60d91ccc3c7d79fc6d0a4d4649323716fbd",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpiutil/wpiutil-cpp/2024.1.1/wpiutil-cpp-2024.1.1-osxuniversal.zip"]
     )
 
@@ -378,7 +378,7 @@ cc_library(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "827c82f474a56d9dca6c3983b70027449d751a03b32f7d87160e2e0c48f1e70d",
+        sha256 = "84b10265246f7e666cba887b93f8dafa38b90a2feb5b2894a5d1847cbd8d08fb",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpimath/wpimath-cpp/2024.1.1/wpimath-cpp-2024.1.1-headers.zip"]
     )
 
@@ -403,7 +403,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "9f73968b0cdc3137cf070cea6a2089f4112b22512a2b3ced7927fa573726f320",
+        sha256 = "ba152e6f2de0289f5980e37d387a6fb0ce47ac11cfac841597fc2dcae807e106",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpimath/wpimath-cpp/2024.1.1/wpimath-cpp-2024.1.1-linuxathena.zip"]
     )
 
@@ -428,7 +428,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "666d8db9bf44830590b09ebc7987d76aeaf7971a7bd5d23cf0d388c4975d4e82",
+        sha256 = "e98e9b08de8fe608c8828a2cbf7efd7e9b864022c878ee31e3b1f82974e29777",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpimath/wpimath-cpp/2024.1.1/wpimath-cpp-2024.1.1-linuxx86-64.zip"]
     )
 
@@ -453,7 +453,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "315d2ac8a5143d92d774b120a8489c3f8ecdcca4adb18e94320cc6c4c70f5a02",
+        sha256 = "bea5227fa5380545b051576bf1d1c1bad6beb164a8d7ab0a5f5c8769620f703e",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpimath/wpimath-cpp/2024.1.1/wpimath-cpp-2024.1.1-windowsx86-64.zip"]
     )
 
@@ -478,7 +478,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "1f9471f163cec19a36ab095fa43f29bd149a671f9041ffc4bd202164096c4def",
+        sha256 = "993685e0afad3a8d279bc289bb70b48dfd752a94a087c640a8e9fd2ff4ddf44c",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpimath/wpimath-cpp/2024.1.1/wpimath-cpp-2024.1.1-osxuniversal.zip"]
     )
 
@@ -509,7 +509,7 @@ cc_library(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "46403e8d398efbd335595bfcb04747d7366667acd07782dca3db3389fcbe7dd9",
+        sha256 = "cf60a74daafed9985c1e8068d7abfb74e2bae92e7460537d2d9a4b8a4f975c0f",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ntcore/ntcore-cpp/2024.1.1/ntcore-cpp-2024.1.1-headers.zip"]
     )
 
@@ -534,7 +534,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "148fbc01b0f3adef25a8e70ce4634c8c3c9fca679512770c64d12d9584b0e29e",
+        sha256 = "d882bbe5e52ffce71e8cd5f72b0f12579b32691d3cfeb8ad35b81c0aaa7d644c",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ntcore/ntcore-cpp/2024.1.1/ntcore-cpp-2024.1.1-linuxathena.zip"]
     )
 
@@ -559,7 +559,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "8e17c1e52bd4156c5efbbff3d5f4fccbd2aab84514844fbd78ed9a536eddf2cf",
+        sha256 = "c98df3807e159cb95b413b7139d754e0dfc8781ef663816714b8813cdaac7f90",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ntcore/ntcore-cpp/2024.1.1/ntcore-cpp-2024.1.1-linuxx86-64.zip"]
     )
 
@@ -584,7 +584,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "072f3c374fd662a0fa00096e841ed5d340d75334ffb7a6ca76d96b20784918db",
+        sha256 = "22c8f7b3ebd8c5350394b3770a9a3c29da3f6f4aac2b04d0e646b697598466cd",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ntcore/ntcore-cpp/2024.1.1/ntcore-cpp-2024.1.1-windowsx86-64.zip"]
     )
 
@@ -609,7 +609,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "a4b0298f7da726868e494a63e9f93900900b827d6102abc0668d3416b0c439c8",
+        sha256 = "9e56ad3bbd39523612493f541c766792cfc6f974f5f03de4c1a01cb80063e80e",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ntcore/ntcore-cpp/2024.1.1/ntcore-cpp-2024.1.1-osxuniversal.zip"]
     )
 
@@ -640,7 +640,7 @@ cc_library(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "a86464e552397f7b41fce4185d40d4daed425fc88dc229622422cbafd6f6d57b",
+        sha256 = "d05521c6ea407c1b6cf8e05b61d8f85a3372cebeef59f098631b9a6b3ccee439",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/2024.1.1/hal-cpp-2024.1.1-headers.zip"]
     )
 
@@ -665,7 +665,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "2cd6d2fb9afc091af032cc7ec1e637ed93cdfda49e846a13d6475bed8ff30fa3",
+        sha256 = "4de8d6302261ee96946d23eeb57145858a15059be14817ac5037e56dc73c67e6",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/2024.1.1/hal-cpp-2024.1.1-linuxathena.zip"]
     )
 
@@ -690,7 +690,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "4762d1b36de153f426d25d037a55b36afacd32494c044485ed7f6efe2b741fb3",
+        sha256 = "26535cf7ba25ac96b00f7fd73fe04142e955eab51c30ea2dd0dedf46b2c34889",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/2024.1.1/hal-cpp-2024.1.1-linuxx86-64.zip"]
     )
 
@@ -715,7 +715,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "ca032f0663b3e2da146fcacad60a443f3c50613d1179de6456f4ca8b1e553707",
+        sha256 = "113597d06fa4877681f13d80a87a746bdfd7606fadb44c9e83eb37147f4f900a",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/2024.1.1/hal-cpp-2024.1.1-windowsx86-64.zip"]
     )
 
@@ -740,7 +740,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "f8cc2ae89dbe0ddc838c960ab13062bb4eba39a664f48e6cfc7cefb57c9d848c",
+        sha256 = "ad85f8733cc0eba8c4ca443356c2419912fbdce6d9023f394bc796189378d7d0",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/hal/hal-cpp/2024.1.1/hal-cpp-2024.1.1-osxuniversal.zip"]
     )
 
@@ -765,7 +765,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "bffaccd77c2a57773fddbc243c1ee0867041459b087dd7f14e0264e1b0740f63",
+        sha256 = "eeae7e779e3b8c69547214db794eb9bf6290412cfb383effa0202e22a79e9334",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/halsim/halsim_gui/2024.1.1/halsim_gui-2024.1.1-linuxx86-64.zip"]
     )
 
@@ -790,7 +790,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "38a52057d6d3380f00f2ef6c44ed7482e6845653e61c42785614edc9c2a7a30d",
+        sha256 = "413abb24086576c9da79cd37a5e59a4d886314f5b7bb1c15ddbd484a5832d6a2",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/halsim/halsim_gui/2024.1.1/halsim_gui-2024.1.1-windowsx86-64.zip"]
     )
 
@@ -815,7 +815,7 @@ filegroup(
     visibility = ["@//third_party/wpilib:__pkg__"],
 )
 """,
-        sha256 = "cfe7e5cd93143bd58e4a5163e869a6ad019de90e83b4f3e8d31913e2e40e1b8c",
+        sha256 = "309d68b9a89f4204c08caac936410e8b225b838421d26cf8bb47ee3260d1cf9a",
         urls = ["https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/halsim/halsim_gui/2024.1.1/halsim_gui-2024.1.1-osxuniversal.zip"]
     )
 
