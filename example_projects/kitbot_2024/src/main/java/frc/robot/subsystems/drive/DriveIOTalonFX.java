@@ -17,6 +17,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -25,7 +26,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 public class DriveIOTalonFX implements DriveIO {
-  private static final double GEAR_RATIO = 6.0;
+  private static final double GEAR_RATIO = 10.0;
+  private static final double KP = 1.0; // TODO: MUST BE TUNED, consider using Phoenix Tuner X
+  private static final double KD = 0.0; // TODO: MUST BE TUNED, consider using Phoenix Tuner X
 
   private final TalonFX leftLeader = new TalonFX(0);
   private final TalonFX leftFollower = new TalonFX(1);
@@ -49,9 +52,11 @@ public class DriveIOTalonFX implements DriveIO {
 
   public DriveIOTalonFX() {
     var config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = 30.0;
+    config.CurrentLimits.StatorCurrentLimit = 60.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.Slot0.kP = KP;
+    config.Slot0.kD = KD;
     leftLeader.getConfigurator().apply(config);
     leftFollower.getConfigurator().apply(config);
     rightLeader.getConfigurator().apply(config);
@@ -117,5 +122,30 @@ public class DriveIOTalonFX implements DriveIO {
   public void setVoltage(double leftVolts, double rightVolts) {
     leftLeader.setControl(new VoltageOut(leftVolts));
     rightLeader.setControl(new VoltageOut(rightVolts));
+  }
+
+  @Override
+  public void setVelocity(
+      double leftRadPerSec, double rightRadPerSec, double leftFFVolts, double rightFFVolts) {
+    leftLeader.setControl(
+        new VelocityVoltage(
+            Units.radiansToRotations(leftRadPerSec * GEAR_RATIO),
+            0.0,
+            true,
+            leftFFVolts,
+            0,
+            false,
+            false,
+            false));
+    rightLeader.setControl(
+        new VelocityVoltage(
+            Units.radiansToRotations(rightRadPerSec * GEAR_RATIO),
+            0.0,
+            true,
+            rightFFVolts,
+            0,
+            false,
+            false,
+            false));
   }
 }

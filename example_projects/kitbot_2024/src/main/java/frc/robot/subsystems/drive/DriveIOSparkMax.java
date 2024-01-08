@@ -16,14 +16,18 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 public class DriveIOSparkMax implements DriveIO {
-  private static final double GEAR_RATIO = 6.0;
+  private static final double GEAR_RATIO = 10.0;
+  private static final double KP = 1.0; // TODO: MUST BE TUNED, consider using REV Hardware Client
+  private static final double KD = 0.0; // TODO: MUST BE TUNED, consider using REV Hardware Client
 
   private final CANSparkMax leftLeader = new CANSparkMax(1, MotorType.kBrushless);
   private final CANSparkMax rightLeader = new CANSparkMax(2, MotorType.kBrushless);
@@ -31,6 +35,8 @@ public class DriveIOSparkMax implements DriveIO {
   private final CANSparkMax rightFollower = new CANSparkMax(4, MotorType.kBrushless);
   private final RelativeEncoder leftEncoder = leftLeader.getEncoder();
   private final RelativeEncoder rightEncoder = rightLeader.getEncoder();
+  private final SparkPIDController leftPID = leftLeader.getPIDController();
+  private final SparkPIDController rightPID = rightLeader.getPIDController();
 
   private final Pigeon2 pigeon = new Pigeon2(20);
   private final StatusSignal<Double> yaw = pigeon.getYaw();
@@ -53,8 +59,13 @@ public class DriveIOSparkMax implements DriveIO {
 
     leftLeader.enableVoltageCompensation(12.0);
     rightLeader.enableVoltageCompensation(12.0);
-    leftLeader.setSmartCurrentLimit(30);
-    rightLeader.setSmartCurrentLimit(30);
+    leftLeader.setSmartCurrentLimit(60);
+    rightLeader.setSmartCurrentLimit(60);
+
+    leftPID.setP(KP);
+    leftPID.setD(KD);
+    rightPID.setP(KP);
+    rightPID.setD(KD);
 
     leftLeader.burnFlash();
     rightLeader.burnFlash();
@@ -90,5 +101,20 @@ public class DriveIOSparkMax implements DriveIO {
   public void setVoltage(double leftVolts, double rightVolts) {
     leftLeader.setVoltage(leftVolts);
     rightLeader.setVoltage(rightVolts);
+  }
+
+  @Override
+  public void setVelocity(
+      double leftRadPerSec, double rightRadPerSec, double leftFFVolts, double rightFFVolts) {
+    leftPID.setReference(
+        Units.radiansPerSecondToRotationsPerMinute(leftRadPerSec * GEAR_RATIO),
+        ControlType.kVelocity,
+        0,
+        leftFFVolts);
+    rightPID.setReference(
+        Units.radiansPerSecondToRotationsPerMinute(rightRadPerSec * GEAR_RATIO),
+        ControlType.kVelocity,
+        0,
+        rightFFVolts);
   }
 }
