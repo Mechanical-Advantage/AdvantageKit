@@ -5,33 +5,27 @@
       "x": 2.0,
       "y": 7.0
     },
-    "rotation": 0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Example Path"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Run Flywheel"
-                }
-              }
-            ]
+            "name": "Run Flywheel"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Example Path"
           }
         }
       ]
     }
   },
-  "folder": null
+  "folder": null,
+  "choreoAuto": false
 }

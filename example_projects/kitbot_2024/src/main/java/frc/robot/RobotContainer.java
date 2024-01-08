@@ -89,9 +89,9 @@ public class RobotContainer {
                 null, // Inputs logged by AdvantageKit
                 drive));
     autoChooser.addOption(
-        "Drive SysId (Quasistic Forward)", sysIdRoutine.quasistatic(Direction.kForward));
+        "Drive SysId (Quasistatic Forward)", sysIdRoutine.quasistatic(Direction.kForward));
     autoChooser.addOption(
-        "Drive SysId (Quasistic Reverse)", sysIdRoutine.quasistatic(Direction.kReverse));
+        "Drive SysId (Quasistatic Reverse)", sysIdRoutine.quasistatic(Direction.kReverse));
     autoChooser.addOption(
         "Drive SysId (Dynamic Forward)", sysIdRoutine.dynamic(Direction.kForward));
     autoChooser.addOption(
