@@ -24,7 +24,7 @@ Feedback, feature requests, and bug reports are welcome on the [issues page](htt
 
 Looking to get started quickly? Here are some example projects to check out:
 
-- [AdvantageKit Example Projects](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/docs/INSTALLATION.md#new-projects) - Example projects for differential and swerve drives, from minimal to advanced. Zip files for each project are attached to the latest release
+- [AdvantageKit Example Projects](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/docs/INSTALLATION.md#new-projects) - Example projects for differential and swerve drives, from minimal to advanced (including a project designed for the [2024 FIRST KitBot](https://www.firstinspires.org/resource-library/frc/kitbot)). Zip files for each project are attached to the latest release.
 - [Team 6328's 2023 Competition Code](https://github.com/Mechanical-Advantage/RobotCode2023) - Java robot code built with AdvantageKit v2 (2023).
 - [Team 2910's 2023 Competition Code](https://github.com/FRCTeam2910/2023CompetitionRobot-Public) - Java robot code built with AdvantageKit v2 (2023).
 - [Team 4099's 2023 Competition Code](https://github.com/team4099/ChargedUp-2023/tree/main) - Kotlin robot code built with AdvantageKit v2 (2023).

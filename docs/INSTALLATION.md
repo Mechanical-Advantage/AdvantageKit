@@ -5,8 +5,9 @@
 For new projects, the easiest way to use AdvantageKit is to download one of the example projects attached to the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest). After downloading and unzipping the file, just adjust the team number in ".wpilib/wpilib_preferences.json" and get started!
 
 - **Skeleton Project:** Includes a basic `TimedRobot` style structure, which supports logging on a real robot, physics simulation, and replay in simulation. This template is ideal if you prefer to start from a minimal project.
-- **Differential Drive Project:** Example command based project with an open-loop tank drive and closed-loop flywheel, including support for physics simulation and replay.
-- **Swerve Drive Project:** Example command based project with a swerve drive and closed-loop flywheel, including support for physics simulation and replay. Additional features include odometry, field-oriented drive with joysticks, and auto paths with PathPlanner.
+- **2024 KitBot Project:** Example command based project for the [2024 FIRST KitBot](https://www.firstinspires.org/resource-library/frc/kitbot), including support for physics simulation, SysId, and PathPlanner.
+- **Differential Drive Project:** Example command based project with a tank drive and flywheel, including support for physics simulation, SysId, and PathPlanner.
+- **Swerve Drive Project:** Example command based project with a swerve drive and flywheel, including support for physics simulation, SysId, and PathPlanner.
 - **Advanced Swerve Drive Project:** Identical to the "Swerve Drive Project" but with support for high-frequency odometry (e.g. 250Hz) on REV and CTRE hardware. This significantly increases complexity, but may improve the consistency of odometry measurements. More details can be found in the [announcement post](https://www.chiefdelphi.com/t/advantagekit-2024-log-replay-again/442968/54#advanced-swerve-drive-project-2).
 
 > Note: To switch between modes, set the "mode" attribute in `Constants.java` to `REAL`, `SIM` (physics simulation), or `REPLAY`. Each subsystem includes a Spark Max and Talon FX implementation. To switch to the Spark Flex, replace all instances of `CANSparkMax` with `CANSparkFlex` (the changes to the API do not impact these projects).
