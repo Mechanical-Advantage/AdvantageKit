@@ -94,7 +94,9 @@ public class AutoLogOutputManager {
     if (root.getClass().isArray()) {
       Object[] rootArray = (Object[]) root;
       for (Object item : rootArray) {
-        registerFieldsImpl(item);
+        if (item != null) {
+          registerFieldsImpl(item);
+        }
       }
       return;
     }
