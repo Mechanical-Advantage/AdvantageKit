@@ -44,7 +44,7 @@ public class Drive extends SubsystemBase {
   private static final double KV = Constants.currentMode == Mode.SIM ? 0.227 : 0.0;
 
   private final DriveIO io;
-  public final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
+  private final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
   private final DifferentialDriveOdometry odometry =
       new DifferentialDriveOdometry(new Rotation2d(), 0.0, 0.0);
   private final DifferentialDriveKinematics kinematics =
@@ -154,5 +154,10 @@ public class Drive extends SubsystemBase {
   @AutoLogOutput
   public double getRightVelocityMetersPerSec() {
     return inputs.rightVelocityRadPerSec * WHEEL_RADIUS;
+  }
+
+  /** Returns the average velocity in radians/second. */
+  public double getCharacterizationVelocity() {
+    return (inputs.leftVelocityRadPerSec + inputs.rightVelocityRadPerSec) / 2.0;
   }
 }

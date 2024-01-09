@@ -25,6 +25,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
+/**
+ * This drive implementation is for Talon FXs driving brushless motors like the Falon 500 or Kraken
+ * X60 with a Pigeon 2 gyro.
+ */
 public class DriveIOTalonFX implements DriveIO {
   private static final double GEAR_RATIO = 10.0;
   private static final double KP = 1.0; // TODO: MUST BE TUNED, consider using Phoenix Tuner X

@@ -24,6 +24,10 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
+/**
+ * NOTE: To use the Spark Flex / NEO Vortex, replace all instances of "CANSparkMax" with
+ * "CANSparkFlex".
+ */
 public class DriveIOSparkMax implements DriveIO {
   private static final double GEAR_RATIO = 10.0;
   private static final double KP = 1.0; // TODO: MUST BE TUNED, consider using REV Hardware Client

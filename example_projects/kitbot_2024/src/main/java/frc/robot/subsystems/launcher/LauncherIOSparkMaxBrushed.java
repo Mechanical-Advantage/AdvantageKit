@@ -15,20 +15,16 @@ package frc.robot.subsystems.launcher;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.util.Units;
 
 /**
- * This launcher implementation is for Spark Maxes driving NEO motors. For the Spark Flex/NEO
- * Vortex, replace all instances of "CANSparkMax" with "CANSparkFlex".
+ * This drive implementation is for Spark Maxes driving brushed motors (e.g. CIMS) with no encoders.
+ * For the Spark Flex in docked mode, replace all instances of "CANSparkMax" with "CANSparkFlex".
  */
-public class LauncherIOSparkMax implements LauncherIO {
-  private final CANSparkMax launchMotor = new CANSparkMax(10, MotorType.kBrushless);
-  private final CANSparkMax feedMotor = new CANSparkMax(11, MotorType.kBrushless);
-  private final RelativeEncoder launchEncoder = launchMotor.getEncoder();
-  private final RelativeEncoder feedEncoder = feedMotor.getEncoder();
+public class LauncherIOSparkMaxBrushed implements LauncherIO {
+  private final CANSparkMax launchMotor = new CANSparkMax(10, MotorType.kBrushed);
+  private final CANSparkMax feedMotor = new CANSparkMax(11, MotorType.kBrushed);
 
-  public LauncherIOSparkMax() {
+  public LauncherIOSparkMaxBrushed() {
     launchMotor.restoreFactoryDefaults();
     feedMotor.restoreFactoryDefaults();
 
@@ -48,15 +44,9 @@ public class LauncherIOSparkMax implements LauncherIO {
 
   @Override
   public void updateInputs(LauncherIOInputs inputs) {
-    inputs.launchPositionRad = Units.rotationsToRadians(launchEncoder.getPosition());
-    inputs.launchVelocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(launchEncoder.getVelocity());
     inputs.launchAppliedVolts = launchMotor.getAppliedOutput() * launchMotor.getBusVoltage();
     inputs.launchCurrentAmps = new double[] {launchMotor.getOutputCurrent()};
 
-    inputs.feedPositionRad = Units.rotationsToRadians(feedEncoder.getPosition());
-    inputs.feedVelocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(feedEncoder.getVelocity());
     inputs.feedAppliedVolts = feedMotor.getAppliedOutput() * feedMotor.getBusVoltage();
     inputs.feedCurrentAmps = new double[] {feedMotor.getOutputCurrent()};
   }

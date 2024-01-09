@@ -21,6 +21,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
 
+/**
+ * This drive implementation is for Talon FXs driving brushless motors like the Falon 500 or Kraken
+ * X60.
+ */
 public class LauncherIOTalonFX implements LauncherIO {
   private final TalonFX launchMotor = new TalonFX(10);
   private final TalonFX feedMotor = new TalonFX(11);
@@ -44,12 +48,12 @@ public class LauncherIOTalonFX implements LauncherIO {
     feedMotor.getConfigurator().apply(config);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        100.0, launchPosition, feedPosition); // Required for odometry, use faster rate
-    BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
+        launchPosition,
         launchVelocity,
         launchAppliedVolts,
         launchCurrent,
+        feedPosition,
         feedVelocity,
         feedAppliedVolts,
         feedCurrent);
