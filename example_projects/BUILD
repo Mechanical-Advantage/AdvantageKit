@@ -36,6 +36,7 @@ pkg_zip(
         "template_files",
         "template_vendordep",
     ],
+    mode = "0777",
 )
 
 pkg_files(
@@ -54,6 +55,7 @@ pkg_zip(
         "template_files",
         "template_vendordep",
     ],
+    mode = "0777",
 )
 
 pkg_files(
@@ -72,6 +74,7 @@ pkg_zip(
         "template_files",
         "template_vendordep",
     ],
+    mode = "0777",
 )
 
 pkg_files(
@@ -90,6 +93,7 @@ pkg_zip(
         "template_files",
         "template_vendordep",
     ],
+    mode = "0777",
 )
 
 pkg_files(
@@ -108,6 +112,7 @@ pkg_zip(
         "template_files",
         "template_vendordep",
     ],
+    mode = "0777",
 )
 
 filegroup(
