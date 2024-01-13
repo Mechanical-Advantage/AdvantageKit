@@ -359,15 +359,7 @@ public class LogTable {
   public <T> void put(String key, Struct<T> struct, T value) {
     if (value == null) return;
     if (writeAllowed(key, LoggableType.Raw)) {
-      addStructSchema(struct, new HashSet<>());
-      if (!structBuffers.containsKey(struct.getTypeString())) {
-        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
-      }
-      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
-      ByteBuffer bb = buffer.write(value);
-      byte[] array = new byte[bb.position()];
-      bb.position(0);
-      bb.get(array);
+      byte[] array = pack(struct, value);
       put(key, new LogValue(array, struct.getTypeString()));
     }
   }
@@ -380,17 +372,34 @@ public class LogTable {
   public <T> void put(String key, Struct<T> struct, T... value) {
     if (value == null) return;
     if (writeAllowed(key, LoggableType.Raw)) {
-      addStructSchema(struct, new HashSet<>());
-      if (!structBuffers.containsKey(struct.getTypeString())) {
-        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
-      }
-      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
-      ByteBuffer bb = buffer.writeArray(value);
-      byte[] array = new byte[bb.position()];
-      bb.position(0);
-      bb.get(array);
+      byte[] array = pack(struct, value);
       put(key, new LogValue(array, struct.getTypeString() + "[]"));
     }
+  }
+
+  private <T> StructBuffer<T> bufferForStruct(Struct<T> struct) {
+    addStructSchema(struct, new HashSet<>());
+    if (!structBuffers.containsKey(struct.getTypeString())) {
+      structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
+    }
+   return (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+  }
+
+  private <T> byte[] pack(Struct<T> struct, T[] value) {
+    StructBuffer<T> buffer = bufferForStruct(struct);
+    return copyBytes(buffer.writeArray(value));
+  }
+
+  private <T> byte[] pack(Struct<T> struct, T value) {
+    StructBuffer<T> buffer = bufferForStruct(struct);
+    return copyBytes(buffer.write(value));
+  }
+
+  private byte[] copyBytes(ByteBuffer bb) {
+    byte[] array = new byte[bb.position()];
+    bb.position(0);
+    bb.get(array);
+    return array;
   }
 
   /**

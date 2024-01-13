@@ -1,53 +1,62 @@
 package org.littletonrobotics.junction;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.proto.Rotation2dProto;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.littletonrobotics.junction.LogTable.LogValue;
 
 public class LogTableTest {
+    private LogTable table;
+
+    @BeforeEach
+    void setup() {
+        table = new LogTable(0);
+    }
+
     @Test
     void supportsIntegers() {
-        LogTable table = new LogTable(0);
         table.put("int", 5);
-        LogValue val = table.get("int");
-        Assertions.assertEquals(5, val.getInteger());
+        Assertions.assertEquals(5, table.get("int").getInteger());
     }
 
     @Test
     void supportsIntArrays() {
         long[] expected = { 1, 2, 3 };
 
-        LogTable table = new LogTable(0);
         table.put("int-array", expected);
 
-        LogValue val = table.get("int-array");
-        Assertions.assertArrayEquals(expected, val.getIntegerArray());
+        Assertions.assertArrayEquals(expected, table.get("int-array").getIntegerArray());
     }
 
     @Test
     void supportsProtobufSerialization() {
         Rotation2d expected = new Rotation2d(1, 2);
 
-        LogTable table = new LogTable(0);
         // We're forcing protobuf based serialization so Struct based doesn't run
         table.put("rot", Rotation2d.proto, expected);
 
-        Rotation2d actual = table.get("rot", Rotation2d.proto, new Rotation2d());
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, table.get("rot", Rotation2d.proto, new Rotation2d()));
+    }
+
+    @Test
+    void protobufIsntWrittenIfKeyAlreadyInUse() {
+        Rotation2d rot = new Rotation2d(1, 2);
+
+        table.put("rot", 5);
+        table.put("rot", Rotation2d.proto, rot); // This should be skipped
+
+        Assertions.assertNotEquals(rot, table.get("rot", Rotation2d.proto, new Rotation2d()));
+        Assertions.assertEquals(5, table.get("rot").getInteger());
     }
 
     @Test
     void supportsStructSerialization() {
         Rotation2d expected = new Rotation2d(1, 2);
 
-        LogTable table = new LogTable(0);
         // We're forcing Struct based serialization so Protobuf based doesn't run
         table.put("rot", Rotation2d.struct, expected);
 
-        Rotation2d actual = table.get("rot", Rotation2d.struct, new Rotation2d());
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, table.get("rot", Rotation2d.struct, new Rotation2d()));
     }
 
     @Test
@@ -55,7 +64,6 @@ public class LogTableTest {
         Rotation2d first = new Rotation2d(1, 2);
         Rotation2d second = new Rotation2d(3, 4);
 
-        LogTable table = new LogTable(0);
         // We're forcing Struct serialization
         table.put("rot", Rotation2d.struct, first, second);
 
