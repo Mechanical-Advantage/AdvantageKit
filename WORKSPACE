@@ -163,6 +163,22 @@ http_archive(
     urls = ["https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip"],
 )
 
+# JUnit5 is used for unit testing in Java. We pull that in via contrib_rules_jvm.
+http_archive(
+    name = "contrib_rules_jvm",
+    sha256 = "bfb24b0959b98d1f4b2181896a42b0e01a869b7994d53158d48e3ef979aafd89",
+    strip_prefix = "rules_jvm-0.21.4",
+    url = "https://github.com/bazel-contrib/rules_jvm/releases/download/v0.21.4/rules_jvm-v0.21.4.tar.gz",
+)
+
+load("@contrib_rules_jvm//:repositories.bzl", "contrib_rules_jvm_deps")
+
+contrib_rules_jvm_deps()
+
+load("@contrib_rules_jvm//:setup.bzl", "contrib_rules_jvm_setup")
+
+contrib_rules_jvm_setup()
+
 # This makes WPILib's source repo (allwpilib) available as a repository within our Bazel workspace.
 #new_git_repository(
 #    name = "allwpilib",

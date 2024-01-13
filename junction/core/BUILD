@@ -1,8 +1,9 @@
 load("//build_tools/repo:java_export.bzl", "java_export")
+load("@contrib_rules_jvm//java:defs.bzl", "java_test_suite")
 
 java_library(
     name = "core",
-    srcs = glob(["src/**/*.java"]),
+    srcs = glob(["src/main/**/*.java"]),
     tags = ["ci_build"],
     visibility = ["//visibility:public"],
     deps = [
@@ -26,4 +27,19 @@ java_export(
     publish_tags = ["ci_publish"],
     visibility = ["//visibility:public"],
     runtime_deps = [":core"],
+)
+
+java_test_suite(
+    name = "core-tests",
+    srcs = glob(["src/test/**/*.java"]),
+    runner = "junit5",
+    runtime_deps = [
+        "@maven//:org_junit_jupiter_junit_jupiter_engine",
+        "@maven//:org_junit_platform_junit_platform_launcher",
+        "@maven//:org_junit_platform_junit_platform_reporting",
+    ],
+    deps = [
+        ":core-export",
+        "@maven//:org_junit_jupiter_junit_jupiter_api",
+    ],
 )

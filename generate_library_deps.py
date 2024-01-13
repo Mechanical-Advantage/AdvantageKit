@@ -37,9 +37,12 @@ MAVEN_DEPS = [
     "com.fasterxml.jackson.core:jackson-databind:2.15.2",
     "org.ejml:ejml-simple:0.43.1",
     "org.ejml:ejml-core:0.43.1",
-    "junit:junit:4.13.2",
     "com.squareup:javapoet:1.13.0",
-    "us.hebi.quickbuf:quickbuf-runtime:1.3.2"
+    "us.hebi.quickbuf:quickbuf-runtime:1.3.2",
+    "org.junit.jupiter:junit-jupiter-api:5.10.1",
+    "org.junit.jupiter:junit-jupiter-engine:5.10.1",
+    "org.junit.platform:junit-platform-launcher:1.10.1",
+    "org.junit.platform:junit-platform-reporting:1.10.1",
 ]
 
 # WPILib dependencies to pull from frcmaven.  If no version is provided, the above version is used.
