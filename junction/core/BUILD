@@ -40,6 +40,7 @@ java_test_suite(
     ],
     deps = [
         ":core-export",
+        "//third_party/wpilib:wpilibj-compileonly",
         "@maven//:org_junit_jupiter_junit_jupiter_api",
     ],
 )
