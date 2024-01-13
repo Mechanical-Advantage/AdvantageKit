@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.littletonrobotics.junction.LogTable.LogValue;
-
 import edu.wpi.first.units.ImmutableMeasure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Measure;
@@ -395,7 +393,7 @@ public class LogTable {
     return copyBytes(buffer.write(value));
   }
 
-  private byte[] copyBytes(ByteBuffer bb) {
+  private static byte[] copyBytes(ByteBuffer bb) {
     byte[] array = new byte[bb.position()];
     bb.position(0);
     bb.get(array);
@@ -419,10 +417,7 @@ public class LogTable {
       ByteBuffer bb;
       try {
         bb = buffer.write(value);
-        byte[] array = new byte[bb.position()];
-        bb.position(0);
-        bb.get(array);
-        put(key, new LogValue(array, proto.getTypeString()));
+        put(key, new LogValue(copyBytes(bb), proto.getTypeString()));
       } catch (IOException e) {
         e.printStackTrace();
       }

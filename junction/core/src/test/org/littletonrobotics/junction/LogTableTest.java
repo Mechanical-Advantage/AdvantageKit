@@ -49,6 +49,7 @@ public class LogTableTest {
         Assertions.assertEquals(5, table.get("rot").getInteger());
     }
 
+
     @Test
     void supportsStructSerialization() {
         Rotation2d expected = new Rotation2d(1, 2);
