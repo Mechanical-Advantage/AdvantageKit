@@ -10,7 +10,9 @@ For new projects, the easiest way to use AdvantageKit is to download one of the 
 - **Swerve Drive Project:** Example command based project with a swerve drive and flywheel, including support for physics simulation, feedforward characterization, and PathPlanner. This projects supports the Spark Max, Spark Flex, and Talon FX.
 - **Advanced Swerve Drive Project:** Identical to the "Swerve Drive Project" but with support for high-frequency odometry (e.g. 250Hz) on REV and CTRE hardware. This significantly increases complexity, but may improve the consistency of odometry measurements. More details can be found in the [announcement post](https://www.chiefdelphi.com/t/advantagekit-2024-log-replay-again/442968/54#advanced-swerve-drive-project-2).
 
-> Note: To switch between modes, set the "mode" attribute in `Constants.java` to `REAL`, `SIM` (physics simulation), or `REPLAY`. To support the Spark Flex, replace all instances of `CANSparkMax` with `CANSparkFlex` in the Spark Max IO implementations (the changes to the API do not impact these projects).
+To switch between modes, set the "mode" attribute in `Constants.java` to `REAL`, `SIM` (physics simulation), or `REPLAY`. To support the Spark Flex, replace all instances of `CANSparkMax` with `CANSparkFlex` in the Spark Max IO implementations (the changes to the API do not impact these projects).
+
+> Note: Git must be installed to build the example projects. See [here](https://git-scm.com/downloads) for installation instructions.
 
 ## Existing Projects
 
@@ -129,3 +131,5 @@ You should also add the `BuildConstants.java` file to the repository `.gitignore
 ```
 src/main/java/frc/robot/BuildConstants.java
 ```
+
+> Note: Git must be installed and available on the PATH to use the Gversion plugin. See [here](https://git-scm.com/downloads).
