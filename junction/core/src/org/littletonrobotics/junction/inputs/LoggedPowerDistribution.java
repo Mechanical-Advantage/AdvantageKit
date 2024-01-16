@@ -62,19 +62,19 @@ public class LoggedPowerDistribution {
   }
 
   public static class PowerDistributionInputs implements LoggableInputs {
-    public double pdpTemperature;
-    public double pdpVoltage;
+    public double pdpTemperature = 0.0;
+    public double pdpVoltage = 12.0;
     public double[] pdpChannelCurrents = new double[24];
-    public double pdpTotalCurrent;
-    public double pdpTotalPower;
-    public double pdpTotalEnergy;
+    public double pdpTotalCurrent = 0.0;
+    public double pdpTotalPower = 0.0;
+    public double pdpTotalEnergy = 0.0;
 
-    public int channelCount;
-    public int handle;
-    public int type;
-    public int moduleId;
-    public long faults;
-    public long stickyFaults;
+    public int channelCount = 24;
+    public int handle = 0;
+    public int type = 0;
+    public int moduleId = 0;
+    public long faults = 0;
+    public long stickyFaults = 0;
 
     @Override
     public void toLog(LogTable table) {

@@ -29,34 +29,34 @@ public class LoggedSystemStats {
   }
 
   public static class SystemStatsInputs implements LoggableInputs {
-    public int fpgaVersion;
-    public int fpgaRevision;
-    public String serialNumber;
-    public String comments;
-    public int teamNumber;
-    public boolean fpgaButton;
-    public boolean systemActive;
-    public boolean brownedOut;
-    public boolean rslState;
-    public boolean systemTimeValid;
-    public double voltageVin;
-    public double currentVin;
-    public double userVoltage3v3;
-    public double userCurrent3v3;
-    public boolean userActive3v3;
-    public int userCurrentFaults3v3;
-    public double userVoltage5v;
-    public double userCurrent5v;
-    public boolean userActive5v;
-    public int userCurrentFaults5v;
-    public double userVoltage6v;
-    public double userCurrent6v;
-    public boolean userActive6v;
-    public int userCurrentFaults6v;
-    public double brownoutVoltage;
-    public double cpuTemp;
+    public int fpgaVersion = 0;
+    public int fpgaRevision = 0;
+    public String serialNumber = "";
+    public String comments = "";
+    public int teamNumber = 0;
+    public boolean fpgaButton = false;
+    public boolean systemActive = false;
+    public boolean brownedOut = false;
+    public boolean rslState = false;
+    public boolean systemTimeValid = false;
+    public double voltageVin = 12.0;
+    public double currentVin = 0.0;
+    public double userVoltage3v3 = 3.3;
+    public double userCurrent3v3 = 0.0;
+    public boolean userActive3v3 = true;
+    public int userCurrentFaults3v3 = 0;
+    public double userVoltage5v = 5.0;
+    public double userCurrent5v = 0.0;
+    public boolean userActive5v = true;
+    public int userCurrentFaults5v = 0;
+    public double userVoltage6v = 6.0;
+    public double userCurrent6v = 0.0;
+    public boolean userActive6v = true;
+    public int userCurrentFaults6v = 0;
+    public double brownoutVoltage = 0.0;
+    public double cpuTemp = 0.0;
     public CANStatus canStatus = new CANStatus();
-    public long epochTime;
+    public long epochTime = 0;
 
     @Override
     public void toLog(LogTable table) {

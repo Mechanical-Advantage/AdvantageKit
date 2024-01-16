@@ -47,7 +47,7 @@ public class LoggedDriverStation {
     public int matchNumber = 0;
     public int replayNumber = 0;
     public int matchType = 0;
-    public double matchTime = 0.00;
+    public double matchTime = -1.0;
 
     public boolean enabled = false;
     public boolean autonomous = false;
