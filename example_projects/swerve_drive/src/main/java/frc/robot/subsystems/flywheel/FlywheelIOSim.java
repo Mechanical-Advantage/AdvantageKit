@@ -45,7 +45,7 @@ public class FlywheelIOSim implements FlywheelIO {
   @Override
   public void setVoltage(double volts) {
     closedLoop = false;
-    appliedVolts = 0.0;
+    appliedVolts = volts;
     sim.setInputVoltage(volts);
   }
 
