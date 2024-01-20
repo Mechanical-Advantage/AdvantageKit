@@ -94,8 +94,8 @@ public class DriveIOSparkMax implements DriveIO {
     inputs.rightPositionRad = Units.rotationsToRadians(rightEncoder.getPosition() / GEAR_RATIO);
     inputs.rightVelocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(rightEncoder.getVelocity() / GEAR_RATIO);
-    inputs.leftAppliedVolts = rightLeader.getAppliedOutput() * rightLeader.getBusVoltage();
-    inputs.leftCurrentAmps =
+    inputs.rightAppliedVolts = rightLeader.getAppliedOutput() * rightLeader.getBusVoltage();
+    inputs.rightCurrentAmps =
         new double[] {rightLeader.getOutputCurrent(), rightFollower.getOutputCurrent()};
 
     inputs.gyroYaw = Rotation2d.fromDegrees(yaw.refresh().getValueAsDouble());

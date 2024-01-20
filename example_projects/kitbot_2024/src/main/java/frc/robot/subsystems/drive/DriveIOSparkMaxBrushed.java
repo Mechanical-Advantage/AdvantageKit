@@ -60,8 +60,8 @@ public class DriveIOSparkMaxBrushed implements DriveIO {
     inputs.leftCurrentAmps =
         new double[] {leftLeader.getOutputCurrent(), leftFollower.getOutputCurrent()};
 
-    inputs.leftAppliedVolts = rightLeader.getAppliedOutput() * rightLeader.getBusVoltage();
-    inputs.leftCurrentAmps =
+    inputs.rightAppliedVolts = rightLeader.getAppliedOutput() * rightLeader.getBusVoltage();
+    inputs.rightCurrentAmps =
         new double[] {rightLeader.getOutputCurrent(), rightFollower.getOutputCurrent()};
   }
 
