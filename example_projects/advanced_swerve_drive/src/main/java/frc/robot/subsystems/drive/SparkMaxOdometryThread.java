@@ -14,11 +14,12 @@
 package frc.robot.subsystems.drive;
 
 import edu.wpi.first.wpilibj.Notifier;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Provides an interface for asynchronously reading high-frequency measurements to a set of queues.
@@ -29,6 +30,7 @@ import java.util.function.DoubleSupplier;
 public class SparkMaxOdometryThread {
   private List<DoubleSupplier> signals = new ArrayList<>();
   private List<Queue<Double>> queues = new ArrayList<>();
+  private List<Queue<Double>> timestampQueues = new ArrayList<>();
 
   private final Notifier notifier;
   private static SparkMaxOdometryThread instance = null;
@@ -43,11 +45,16 @@ public class SparkMaxOdometryThread {
   private SparkMaxOdometryThread() {
     notifier = new Notifier(this::periodic);
     notifier.setName("SparkMaxOdometryThread");
-    notifier.startPeriodic(1.0 / Module.ODOMETRY_FREQUENCY);
+  }
+
+  public void start() {
+    if (timestampQueues.size() > 0) {
+      notifier.startPeriodic(1.0 / Module.ODOMETRY_FREQUENCY);
+    }
   }
 
   public Queue<Double> registerSignal(DoubleSupplier signal) {
-    Queue<Double> queue = new ArrayBlockingQueue<>(100);
+    Queue<Double> queue = new ArrayDeque<>(100);
     Drive.odometryLock.lock();
     try {
       signals.add(signal);
@@ -58,11 +65,26 @@ public class SparkMaxOdometryThread {
     return queue;
   }
 
+  public Queue<Double> makeTimestampQueue() {
+    Queue<Double> queue = new ArrayDeque<>(100);
+    Drive.odometryLock.lock();
+    try {
+      timestampQueues.add(queue);
+    } finally {
+      Drive.odometryLock.unlock();
+    }
+    return queue;
+  }
+
   private void periodic() {
     Drive.odometryLock.lock();
+    double timestamp = Logger.getRealTimestamp() / 1e6;
     try {
       for (int i = 0; i < signals.size(); i++) {
         queues.get(i).offer(signals.get(i).getAsDouble());
+      }
+      for (int i = 0; i < timestampQueues.size(); i++) {
+        timestampQueues.get(i).offer(timestamp);
       }
     } finally {
       Drive.odometryLock.unlock();

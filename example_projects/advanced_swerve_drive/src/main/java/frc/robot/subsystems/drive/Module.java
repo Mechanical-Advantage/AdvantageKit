@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Module {
   private static final double WHEEL_RADIUS = Units.inchesToMeters(2.0);
-  public static final double ODOMETRY_FREQUENCY = 250.0;
+  static final double ODOMETRY_FREQUENCY = 250.0;
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -36,8 +36,7 @@ public class Module {
   private Rotation2d angleSetpoint = null; // Setpoint for closed loop control, null for open loop
   private Double speedSetpoint = null; // Setpoint for closed loop control, null for open loop
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
-  private double lastPositionMeters = 0.0; // Used for delta calculation
-  private SwerveModulePosition[] positionDeltas = new SwerveModulePosition[] {};
+  private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
   public Module(ModuleIO io, int index) {
     this.io = io;
@@ -108,17 +107,15 @@ public class Module {
       }
     }
 
-    // Calculate position deltas for odometry
-    int deltaCount =
-        Math.min(inputs.odometryDrivePositionsRad.length, inputs.odometryTurnPositions.length);
-    positionDeltas = new SwerveModulePosition[deltaCount];
-    for (int i = 0; i < deltaCount; i++) {
+    // Calculate positions for odometry
+    int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
+    odometryPositions = new SwerveModulePosition[sampleCount];
+    for (int i = 0; i < sampleCount; i++) {
       double positionMeters = inputs.odometryDrivePositionsRad[i] * WHEEL_RADIUS;
       Rotation2d angle =
           inputs.odometryTurnPositions[i].plus(
               turnRelativeOffset != null ? turnRelativeOffset : new Rotation2d());
-      positionDeltas[i] = new SwerveModulePosition(positionMeters - lastPositionMeters, angle);
-      lastPositionMeters = positionMeters;
+      odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
     }
   }
 
@@ -190,9 +187,14 @@ public class Module {
     return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
   }
 
-  /** Returns the module position deltas received this cycle. */
-  public SwerveModulePosition[] getPositionDeltas() {
-    return positionDeltas;
+  /** Returns the module positions received this cycle. */
+  public SwerveModulePosition[] getOdometryPositions() {
+    return odometryPositions;
+  }
+
+  /** Returns the timestamps of the samples received this cycle. */
+  public double[] getOdometryTimestamps() {
+    return inputs.odometryTimestamps;
   }
 
   /** Returns the drive velocity in radians/sec. */

@@ -44,6 +44,8 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final TalonFX turnTalon;
   private final CANcoder cancoder;
 
+  private final Queue<Double> timestampQueue;
+
   private final StatusSignal<Double> drivePosition;
   private final Queue<Double> drivePositionQueue;
   private final StatusSignal<Double> driveVelocity;
@@ -108,6 +110,8 @@ public class ModuleIOTalonFX implements ModuleIO {
 
     cancoder.getConfigurator().apply(new CANcoderConfiguration());
 
+    timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
+
     drivePosition = driveTalon.getPosition();
     drivePositionQueue =
         PhoenixOdometryThread.getInstance().registerSignal(driveTalon, driveTalon.getPosition());
@@ -168,6 +172,8 @@ public class ModuleIOTalonFX implements ModuleIO {
     inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
     inputs.turnCurrentAmps = new double[] {turnCurrent.getValueAsDouble()};
 
+    inputs.odometryTimestamps =
+        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryDrivePositionsRad =
         drivePositionQueue.stream()
             .mapToDouble((Double value) -> Units.rotationsToRadians(value) / DRIVE_GEAR_RATIO)
@@ -176,6 +182,7 @@ public class ModuleIOTalonFX implements ModuleIO {
         turnPositionQueue.stream()
             .map((Double value) -> Rotation2d.fromRotations(value / TURN_GEAR_RATIO))
             .toArray(Rotation2d[]::new);
+    timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();
   }
