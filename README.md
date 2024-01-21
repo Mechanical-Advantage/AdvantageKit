@@ -16,6 +16,7 @@ Please see the following guides to get started with AdvantageKit:
 - [Recording Outputs](/docs/RECORDING-OUTPUTS.md)
 - [Version Control](/docs/VERSION-CONTROL.md)
 - [Common Issues (And How To Avoid Them)](/docs/COMMON-ISSUES.md)
+- [Using SysId With AdvantageKit](/docs/SYSID.md)
 - [Developing AdvantageKit](/docs/DEVELOPING.md)
 
 Feedback, feature requests, and bug reports are welcome on the [issues page](https://github.com/Mechanical-Advantage/AdvantageKit/issues). For non-public inquires, please send a message to software@team6328.org.
