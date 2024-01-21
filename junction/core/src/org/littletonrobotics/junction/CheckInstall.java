@@ -43,8 +43,9 @@ public class CheckInstall {
     try (FileInputStream inputStream = new FileInputStream(buildFile)) {
       String contents = new String(inputStream.readAllBytes());
       for (String line : contents.split("\n")) {
-        if (line.contains("id \"edu.wpi.first.GradleRIO\" version ")) {
-          installedWPILibVersion = line.split("\"")[3];
+        if (line.contains("\"edu.wpi.first.GradleRIO\"")) {
+          String[] lineSplit = line.split("\"");
+          installedWPILibVersion = lineSplit[lineSplit.length - 1];
           break;
         }
       }
