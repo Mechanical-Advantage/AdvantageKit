@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.regex.Pattern;
 
 public class CheckInstall {
   private CheckInstall() {
@@ -44,8 +45,14 @@ public class CheckInstall {
       String contents = new String(inputStream.readAllBytes());
       for (String line : contents.split("\n")) {
         if (line.contains("\"edu.wpi.first.GradleRIO\"")) {
-          String[] lineSplit = line.split("\"");
-          installedWPILibVersion = lineSplit[lineSplit.length - 1];
+          var matcher = Pattern.compile("\"[^\"]+\"").matcher(line);
+          while (matcher.find()) {
+            int start = matcher.start() + 1;
+            int end = matcher.end() - 1;
+            if (end >= start) {
+              installedWPILibVersion = line.substring(start, end);
+            }
+          }
           break;
         }
       }
