@@ -23,13 +23,15 @@ Feedback, feature requests, and bug reports are welcome on the [issues page](htt
 
 ## Sample Projects
 
-Looking to get started quickly? Here are some example projects to check out:
+Looking to get started quickly? **Check out the [AdvantageKit example projects](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/docs/INSTALLATION.md#new-projects).** There are versions for differential and swerve drives, from minimal to advanced (including a project designed for the [2024 FIRST KitBot](https://www.firstinspires.org/resource-library/frc/kitbot)). Zip files for each project are attached to the latest release.
 
-- [AdvantageKit Example Projects](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/docs/INSTALLATION.md#new-projects) - Example projects for differential and swerve drives, from minimal to advanced (including a project designed for the [2024 FIRST KitBot](https://www.firstinspires.org/resource-library/frc/kitbot)). Zip files for each project are attached to the latest release.
-- [Team 6328's 2023 Competition Code](https://github.com/Mechanical-Advantage/RobotCode2023) - Java robot code built with AdvantageKit v2 (2023).
-- [Team 2910's 2023 Competition Code](https://github.com/FRCTeam2910/2023CompetitionRobot-Public) - Java robot code built with AdvantageKit v2 (2023).
-- [Team 4099's 2023 Competition Code](https://github.com/team4099/ChargedUp-2023/tree/main) - Kotlin robot code built with AdvantageKit v2 (2023).
-- [Team 6328's 2022 Competition Code](https://github.com/Mechanical-Advantage/RobotCode2022) - Java robot code built with AdvantageKit v1 (2022).
+Also take a look at the examples below of teams utilizing AdvantageKit in their competition code:
+
+- [Team 6328's 2023 Code](https://github.com/Mechanical-Advantage/RobotCode2023) - Spark Max swerve with a triple jointed arm, pose estimation, and auto scoring ([TBA](https://www.thebluealliance.com/team/6328/2023)).
+- [Team 2910's 2023 Code](https://github.com/FRCTeam2910/2023CompetitionRobot-Public) - Talon FX swerve with PathPlanner, vision, and a telescoping arm ([TBA](https://www.thebluealliance.com/team/2910/2023)).
+- [Team 3476's 2023 Code](https://github.com/FRC3476/FRC-2023) - Swerve with pose estimation, custom superstructure management, and more ([TBA](https://www.thebluealliance.com/team/3476/2023)).
+- [Team 4099's 2023 Code](https://github.com/team4099/ChargedUp-2023/tree/main) - Kotlin code with a swerve, elevator, pose estimation, etc ([TBA](https://www.thebluealliance.com/team/4099/2023)).
+- [Team 6328's 2022 Code](https://github.com/Mechanical-Advantage/RobotCode2022) - Spark Max differential drive with pose estimation and auto aiming ([TBA](https://www.thebluealliance.com/team/6328/2022)).
 
 ## Repository Structure
 
