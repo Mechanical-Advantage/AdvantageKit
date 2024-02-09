@@ -16,6 +16,7 @@ package frc.robot.subsystems.launcher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.NoteVisualizer;
 import org.littletonrobotics.junction.Logger;
 
 public class Launcher extends SubsystemBase {
@@ -69,6 +70,7 @@ public class Launcher extends SubsystemBase {
                 () -> {
                   io.setFeedVoltage(launchSpeedFeeder);
                 }),
+            NoteVisualizer.shoot(),
             Commands.idle())
         .finallyDo(
             () -> {

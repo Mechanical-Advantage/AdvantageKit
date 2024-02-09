@@ -29,6 +29,7 @@ import frc.robot.subsystems.launcher.Launcher;
 import frc.robot.subsystems.launcher.LauncherIO;
 import frc.robot.subsystems.launcher.LauncherIOSim;
 import frc.robot.subsystems.launcher.LauncherIOSparkMaxBrushed;
+import frc.robot.util.NoteVisualizer;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -103,6 +104,9 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    // Set up note visualizer
+    NoteVisualizer.setRobotPoseSupplier(drive::getPose);
 
     // Configure the button bindings
     configureButtonBindings();
