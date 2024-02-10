@@ -72,6 +72,6 @@ public class NoteVisualizer {
                           });
                 },
                 Set.of())
-            .ignoringDisable(false));
+            .ignoringDisable(true));
   }
 }
