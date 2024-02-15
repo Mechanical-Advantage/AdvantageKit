@@ -180,6 +180,7 @@ public class LoggedSystemStats {
       sysInputs.userActive6v = conduit.getUserActive6v();
       sysInputs.userCurrentFaults6v = conduit.getUserCurrentFaults6v();
 
+      sysInputs.brownoutVoltage = conduit.getBrownoutVoltage();
       sysInputs.cpuTemp = conduit.getCPUTemp();
 
       sysInputs.canStatus.setStatus(
