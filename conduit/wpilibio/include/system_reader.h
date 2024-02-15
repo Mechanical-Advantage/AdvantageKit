@@ -27,4 +27,7 @@ using namespace org::littletonrobotics::conduit;
 class SystemReader {
  public:
   void read(schema::SystemData* system_buf);
+
+ private:
+  uint64_t cycleCount = 0;
 };
