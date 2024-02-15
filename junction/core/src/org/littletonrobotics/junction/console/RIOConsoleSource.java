@@ -17,6 +17,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.Buffer;
+import java.nio.BufferOverflowException;
+import java.nio.CharBuffer;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -28,9 +31,7 @@ public class RIOConsoleSource implements ConsoleSource {
   private static final String filePath = "/home/lvuser/FRC_UserProgram.log";
   private BufferedReader reader = null;
 
-  private static final int bufferSize = 10240;
-  private int writePosition = 0;
-  private byte[] data = new byte[bufferSize];
+  private CharBuffer buffer = CharBuffer.allocate(10240);
 
   public RIOConsoleSource() {
     try {
@@ -54,33 +55,28 @@ public class RIOConsoleSource implements ConsoleSource {
         DriverStation.reportError("Failed to read console file \"" + filePath + "\"", true);
       }
       if (nextChar != -1) {
-        data[writePosition] = (byte) nextChar;
-        writePosition++;
-        if (writePosition >= bufferSize) {
-          // Too much data, save any full lines and continue on the next cycle
-          break;
-        }
+        try {
+          buffer.put((char) nextChar);
+        } catch (BufferOverflowException e) {}
       } else {
         break;
       }
     }
 
     // Read all complete lines
-    String dataStr = new String(data);
-    int lastNewline = dataStr.lastIndexOf("\n");
-    String completeLines;
-    if (lastNewline != -1) {
-      completeLines = dataStr.substring(0, lastNewline);
-      byte[] trimmedData = new byte[bufferSize];
-      if (lastNewline < bufferSize - 1) {
-        System.arraycopy(data, lastNewline + 1, trimmedData, 0, bufferSize - lastNewline - 1);
+    String output = null;
+    for (int i = buffer.position(); i > 0; i--) {
+      if (i < buffer.position() && buffer.get(i) == '\n') {
+        int originalPosition = buffer.position();
+        output = new String(buffer.array(), 0, i);
+        buffer.rewind();
+        buffer.put(buffer.array(), i + 1, buffer.limit() - i - 1);
+        buffer.position(originalPosition - i - 1);
+        break;
       }
-      data = trimmedData;
-      writePosition -= lastNewline + 1;
-    } else {
-      completeLines = "";
     }
-    return completeLines;
+    if (output == null) output = "";
+    return output;
   }
 
   public void close() throws Exception {
