@@ -85,22 +85,24 @@ void SystemReader::read(schema::SystemData* system_buf) {
   system_buf->mutate_brownout_voltage(HAL_GetBrownoutVoltage(&status));
   system_buf->mutate_cpu_temp(HAL_GetCPUTemp(&status));
 
-  float percent_bus_utilization = 0;
-  uint32_t bus_off_count = 0;
-  uint32_t tx_full_count = 0;
-  uint32_t receive_error_count = 0;
-  uint32_t transmit_error_count = 0;
-  HAL_CAN_GetCANStatus(&percent_bus_utilization, &bus_off_count, &tx_full_count,
-                       &receive_error_count, &transmit_error_count, &status);
+  if (cycleCount % 20 == 0) {
+    float percent_bus_utilization = 0;
+    uint32_t bus_off_count = 0;
+    uint32_t tx_full_count = 0;
+    uint32_t receive_error_count = 0;
+    uint32_t transmit_error_count = 0;
+    HAL_CAN_GetCANStatus(&percent_bus_utilization, &bus_off_count, &tx_full_count,
+                        &receive_error_count, &transmit_error_count, &status);
 
-  system_buf->mutable_can_status().mutate_percent_bus_utilization(
-      percent_bus_utilization);
-  system_buf->mutable_can_status().mutate_bus_off_count(bus_off_count);
-  system_buf->mutable_can_status().mutate_tx_full_count(tx_full_count);
-  system_buf->mutable_can_status().mutate_receive_error_count(
-      receive_error_count);
-  system_buf->mutable_can_status().mutate_transmit_error_count(
-      transmit_error_count);
+    system_buf->mutable_can_status().mutate_percent_bus_utilization(
+        percent_bus_utilization);
+    system_buf->mutable_can_status().mutate_bus_off_count(bus_off_count);
+    system_buf->mutable_can_status().mutate_tx_full_count(tx_full_count);
+    system_buf->mutable_can_status().mutate_receive_error_count(
+        receive_error_count);
+    system_buf->mutable_can_status().mutate_transmit_error_count(
+        transmit_error_count);
+  }
 
   system_buf->mutate_epoch_time(wpi::GetSystemTime());
   cycleCount++;
