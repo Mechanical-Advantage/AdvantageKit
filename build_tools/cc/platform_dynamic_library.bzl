@@ -7,18 +7,22 @@ def cc_platform_dynamic_library(name, libname, deps, visibility):
         name = linux_libname,
         deps = deps,
         linkshared = True,
+        tags = ["manual"]
     )
 
     native.cc_binary(
         name = win_libname,
         deps = deps,
         linkshared = True,
+        tags = ["manual"]
     )
 
     native.cc_binary(
         name = macos_libname,
         deps = deps,
         linkshared = True,
+        tags = ["manual"]
+
     )
 
     native.alias(
