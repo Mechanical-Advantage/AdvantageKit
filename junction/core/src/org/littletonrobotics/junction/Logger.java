@@ -65,7 +65,7 @@ public class Logger {
   private static Map<String, String> metadata = new HashMap<>();
   private static ConsoleSource console;
   private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
-  private static Supplier<ByteBuffer> urclSupplier = null;
+  private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean deterministicTimestamps = true;
 
   private static LogReplaySource replaySource;
@@ -122,8 +122,10 @@ public class Logger {
    * <pre>
    * <code>Logger.registerURCL(URCL.startExternal());</code>
    * </pre>
+   * 
+   * <p><b>Important: This function requires URCL 2024.1.0 or later.</b>
    */
-  public static void registerURCL(Supplier<ByteBuffer> logSupplier) {
+  public static void registerURCL(Supplier<ByteBuffer[]> logSupplier) {
     urclSupplier = logSupplier;
   }
 
@@ -263,11 +265,25 @@ public class Logger {
       if (urclSupplier != null
           && replaySource == null
           && RobotBase.isReal()) {
-        ByteBuffer buffer = urclSupplier.get();
-        buffer.rewind();
-        byte[] bytes = new byte[buffer.remaining()];
-        buffer.get(bytes);
-        entry.put("URCL", new LogValue(bytes, "URCL"));
+        ByteBuffer[] buffers = urclSupplier.get();
+        if (buffers.length == 3) {
+          for (int i = 0; i < 3; i++) {
+            buffers[i].rewind();
+            byte[] bytes = new byte[buffers[i].remaining()];
+            buffers[i].get(bytes);
+            switch (i) {
+              case 0:
+                entry.put("URCL/Raw/Persistent", new LogValue(bytes, "URCLr2_persistent"));
+                break;
+              case 1:
+                entry.put("URCL/Raw/Periodic", new LogValue(bytes, "URCLr2_periodic"));
+                break;
+              case 2:
+                entry.put("URCL/Raw/Aliases", new LogValue(bytes, "URCLr2_aliases"));
+                break;
+            }
+          }
+        }
       }
       long saveDataEnd = getRealTimestamp();
 
