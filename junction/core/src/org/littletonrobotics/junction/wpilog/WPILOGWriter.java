@@ -40,6 +40,8 @@ public class WPILOGWriter implements LogDataReceiver {
                                                           // timestamp/timezone is updated
   private static final String defaultPathRio = "/U/logs";
   private static final String defaultPathSim = "logs";
+  private static final double defaultWritePeriodRio = 0.1;
+  private static final double defaultWritePeriodSim = 0.01;
   private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
 
   private String folder;
@@ -98,7 +100,7 @@ public class WPILOGWriter implements LogDataReceiver {
    *             number (if applicable).
    */
   public WPILOGWriter(String path) {
-    this(path, 0.1);
+    this(path, RobotBase.isSimulation() ? defaultWritePeriodSim : defaultWritePeriodRio);
   }
 
   /**
