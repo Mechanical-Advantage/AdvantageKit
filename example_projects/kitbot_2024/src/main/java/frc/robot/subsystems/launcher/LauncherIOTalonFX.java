@@ -32,17 +32,17 @@ public class LauncherIOTalonFX implements LauncherIO {
   private final StatusSignal<Double> launchPosition = launchMotor.getPosition();
   private final StatusSignal<Double> launchVelocity = launchMotor.getVelocity();
   private final StatusSignal<Double> launchAppliedVolts = launchMotor.getMotorVoltage();
-  private final StatusSignal<Double> launchCurrent = launchMotor.getStatorCurrent();
+  private final StatusSignal<Double> launchCurrent = launchMotor.getSupplyCurrent();
 
   private final StatusSignal<Double> feedPosition = feedMotor.getPosition();
   private final StatusSignal<Double> feedVelocity = feedMotor.getVelocity();
   private final StatusSignal<Double> feedAppliedVolts = feedMotor.getMotorVoltage();
-  private final StatusSignal<Double> feedCurrent = feedMotor.getStatorCurrent();
+  private final StatusSignal<Double> feedCurrent = feedMotor.getSupplyCurrent();
 
   public LauncherIOTalonFX() {
     var config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = 80.0;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = 80.0;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     launchMotor.getConfigurator().apply(config);
     feedMotor.getConfigurator().apply(config);

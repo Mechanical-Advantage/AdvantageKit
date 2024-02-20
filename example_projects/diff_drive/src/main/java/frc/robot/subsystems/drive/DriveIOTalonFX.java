@@ -38,22 +38,22 @@ public class DriveIOTalonFX implements DriveIO {
   private final StatusSignal<Double> leftPosition = leftLeader.getPosition();
   private final StatusSignal<Double> leftVelocity = leftLeader.getVelocity();
   private final StatusSignal<Double> leftAppliedVolts = leftLeader.getMotorVoltage();
-  private final StatusSignal<Double> leftLeaderCurrent = leftLeader.getStatorCurrent();
-  private final StatusSignal<Double> leftFollowerCurrent = leftFollower.getStatorCurrent();
+  private final StatusSignal<Double> leftLeaderCurrent = leftLeader.getSupplyCurrent();
+  private final StatusSignal<Double> leftFollowerCurrent = leftFollower.getSupplyCurrent();
 
   private final StatusSignal<Double> rightPosition = rightLeader.getPosition();
   private final StatusSignal<Double> rightVelocity = rightLeader.getVelocity();
   private final StatusSignal<Double> rightAppliedVolts = rightLeader.getMotorVoltage();
-  private final StatusSignal<Double> rightLeaderCurrent = rightLeader.getStatorCurrent();
-  private final StatusSignal<Double> rightFollowerCurrent = rightFollower.getStatorCurrent();
+  private final StatusSignal<Double> rightLeaderCurrent = rightLeader.getSupplyCurrent();
+  private final StatusSignal<Double> rightFollowerCurrent = rightFollower.getSupplyCurrent();
 
   private final Pigeon2 pigeon = new Pigeon2(20);
   private final StatusSignal<Double> yaw = pigeon.getYaw();
 
   public DriveIOTalonFX() {
     var config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = 60.0;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = 60.0;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Slot0.kP = KP;
     config.Slot0.kD = KD;

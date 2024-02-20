@@ -46,11 +46,11 @@ public class DriveIOTalonSRX implements DriveIO {
   public void updateInputs(DriveIOInputs inputs) {
     inputs.leftAppliedVolts = leftLeader.getMotorOutputVoltage();
     inputs.leftCurrentAmps =
-        new double[] {leftLeader.getStatorCurrent(), leftFollower.getStatorCurrent()};
+        new double[] {leftLeader.getSupplyCurrent(), leftFollower.getSupplyCurrent()};
 
     inputs.rightAppliedVolts = rightLeader.getMotorOutputVoltage();
     inputs.rightCurrentAmps =
-        new double[] {rightLeader.getStatorCurrent(), rightFollower.getStatorCurrent()};
+        new double[] {rightLeader.getSupplyCurrent(), rightFollower.getSupplyCurrent()};
   }
 
   @Override

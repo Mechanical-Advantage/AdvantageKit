@@ -33,13 +33,13 @@ public class FlywheelIOTalonFX implements FlywheelIO {
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
   private final StatusSignal<Double> leaderVelocity = leader.getVelocity();
   private final StatusSignal<Double> leaderAppliedVolts = leader.getMotorVoltage();
-  private final StatusSignal<Double> leaderCurrent = leader.getStatorCurrent();
-  private final StatusSignal<Double> followerCurrent = follower.getStatorCurrent();
+  private final StatusSignal<Double> leaderCurrent = leader.getSupplyCurrent();
+  private final StatusSignal<Double> followerCurrent = follower.getSupplyCurrent();
 
   public FlywheelIOTalonFX() {
     var config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = 30.0;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = 30.0;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     leader.getConfigurator().apply(config);
     follower.getConfigurator().apply(config);

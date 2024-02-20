@@ -37,10 +37,10 @@ public class LauncherIOTalonSRX implements LauncherIO {
   @Override
   public void updateInputs(LauncherIOInputs inputs) {
     inputs.launchAppliedVolts = launchMotor.getMotorOutputVoltage();
-    inputs.launchCurrentAmps = new double[] {launchMotor.getStatorCurrent()};
+    inputs.launchCurrentAmps = new double[] {launchMotor.getSupplyCurrent()};
 
     inputs.feedAppliedVolts = feedMotor.getMotorOutputVoltage();
-    inputs.feedCurrentAmps = new double[] {feedMotor.getStatorCurrent()};
+    inputs.feedCurrentAmps = new double[] {feedMotor.getSupplyCurrent()};
   }
 
   @Override
