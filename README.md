@@ -30,6 +30,7 @@ Also take a look at the examples below of teams utilizing AdvantageKit in their 
 - [Team 6328's 2023 Code](https://github.com/Mechanical-Advantage/RobotCode2023) - Spark Max swerve with a triple jointed arm, pose estimation, and auto scoring ([TBA](https://www.thebluealliance.com/team/6328/2023)).
 - [Team 2910's 2023 Code](https://github.com/FRCTeam2910/2023CompetitionRobot-Public) - Talon FX swerve with PathPlanner, vision, and a telescoping arm ([TBA](https://www.thebluealliance.com/team/2910/2023)).
 - [Team 3476's 2023 Code](https://github.com/FRC3476/FRC-2023) - Swerve with pose estimation, custom superstructure management, and more ([TBA](https://www.thebluealliance.com/team/3476/2023)).
+- [Team 5940's 2023 Code](https://github.com/BREAD5940/2023-Onseason) - Talon FX swerve with automated scoring/pickup and "Northstar" AprilTag vision system ([TBA](https://www.thebluealliance.com/team/5940/2023))
 - [Team 4099's 2023 Code](https://github.com/team4099/ChargedUp-2023/tree/main) - Kotlin code with a swerve, elevator, pose estimation, etc ([TBA](https://www.thebluealliance.com/team/4099/2023)).
 - [Team 6328's 2022 Code](https://github.com/Mechanical-Advantage/RobotCode2022) - Spark Max differential drive with pose estimation and auto aiming ([TBA](https://www.thebluealliance.com/team/6328/2022)).
 
