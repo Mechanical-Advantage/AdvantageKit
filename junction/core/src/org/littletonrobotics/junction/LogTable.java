@@ -170,6 +170,7 @@ public class LogTable {
    * as a different type.
    */
   public void put(String key, LogValue value) {
+    if (value == null) return;
     if (writeAllowed(key, value.type)) {
       data.put(prefix + key, value);
     }
@@ -180,6 +181,7 @@ public class LogTable {
    * as a different type.
    */
   public void put(String key, byte[] value) {
+    if (value == null) return;
     byte[] valueClone = new byte[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
@@ -230,6 +232,7 @@ public class LogTable {
    * a different type.
    */
   public void put(String key, String value) {
+    if (value == null) return;
     put(key, new LogValue(value, null));
   }
 
@@ -238,6 +241,7 @@ public class LogTable {
    * a different type.
    */
   public <E extends Enum<E>> void put(String key, E value) {
+    if (value == null) return;
     put(key, new LogValue(value.name(), null));
   }
 
@@ -246,6 +250,7 @@ public class LogTable {
    * a different type.
    */
   public <U extends Unit<U>> void put(String key, Measure<U> value) {
+    if (value == null) return;
     put(key, new LogValue(value.baseUnitMagnitude(), null));
   }
 
@@ -254,6 +259,7 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, boolean[] value) {
+    if (value == null) return;
     boolean[] valueClone = new boolean[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
@@ -264,6 +270,7 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, int[] value) {
+    if (value == null) return;
     long[] valueClone = new long[value.length];
     for (int i = 0; i < value.length; i++) {
       valueClone[i] = value[i];
@@ -276,6 +283,7 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, long[] value) {
+    if (value == null) return;
     long[] valueClone = new long[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
@@ -286,6 +294,7 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, float[] value) {
+    if (value == null) return;
     float[] valueClone = new float[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
@@ -296,6 +305,7 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, double[] value) {
+    if (value == null) return;
     double[] valueClone = new double[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
@@ -306,6 +316,7 @@ public class LogTable {
    * exists as a different type.
    */
   public void put(String key, String[] value) {
+    if (value == null) return;
     String[] valueClone = new String[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
@@ -337,6 +348,7 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <T> void put(String key, Struct<T> struct, T value) {
+    if (value == null) return;
     if (writeAllowed(key, LoggableType.Raw)) {
       addStructSchema(struct, new HashSet<>());
       if (!structBuffers.containsKey(struct.getTypeString())) {
@@ -357,6 +369,7 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <T> void put(String key, Struct<T> struct, T... value) {
+    if (value == null) return;
     if (writeAllowed(key, LoggableType.Raw)) {
       addStructSchema(struct, new HashSet<>());
       if (!structBuffers.containsKey(struct.getTypeString())) {
@@ -377,6 +390,7 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <T, MessageType extends ProtoMessage<?>> void put(String key, Protobuf<T, MessageType> proto, T value) {
+    if (value == null) return;
     if (writeAllowed(key, LoggableType.Raw)) {
       proto.forEachDescriptor((name) -> data.containsKey("/.schema/" + name), (typeString, schema) -> data
           .put("/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto")));
@@ -441,6 +455,7 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <T extends WPISerializable> void put(String key, T value) {
+    if (value == null) return;
     // If struct is supported, write as struct
     Struct<T> struct = (Struct<T>) findStructType(value.getClass());
     if (struct != null) {
@@ -463,6 +478,7 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <T extends StructSerializable> void put(String key, T... value) {
+    if (value == null) return;
     // If struct is supported, write as struct
     Struct<T> struct = (Struct<T>) findStructType(value.getClass().getComponentType());
     if (struct != null) {
