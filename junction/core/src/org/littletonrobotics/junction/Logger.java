@@ -60,6 +60,7 @@ public class Logger {
   private static final int receiverQueueCapcity = 500; // 10s at 50Hz
 
   private static boolean running = false;
+  private static long cycleCount = 0;
   private static LogTable entry = new LogTable(0);
   private static LogTable outputTable;
   private static Map<String, String> metadata = new HashMap<>();
@@ -234,6 +235,7 @@ public class Logger {
    * timestamp and globally logged data.
    */
   static void periodicBeforeUser() {
+    cycleCount++;
     if (running) {
       // Capture conduit data
       ConduitApi conduit = ConduitApi.getInstance();
@@ -429,6 +431,19 @@ public class Logger {
    */
   public static long getRealTimestamp() {
     return HALUtil.getFPGATime();
+  }
+
+  /**
+   * Runs the provided callback function every N loop cycles. This method can be used
+   * to update inputs or log outputs at a lower rate than the standard loop cycle.
+   * 
+   * <p><b>Note that this method must be called periodically to continue running the
+   * callback function</b>.
+   */
+  public static void runEveryN(int n, Runnable function) {
+    if (cycleCount % n == 0) {
+      function.run();
+    }
   }
 
   /**
