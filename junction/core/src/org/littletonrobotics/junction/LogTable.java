@@ -152,7 +152,8 @@ public class LogTable {
 
   /**
    * Checks whether the field can be updated with the specified type (it doesn't
-   * exist or is already the correct type).
+   * exist or is already the correct type). Sends a warning to the Driver Station
+   * if the existing type is different.
    */
   private boolean writeAllowed(String key, LoggableType type) {
     LogValue currentValue = data.get(prefix + key);
@@ -162,6 +163,14 @@ public class LogTable {
     if (currentValue.type.equals(type)) {
       return true;
     }
+    DriverStation.reportWarning(
+        "Failed to write to field \""
+            + prefix + key
+            + "\" - attempted to write "
+            + type
+            + " value but expected "
+            + currentValue.type,
+        true);
     return false;
   }
 
