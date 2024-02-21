@@ -16,9 +16,10 @@ package frc.robot.subsystems.drive;
 import edu.wpi.first.wpilibj.Notifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -28,7 +29,7 @@ import org.littletonrobotics.junction.Logger;
  * blocking thread. A Notifier thread is used to gather samples with consistent timing.
  */
 public class SparkMaxOdometryThread {
-  private List<DoubleSupplier> signals = new ArrayList<>();
+  private List<Supplier<OptionalDouble>> signals = new ArrayList<>();
   private List<Queue<Double>> queues = new ArrayList<>();
   private List<Queue<Double>> timestampQueues = new ArrayList<>();
 
@@ -53,7 +54,7 @@ public class SparkMaxOdometryThread {
     }
   }
 
-  public Queue<Double> registerSignal(DoubleSupplier signal) {
+  public Queue<Double> registerSignal(Supplier<OptionalDouble> signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
     Drive.odometryLock.lock();
     try {
@@ -80,11 +81,22 @@ public class SparkMaxOdometryThread {
     Drive.odometryLock.lock();
     double timestamp = Logger.getRealTimestamp() / 1e6;
     try {
+      double[] values = new double[signals.size()];
+      boolean isValid = true;
       for (int i = 0; i < signals.size(); i++) {
-        queues.get(i).offer(signals.get(i).getAsDouble());
+        OptionalDouble value = signals.get(i).get();
+        if (value.isPresent()) {
+          values[i] = value.getAsDouble();
+        } else {
+          isValid = false;
+          break;
+        }
       }
-      for (int i = 0; i < timestampQueues.size(); i++) {
-        timestampQueues.get(i).offer(timestamp);
+      if (isValid) {
+        for (int i = 0; i < signals.size(); i++) {
+          queues.get(i).offer(values[i]);
+          timestampQueues.get(i).offer(timestamp);
+        }
       }
     } finally {
       Drive.odometryLock.unlock();
