@@ -62,8 +62,8 @@ public class Logger {
   private static boolean running = false;
   private static long cycleCount = 0;
   private static LogTable entry = new LogTable(0);
+  private static LogTable metadataTable = new LogTable(0);
   private static LogTable outputTable;
-  private static Map<String, String> metadata = new HashMap<>();
   private static ConsoleSource console;
   private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
@@ -130,18 +130,7 @@ public class Logger {
     urclSupplier = logSupplier;
   }
 
-  /**
-   * Records a metadata value. This method only works during setup before starting
-   * to log, then data will be recorded during the first cycle.
-   * 
-   * @param key   The name used to identify this metadata field.
-   * @param value The value of the metadata field.
-   */
-  public static void recordMetadata(String key, String value) {
-    if (!running) {
-      metadata.put(key, value);
-    }
-  }
+
 
   /**
    * Causes the timestamp returned by "Timer.getFPGATimestamp()" and similar to
@@ -195,9 +184,10 @@ public class Logger {
       }
 
       // Record metadata
-      LogTable metadataTable = entry.getSubtable(replaySource == null ? "RealMetadata" : "ReplayMetadata");
-      for (Map.Entry<String, String> item : metadata.entrySet()) {
-        metadataTable.put(item.getKey(), item.getValue());
+      LogTable entryMetaTable = entry.getSubtable(replaySource == null ? "RealMetadata" : "ReplayMetadata");
+
+      for (Map.Entry<String, LogValue> item : metadataTable.getAll(false).entrySet()) {
+        entryMetaTable.put(item.getKey(), item.getValue());
       }
 
       // Start receiver thread
@@ -797,6 +787,298 @@ public class Logger {
           | SecurityException e) {
         e.printStackTrace();
       }
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, byte[] value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, boolean value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, int value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, long value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, float value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle. 
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, double value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, String value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static <E extends Enum<E>> void recordMetadata(String key, E value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static <U extends Unit<U>> void recordMetadata(String key, Measure<U> value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, boolean[] value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, int[] value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, long[] value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, float[] value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, double[] value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static void recordMetadata(String key, String[] value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * <p>
+   * This method serializes a single object as a struct. Example usage:
+   * {@code recordMetadata("MyPose", Pose2d.struct, new Pose2d())}
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  public static <T> void recordMetadata(String key, Struct<T> struct, T value) {
+    if (running) {
+      metadataTable.put(key, struct, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * <p>
+   * This method serializes an array of objects as a struct. Example usage:
+   * {@code
+   * recordMetadata("MyPoses", Pose2d.struct, new Pose2d(), new Pose2d());
+   * recordMetadata("MyPoses", Pose2d.struct, new Pose2d[] {new Pose2d(), new
+   * Pose2d()});
+   * }
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> void recordMetadata(String key, Struct<T> struct, T... value) {
+    if (running) {
+      metadataTable.put(key, struct, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * <p>
+   * This method serializes a single object as a protobuf. Protobuf should only be
+   * used for objects that do not support struct serialization. Example usage:
+   * {@code recordMetadata("MyPose", Pose2d.proto, new Pose2d())}
+   * 
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T, MessageType extends ProtoMessage<?>> void recordMetadata(String key, Protobuf<T, MessageType> proto,
+      T value) {
+    if (running) {
+      metadataTable.put(key, proto, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * <p>
+   * This method serializes a single object as a struct or protobuf automatically.
+   * Struct is preferred if both methods are supported.
+   * 
+   * @param T     The type
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T extends WPISerializable> void recordMetadata(String key, T value) {
+    if (running) {
+      metadataTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a metadata value. This method only works during setup before starting
+   * to log, then data will be recorded during the first cycle.
+   * 
+   * <p>
+   * This method serializes an array of objects as a struct automatically.
+   * Top-level protobuf arrays are not supported.
+   * 
+   * @param T     The type
+   * @param key   The name used to identify this metadata field.
+   * @param value The value of the metadata field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T extends StructSerializable> void recordMetadata(String key, T... value) {
+    if (running) {
+      metadataTable.put(key, value);
     }
   }
 }
