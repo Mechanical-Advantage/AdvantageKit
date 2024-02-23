@@ -93,8 +93,10 @@ public class SparkMaxOdometryThread {
         }
       }
       if (isValid) {
-        for (int i = 0; i < signals.size(); i++) {
+        for (int i = 0; i < queues.size(); i++) {
           queues.get(i).offer(values[i]);
+        }
+        for (int i = 0; i < timestampQueues.size(); i++) {
           timestampQueues.get(i).offer(timestamp);
         }
       }
