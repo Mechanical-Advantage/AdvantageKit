@@ -17,6 +17,7 @@ import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -257,27 +258,27 @@ public class LoggedDriverStation {
       boolean isRedAlliance = false;
       int stationNumber = 1;
       switch (dsInputs.allianceStation) {
-        case 0:
+        case DriverStationJNI.kRed1AllianceStation:
           isRedAlliance = true;
           stationNumber = 1;
           break;
-        case 1:
+        case DriverStationJNI.kRed2AllianceStation:
           isRedAlliance = true;
           stationNumber = 2;
           break;
-        case 2:
+        case DriverStationJNI.kRed3AllianceStation:
           isRedAlliance = true;
           stationNumber = 3;
           break;
-        case 3:
+        case DriverStationJNI.kBlue1AllianceStation:
           isRedAlliance = false;
           stationNumber = 1;
           break;
-        case 4:
+        case DriverStationJNI.kBlue2AllianceStation:
           isRedAlliance = false;
           stationNumber = 2;
           break;
-        case 5:
+        case DriverStationJNI.kBlue3AllianceStation:
           isRedAlliance = false;
           stationNumber = 3;
           break;
