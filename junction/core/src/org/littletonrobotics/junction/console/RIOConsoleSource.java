@@ -37,13 +37,13 @@ public class RIOConsoleSource implements ConsoleSource {
     try {
       reader = new BufferedReader(new FileReader(filePath));
     } catch (FileNotFoundException e) {
-      DriverStation.reportError("Failed to open console file \"" + filePath + "\"", true);
+      DriverStation.reportError("Failed to open console file \"" + filePath + "\", disabling console capture.", true);
     }
   }
 
   public String getNewData() {
     if (reader == null) {
-      return null;
+      return "";
     }
 
     // Read new data from console
@@ -52,7 +52,9 @@ public class RIOConsoleSource implements ConsoleSource {
       try {
         nextChar = reader.read();
       } catch (IOException e) {
-        DriverStation.reportError("Failed to read console file \"" + filePath + "\"", true);
+        DriverStation.reportError("Failed to read console file \"" + filePath + "\", disabling console capture.", true);
+        reader = null;
+        return "";
       }
       if (nextChar != -1) {
         try {
