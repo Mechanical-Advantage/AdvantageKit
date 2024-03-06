@@ -45,6 +45,7 @@ import us.hebi.quickbuf.ProtoMessage;
  * table.
  */
 public class LogTable {
+  private static boolean disableProtobufWarning = false;
   private final String prefix;
   private final SharedTimestamp timestamp;
   private final Map<String, LogValue> data;
@@ -60,6 +61,11 @@ public class LogTable {
     public SharedTimestamp(long value) {
       this.value = value;
     }
+  }
+
+  /** Disables warning message print when logging protobuf values. */
+  public static void disableProtobufWarning() {
+    disableProtobufWarning = true;
   }
 
   /** Creates a new LogTable. */
@@ -416,6 +422,16 @@ public class LogTable {
         put(key, new LogValue(array, proto.getTypeString()));
       } catch (IOException e) {
         e.printStackTrace();
+      }
+
+      // Driver Station alert
+      if (!disableProtobufWarning) {
+        DriverStation.reportWarning(
+          "Logging value to field \""
+              + prefix
+              + key
+              + "\" using protobuf encoding. This may cause high loop overruns, please monitor performance or save the value in a different format. Call \"LogTable.disableProtobufWarning()\" to disable this message.",
+          false);
       }
     }
   }
