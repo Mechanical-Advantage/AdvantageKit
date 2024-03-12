@@ -451,6 +451,9 @@ public class Logger {
    * the simulator. This should be called every loop cycle after updating the
    * inputs from the hardware (if applicable).
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key    The name used to identify this set of inputs.
    * @param inputs The inputs to log or update.
    */
@@ -468,6 +471,9 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -481,6 +487,9 @@ public class Logger {
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -496,6 +505,9 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -509,6 +521,9 @@ public class Logger {
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -524,6 +539,9 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -537,6 +555,9 @@ public class Logger {
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -552,6 +573,9 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -565,6 +589,9 @@ public class Logger {
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -580,6 +607,9 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -593,6 +623,9 @@ public class Logger {
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -608,6 +641,9 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -621,6 +657,9 @@ public class Logger {
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -636,6 +675,9 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -649,6 +691,9 @@ public class Logger {
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -664,6 +709,9 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -677,6 +725,9 @@ public class Logger {
   /**
    * Records a single output field for easy access when viewing the log. On the
    * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * <p>
    * This method serializes a single object as a struct. Example usage:
@@ -704,6 +755,9 @@ public class Logger {
    * Pose2d()});
    * }
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -723,6 +777,9 @@ public class Logger {
    * This method serializes a single object as a protobuf. Protobuf should only be
    * used for objects that do not support struct serialization. Example usage:
    * {@code recordOutput("MyPose", Pose2d.proto, new Pose2d())}
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -744,6 +801,9 @@ public class Logger {
    * This method serializes a single object as a struct or protobuf automatically.
    * Struct is preferred if both methods are supported.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param T     The type
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -764,6 +824,9 @@ public class Logger {
    * This method serializes an array of objects as a struct automatically.
    * Top-level protobuf arrays are not supported.
    * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
+   * 
    * @param T     The type
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
@@ -783,6 +846,9 @@ public class Logger {
    * <p>
    * The current position of the Mechanism2d is logged once as a set of nested
    * fields. If the position is updated, this method must be called again.
+   * 
+   * <p>This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more details.
    * 
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
