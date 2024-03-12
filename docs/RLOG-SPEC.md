@@ -1,13 +1,13 @@
 # Byte Format for Robot Logs (.rlog)
 
-> Note: AdvantageKit v2 (2023) replaced RLOG with WPILOG as its preferred logging format. RLOG continues to be supported by AdvantageScope to interact with older code.
-
 ## Log Revisions
 
 The first byte represents the log format revision. The decoding device should always check whether it supports the specified revision before continuing. Below is a list of possible revisions:
 
-- 0x00 = Invalid file. This is the first byte of logs produced before a revision number was included.
-- 0x01 = Current revision. The log follows the specification described below.
+- R1 = Supported by AdvantageKit v0.0.1-v1.8.1 and v2.2.0-v3.1.1. Uses a predefined set of field types.
+- R2 = Supported by AdvantageKit v3.2.0 and newer. Uses string names for field types.
+
+All values are stored in big endian order.
 
 ## Message Types
 
@@ -28,15 +28,20 @@ Each human-readable string key (e.g. "/DriveTrain/LeftPositionRadians") is repre
 1. Key ID (short, 2 bytes)
 2. Number of bytes in string (short, 2 bytes)
 3. String key (UTF-8 encoded)
+4. Number of bytes in string (short, 2 bytes) - Only if RLOG R2
+5. String type (UTF-8 encoded) - Only if RLOG R2
 
 ## Field
 
-Field messages represent a change to a single value. If a key is not provided for a given cycle, the robot code should set its type to "null". A field's type can change over the course of a log, though each cycle can only contain a single value for each key (e.g. a field cannot have both an integer and boolean value at the same time). The structure of these messages begins with the following information:
+Field messages represent a change to a single value. The structure of these messages begins with the following information:
 
 1. Key ID (short, 2 bytes)
-2. Value type (1 byte)
+2. Value type (1 byte) - Only if RLOG R1
+2. Value length (short, 2 bytes) - Only if RLOG R2
 
-The possible value types are listed below along with the format of the value. Null (0x00) does not include more information.
+For RLOG R2, the value can follow any format. By default, use the [WPILOG-specified data types](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc#data-types).
+
+For RLOG R1, the possible value types are listed below along with the format of the value. Null (0x00) does not include more information.
 
 ### Boolean (0x01)
 

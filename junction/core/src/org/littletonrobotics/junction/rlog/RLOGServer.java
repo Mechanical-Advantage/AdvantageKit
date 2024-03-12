@@ -30,6 +30,10 @@ public class RLOGServer implements LogDataReceiver {
   private final int port;
   private ServerThread thread;
 
+  public RLOGServer() {
+    this(5800);
+  }
+
   public RLOGServer(int port) {
     this.port = port;
   }
@@ -37,7 +41,7 @@ public class RLOGServer implements LogDataReceiver {
   public void start() {
     thread = new ServerThread(port);
     thread.start();
-    System.out.println("Log server started on port " + Integer.toString(port));
+    System.out.println("RLOG server started on port " + Integer.toString(port));
   }
 
   public void end() {
@@ -54,7 +58,7 @@ public class RLOGServer implements LogDataReceiver {
   }
 
   private class ServerThread extends Thread {
-    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if hearbeat not received for this length
+    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if heartbeat not received for this length
 
     ServerSocket server;
     RLOGEncoder encoder = new RLOGEncoder();
@@ -63,7 +67,7 @@ public class RLOGServer implements LogDataReceiver {
     List<Double> lastHeartbeats = new ArrayList<>();
 
     public ServerThread(int port) {
-      super("LogSocketServer");
+      super("RLOGServer");
       this.setDaemon(true);
       try {
         server = new ServerSocket(port);
@@ -82,7 +86,7 @@ public class RLOGServer implements LogDataReceiver {
           socket.getOutputStream().write(encodeData(encoder.getNewcomerData().array()));
           sockets.add(socket);
           lastHeartbeats.add(Logger.getRealTimestamp() / 1000000.0);
-          System.out.println("Connected to log client - " + socket.getInetAddress().getHostAddress());
+          System.out.println("Connected to RLOG client - " + socket.getInetAddress().getHostAddress());
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -94,7 +98,7 @@ public class RLOGServer implements LogDataReceiver {
         return;
       }
 
-      encoder.encodeTable(table);
+      encoder.encodeTable(table, false);
       byte[] data = encodeData(encoder.getOutput().array());
       for (int i = 0; i < sockets.size(); i++) {
         Socket socket = sockets.get(i);
@@ -139,7 +143,7 @@ public class RLOGServer implements LogDataReceiver {
     }
 
     private void printDisconnectMessage(Socket socket, String reason) {
-      System.out.println("Disconnected from log client (" + reason + ") - " + socket.getInetAddress().getHostAddress());
+      System.out.println("Disconnected from RLOG client (" + reason + ") - " + socket.getInetAddress().getHostAddress());
     }
 
     public void close() {

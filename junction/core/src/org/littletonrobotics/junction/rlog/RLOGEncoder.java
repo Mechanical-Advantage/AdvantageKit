@@ -23,27 +23,22 @@ import java.util.Map;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 
-/** Converts log tables to the RLOG format. */
+/** 
+ * Converts log tables to the RLOG format. Based on RLOG R2 with
+ * support for custom type strings.
+ */
 class RLOGEncoder {
-  public static final byte logRevision = (byte) 1;
+  public static final byte logRevision = (byte) 2;
 
   private ByteBuffer nextOutput;
   private boolean isFirstTable = true;
   private LogTable lastTable = new LogTable(0);
   private Map<String, Short> keyIDs = new HashMap<>();
+  private Map<String, String> keyTypes = new HashMap<>();
   private short nextKeyID = 0;
 
   /** Reads the encoded output of the last encoded table. */
   public ByteBuffer getOutput() {
-    return nextOutput;
-  }
-
-  /**
-   * Encodes a single tables and returns the encoded output. Equivalent to calling
-   * "encodeTable()" and then "getOutput()"
-   */
-  public ByteBuffer getOutput(LogTable table) {
-    encodeTable(table);
     return nextOutput;
   }
 
@@ -62,7 +57,7 @@ class RLOGEncoder {
 
     // Encode key IDs
     for (Map.Entry<String, Short> keyID : keyIDs.entrySet()) {
-      buffers.add(encodeKey(keyID.getValue(), keyID.getKey()));
+      buffers.add(encodeKey(keyID.getValue(), keyID.getKey(), keyTypes.get(keyID.getKey())));
     }
 
     // Encode fields
@@ -83,14 +78,14 @@ class RLOGEncoder {
   }
 
   /** Encodes a single table and stores the result. */
-  public void encodeTable(LogTable table) {
+  public void encodeTable(LogTable table, boolean includeRevision) {
     List<ByteBuffer> buffers = new ArrayList<>();
 
     Map<String, LogValue> newMap = table.getAll(false);
     Map<String, LogValue> oldMap = lastTable.getAll(false);
 
     // Encode log revision
-    if (isFirstTable) {
+    if (isFirstTable && includeRevision) {
       buffers.add(ByteBuffer.allocate(1).put(logRevision));
       isFirstTable = false;
     }
@@ -109,19 +104,12 @@ class RLOGEncoder {
       // Write new data
       if (!keyIDs.containsKey(field.getKey())) {
         keyIDs.put(field.getKey(), nextKeyID);
-        buffers.add(encodeKey(nextKeyID, field.getKey()));
+        keyTypes.put(field.getKey(), field.getValue().getWPILOGType());
+        buffers.add(encodeKey(nextKeyID, field.getKey(), field.getValue().getWPILOGType()));
         nextKeyID++;
       }
       buffers.add(encodeValue(keyIDs.get(field.getKey()), newValue));
     }
-
-    // Encode removed fields (no longer supported)
-    //
-    // for (Map.Entry<String, LogValue> field : oldMap.entrySet()) {
-    // if (!newMap.containsKey(field.getKey())) {
-    // buffers.add(encodeValue(keyIDs.get(field.getKey()), null));
-    // }
-    // }
 
     // Update last table
     lastTable = table;
@@ -144,14 +132,19 @@ class RLOGEncoder {
     return buffer;
   }
 
-  private static ByteBuffer encodeKey(short keyID, String key) {
+  private static ByteBuffer encodeKey(short keyID, String key, String type) {
     try {
       byte[] keyBytes = key.getBytes("UTF-8");
-      ByteBuffer buffer = ByteBuffer.allocate(1 + Short.BYTES + Short.BYTES + keyBytes.length);
+      byte[] typeBytes = type.getBytes("UTF-8");
+      ByteBuffer buffer = ByteBuffer.allocate(
+        1 + Short.BYTES + Short.BYTES + keyBytes.length + Short.BYTES + typeBytes.length
+      );
       buffer.put((byte) 1);
       buffer.putShort(keyID);
       buffer.putShort((short) keyBytes.length);
       buffer.put(keyBytes);
+      buffer.putShort((short) typeBytes.length);
+      buffer.put(typeBytes);
       return buffer;
     } catch (UnsupportedEncodingException e) {
       return ByteBuffer.allocate(0);
@@ -160,8 +153,8 @@ class RLOGEncoder {
 
   private static ByteBuffer encodeValue(short keyID, LogValue value) {
     try {
-      // Generate key and type buffer
-      ByteBuffer keyBuffer = ByteBuffer.allocate(1 + Short.BYTES + 1);
+      // Generate key and length buffer
+      ByteBuffer keyBuffer = ByteBuffer.allocate(1 + Short.BYTES + Short.BYTES);
       keyBuffer.put((byte) 2);
       keyBuffer.putShort(keyID);
 
@@ -169,84 +162,67 @@ class RLOGEncoder {
       ByteBuffer valueBuffer;
       switch (value.type) {
         case Raw:
-          keyBuffer.put((byte) 10);
           byte[] byteArray = value.getRaw();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + byteArray.length);
-          valueBuffer.putShort((short) byteArray.length);
+          valueBuffer = ByteBuffer.allocate(byteArray.length);
           valueBuffer.put(byteArray);
           break;
         case Boolean:
-          keyBuffer.put((byte) 1);
           valueBuffer = ByteBuffer.allocate(1).put(value.getBoolean() ? (byte) 1 : (byte) 0);
           break;
-        case Integer: // Save as Integer (int32)
-          keyBuffer.put((byte) 3);
-          valueBuffer = ByteBuffer.allocate(Integer.BYTES).putInt((int) value.getInteger());
+        case Integer:
+          valueBuffer = ByteBuffer.allocate(Long.BYTES).putLong(value.getInteger());
           break;
-        case Float: // Save as Double
-          keyBuffer.put((byte) 5);
-          valueBuffer = ByteBuffer.allocate(Double.BYTES).putDouble(value.getFloat());
+        case Float:
+          valueBuffer = ByteBuffer.allocate(Float.BYTES).putFloat(value.getFloat());
           break;
         case Double:
-          keyBuffer.put((byte) 5);
           valueBuffer = ByteBuffer.allocate(Double.BYTES).putDouble(value.getDouble());
           break;
         case String:
-          keyBuffer.put((byte) 7);
           String stringValue = value.getString();
           byte[] stringBytes = stringValue.getBytes("UTF-8");
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + stringBytes.length);
-          valueBuffer.putShort((short) stringBytes.length);
+          valueBuffer = ByteBuffer.allocate(stringBytes.length);
           valueBuffer.put(stringBytes);
           break;
         case BooleanArray:
-          keyBuffer.put((byte) 2);
           boolean[] booleanArray = value.getBooleanArray();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + booleanArray.length);
-          valueBuffer.putShort((short) booleanArray.length);
+          valueBuffer = ByteBuffer.allocate(booleanArray.length);
           for (boolean i : booleanArray) {
             valueBuffer.put(i ? (byte) 1 : (byte) 0);
           }
           break;
-        case IntegerArray: // Save as IntegerArray (int32[])
-          keyBuffer.put((byte) 4);
+        case IntegerArray:
           long[] intArray = value.getIntegerArray();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + (intArray.length * Integer.BYTES));
-          valueBuffer.putShort((short) intArray.length);
+          valueBuffer = ByteBuffer.allocate(intArray.length * Long.BYTES);
           for (long i : intArray) {
-            valueBuffer.putInt((int) i);
+            valueBuffer.putLong(i);
           }
           break;
-        case FloatArray: // Save as DoubleArray
-          keyBuffer.put((byte) 6);
+        case FloatArray:
           float[] floatArray = value.getFloatArray();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + (floatArray.length * Double.BYTES));
-          valueBuffer.putShort((short) floatArray.length);
+          valueBuffer = ByteBuffer.allocate(floatArray.length * Float.BYTES);
           for (float i : floatArray) {
-            valueBuffer.putDouble(i);
+            valueBuffer.putFloat(i);
           }
           break;
         case DoubleArray:
-          keyBuffer.put((byte) 6);
           double[] doubleArray = value.getDoubleArray();
-          valueBuffer = ByteBuffer.allocate(Short.BYTES + (doubleArray.length * Double.BYTES));
-          valueBuffer.putShort((short) doubleArray.length);
+          valueBuffer = ByteBuffer.allocate(doubleArray.length * Double.BYTES);
           for (double i : doubleArray) {
             valueBuffer.putDouble(i);
           }
           break;
         case StringArray:
-          keyBuffer.put((byte) 8);
           String[] stringArray = value.getStringArray();
-          int capacity = Short.BYTES;
+          int capacity = Integer.BYTES;
           for (String i : stringArray) {
-            capacity += Short.BYTES + i.getBytes("UTF-8").length;
+            capacity += Integer.BYTES + i.getBytes("UTF-8").length;
           }
           valueBuffer = ByteBuffer.allocate(capacity);
-          valueBuffer.putShort((short) stringArray.length);
+          valueBuffer.putInt(stringArray.length);
           for (String i : stringArray) {
             byte[] bytes = i.getBytes("UTF-8");
-            valueBuffer.putShort((short) bytes.length);
+            valueBuffer.putInt(bytes.length);
             valueBuffer.put(bytes);
           }
           break;
@@ -254,6 +230,7 @@ class RLOGEncoder {
           valueBuffer = ByteBuffer.allocate(0);
       }
 
+      keyBuffer.putShort((short) valueBuffer.capacity());
       return ByteBuffer.allocate(keyBuffer.capacity() + valueBuffer.capacity()).put(keyBuffer.array())
           .put(valueBuffer.array());
     } catch (UnsupportedEncodingException e) {
