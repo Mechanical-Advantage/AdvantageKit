@@ -57,27 +57,27 @@ import us.hebi.quickbuf.ProtoMessage;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
-  private static final int receiverQueueCapcity = 500; // 10s at 50Hz
+  protected static final int receiverQueueCapcity = 500; // 10s at 50Hz
 
-  private static boolean running = false;
-  private static long cycleCount = 0;
-  private static LogTable entry = new LogTable(0);
-  private static LogTable outputTable;
-  private static Map<String, String> metadata = new HashMap<>();
-  private static ConsoleSource console;
-  private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
-  private static Supplier<ByteBuffer[]> urclSupplier = null;
-  private static boolean deterministicTimestamps = true;
+  protected static boolean running = false;
+  protected static long cycleCount = 0;
+  protected static LogTable entry = new LogTable(0);
+  protected static LogTable outputTable;
+  protected static Map<String, String> metadata = new HashMap<>();
+  protected static ConsoleSource console;
+  protected static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
+  protected static Supplier<ByteBuffer[]> urclSupplier = null;
+  protected static boolean deterministicTimestamps = true;
 
-  private static LogReplaySource replaySource;
-  private static final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
-  private static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
-  private static boolean receiverQueueFault = false;
+  protected static LogReplaySource replaySource;
+  protected static final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
+  protected static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
+  protected static boolean receiverQueueFault = false;
 
-  private Logger() {
+  protected Logger() {
   }
 
-  private static Logger instance = new Logger();
+  protected static Logger instance = new Logger();
 
   /** @deprecated Call the static methods directly. */
   @Deprecated
@@ -346,7 +346,7 @@ public class Logger {
    * Updates the MathShared object for wpimath to enable or disable AdvantageKit's
    * mocked timestamps.
    */
-  private static void setMathShared(boolean mocked) {
+  protected static void setMathShared(boolean mocked) {
     MathSharedStore.setMathShared(
         new MathShared() {
           @Override
