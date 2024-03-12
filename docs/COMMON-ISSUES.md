@@ -11,7 +11,7 @@ Some common non-deterministic data sources to watch out for include:
 - Interactions with the RIO filesystem. Files can be saved and read by the robot code, but incoming data still needs to be treated as an input.
 - Random number generation, which cannot be recreated in a simulator.
 
-## Multithreading
+## Multithreading For Replay
 
 The main robot code logic must be single threaded to work with log replay. This is because the timing of extra threads cannot be recreated in simulation; threads will not execute at the same rate consistently, especially on different hardware.
 
@@ -25,6 +25,10 @@ There are two solutions to this issue:
 ```java
 Pathfinding.setPathfinder(new LocalADStarAK());
 ```
+
+## Logging From Threads
+
+AdvantageKit's logging APIs (i.e. `recordOutput` and `processInputs`) are **not** thread-safe, and should only be called from the main thread. As all values in AdvantageKit are synchronized to the main loop cycle, logging data from other threads would fail to capture values accurately even if this functionality was supported. Instead, threads should only be used in IO implementations (see above) and should record all values as inputs, synchronized appropriately to the main loop cycle in a thread-safe manner.
 
 ## Uninitialized Inputs
 
