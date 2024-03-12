@@ -13,6 +13,10 @@
 
 package org.littletonrobotics.junction;
 
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.util.List;
+
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -32,11 +36,11 @@ import edu.wpi.first.hal.NotifierJNI;
  * Notifier instance.
  */
 public class LoggedRobot extends IterativeRobotBase {
-
   public static final double defaultPeriodSecs = 0.02;
   private final int notifier = NotifierJNI.initializeNotifier();
   private final long periodUs;
   private long nextCycleUs = 0;
+  private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
 
   private boolean useTiming = true;
 
@@ -113,6 +117,7 @@ public class LoggedRobot extends IterativeRobotBase {
       loopFunc();
       long userCodeEnd = Logger.getRealTimestamp();
 
+      gcStatsCollector.update();
       Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
     }
   }
@@ -126,5 +131,28 @@ public class LoggedRobot extends IterativeRobotBase {
   /** Sets whether to use standard timing or run as fast as possible. */
   public void setUseTiming(boolean useTiming) {
     this.useTiming = useTiming;
+  }
+
+  private static final class GcStatsCollector {
+    private List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
+    private final long[] lastTimes = new long[gcBeans.size()];
+    private final long[] lastCounts = new long[gcBeans.size()];
+  
+    public void update() {
+      long accumTime = 0;
+      long accumCounts = 0;
+      for (int i = 0; i < gcBeans.size(); i++) {
+        long gcTime = gcBeans.get(i).getCollectionTime();
+        long gcCount = gcBeans.get(i).getCollectionCount();
+        accumTime += gcTime - lastTimes[i];
+        accumCounts += gcCount - lastCounts[i];
+  
+        lastTimes[i] = gcTime;
+        lastCounts[i] = gcCount;
+      }
+  
+      Logger.recordOutput("LoggedRobot/GCTimeMS", (double) accumTime);
+      Logger.recordOutput("LoggedRobot/GCCounts", (double) accumCounts);
+    }
   }
 }
