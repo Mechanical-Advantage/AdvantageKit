@@ -68,7 +68,7 @@ public class Logger {
   private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean deterministicTimestamps = true;
-  private static boolean enableConsole = false;
+  private static boolean enableConsole = true;
 
   private static LogReplaySource replaySource;
   private static final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);

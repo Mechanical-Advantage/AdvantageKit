@@ -14,12 +14,19 @@
 package org.littletonrobotics.junction.console;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -29,60 +36,92 @@ import edu.wpi.first.wpilibj.DriverStation;
  */
 public class RIOConsoleSource implements ConsoleSource {
   private static final String filePath = "/home/lvuser/FRC_UserProgram.log";
-  private BufferedReader reader = null;
-
-  private CharBuffer buffer = CharBuffer.allocate(10240);
+  private final Thread thread;
+  private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(100);
+  private final List<String> lines = new ArrayList<>();
 
   public RIOConsoleSource() {
+    thread = new Thread(this::run, "RIOConsoleSource");
+    thread.setDaemon(true);
+    thread.start();
+  }
+
+  public String getNewData() {
+    lines.clear();
+    queue.drainTo(lines);
+    return String.join("\n", lines);
+  }
+
+  public void close() throws Exception {
+    thread.interrupt();
+  }
+
+  private void run() {
+    // Initialize reader
+    CharBuffer buffer = CharBuffer.allocate(10240);
+    BufferedReader reader;
     try {
       reader = new BufferedReader(new FileReader(filePath));
     } catch (FileNotFoundException e) {
       DriverStation.reportError("Failed to open console file \"" + filePath + "\", disabling console capture.", true);
-    }
-  }
-
-  public String getNewData() {
-    if (reader == null) {
-      return "";
+      return;
     }
 
-    // Read new data from console
     while (true) {
-      int nextChar = -1;
-      try {
-        nextChar = reader.read();
-      } catch (IOException e) {
-        DriverStation.reportError("Failed to read console file \"" + filePath + "\", disabling console capture.", true);
-        reader = null;
-        return "";
-      }
-      if (nextChar != -1) {
+      // Read new data from console
+      while (true) {
+        int nextChar = -1;
         try {
-          buffer.put((char) nextChar);
-        } catch (BufferOverflowException e) {}
-      } else {
-        break;
+          nextChar = reader.read();
+        } catch (IOException e) {
+          DriverStation.reportError("Failed to read console file \"" + filePath + "\", disabling console capture.", true);
+          try {
+            reader.close();
+          } catch (IOException io) {}
+          return;
+        }
+        if (nextChar != -1) {
+          try {
+            buffer.put((char) nextChar);
+          } catch (BufferOverflowException e) {}
+        } else {
+          // Break read loop, send complete lines to queue
+          break;
+        }
+      }
+
+      // Read all complete lines
+      String output = null;
+      for (int i = buffer.position(); i > 0; i--) {
+        if (i < buffer.position() && buffer.get(i) == '\n') {
+          int originalPosition = buffer.position();
+          output = new String(buffer.array(), 0, i);
+          buffer.rewind();
+          buffer.put(buffer.array(), i + 1, buffer.limit() - i - 1);
+          buffer.position(originalPosition - i - 1);
+          break;
+        }
+      }
+      if (output != null) {
+        try {
+          queue.put(output);
+        } catch (InterruptedException e) {
+          try {
+            reader.close();
+          } catch (IOException io) {}
+          return;
+        }
+      }
+
+      // Sleep to avoid spinning needlessly
+      try {
+        Thread.sleep(20);
+      } catch (InterruptedException e) {
+        try {
+          reader.close();
+        } catch (IOException io) {}
+        return;
       }
     }
-
-    // Read all complete lines
-    String output = null;
-    for (int i = buffer.position(); i > 0; i--) {
-      if (i < buffer.position() && buffer.get(i) == '\n') {
-        int originalPosition = buffer.position();
-        output = new String(buffer.array(), 0, i);
-        buffer.rewind();
-        buffer.put(buffer.array(), i + 1, buffer.limit() - i - 1);
-        buffer.position(originalPosition - i - 1);
-        break;
-      }
-    }
-    if (output == null) output = "";
-    return output;
   }
-
-  public void close() throws Exception {
-    reader.close();
-  }
-
 }
