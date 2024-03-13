@@ -30,6 +30,10 @@ public class RLOGServer implements LogDataReceiver {
   private final int port;
   private ServerThread thread;
 
+  public RLOGServer() {
+    this(5800);
+  }
+
   public RLOGServer(int port) {
     this.port = port;
   }
@@ -37,7 +41,7 @@ public class RLOGServer implements LogDataReceiver {
   public void start() {
     thread = new ServerThread(port);
     thread.start();
-    System.out.println("Log server started on port " + Integer.toString(port));
+    System.out.println("RLOG server started on port " + Integer.toString(port));
   }
 
   public void end() {
@@ -54,16 +58,17 @@ public class RLOGServer implements LogDataReceiver {
   }
 
   private class ServerThread extends Thread {
-    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if hearbeat not received for this length
+    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if heartbeat not received for this length
 
     ServerSocket server;
+    Thread heartbeatThread;
     RLOGEncoder encoder = new RLOGEncoder();
 
     List<Socket> sockets = new ArrayList<>();
     List<Double> lastHeartbeats = new ArrayList<>();
 
     public ServerThread(int port) {
-      super("LogSocketServer");
+      super("RLOGServer");
       this.setDaemon(true);
       try {
         server = new ServerSocket(port);
@@ -76,13 +81,66 @@ public class RLOGServer implements LogDataReceiver {
       if (server == null) {
         return;
       }
+
+      // Check hearbeats periodically
+      heartbeatThread = new Thread(() -> {
+        while (true) {
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException e) {
+            return;
+          }
+
+          synchronized (this) {
+            for (int i = 0; i < sockets.size(); i++) {
+              Socket socket = sockets.get(i);
+              if (socket.isClosed()) {
+                continue;
+              }
+
+              try {
+                // Read heartbeat
+                InputStream inputStream = socket.getInputStream();
+                if (inputStream.available() > 0) {
+                  inputStream.skip(inputStream.available());
+                  lastHeartbeats.set(i, Logger.getRealTimestamp() / 1000000.0);
+                }
+
+                // Close connection if socket timed out
+                if (Logger.getRealTimestamp() / 1000000.0 - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
+                  socket.close();
+                  printDisconnectMessage(socket, "timeout");
+                  continue;
+                }
+
+                // Broadcast message to stay alive
+                socket.getOutputStream().write(new byte[4]);
+              } catch (IOException e) {
+                try {
+                  socket.close();
+                  printDisconnectMessage(socket, "IOException");
+                } catch (IOException a) {
+                  a.printStackTrace();
+                }
+              }
+            }
+          }
+        }
+      });
+      heartbeatThread.setName("RLOGServerHeartbeats");
+      heartbeatThread.setDaemon(true);
+      heartbeatThread.start();
+
+      // Wait for clients
       while (true) {
         try {
           Socket socket = server.accept();
-          socket.getOutputStream().write(encodeData(encoder.getNewcomerData().array()));
           sockets.add(socket);
           lastHeartbeats.add(Logger.getRealTimestamp() / 1000000.0);
-          System.out.println("Connected to log client - " + socket.getInetAddress().getHostAddress());
+          synchronized (this) {
+            socket.getOutputStream().write(encodeData(encoder.getNewcomerData().array()));
+          }
+          System.out.println("Connected to RLOG client - " + socket.getInetAddress().getHostAddress());
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -94,37 +152,27 @@ public class RLOGServer implements LogDataReceiver {
         return;
       }
 
-      encoder.encodeTable(table);
-      byte[] data = encodeData(encoder.getOutput().array());
-      for (int i = 0; i < sockets.size(); i++) {
-        Socket socket = sockets.get(i);
-        if (socket.isClosed()) {
-          continue;
-        }
+      synchronized (this) {
+        // Encode data
+        encoder.encodeTable(table, false);
+        byte[] data = encodeData(encoder.getOutput().array());
 
-        try {
-          // Read heartbeat
-          InputStream inputStream = socket.getInputStream();
-          if (inputStream.available() > 0) {
-            inputStream.skip(inputStream.available());
-            lastHeartbeats.set(i, Logger.getRealTimestamp() / 1000000.0);
+        // Broadcast data to each socket
+        for (int i = 0; i < sockets.size(); i++) {
+          Socket socket = sockets.get(i);
+          if (socket.isClosed()) {
+            continue;
           }
 
-          // Close connection if socket timed out
-          if (Logger.getRealTimestamp() / 1000000.0 - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
-            socket.close();
-            printDisconnectMessage(socket, "timeout");
-          } else {
-
-            // Send new data
-            socket.getOutputStream().write(data);
-          }
-        } catch (IOException e) {
           try {
-            socket.close();
-            printDisconnectMessage(socket, "IOException");
-          } catch (IOException a) {
-            a.printStackTrace();
+            socket.getOutputStream().write(data);
+          } catch (IOException e) {
+            try {
+              socket.close();
+              printDisconnectMessage(socket, "IOException");
+            } catch (IOException a) {
+              a.printStackTrace();
+            }
           }
         }
       }
@@ -139,7 +187,7 @@ public class RLOGServer implements LogDataReceiver {
     }
 
     private void printDisconnectMessage(Socket socket, String reason) {
-      System.out.println("Disconnected from log client (" + reason + ") - " + socket.getInetAddress().getHostAddress());
+      System.out.println("Disconnected from RLOG client (" + reason + ") - " + socket.getInetAddress().getHostAddress());
     }
 
     public void close() {
@@ -150,6 +198,9 @@ public class RLOGServer implements LogDataReceiver {
         } catch (IOException e) {
           e.printStackTrace();
         }
+      }
+      if (heartbeatThread != null) {
+        heartbeatThread.interrupt();
       }
       this.interrupt();
     }
