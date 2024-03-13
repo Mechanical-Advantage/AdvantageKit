@@ -64,10 +64,11 @@ public class Logger {
   private static LogTable entry = new LogTable(0);
   private static LogTable outputTable;
   private static Map<String, String> metadata = new HashMap<>();
-  private static ConsoleSource console;
+  private static ConsoleSource console = null;
   private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean deterministicTimestamps = true;
+  private static boolean enableConsole = false;
 
   private static LogReplaySource replaySource;
   private static final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
@@ -161,6 +162,13 @@ public class Logger {
   }
 
   /**
+   * Disables automatic console capture.
+   */
+  public static void disableConsoleCapture() {
+    enableConsole = false;
+  }
+
+  /**
    * Returns whether a replay source is currently being used.
    */
   public static boolean hasReplaySource() {
@@ -176,10 +184,12 @@ public class Logger {
       running = true;
 
       // Start console capture
-      if (RobotBase.isReal()) {
-        console = new RIOConsoleSource();
-      } else {
-        console = new SimConsoleSource();
+      if (enableConsole) {
+        if (RobotBase.isReal()) {
+          console = new RIOConsoleSource();
+        } else {
+          console = new SimConsoleSource();
+        }
       }
 
       // Start replay source
@@ -217,10 +227,12 @@ public class Logger {
   public static void end() {
     if (running) {
       running = false;
-      try {
-        console.close();
-      } catch (Exception e) {
-        DriverStation.reportError("Failed to stop console capture.", true);
+      if (console != null) {
+        try {
+          console.close();
+        } catch (Exception e) {
+          DriverStation.reportError("Failed to stop console capture.", true);
+        }
       }
       if (replaySource != null) {
         replaySource.end();
@@ -316,9 +328,11 @@ public class Logger {
       long autoLogStart = getRealTimestamp();
       AutoLogOutputManager.periodic();
       long consoleCaptureStart = getRealTimestamp();
-      String consoleData = console.getNewData();
-      if (!consoleData.isEmpty()) {
-        recordOutput("Console", consoleData.trim());
+      if (enableConsole) {
+        String consoleData = console.getNewData();
+        if (!consoleData.isEmpty()) {
+          recordOutput("Console", consoleData.trim());
+        }
       }
       long consoleCaptureEnd = getRealTimestamp();
 
