@@ -40,5 +40,5 @@ public interface LogDataReceiver {
    * 
    * @param table A copy of the data to save.
    */
-  public void putTable(LogTable table);
+  public void putTable(LogTable table) throws InterruptedException;
 }
