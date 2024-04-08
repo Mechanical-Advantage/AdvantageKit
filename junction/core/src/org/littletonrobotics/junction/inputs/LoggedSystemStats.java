@@ -90,7 +90,7 @@ public class LoggedSystemStats {
       table.put("6vRail/CurrentFaults", userCurrentFaults6v);
 
       table.put("BrownoutVoltage", brownoutVoltage);
-      table.put("CPUTempCelcius", cpuTemp);
+      table.put("CPUTempCelsius", cpuTemp);
 
       table.put("CANBus/Utilization", canStatus.percentBusUtilization);
       table.put("CANBus/OffCount", canStatus.busOffCount);
@@ -133,7 +133,7 @@ public class LoggedSystemStats {
       userCurrentFaults6v = table.get("6vRail/CurrentFaults", userCurrentFaults6v);
 
       brownoutVoltage = table.get("BrownoutVoltage", brownoutVoltage);
-      cpuTemp = table.get("CPUTempCelcius", cpuTemp);
+      cpuTemp = table.get("CPUTempCelsius", cpuTemp);
 
       canStatus.setStatus(
           table.get("CANBus/Utilization", canStatus.percentBusUtilization),
