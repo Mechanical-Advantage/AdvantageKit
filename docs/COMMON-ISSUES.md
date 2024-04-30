@@ -10,6 +10,7 @@ Some common non-deterministic data sources to watch out for include:
 - Large hardware libraries like [YAGSL](https://github.com/BroncBotz3481/YAGSL) or [Phoenix 6 swerve](https://v6.docs.ctr-electronics.com/en/latest/docs/tuner/tuner-swerve/index.html), which interact with hardware directly instead of through an IO layer. Try using the AdvantageKit [swerve template project](INSTALLATION.md#new-projects) instead.
 - Interactions with the RIO filesystem. Files can be saved and read by the robot code, but incoming data still needs to be treated as an input.
 - Random number generation, which cannot be recreated in a simulator.
+- Iteration over unordered collections (such as unordered maps).
 
 ## Multithreading For Replay
 
