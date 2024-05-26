@@ -13,12 +13,12 @@ namespace org.littletonrobotics.conduit.schema;
 struct Joystick {
     name:[uint8:256];
     type:uint8;
-    axis_count:uint8;
+    axis_count:int16;
     axis_types:[uint8:12];
     axis_values:[float32:12];
     button_count:uint8;
     buttons:int32;
-    pov_count:uint8;
+    pov_count:int16;
     pov_values:[int16:12];
     is_xbox:bool;
 }

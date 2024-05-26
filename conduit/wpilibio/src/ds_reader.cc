@@ -68,12 +68,9 @@ void DsReader::update_ds_data() {
       std::memcpy(stick_buf->mutable_name()->Data(), jd.name,
                   stick_buf->name()->size());
       stick_buf->mutate_type(jd.type);
-      stick_buf->mutate_axis_count(jd.axisCount);
 
       std::memcpy(stick_buf->mutable_axis_types()->Data(), jd.axisTypes,
                   stick_buf->mutable_axis_types()->size() * sizeof(uint8_t));
-      stick_buf->mutate_button_count(jd.buttonCount);
-      stick_buf->mutate_pov_count(jd.povCount);
       stick_buf->mutate_is_xbox(jd.isXbox);
 
       // Read joystick values
@@ -81,15 +78,18 @@ void DsReader::update_ds_data() {
       HAL_GetJoystickAxes(joystickNum, &axes);
       std::memcpy(stick_buf->mutable_axis_values()->Data(), axes.axes,
                   stick_buf->axis_values()->size() * sizeof(float));
+      stick_buf->mutate_axis_count(axes.count);
 
       HAL_JoystickPOVs povs;
       HAL_GetJoystickPOVs(joystickNum, &povs);
       std::memcpy(stick_buf->mutable_pov_values()->Data(), povs.povs,
                   stick_buf->pov_values()->size() * sizeof(int16_t));
+      stick_buf->mutate_pov_count(povs.count);
 
       HAL_JoystickButtons buttons;
       HAL_GetJoystickButtons(joystickNum, &buttons);
       stick_buf->mutate_buttons(buttons.buttons);
+      stick_buf->mutate_button_count(buttons.count);
     }
 
     // Copy all data into the internal buffer
