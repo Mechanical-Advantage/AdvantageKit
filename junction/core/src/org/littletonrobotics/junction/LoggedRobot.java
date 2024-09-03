@@ -106,7 +106,11 @@ public class LoggedRobot extends IterativeRobotBase {
         } else {
           // Wait before next cycle
           NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
-          NotifierJNI.waitForNotifierAlarm(notifier);
+          if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
+            // Break the loop if the notifier was stopped
+            Logger.end();
+            break;
+          }
         }
         nextCycleUs += periodUs;
       }
