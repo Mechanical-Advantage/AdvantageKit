@@ -108,6 +108,7 @@ public class LoggedRobot extends IterativeRobotBase {
           NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
           if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
             // Break the loop if the notifier was stopped
+            Logger.end();
             break;
           }
         }
