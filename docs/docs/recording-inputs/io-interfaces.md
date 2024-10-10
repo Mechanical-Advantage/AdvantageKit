@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # IO Interfaces
 
-By necessity, any interaction with external hardware must be isolated such that all input data is logged and can be replayed in the simulator where that hardware is not present. Most hardware interaction occurs in subsystem classes (read [this section](#dashboard-options--networktables-inputs) for information on using NetworkTables as an input). Traditionally, a subsystem has three main components:
+By necessity, any interaction with external hardware must be isolated such that all input data is logged and can be replayed in the simulator where that hardware is not present. Most hardware interaction occurs in subsystem classes (read [this section](/recording-inputs/dashboard-inputs) for information on using NetworkTables as an input). Traditionally, a subsystem has three main components:
 
 ![Diagram of traditional subsystem](img/subsystem-1.png)
 
@@ -19,10 +19,10 @@ Data logging of inputs should occur between the control logic and hardware inter
 ![Diagram of restructured subsystem](img/subsystem-2.png)
 
 :::tip
-Refer to the [AdvantageKit examples](INSTALLATION.md#new-projects) or [6328's 2022 robot code](https://github.com/Mechanical-Advantage/RobotCode2022/tree/main/src/main/java/frc/robot/subsystems) for some reference IO interfaces and implementations.
+Refer to the [AdvantageKit examples](/installation#new-projects) or [6328's 2022 robot code](https://github.com/Mechanical-Advantage/RobotCode2022/tree/main/src/main/java/frc/robot/subsystems) for some reference IO interfaces and implementations.
 :::
 
-Outputs (setting voltage, setpoint, PID constants, etc.) make use of simple methods for each command. Input data is more controlled such that it can be logged and replayed. Each IO interface defines a class with public attributes for all input data, along with methods for saving and replaying that data from a log (`toLog` and `fromLog`). We recommend using the [`@AutoLog`](#autolog-annotation) annotation to generate these methods automatically.
+Outputs (setting voltage, setpoint, PID constants, etc.) make use of simple methods for each command. Input data is more controlled such that it can be logged and replayed. Each IO interface defines a class with public attributes for all input data, along with methods for saving and replaying that data from a log (`toLog` and `fromLog`). We recommend using the [`@AutoLog`](/recording-inputs/annotation-logging) annotation to generate these methods automatically.
 
 The IO layer includes a single method (`updateInputs`) for updating all of the input data. The subsystem class contains an instance of both the current IO implementation and the "inputs" object. Once per cycle, it updates the input data and sends it to the logging framework:
 

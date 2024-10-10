@@ -16,7 +16,7 @@ The following simple data types are currently supported:
 
 Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). Supported classes include `Translation2d`, `Pose3d`, and `SwerveModuleState` with more coming soon. These classes can be logged as single values or arrays just like any simple type, and used as input or output fields.
 
-AdvantageKit also supports logging the state of a `Mechanism2d` object as an output. For details, see [here](RECORDING-OUTPUTS.md#mechanism2d).
+AdvantageKit also supports logging the state of a `Mechanism2d` object as an output. For details, see [here](/recording-outputs/mechanism2d).
 
 ### Units
 

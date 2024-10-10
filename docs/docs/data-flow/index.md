@@ -11,8 +11,8 @@
 
 Below are definitions of each component:
 
-- **User inputs** - Input data from hardware managed by the user program. This primarily includes input data to subsystem classes. See [Recording Inputs](RECORDING-INPUTS.md) for details about how this component is implemented.
-- **User outputs** - Data produced by the user program based on the current inputs (odometry, calculated voltages, internal states, etc.). This data can be reproduced during replay, so it's the primary method of debugging code based on a log file. See [Recording Outputs](RECORDING-OUTPUTS.md) for details about how this component is implemented.
+- **User inputs** - Input data from hardware managed by the user program. This primarily includes input data to subsystem classes. See [Recording Inputs](/recording-inputs/io-interfaces) for details about how this component is implemented.
+- **User outputs** - Data produced by the user program based on the current inputs (odometry, calculated voltages, internal states, etc.). This data can be reproduced during replay, so it's the primary method of debugging code based on a log file. See [Recording Outputs](/recording-outputs) for details about how this component is implemented.
 - **Replay source** - Provides data from an external source for use during replay. This usually means reading data from a log file produced by the robot. A replay source only exists while in replay (never on the real robot).
 - **Data receiver** - Saves data to an external source in all modes. Multiple data receivers can be provided (or none at all). While data receivers can to a log file or send data over the network.
 - **LoggedDriverStation** _(Built-in input)_ - Internal class for recording and replaying driver station data (enabled state, joystick data, alliance color, etc).
