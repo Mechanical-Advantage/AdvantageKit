@@ -1,3 +1,7 @@
+---
+sidebar_position: 9
+---
+
 # Developing AdvantageKit
 
 We use [Bazel](https://bazel.build/) to build, run, and test AdvantageKit code. To start working on AdvantageKit, you must first install it.

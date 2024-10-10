@@ -5,14 +5,16 @@
 For new projects, the easiest way to use AdvantageKit is to download one of the example projects attached to the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest). After downloading and unzipping the file, just adjust the team number in ".wpilib/wpilib_preferences.json" and get started!
 
 - **Skeleton Project:** Includes a basic `TimedRobot` style structure, which supports logging on a real robot, physics simulation, and replay in simulation. This template is ideal if you prefer to start from a minimal project.
-- **2024 KitBot Project:** Example command based project for the [2024 FIRST KitBot](https://www.firstinspires.org/resource-library/frc/kitbot), including support for physics simulation, feedforward characterization, and PathPlanner. *Note that this project supports both brushed and brushless motors on the Spark Max, Spark Flex, Talon FX, and Talon SRX. A time-based auto is provided as an alternative to PathPlanner for robots without drive encoders.*
+- **2024 KitBot Project:** Example command based project for the [2024 FIRST KitBot](https://www.firstinspires.org/resource-library/frc/kitbot), including support for physics simulation, feedforward characterization, and PathPlanner. _Note that this project supports both brushed and brushless motors on the Spark Max, Spark Flex, Talon FX, and Talon SRX. A time-based auto is provided as an alternative to PathPlanner for robots without drive encoders._
 - **Differential Drive Project:** Example command based project with a tank drive and flywheel, including support for physics simulation, feedforward characterization, and PathPlanner. This projects supports the Spark Max, Spark Flex, and Talon FX.
 - **Swerve Drive Project:** Example command based project with a swerve drive and flywheel, including support for physics simulation, feedforward characterization, and PathPlanner. This projects supports the Spark Max, Spark Flex, and Talon FX.
 - **Advanced Swerve Drive Project:** Identical to the "Swerve Drive Project" but with support for high-frequency odometry (e.g. 250Hz) on REV and CTRE hardware. This significantly increases complexity, but may improve the consistency of odometry measurements. More details can be found in the [announcement post](https://www.chiefdelphi.com/t/advantagekit-2024-log-replay-again/442968/54#advanced-swerve-drive-project-2).
 
 To switch between modes, set the "mode" attribute in `Constants.java` to `REAL`, `SIM` (physics simulation), or `REPLAY`. To support the Spark Flex, replace all instances of `CANSparkMax` with `CANSparkFlex` in the Spark Max IO implementations (the changes to the API do not impact these projects).
 
-> Note: Git must be installed to build the example projects. See [here](https://git-scm.com/downloads) for installation instructions.
+:::info
+Git must be installed to build the example projects. See [here](https://git-scm.com/downloads) for installation instructions.
+:::
 
 ## Existing Projects
 
@@ -55,7 +57,9 @@ dependencies {
 
 AdvantageKit is available through GitHub Packages. Per [this issue](https://github.community/t/download-from-github-package-registry-without-authentication/14407), downloading packages from GitHub requires authentication, even for public repositories. The configuration above includes an access token so that anyone can download AdvantageKit. The obfuscation of the string hides it from GitHub's bot; **do not include the plain text token in any GitHub repository.** This will cause the token to be automatically revoked, requiring us to create and distribute a new token.
 
-> Note: A token for accessing GitHub packages and AdvantageKit can be created using any GitHub account. Under account settings, go to "Developer settings" > "Personal access token" > "Tokens (classic)" > "Generate new token" > "Generate new token (classic)" and enable the "read:packages" scope. Keep in mind that GitHub will revoke this token if the plaintext version appears in a GitHub repository.
+:::tip
+A token for accessing GitHub packages and AdvantageKit can be created using any GitHub account. Under account settings, go to "Developer settings" > "Personal access token" > "Tokens (classic)" > "Generate new token" > "Generate new token (classic)" and enable the "read:packages" scope. Keep in mind that GitHub will revoke this token if the plaintext version appears in a GitHub repository.
+:::
 
 ## Offline Installation
 
@@ -97,39 +101,8 @@ if (isReal()) {
 Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 ```
 
-> Note: By default, the `WPILOGWriter` class writes to a USB stick when running on the roboRIO. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports**.
+:::info
+By default, the `WPILOGWriter` class writes to a USB stick when running on the roboRIO. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports**.
+:::
 
 This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required. See the example projects for one method of implementing this logic.
-
-## Gversion Plugin (Git Metadata)
-
-We recommend using the [Gversion](https://github.com/lessthanoptimal/gversion-plugin) Gradle plugin to record metadata like the Git hash and build date. For more details, see [Version Control](VERSION-CONTROL.md). To install it, add the plugin at the top of `build.gradle`:
-
-```groovy
-plugins {
-    // ...
-    id "com.peterabeles.gversion" version "1.10"
-}
-```
-
-Add the `createVersionFile` task as a dependency of `compileJava`:
-
-```groovy
-project.compileJava.dependsOn(createVersionFile)
-gversion {
-  srcDir       = "src/main/java/"
-  classPackage = "frc.robot"
-  className    = "BuildConstants"
-  dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-  timeZone     = "America/New_York" // Use preferred time zone
-  indent       = "  "
-}
-```
-
-You should also add the `BuildConstants.java` file to the repository `.gitignore`:
-
-```
-src/main/java/frc/robot/BuildConstants.java
-```
-
-> Note: Git must be installed and available on the PATH to use the Gversion plugin. See [here](https://git-scm.com/downloads).

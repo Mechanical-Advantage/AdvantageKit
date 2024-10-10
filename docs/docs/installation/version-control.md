@@ -4,9 +4,47 @@ Typically, log replay requires that the code running on the robot and in the sim
 
 ## Gversion
 
-The [gversion](https://github.com/lessthanoptimal/gversion-plugin) Gradle plugin produces a constants file with important metadata, including the [Git hash](https://www.mikestreety.co.uk/blog/the-git-commit-hash/) uniquely identifying each commit. It also includes whether the tree is "dirty" (if it included uncommitted changes).
+The [gversion](https://github.com/lessthanoptimal/gversion-plugin) Gradle plugin produces a constants file with important metadata, including the [Git hash](https://www.mikestreety.co.uk/blog/the-git-commit-hash/) uniquely identifying each commit. It also includes whether the tree is "dirty" (if it included uncommitted changes). The example projects include Gversion already. Otherwise, follow the installation instructions below.
 
-The example projects include Gversion already, and the installation page shows [how to install the plugin](INSTALLATION.md#gversion-plugin-git-metadata) in an existing project. Metadata can be recorded in the log file as shown below:
+<details>
+<summary>Installation</summary>
+
+Add the plugin at the top of `build.gradle`:
+
+```groovy
+plugins {
+    // ...
+    id "com.peterabeles.gversion" version "1.10"
+}
+```
+
+Add the `createVersionFile` task as a dependency of `compileJava`:
+
+```groovy
+project.compileJava.dependsOn(createVersionFile)
+gversion {
+  srcDir       = "src/main/java/"
+  classPackage = "frc.robot"
+  className    = "BuildConstants"
+  dateFormat   = "yyyy-MM-dd HH:mm:ss z"
+  timeZone     = "America/New_York" // Use preferred time zone
+  indent       = "  "
+}
+```
+
+You should also add the `BuildConstants.java` file to the repository `.gitignore`:
+
+```
+src/main/java/frc/robot/BuildConstants.java
+```
+
+:::info
+Git must be installed and available on the PATH to use the Gversion plugin. See [here](https://git-scm.com/downloads).
+:::
+
+</details>
+
+Metadata can be recorded in the log file as shown below:
 
 ```java
 public void robotInit() {
@@ -17,7 +55,7 @@ public void robotInit() {
 }
 ```
 
-The metadata values can be viewed using AdvantageScope's 🔍 [Metadata](https://github.com/Mechanical-Advantage/AdvantageScope/blob/main/docs/tabs/METADATA.md) tab. Running `git checkout ??????...` with the commit hash will return to the same version of code that was running on the robot (except for any uncommitted changes).
+The metadata values can be viewed using AdvantageScope's 🔍 [Metadata](https://docs.advantagescope.org/tab-reference/metadata) tab. Running `git checkout ??????...` with the commit hash will return to the same version of code that was running on the robot (except for any uncommitted changes).
 
 ## Event Deploy
 
