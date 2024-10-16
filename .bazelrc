@@ -3,6 +3,9 @@ try-import %workspace%/user.bazelrc
 build --enable_platform_specific_config
 build --enable_runfiles
 build --java_language_version=17
+build --java_runtime_version=17
+build --tool_java_language_version=17
+build --tool_java_runtime_version=17
 build --spawn_strategy=local # This disables sandboxing, which is a stopgap instead of using SandboxFS (we'd like to do this eventually, WPILib toolchain doesn't like the symlink tree)
 build --incompatible_enable_cc_toolchain_resolution # Enables the new toolchain identification feature which uses platforms to find the right cc toolchain
 
