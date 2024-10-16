@@ -55,6 +55,7 @@ void SystemReader::read(schema::SystemData* system_buf) {
   system_buf->mutate_fpga_button(HAL_GetFPGAButton(&status));
   system_buf->mutate_system_active(HAL_GetSystemActive(&status));
   system_buf->mutate_browned_out(HAL_GetBrownedOut(&status));
+  system_buf->mutate_comms_disable_count(HAL_GetCommsDisableCount(&status));
   system_buf->mutate_rsl_state(HAL_GetRSLState(&status));
   if (cycleCount % 50 == 0) {
     // This read takes longer

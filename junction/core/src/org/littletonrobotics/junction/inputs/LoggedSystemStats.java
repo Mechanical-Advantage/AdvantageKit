@@ -37,6 +37,7 @@ public class LoggedSystemStats {
     public boolean fpgaButton = false;
     public boolean systemActive = false;
     public boolean brownedOut = false;
+    public int commsDisableCount = 0;
     public boolean rslState = false;
     public boolean systemTimeValid = false;
     public double voltageVin = 12.0;
@@ -68,6 +69,7 @@ public class LoggedSystemStats {
       table.put("FPGAButton", fpgaButton);
       table.put("SystemActive", systemActive);
       table.put("BrownedOut", brownedOut);
+      table.put("CommsDisableCount", commsDisableCount);
       table.put("RSLState", rslState);
       table.put("SystemTimeValid", systemTimeValid);
 
@@ -110,6 +112,7 @@ public class LoggedSystemStats {
       teamNumber = table.get("TeamNumber", teamNumber);
       fpgaButton = table.get("FPGAButton", fpgaButton);
       systemActive = table.get("SystemActive", systemActive);
+      commsDisableCount = table.get("CommsDisableCount", commsDisableCount);
       brownedOut = table.get("BrownedOut", brownedOut);
       rslState = table.get("RSLState", rslState);
       systemTimeValid = table.get("SystemTimeValid", systemTimeValid);
@@ -159,6 +162,7 @@ public class LoggedSystemStats {
       sysInputs.fpgaButton = conduit.getFPGAButton();
       sysInputs.systemActive = conduit.getSystemActive();
       sysInputs.brownedOut = conduit.getBrownedOut();
+      sysInputs.commsDisableCount = conduit.getCommsDisableCount();
       sysInputs.rslState = conduit.getRSLState();
       sysInputs.systemTimeValid = conduit.getSystemTimeValid();
 

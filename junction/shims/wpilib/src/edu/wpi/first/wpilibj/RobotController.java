@@ -141,15 +141,13 @@ public final class RobotController {
   }
 
   /**
-   * Gets the number of times the system has been disabled due to communication errors with the
-   * Driver Station.
-   * 
-   * IMPORTANT: This method is not available in replay with AdvantageKit.
+   * Gets the number of times the system has been disabled due to communication
+   * errors with the Driver Station.
    *
    * @return number of disables due to communication errors.
    */
   public static int getCommsDisableCount() {
-    return HAL.getCommsDisableCount();
+    return LoggedSystemStats.getInputs().commsDisableCount;
   }
 
   /**
@@ -406,8 +404,9 @@ public final class RobotController {
   }
 
   /**
-   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so this function should
-   * not be called multiple times per loop cycle to avoid overruns.
+   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so
+   * this function should not be called multiple times per loop cycle to avoid
+   * overruns.
    *
    * @param state The state to set the LED to.
    */
@@ -416,8 +415,9 @@ public final class RobotController {
   }
 
   /**
-   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so this function
-   * should not be called multiple times per loop cycle to avoid overruns.
+   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so
+   * this function should not be called multiple times per loop cycle to avoid
+   * overruns.
    *
    * @return The state of the LED.
    */
