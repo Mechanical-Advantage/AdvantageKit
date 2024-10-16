@@ -245,6 +245,10 @@ public class ConduitApi {
     return sys.brownedOut() != 0;
   }
 
+  public int getCommsDisableCount() {
+    return sys.commsDisableCount();
+  }
+
   public boolean getRSLState() {
     return sys.rslState() != 0;
   }

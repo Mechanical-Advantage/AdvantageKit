@@ -29,7 +29,7 @@ import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DataLogBackgroundWriter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -54,7 +54,7 @@ public class WPILOGWriter implements LogDataReceiver {
   private LocalDateTime logDate;
   private String logMatchText;
 
-  private DataLog log;
+  private DataLogBackgroundWriter log;
   private LogTable lastTable;
   private int timestampID;
   private Map<String, Integer> entryIDs;
@@ -129,7 +129,7 @@ public class WPILOGWriter implements LogDataReceiver {
     }
 
     // Create new log
-    log = new DataLog(folder, filename, writePeriodSecs, WPILOGConstants.extraHeader);
+    log = new DataLogBackgroundWriter(folder, filename, writePeriodSecs, WPILOGConstants.extraHeader);
     timestampID = log.start(timestampKey, LoggableType.Integer.getWPILOGType(),
         WPILOGConstants.entryMetadata, 0);
     lastTable = new LogTable(0);

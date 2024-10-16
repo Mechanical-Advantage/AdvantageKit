@@ -70,6 +70,7 @@ struct SystemData {
     fpga_button:int32;
     system_active:int32;
     browned_out:int32;
+    comms_disable_count:int32;
     rsl_state:int32;
     system_time_valid:int32;
     voltage_vin:float64;

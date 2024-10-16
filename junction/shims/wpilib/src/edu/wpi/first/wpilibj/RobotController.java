@@ -20,6 +20,7 @@ package edu.wpi.first.wpilibj;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.hal.LEDJNI;
 import edu.wpi.first.hal.PowerJNI;
@@ -137,6 +138,16 @@ public final class RobotController {
    */
   public static boolean isBrownedOut() {
     return LoggedSystemStats.getInputs().brownedOut;
+  }
+
+  /**
+   * Gets the number of times the system has been disabled due to communication
+   * errors with the Driver Station.
+   *
+   * @return number of disables due to communication errors.
+   */
+  public static int getCommsDisableCount() {
+    return LoggedSystemStats.getInputs().commsDisableCount;
   }
 
   /**
@@ -316,6 +327,11 @@ public final class RobotController {
     return LoggedSystemStats.getInputs().userCurrentFaults6v;
   }
 
+  /** Reset the overcurrent fault counters for all user rails to 0. */
+  public static void resetRailFaultCounts() {
+    PowerJNI.resetUserCurrentFaults();
+  }
+
   /**
    * Get the current brownout voltage setting.
    *
@@ -388,8 +404,9 @@ public final class RobotController {
   }
 
   /**
-   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so this function should
-   * not be called multiple times per loop cycle to avoid overruns.
+   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so
+   * this function should not be called multiple times per loop cycle to avoid
+   * overruns.
    *
    * @param state The state to set the LED to.
    */
@@ -398,8 +415,9 @@ public final class RobotController {
   }
 
   /**
-   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so this function
-   * should not be called multiple times per loop cycle to avoid overruns.
+   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so
+   * this function should not be called multiple times per loop cycle to avoid
+   * overruns.
    *
    * @return The state of the LED.
    */
