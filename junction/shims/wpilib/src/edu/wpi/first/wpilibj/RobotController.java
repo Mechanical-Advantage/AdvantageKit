@@ -20,6 +20,7 @@ package edu.wpi.first.wpilibj;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.hal.LEDJNI;
 import edu.wpi.first.hal.PowerJNI;
@@ -137,6 +138,18 @@ public final class RobotController {
    */
   public static boolean isBrownedOut() {
     return LoggedSystemStats.getInputs().brownedOut;
+  }
+
+  /**
+   * Gets the number of times the system has been disabled due to communication errors with the
+   * Driver Station.
+   * 
+   * IMPORTANT: This method is not available in replay with AdvantageKit.
+   *
+   * @return number of disables due to communication errors.
+   */
+  public static int getCommsDisableCount() {
+    return HAL.getCommsDisableCount();
   }
 
   /**
@@ -314,6 +327,11 @@ public final class RobotController {
    */
   public static int getFaultCount6V() {
     return LoggedSystemStats.getInputs().userCurrentFaults6v;
+  }
+
+  /** Reset the overcurrent fault counters for all user rails to 0. */
+  public static void resetRailFaultCounts() {
+    PowerJNI.resetUserCurrentFaults();
   }
 
   /**

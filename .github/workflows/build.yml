@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: "11"
+          java-version: "17"
       - name: "Build all"
         run: bazelisk build --config=athena --verbose_failures ...
       - name: "Release: Get version number"
@@ -149,9 +149,9 @@ jobs:
       - name: 'Release: Upload "junction/shims/wpilib" to GitHub'
         if: github.event_name == 'release'
         run: bazelisk run --define "maven_repo=https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit" --define "maven_user=Mechanical-Advantage" --define "maven_password=${{ secrets.GITHUB_TOKEN }}" --define "publishing_version=${{ steps.get_version.outputs.version-without-v }}" //junction/shims/wpilib:wpilib-export.publish
-      
+
       # Upload local repo
-      - name: 'Release: Upload local repo'
+      - name: "Release: Upload local repo"
         uses: actions/upload-artifact@v3
         if: github.event_name == 'release'
         with:
@@ -163,25 +163,25 @@ jobs:
       matrix:
         host:
           - {
-              os: macos-12, 
-              displayName: "macOS", 
+              os: macos-12,
+              displayName: "macOS",
               classifier: "osxuniversal",
               mavenLocal: "file://$HOME/maven_offline",
-              mavenLocalUpload: "~/maven_offline"
+              mavenLocalUpload: "~/maven_offline",
             }
           - {
               os: ubuntu-22.04,
               displayName: "Linux",
               classifier: "linuxx86-64",
               mavenLocal: "file://$HOME/maven_offline",
-              mavenLocalUpload: "~/maven_offline"
+              mavenLocalUpload: "~/maven_offline",
             }
           - {
               os: windows-2019,
               displayName: "Windows",
               classifier: "windowsx86-64",
               mavenLocal: "file://%userprofile%\\maven_offline",
-              mavenLocalUpload: "%userprofile%/maven_offline"
+              mavenLocalUpload: "%userprofile%/maven_offline",
             }
 
     name: Build for ${{ matrix.host.displayName }}
@@ -195,7 +195,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: "11"
+          java-version: "17"
       - name: "Build all"
         run: bazelisk build --verbose_failures ...
       - name: "Test all"
@@ -229,7 +229,7 @@ jobs:
         run: python3 build_tools/repo/publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit.conduit --artifact_id conduit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.host.classifier }} --file_path bazel-bin/conduit/wpilibio/wpilibio-${{ steps.get_version.outputs.version-without-v }}-${{ matrix.host.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
 
       # Upload local repo
-      - name: 'Release: Upload local repo'
+      - name: "Release: Upload local repo"
         uses: actions/upload-artifact@v3
         if: github.event_name == 'release'
         with:

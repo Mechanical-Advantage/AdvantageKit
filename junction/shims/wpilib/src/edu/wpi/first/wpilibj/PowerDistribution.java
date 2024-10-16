@@ -117,8 +117,16 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    */
   public double getCurrent(int channel) {
     double current = LoggedPowerDistribution.getInstance().getInputs().pdpChannelCurrents[channel];
-
     return current;
+  }
+
+  /**
+   * Query all currents of the PDP.
+   *
+   * @return The current of each channel in Amperes
+   */
+  public double[] getAllCurrents() {
+    return LoggedPowerDistribution.getInstance().getInputs().pdpChannelCurrents.clone();
   }
 
   /**

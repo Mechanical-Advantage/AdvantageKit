@@ -628,7 +628,7 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public static <U extends Unit<U>> void recordOutput(String key, Measure<U> value) {
+  public static <U extends Unit> void recordOutput(String key, Measure<U> value) {
     if (running) {
       outputTable.put(key, value);
     }

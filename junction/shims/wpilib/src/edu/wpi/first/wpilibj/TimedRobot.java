@@ -17,6 +17,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.units.measure.Time;
+
 /**
  * @Deprecated The main robot class must inherit from LoggedRobot instead of
  *             TimedRobot when using AdvantageKit's WPILib shims. For more
@@ -27,8 +29,8 @@ package edu.wpi.first.wpilibj;
 public class TimedRobot extends IterativeRobotBase {
   static class Callback implements Comparable<Callback> {
     public Runnable func;
-    public double period;
-    public double expirationTime;
+    public long period;
+    public long expirationTime;
 
     Callback(Runnable func, double startTimeSeconds, double periodSeconds, double offsetSeconds) {
     }
@@ -76,5 +78,11 @@ public class TimedRobot extends IterativeRobotBase {
   }
 
   public void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
+  }
+
+  public final void addPeriodic(Runnable callback, Time period) {
+  }
+
+  public final void addPeriodic(Runnable callback, Time period, Time offset) {
   }
 }
