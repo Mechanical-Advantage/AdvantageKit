@@ -41,13 +41,13 @@ void SystemReader::read(schema::SystemData* system_buf) {
     HAL_GetSerialNumber(&serialNum);
     system_buf->mutate_serial_number_size(serialNum.len);
     std::memcpy(system_buf->mutable_serial_number()->Data(), serialNum.str,
-                system_buf->serial_number()->size());
+                serialNum.len);
 
     WPI_String comments;
     HAL_GetComments(&comments);
     system_buf->mutate_comments_size(comments.len);
     std::memcpy(system_buf->mutable_comments()->Data(), comments.str,
-                system_buf->comments()->size());
+                comments.len);
 
     system_buf->mutate_team_number(HAL_GetTeamNumber());
   }
