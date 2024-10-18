@@ -42,14 +42,14 @@ All of the IO methods include a default implementation which is used during simu
 public RobotContainer() {
     if (isReal()) {
         // Instantiate IO implementations to talk to real hardware
-        driveTrain = new DriveTrain(DriveTrainIOReal());
-        elevator = new Elevator(ElevatorIOReal());
-        intake = new Intake(IntakeIOReal());
+        driveTrain = new DriveTrain(new DriveTrainIOReal());
+        elevator = new Elevator(new ElevatorIOReal());
+        intake = new Intake(new IntakeIOReal());
     } else {
         // Use anonymous classes to create "dummy" IO implementations
-        driveTrain = new DriveTrain(DriveTrainIO() {});
-        elevator = new Elevator(ElevatorIO() {});
-        intake = new Intake(IntakeIO() {});
+        driveTrain = new DriveTrain(new DriveTrainIO() {});
+        elevator = new Elevator(new ElevatorIO() {});
+        intake = new Intake(new IntakeIO() {});
     }
 }
 ```
