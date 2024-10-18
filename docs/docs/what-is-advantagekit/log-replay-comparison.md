@@ -53,4 +53,4 @@ AdvantageKit is **free** and **open-source**. It can be used with hardware from 
 | FRC language support                                                                                                                                   | <center>Java, Python, C++</center> | <center>Java, Python, C++</center>                                                      | <center>Java</center>        |
 | Pricing                                                                                                                                                | <center>Free</center>              | <center>Requires [Phoenix Pro](https://store.ctr-electronics.com/phoenix-pro/)</center> | <center>Free</center>        |
 
-\*Code logic replayed using Hoot Replay may not match the behavior of the real robot. CTRE timestamps available during Hoot Replay use a different time base than the real robot.
+\*Code logic replayed using Hoot Replay may not match the behavior of the real robot. Phoenix timestamps available during Hoot Replay use a different time base than the real robot.
