@@ -32,7 +32,7 @@ Hoot logging is enabled by default and **does not require architecture changes t
 
 ### AdvantageKit
 
-AdvantageKit guarantees **deterministic replay of robot code in simulation**, allowing for [additional fields to be logged](./example-output-logging.md) or [code logic to be adjusted](./example-bug-fixes.md) in replay. AdvantageKit **guarantees that the replayed robot code will match the behavior of the real robot**.
+AdvantageKit guarantees **deterministic replay of robot code in simulation**, allowing for [additional fields to be logged](./example-output-logging.md) or [code logic to be adjusted](./example-bug-fixes.md) in replay with complete certainty of the original and adjusted behavior of the real robot. AdvantageKit **guarantees that the replayed robot code will match the behavior of the real robot**.
 
 AdvantageKit is not enabled by default. Code bases not already using [hardware abstraction](../recording-inputs/io-interfaces.md) for subsystems must be restructured when switching to AdvantageKit.
 
