@@ -26,11 +26,23 @@ public class LogFileUtil {
   }
 
   /**
-   * Adds a suffix to the given path (e.g. "test.rlog" -> "test_simulated.rlog").
+   * Adds a suffix to the given path (e.g. "test.wpilog" -> "test_sim.wpilog").
+   * 
+   * <p>
+   * If the input path already contains the suffix, an index will be added
+   * instead.
    */
   public static String addPathSuffix(String path, String suffix) {
     String[] tokens = path.split("\\.");
-    return tokens[0] + suffix + "." + tokens[1];
+    if (tokens[0].endsWith(suffix)) {
+      return tokens[0] + "_2." + tokens[1];
+    } else if (tokens[0].matches(".+" + suffix + "_[0-9]+$")) {
+      int splitIndex = tokens[0].lastIndexOf("_");
+      int index = Integer.parseInt(tokens[0].substring(splitIndex + 1));
+      return tokens[0].substring(0, splitIndex) + "_" + Integer.toString(index + 1) + "." + tokens[1];
+    } else {
+      return tokens[0] + suffix + "." + tokens[1];
+    }
   }
 
   /**
