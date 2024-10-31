@@ -17,7 +17,6 @@ import edu.wpi.first.util.datalog.DataLogWriter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -80,7 +79,7 @@ public class WPILOGWriter implements LogDataReceiver {
       autoRename = false;
     } else {
       folder = path;
-      filename = "Log_" + randomIdentifier + ".wpilog";
+      filename = "akit_" + randomIdentifier + ".wpilog";
       autoRename = true;
     }
   }
@@ -195,11 +194,16 @@ public class WPILOGWriter implements LogDataReceiver {
 
       // Update filename
       StringBuilder newFilenameBuilder = new StringBuilder();
-      newFilenameBuilder.append("Log_");
+      newFilenameBuilder.append("akit_");
       if (logDate == null) {
         newFilenameBuilder.append(randomIdentifier);
       } else {
         newFilenameBuilder.append(timeFormatter.format(logDate));
+      }
+      String eventName = table.get("DriverStation/EventName", "").toLowerCase();
+      if (eventName.length() > 0) {
+        newFilenameBuilder.append("_");
+        newFilenameBuilder.append(eventName);
       }
       if (logMatchText != null) {
         newFilenameBuilder.append("_");
@@ -207,8 +211,8 @@ public class WPILOGWriter implements LogDataReceiver {
       }
       newFilenameBuilder.append(".wpilog");
       String newFilename = newFilenameBuilder.toString();
-      if (!newFilename.equals(filename) && Timer.getFPGATimestamp() > 15.0) {
-        String logPath = Path.of(folder, filename).toString();
+      if (!newFilename.equals(filename)) {
+        String logPath = Path.of(folder, newFilename).toString();
         System.out.println("[AdvantageKit] Renaming log to \"" + logPath + "\"");
 
         File fileA = new File(folder, filename);
