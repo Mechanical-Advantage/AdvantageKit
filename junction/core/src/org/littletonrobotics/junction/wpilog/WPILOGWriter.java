@@ -13,26 +13,24 @@
 
 package org.littletonrobotics.junction.wpilog;
 
+import edu.wpi.first.util.datalog.DataLogWriter;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.MatchType;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import java.io.File;
-import java.text.SimpleDateFormat;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
 import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.util.datalog.DataLogBackgroundWriter;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
-import edu.wpi.first.wpilibj.RobotBase;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
@@ -40,21 +38,19 @@ public class WPILOGWriter implements LogDataReceiver {
                                                           // timestamp/timezone is updated
   private static final String defaultPathRio = "/U/logs";
   private static final String defaultPathSim = "logs";
-  private static final double defaultWritePeriodRio = 0.1;
-  private static final double defaultWritePeriodSim = 0.01;
   private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
 
   private String folder;
   private String filename;
   private final String randomIdentifier;
-  private final double writePeriodSecs;
   private Double dsAttachedTime;
 
   private boolean autoRename;
   private LocalDateTime logDate;
   private String logMatchText;
 
-  private DataLogBackgroundWriter log;
+  private DataLogWriter log;
+  private boolean isOpen = false;
   private LogTable lastTable;
   private int timestampID;
   private Map<String, Integer> entryIDs;
@@ -62,15 +58,12 @@ public class WPILOGWriter implements LogDataReceiver {
 
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
-   * 
-   * @param path            Path to log file or folder. If only a folder is
-   *                        provided, the filename will be generated based on the
-   *                        current time and match number (if applicable).
-   * @param writePeriodSecs Time between automatic flushes to the disk, in seconds
+   *
+   * @param path Path to log file or folder. If only a folder is provided, the
+   *             filename will be generated based on the current time and match
+   *             number (if applicable).
    */
-  public WPILOGWriter(String path, double writePeriod) {
-    writePeriodSecs = writePeriod;
-
+  public WPILOGWriter(String path) {
     // Create random identifier
     Random random = new Random();
     StringBuilder randomIdentifierBuilder = new StringBuilder();
@@ -90,17 +83,6 @@ public class WPILOGWriter implements LogDataReceiver {
       filename = "Log_" + randomIdentifier + ".wpilog";
       autoRename = true;
     }
-  }
-
-  /**
-   * Create a new WPILOGWriter for writing to a ".wpilog" file.
-   *
-   * @param path Path to log file or folder. If only a folder is provided, the
-   *             filename will be generated based on the current time and match
-   *             number (if applicable).
-   */
-  public WPILOGWriter(String path) {
-    this(path, RobotBase.isSimulation() ? defaultWritePeriodSim : defaultWritePeriodRio);
   }
 
   /**
@@ -129,9 +111,17 @@ public class WPILOGWriter implements LogDataReceiver {
     }
 
     // Create new log
-    log = new DataLogBackgroundWriter(folder, filename, writePeriodSecs, WPILOGConstants.extraHeader);
-    timestampID = log.start(timestampKey, LoggableType.Integer.getWPILOGType(),
-        WPILOGConstants.entryMetadata, 0);
+    String logPath = Path.of(folder, filename).toString();
+    System.out.println("Logging to \"" + logPath + "\"");
+    try {
+      log = new DataLogWriter(logPath, WPILOGConstants.extraHeader);
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to open output log file.", true);
+      return;
+    }
+    isOpen = true;
+    timestampID = log.start(
+        timestampKey, LoggableType.Integer.getWPILOGType(), WPILOGConstants.entryMetadata, 0);
     lastTable = new LogTable(0);
 
     // Reset data
@@ -146,12 +136,17 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   public void putTable(LogTable table) {
+    // Exit if log not open
+    if (!isOpen)
+      return;
+
     // Auto rename
     if (autoRename) {
 
       // Update timestamp
       if (logDate == null) {
-        if ((table.get("DriverStation/DSAttached", false) && table.get("SystemStats/SystemTimeValid", false))
+        if ((table.get("DriverStation/DSAttached", false)
+            && table.get("SystemStats/SystemTimeValid", false))
             || RobotBase.isSimulation()) {
           if (dsAttachedTime == null) {
             dsAttachedTime = Logger.getRealTimestamp() / 1000000.0;
@@ -212,8 +207,13 @@ public class WPILOGWriter implements LogDataReceiver {
       }
       newFilenameBuilder.append(".wpilog");
       String newFilename = newFilenameBuilder.toString();
-      if (!newFilename.equals(filename)) {
-        log.setFilename(newFilename);
+      if (!newFilename.equals(filename) && Timer.getFPGATimestamp() > 15.0) {
+        String logPath = Path.of(folder, filename).toString();
+        System.out.println("Renaming log to \"" + logPath + "\"");
+
+        File fileA = new File(folder, filename);
+        File fileB = new File(folder, newFilename);
+        fileA.renameTo(fileB);
         filename = newFilename;
       }
     }
@@ -232,8 +232,13 @@ public class WPILOGWriter implements LogDataReceiver {
       LoggableType type = field.getValue().type;
       boolean appendData = false;
       if (!entryIDs.containsKey(field.getKey())) { // New field
-        entryIDs.put(field.getKey(), log.start(field.getKey(), field.getValue().getWPILOGType(),
-            WPILOGConstants.entryMetadata, table.getTimestamp()));
+        entryIDs.put(
+            field.getKey(),
+            log.start(
+                field.getKey(),
+                field.getValue().getWPILOGType(),
+                WPILOGConstants.entryMetadata,
+                table.getTimestamp()));
         entryTypes.put(field.getKey(), type);
         appendData = true;
       } else if (!field.getValue().equals(oldMap.get(field.getKey()))) { // Updated field
@@ -280,6 +285,9 @@ public class WPILOGWriter implements LogDataReceiver {
         }
       }
     }
+
+    // Flush to disk
+    log.flush();
 
     // Update last table
     lastTable = table;
