@@ -320,6 +320,8 @@ public class Logger {
       // Update final outputs
       long autoLogStart = getRealTimestamp();
       AutoLogOutputManager.periodic();
+      long alertLogStart = getRealTimestamp();
+      AlertLogger.periodic();
       long consoleCaptureStart = getRealTimestamp();
       if (enableConsole) {
         String consoleData = console.getNewData();
@@ -330,7 +332,8 @@ public class Logger {
       long consoleCaptureEnd = getRealTimestamp();
 
       // Record timing data
-      recordOutput("Logger/AutoLogPeriodicMS", (consoleCaptureStart - autoLogStart) / 1000.0);
+      recordOutput("Logger/AutoLogPeriodicMS", (alertLogStart - autoLogStart) / 1000.0);
+      recordOutput("Logger/AlertLogPeriodicMS", (consoleCaptureStart - alertLogStart) / 1000.0);
       recordOutput("Logger/ConsolePeriodicMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
       recordOutput("LoggedRobot/UserCodeMS", userCodeLength / 1000.0);
       long periodicAfterLength = consoleCaptureEnd - autoLogStart;
