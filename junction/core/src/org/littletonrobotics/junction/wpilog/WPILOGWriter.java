@@ -19,7 +19,10 @@ import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -38,6 +41,7 @@ public class WPILOGWriter implements LogDataReceiver {
   private static final String defaultPathRio = "/U/logs";
   private static final String defaultPathSim = "logs";
   private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
+  private static final String advantageScopeFileName = "ascope-log-path.txt";
 
   private String folder;
   private String filename;
@@ -132,6 +136,21 @@ public class WPILOGWriter implements LogDataReceiver {
 
   public void end() {
     log.close();
+
+    // Send log path to AdvantageScope in replay
+    if (Logger.hasReplaySource()) {
+      try {
+        String fullLogPath = FileSystems.getDefault().getPath(folder, filename).normalize().toAbsolutePath()
+            .toString();
+        Path advantageScopeTempPath = Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
+        PrintWriter writer = new PrintWriter(advantageScopeTempPath.toString(), "UTF-8");
+        writer.println(fullLogPath);
+        writer.close();
+        System.out.println("[AdvantageKit] Replay log sent to AdvantageScope.");
+      } catch (Exception e) {
+        DriverStation.reportError("[AdvantageKit] Failed to send log to AdvantageScope.", false);
+      }
+    }
   }
 
   public void putTable(LogTable table) {

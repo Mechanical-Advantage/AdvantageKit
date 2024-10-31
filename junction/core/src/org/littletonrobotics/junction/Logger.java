@@ -231,6 +231,11 @@ public class Logger {
         replaySource.end();
       }
       receiverThread.interrupt();
+      try {
+        receiverThread.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
       setMathShared(false);
     }
   }
