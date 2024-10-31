@@ -171,7 +171,7 @@ public class LogTable {
       return true;
     }
     DriverStation.reportWarning(
-        "Failed to write to field \""
+        "[AdvantageKit] Failed to write to field \""
             + prefix + key
             + "\" - attempted to write "
             + type
@@ -442,7 +442,7 @@ public class LogTable {
       // Driver Station alert
       if (!disableProtobufWarning) {
         DriverStation.reportWarning(
-            "Logging value to field \""
+            "[AdvantageKit] Logging value to field \""
                 + prefix
                 + key
                 + "\" using protobuf encoding. This may cause high loop overruns, please monitor performance or save the value in a different format. Call \"LogTable.disableProtobufWarning()\" to disable this message.",
@@ -507,7 +507,8 @@ public class LogTable {
       if (proto != null) {
         put(key, proto, value);
       } else {
-        DriverStation.reportError("Auto serialization is not supported for type " + value.getClass().getSimpleName(),
+        DriverStation.reportError(
+            "[AdvantageKit] Auto serialization is not supported for type " + value.getClass().getSimpleName(),
             false);
       }
     }
@@ -527,7 +528,8 @@ public class LogTable {
       put(key, struct, value);
     } else {
       DriverStation.reportError(
-          "Auto serialization is not supported for array type " + value.getClass().getComponentType().getSimpleName(),
+          "[AdvantageKit] Auto serialization is not supported for array type "
+              + value.getClass().getComponentType().getSimpleName(),
           false);
     }
   }

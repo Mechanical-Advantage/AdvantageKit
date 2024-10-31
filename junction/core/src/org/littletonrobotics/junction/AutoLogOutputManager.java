@@ -372,7 +372,8 @@ public class AutoLogOutputManager {
                   Logger.recordOutput(key, (StructSerializable[]) value);
                 } catch (ClassCastException e) {
                   DriverStation.reportError(
-                      "Auto serialization is not supported for array type " + componentType.getSimpleName(),
+                      "[AdvantageKit] Auto serialization is not supported for array type "
+                          + componentType.getSimpleName(),
                       false);
                 }
               }
@@ -453,7 +454,7 @@ public class AutoLogOutputManager {
                   Logger.recordOutput(key, (WPISerializable) value);
                 } catch (ClassCastException e) {
                   DriverStation.reportError(
-                      "Auto serialization is not supported for type " + type.getSimpleName(),
+                      "[AdvantageKit] Auto serialization is not supported for type " + type.getSimpleName(),
                       false);
                 }
             });

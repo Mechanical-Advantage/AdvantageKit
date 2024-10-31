@@ -112,11 +112,11 @@ public class WPILOGWriter implements LogDataReceiver {
 
     // Create new log
     String logPath = Path.of(folder, filename).toString();
-    System.out.println("Logging to \"" + logPath + "\"");
+    System.out.println("[AdvantageKit] Logging to \"" + logPath + "\"");
     try {
       log = new DataLogWriter(logPath, WPILOGConstants.extraHeader);
     } catch (IOException e) {
-      DriverStation.reportError("Failed to open output log file.", true);
+      DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
       return;
     }
     isOpen = true;
@@ -209,7 +209,7 @@ public class WPILOGWriter implements LogDataReceiver {
       String newFilename = newFilenameBuilder.toString();
       if (!newFilename.equals(filename) && Timer.getFPGATimestamp() > 15.0) {
         String logPath = Path.of(folder, filename).toString();
-        System.out.println("Renaming log to \"" + logPath + "\"");
+        System.out.println("[AdvantageKit] Renaming log to \"" + logPath + "\"");
 
         File fileA = new File(folder, filename);
         File fileB = new File(folder, newFilename);

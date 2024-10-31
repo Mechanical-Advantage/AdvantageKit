@@ -50,15 +50,15 @@ public class WPILOGReader implements LogReplaySource {
     try {
       reader = new DataLogReader(filename);
     } catch (IOException e) {
-      DriverStation.reportError("Failed to open replay log file.", true);
+      DriverStation.reportError("[AdvantageKit] Failed to open replay log file.", true);
     }
 
     // Check validity
     if (!reader.isValid()) {
-      DriverStation.reportError("The replay log is not a valid WPILOG file.", false);
+      DriverStation.reportError("[AdvantageKit] The replay log is not a valid WPILOG file.", false);
       isValid = false;
     } else if (!reader.getExtraHeader().equals(WPILOGConstants.extraHeader)) {
-      DriverStation.reportError("The replay log was not produced by AdvantageKit.", true);
+      DriverStation.reportError("[AdvantageKit] The replay log was not produced by AdvantageKit.", true);
       isValid = false;
     } else {
       isValid = true;

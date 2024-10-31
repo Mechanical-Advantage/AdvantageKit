@@ -44,7 +44,7 @@ public class RLOGServer implements LogDataReceiver {
   public void start() {
     thread = new ServerThread(port);
     thread.start();
-    System.out.println("RLOG server started on port " + Integer.toString(port));
+    System.out.println("[AdvantageKit] RLOG server started on port " + Integer.toString(port));
   }
 
   public void end() {
@@ -75,11 +75,12 @@ public class RLOGServer implements LogDataReceiver {
   }
 
   private class ServerThread extends Thread {
-    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if heartbeat not received for this length
+    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if heartbeat not received for this
+                                                            // length
 
     ServerSocket server;
     Thread broadcastThread;
-    
+
     ArrayBlockingQueue<byte[]> broadcastQueue = new ArrayBlockingQueue<>(500);
     List<Socket> sockets = new ArrayList<>();
     List<Double> lastHeartbeats = new ArrayList<>();
@@ -116,7 +117,7 @@ public class RLOGServer implements LogDataReceiver {
           socket.getOutputStream().write(data);
           sockets.add(socket);
           lastHeartbeats.add(Logger.getRealTimestamp() / 1000000.0);
-          System.out.println("Connected to RLOG client - " + socket.getInetAddress().getHostAddress());
+          System.out.println("[AdvantageKit] Connected to RLOG client - " + socket.getInetAddress().getHostAddress());
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -178,7 +179,8 @@ public class RLOGServer implements LogDataReceiver {
     }
 
     private void printDisconnectMessage(Socket socket, String reason) {
-      System.out.println("Disconnected from RLOG client (" + reason + ") - " + socket.getInetAddress().getHostAddress());
+      System.out
+          .println("Disconnected from RLOG client (" + reason + ") - " + socket.getInetAddress().getHostAddress());
     }
 
     public void close() {

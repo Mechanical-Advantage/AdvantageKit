@@ -63,7 +63,8 @@ public class RIOConsoleSource implements ConsoleSource {
     try {
       reader = new BufferedReader(new FileReader(filePath));
     } catch (FileNotFoundException e) {
-      DriverStation.reportError("Failed to open console file \"" + filePath + "\", disabling console capture.", true);
+      DriverStation.reportError(
+          "[AdvantageKit] Failed to open console file \"" + filePath + "\", disabling console capture.", true);
       return;
     }
 
@@ -74,16 +75,19 @@ public class RIOConsoleSource implements ConsoleSource {
         try {
           nextChar = reader.read();
         } catch (IOException e) {
-          DriverStation.reportError("Failed to read console file \"" + filePath + "\", disabling console capture.", true);
+          DriverStation.reportError(
+              "[AdvantageKit] Failed to read console file \"" + filePath + "\", disabling console capture.", true);
           try {
             reader.close();
-          } catch (IOException io) {}
+          } catch (IOException io) {
+          }
           return;
         }
         if (nextChar != -1) {
           try {
             buffer.put((char) nextChar);
-          } catch (BufferOverflowException e) {}
+          } catch (BufferOverflowException e) {
+          }
         } else {
           // Break read loop, send complete lines to queue
           break;
@@ -108,7 +112,8 @@ public class RIOConsoleSource implements ConsoleSource {
         } catch (InterruptedException e) {
           try {
             reader.close();
-          } catch (IOException io) {}
+          } catch (IOException io) {
+          }
           return;
         }
       }
@@ -119,7 +124,8 @@ public class RIOConsoleSource implements ConsoleSource {
       } catch (InterruptedException e) {
         try {
           reader.close();
-        } catch (IOException io) {}
+        } catch (IOException io) {
+        }
         return;
       }
     }

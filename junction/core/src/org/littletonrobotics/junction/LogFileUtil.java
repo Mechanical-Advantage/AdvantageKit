@@ -44,7 +44,8 @@ public class LogFileUtil {
     // Read environment variables
     String envPath = System.getenv(environmentVariable);
     if (envPath != null) {
-      System.out.println("Using log from " + environmentVariable + " environment variable - \"" + envPath + "\"");
+      System.out.println(
+          "[AdvantageKit] Replaying log from " + environmentVariable + " environment variable: \"" + envPath + "\"");
       return envPath;
     }
 
@@ -56,7 +57,7 @@ public class LogFileUtil {
     } catch (IOException e) {
     }
     if (advantageScopeLogPath != null) {
-      System.out.println("Using log from AdvantageScope - \"" + advantageScopeLogPath + "\"");
+      System.out.println("[AdvantageKit] Replaying log from AdvantageScope: \"" + advantageScopeLogPath + "\"");
       return advantageScopeLogPath;
     }
 
