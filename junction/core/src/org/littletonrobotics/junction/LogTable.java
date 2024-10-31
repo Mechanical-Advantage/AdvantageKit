@@ -15,6 +15,7 @@ package org.littletonrobotics.junction;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -206,6 +207,19 @@ public class LogTable {
   }
 
   /**
+   * Writes a new 2D Raw value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  public void put(String key, byte[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
+  }
+
+  /**
    * Writes a new Boolean value to the table. Skipped if the key already exists as
    * a different type.
    */
@@ -288,6 +302,19 @@ public class LogTable {
   }
 
   /**
+   * Writes a new 2D BooleanArray value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  public void put(String key, boolean[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
+  }
+
+  /**
    * Writes a new IntegerArray value to the table. Skipped if the key already
    * exists as a different type.
    */
@@ -299,6 +326,19 @@ public class LogTable {
       valueClone[i] = value[i];
     }
     put(key, new LogValue(valueClone, null));
+  }
+
+  /**
+   * Writes a new 2D IntegerArray value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  public void put(String key, int[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
   }
 
   /**
@@ -314,6 +354,19 @@ public class LogTable {
   }
 
   /**
+   * Writes a new 2D IntegerArray value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  public void put(String key, long[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
+  }
+
+  /**
    * Writes a new FloatArray value to the table. Skipped if the key already
    * exists as a different type.
    */
@@ -323,6 +376,19 @@ public class LogTable {
     float[] valueClone = new float[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
+  }
+
+  /**
+   * Writes a new 2D FloatArray value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  public void put(String key, float[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
   }
 
   /**
@@ -338,6 +404,19 @@ public class LogTable {
   }
 
   /**
+   * Writes a new 2D DoubleArray value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  public void put(String key, double[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
+  }
+
+  /**
    * Writes a new StringArray value to the table. Skipped if the key already
    * exists as a different type.
    */
@@ -347,6 +426,19 @@ public class LogTable {
     String[] valueClone = new String[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
+  }
+
+  /**
+   * Writes a new 2D StringArray value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  public void put(String key, String[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
   }
 
   private void addStructSchema(Struct<?> struct, Set<String> seen) {
@@ -410,6 +502,20 @@ public class LogTable {
       bb.position(0);
       bb.get(array);
       put(key, new LogValue(array, struct.getTypeString() + "[]"));
+    }
+  }
+
+  /**
+   * Writes a new 2D struct array value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> void put(String key, Struct<T> struct, T[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), struct, value[i]);
     }
   }
 
@@ -534,6 +640,20 @@ public class LogTable {
     }
   }
 
+  /**
+   * Writes a new auto serialized 2D array value to the table. Skipped if the key
+   * already exists as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T extends StructSerializable> void put(String key, T[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
+  }
+
   /** Reads a generic value from the table. */
   public LogValue get(String key) {
     return data.get(prefix + key);
@@ -543,6 +663,19 @@ public class LogTable {
   public byte[] get(String key, byte[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getRaw(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a 2D Raw value from the table. */
+  public byte[][] get(String key, byte[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      byte[][] value = new byte[get(key + "/length", 0)][];
+      for (int i = 0; i < value.length; i++) {
+        value[i] = get(key + "/" + Integer.toString(i), new byte[0]);
+      }
+      return value;
     } else {
       return defaultValue;
     }
@@ -643,6 +776,19 @@ public class LogTable {
     }
   }
 
+  /** Reads a 2D BooleanArray value from the table. */
+  public boolean[][] get(String key, boolean[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      boolean[][] value = new boolean[get(key + "/length", 0)][];
+      for (int i = 0; i < value.length; i++) {
+        value[i] = get(key + "/" + Integer.toString(i), new boolean[0]);
+      }
+      return value;
+    } else {
+      return defaultValue;
+    }
+  }
+
   /** Reads an IntegerArray value from the table. */
   public int[] get(String key, int[] defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -661,10 +807,36 @@ public class LogTable {
     }
   }
 
+  /** Reads a 2D IntegerArray value from the table. */
+  public int[][] get(String key, int[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      int[][] value = new int[get(key + "/length", 0)][];
+      for (int i = 0; i < value.length; i++) {
+        value[i] = get(key + "/" + Integer.toString(i), new int[0]);
+      }
+      return value;
+    } else {
+      return defaultValue;
+    }
+  }
+
   /** Reads an IntegerArray value from the table. */
   public long[] get(String key, long[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getIntegerArray(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a 2D IntegerArray value from the table. */
+  public long[][] get(String key, long[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      long[][] value = new long[get(key + "/length", 0)][];
+      for (int i = 0; i < value.length; i++) {
+        value[i] = get(key + "/" + Integer.toString(i), new long[0]);
+      }
+      return value;
     } else {
       return defaultValue;
     }
@@ -679,6 +851,19 @@ public class LogTable {
     }
   }
 
+  /** Reads a 2D FloatArray value from the table. */
+  public float[][] get(String key, float[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      float[][] value = new float[get(key + "/length", 0)][];
+      for (int i = 0; i < value.length; i++) {
+        value[i] = get(key + "/" + Integer.toString(i), new float[0]);
+      }
+      return value;
+    } else {
+      return defaultValue;
+    }
+  }
+
   /** Reads a DoubleArray value from the table. */
   public double[] get(String key, double[] defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -688,10 +873,36 @@ public class LogTable {
     }
   }
 
+  /** Reads a 2D DoubleArray value from the table. */
+  public double[][] get(String key, double[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      double[][] value = new double[get(key + "/length", 0)][];
+      for (int i = 0; i < value.length; i++) {
+        value[i] = get(key + "/" + Integer.toString(i), new double[0]);
+      }
+      return value;
+    } else {
+      return defaultValue;
+    }
+  }
+
   /** Reads a StringArray value from the table. */
   public String[] get(String key, String[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getStringArray(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a 2D StringArray value from the table. */
+  public String[][] get(String key, String[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      String[][] value = new String[get(key + "/length", 0)][];
+      for (int i = 0; i < value.length; i++) {
+        value[i] = get(key + "/" + Integer.toString(i), new String[0]);
+      }
+      return value;
     } else {
       return defaultValue;
     }
@@ -720,6 +931,23 @@ public class LogTable {
       }
       StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
       return buffer.readArray(get(key).getRaw());
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a 2D struct array value from the table. */
+  @SuppressWarnings("unchecked")
+  public <T> T[][] get(String key, Struct<T> struct, T[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      int length = get(key + "/length", 0);
+      T[][] value = (T[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
+      for (int i = 0; i < value.length; i++) {
+        T[] defaultItemValue = (T[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
+            0);
+        value[i] = get(key + "/" + Integer.toString(i), struct, defaultItemValue);
+      }
+      return value;
     } else {
       return defaultValue;
     }
@@ -778,6 +1006,23 @@ public class LogTable {
       }
     }
     return defaultValue;
+  }
+
+  /** Reads a serialized (struct) array value from the table. */
+  @SuppressWarnings("unchecked")
+  public <T extends StructSerializable> T[][] get(String key, T[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      int length = get(key + "/length", 0);
+      T[][] value = (T[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
+      for (int i = 0; i < value.length; i++) {
+        T[] defaultItemValue = (T[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
+            0);
+        value[i] = get(key + "/" + Integer.toString(i), defaultItemValue);
+      }
+      return value;
+    } else {
+      return defaultValue;
+    }
   }
 
   /** Returns a string representation of the table. */
