@@ -285,13 +285,13 @@ public class Logger {
             buffers[i].get(bytes);
             switch (i) {
               case 0:
-                entry.put("URCL/Raw/Persistent", new LogValue(bytes, "URCLr2_persistent"));
+                entry.put("URCL/Raw/Persistent", new LogValue(bytes, "URCLr3_persistent"));
                 break;
               case 1:
-                entry.put("URCL/Raw/Periodic", new LogValue(bytes, "URCLr2_periodic"));
+                entry.put("URCL/Raw/Periodic", new LogValue(bytes, "URCLr3_periodic"));
                 break;
               case 2:
-                entry.put("URCL/Raw/Aliases", new LogValue(bytes, "URCLr2_aliases"));
+                entry.put("URCL/Raw/Aliases", new LogValue(bytes, "URCLr3_aliases"));
                 break;
             }
           }
