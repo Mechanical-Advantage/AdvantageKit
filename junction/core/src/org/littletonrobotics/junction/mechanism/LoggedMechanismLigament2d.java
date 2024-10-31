@@ -15,7 +15,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package org.littletonrobotics.junction.mechanism;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.DoubleEntry;
@@ -31,7 +31,7 @@ import org.littletonrobotics.junction.LogTable;
  *
  * @see Mechanism2d
  */
-public class MechanismLigament2d extends MechanismObject2d {
+public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
   private StringPublisher m_typePub;
   private double m_angle;
   private DoubleEntry m_angleEntry;
@@ -51,7 +51,7 @@ public class MechanismLigament2d extends MechanismObject2d {
    * @param lineWidth The ligament's line width.
    * @param color     The ligament's color.
    */
-  public MechanismLigament2d(
+  public LoggedMechanismLigament2d(
       String name, double length, double angle, double lineWidth, Color8Bit color) {
     super(name);
     setColor(color);
@@ -67,7 +67,7 @@ public class MechanismLigament2d extends MechanismObject2d {
    * @param length The ligament's length.
    * @param angle  The ligament's angle relative to its parent in degrees.
    */
-  public MechanismLigament2d(String name, double length, double angle) {
+  public LoggedMechanismLigament2d(String name, double length, double angle) {
     this(name, length, angle, 10, new Color8Bit(235, 137, 52));
   }
 
@@ -243,12 +243,12 @@ public class MechanismLigament2d extends MechanismObject2d {
     m_weightEntry.set(m_weight);
   }
 
-  synchronized void akitLog(LogTable table) {
+  synchronized void logOutput(LogTable table) {
     table.put(".type", "line");
     table.put("angle", m_angle);
     table.put("length", m_length);
     table.put("color", m_color);
     table.put("weight", m_weight);
-    super.akitLog(table);
+    super.logOutput(table);
   }
 }

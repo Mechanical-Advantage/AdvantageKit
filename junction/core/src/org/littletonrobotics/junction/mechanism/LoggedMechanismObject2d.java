@@ -15,7 +15,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package org.littletonrobotics.junction.mechanism;
 
 import edu.wpi.first.networktables.NetworkTable;
 import java.util.HashMap;
@@ -32,25 +32,25 @@ import org.littletonrobotics.junction.LogTable;
  *
  * @see Mechanism2d
  */
-public abstract class MechanismObject2d implements AutoCloseable {
+public abstract class LoggedMechanismObject2d implements AutoCloseable {
   /** Relative to parent. */
   private final String m_name;
 
   private NetworkTable m_table;
-  private final Map<String, MechanismObject2d> m_objects = new HashMap<>(1);
+  private final Map<String, LoggedMechanismObject2d> m_objects = new HashMap<>(1);
 
   /**
    * Create a new Mechanism node object.
    *
    * @param name the node's name, must be unique.
    */
-  protected MechanismObject2d(String name) {
+  protected LoggedMechanismObject2d(String name) {
     m_name = name;
   }
 
   @Override
   public void close() {
-    for (MechanismObject2d obj : m_objects.values()) {
+    for (LoggedMechanismObject2d obj : m_objects.values()) {
       obj.close();
     }
   }
@@ -66,7 +66,7 @@ public abstract class MechanismObject2d implements AutoCloseable {
    *                                       object names must
    *                                       be unique.
    */
-  public final synchronized <T extends MechanismObject2d> T append(T object) {
+  public final synchronized <T extends LoggedMechanismObject2d> T append(T object) {
     if (m_objects.containsKey(object.getName())) {
       throw new UnsupportedOperationException("Mechanism object names must be unique!");
     }
@@ -80,7 +80,7 @@ public abstract class MechanismObject2d implements AutoCloseable {
   final synchronized void update(NetworkTable table) {
     m_table = table;
     updateEntries(m_table);
-    for (MechanismObject2d obj : m_objects.values()) {
+    for (LoggedMechanismObject2d obj : m_objects.values()) {
       obj.update(m_table.getSubTable(obj.m_name));
     }
   }
@@ -96,9 +96,9 @@ public abstract class MechanismObject2d implements AutoCloseable {
     return m_name;
   }
 
-  synchronized void akitLog(LogTable table) {
-    for (MechanismObject2d obj : m_objects.values()) {
-      obj.akitLog(table.getSubtable(obj.m_name));
+  synchronized void logOutput(LogTable table) {
+    for (LoggedMechanismObject2d obj : m_objects.values()) {
+      obj.logOutput(table.getSubtable(obj.m_name));
     }
   }
 }

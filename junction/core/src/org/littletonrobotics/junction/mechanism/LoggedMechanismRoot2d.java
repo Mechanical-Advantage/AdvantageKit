@@ -15,7 +15,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package org.littletonrobotics.junction.mechanism;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -36,10 +36,10 @@ import org.littletonrobotics.junction.LogTable;
  * <p>
  * Append other nodes by using {@link #append(MechanismObject2d)}.
  */
-public final class MechanismRoot2d implements AutoCloseable {
+public final class LoggedMechanismRoot2d implements AutoCloseable {
   private final String m_name;
   private NetworkTable m_table;
-  private final Map<String, MechanismObject2d> m_objects = new HashMap<>(1);
+  private final Map<String, LoggedMechanismObject2d> m_objects = new HashMap<>(1);
   private double m_x;
   private DoublePublisher m_xPub;
   private double m_y;
@@ -52,7 +52,7 @@ public final class MechanismRoot2d implements AutoCloseable {
    * @param x    x coordinate of root (provide only when constructing a root node)
    * @param y    y coordinate of root (provide only when constructing a root node)
    */
-  MechanismRoot2d(String name, double x, double y) {
+  LoggedMechanismRoot2d(String name, double x, double y) {
     m_name = name;
     m_x = x;
     m_y = y;
@@ -66,7 +66,7 @@ public final class MechanismRoot2d implements AutoCloseable {
     if (m_yPub != null) {
       m_yPub.close();
     }
-    for (MechanismObject2d obj : m_objects.values()) {
+    for (LoggedMechanismObject2d obj : m_objects.values()) {
       obj.close();
     }
   }
@@ -82,7 +82,7 @@ public final class MechanismRoot2d implements AutoCloseable {
    *                                       object names must
    *                                       be unique.
    */
-  public synchronized <T extends MechanismObject2d> T append(T object) {
+  public synchronized <T extends LoggedMechanismObject2d> T append(T object) {
     if (m_objects.containsKey(object.getName())) {
       throw new UnsupportedOperationException("Mechanism object names must be unique!");
     }
@@ -116,7 +116,7 @@ public final class MechanismRoot2d implements AutoCloseable {
     }
     m_yPub = m_table.getDoubleTopic("y").publish();
     flush();
-    for (MechanismObject2d obj : m_objects.values()) {
+    for (LoggedMechanismObject2d obj : m_objects.values()) {
       obj.update(m_table.getSubTable(obj.getName()));
     }
   }
@@ -134,11 +134,11 @@ public final class MechanismRoot2d implements AutoCloseable {
     }
   }
 
-  synchronized void akitLog(LogTable table) {
+  synchronized void logOutput(LogTable table) {
     table.put("x", m_x);
     table.put("y", m_y);
-    for (MechanismObject2d obj : m_objects.values()) {
-      obj.akitLog(table.getSubtable(obj.getName()));
+    for (LoggedMechanismObject2d obj : m_objects.values()) {
+      obj.logOutput(table.getSubtable(obj.getName()));
     }
   }
 }

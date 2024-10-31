@@ -15,7 +15,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package org.littletonrobotics.junction.mechanism;
 
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NTSendable;
@@ -41,9 +41,9 @@ import org.littletonrobotics.junction.LogTable;
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-public final class Mechanism2d implements NTSendable, AutoCloseable {
+public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
   private NetworkTable m_table;
-  private final Map<String, MechanismRoot2d> m_roots;
+  private final Map<String, LoggedMechanismRoot2d> m_roots;
   private final double[] m_dims = new double[2];
   private String m_color;
   private DoubleArrayPublisher m_dimsPub;
@@ -59,7 +59,7 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
    * @param width  the width
    * @param height the height
    */
-  public Mechanism2d(double width, double height) {
+  public LoggedMechanism2d(double width, double height) {
     this(width, height, new Color8Bit(0, 0, 32));
   }
 
@@ -73,7 +73,7 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
    * @param height          the height
    * @param backgroundColor the background color. Defaults to dark blue.
    */
-  public Mechanism2d(double width, double height, Color8Bit backgroundColor) {
+  public LoggedMechanism2d(double width, double height, Color8Bit backgroundColor) {
     m_roots = new HashMap<>();
     m_dims[0] = width;
     m_dims[1] = height;
@@ -88,7 +88,7 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
     if (m_colorPub != null) {
       m_colorPub.close();
     }
-    for (MechanismRoot2d root : m_roots.values()) {
+    for (LoggedMechanismRoot2d root : m_roots.values()) {
       root.close();
     }
   }
@@ -105,13 +105,13 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
    * @param y    the root y coordinate
    * @return a new root joint object, or the existing one with the given name.
    */
-  public synchronized MechanismRoot2d getRoot(String name, double x, double y) {
-    MechanismRoot2d existing = m_roots.get(name);
+  public synchronized LoggedMechanismRoot2d getRoot(String name, double x, double y) {
+    LoggedMechanismRoot2d existing = m_roots.get(name);
     if (existing != null) {
       return existing;
     }
 
-    MechanismRoot2d root = new MechanismRoot2d(name, x, y);
+    LoggedMechanismRoot2d root = new LoggedMechanismRoot2d(name, x, y);
     m_roots.put(name, root);
     if (m_table != null) {
       root.update(m_table.getSubTable(name));
@@ -146,9 +146,9 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
       }
       m_colorPub = m_table.getStringTopic("backgroundColor").publish();
       m_colorPub.set(m_color);
-      for (Entry<String, MechanismRoot2d> entry : m_roots.entrySet()) {
+      for (Entry<String, LoggedMechanismRoot2d> entry : m_roots.entrySet()) {
         String name = entry.getKey();
-        MechanismRoot2d root = entry.getValue();
+        LoggedMechanismRoot2d root = entry.getValue();
         synchronized (root) {
           root.update(m_table.getSubTable(name));
         }
@@ -156,16 +156,16 @@ public final class Mechanism2d implements NTSendable, AutoCloseable {
     }
   }
 
-  public synchronized void akitLog(LogTable table) {
+  public synchronized void logOutput(LogTable table) {
     table.put(".type", "Mechanism2d");
     table.put(".controllable", false);
     table.put("dims", m_dims);
     table.put("backgroundColor", m_color);
-    for (Entry<String, MechanismRoot2d> entry : m_roots.entrySet()) {
+    for (Entry<String, LoggedMechanismRoot2d> entry : m_roots.entrySet()) {
       String name = entry.getKey();
-      MechanismRoot2d root = entry.getValue();
+      LoggedMechanismRoot2d root = entry.getValue();
       synchronized (root) {
-        root.akitLog(table.getSubtable(name));
+        root.logOutput(table.getSubtable(name));
       }
     }
   }

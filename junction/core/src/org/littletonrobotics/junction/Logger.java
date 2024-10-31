@@ -33,6 +33,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 import org.littletonrobotics.junction.inputs.LoggedDriverStation;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.inputs.LoggedSystemStats;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -46,7 +47,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.protobuf.Protobuf;
@@ -916,15 +916,9 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public static void recordOutput(String key, Mechanism2d value) {
+  public static void recordOutput(String key, LoggedMechanism2d value) {
     if (running) {
-      try {
-        // Use reflection because we don't explicitly depend on the shimmed classes
-        Mechanism2d.class.getMethod("akitLog", LogTable.class).invoke(value, outputTable.getSubtable(key));
-      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-          | SecurityException e) {
-        e.printStackTrace();
-      }
+      value.logOutput(outputTable.getSubtable(key));
     }
   }
 }

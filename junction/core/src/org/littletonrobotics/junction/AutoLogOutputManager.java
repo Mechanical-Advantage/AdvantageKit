@@ -13,7 +13,6 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -29,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 
 public class AutoLogOutputManager {
   private static final List<Runnable> callbacks = new ArrayList<>();
@@ -438,12 +439,12 @@ public class AutoLogOutputManager {
               if (value != null)
                 Logger.recordOutput(key, (Measure<?>) value);
             });
-      } else if (type.equals(Mechanism2d.class)) {
+      } else if (type.equals(LoggedMechanism2d.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
               if (value != null)
-                Logger.recordOutput(key, (Mechanism2d) value);
+                Logger.recordOutput(key, (LoggedMechanism2d) value);
             });
       } else {
         callbacks.add(
