@@ -78,14 +78,6 @@ public class Logger {
   private Logger() {
   }
 
-  private static Logger instance = new Logger();
-
-  /** @deprecated Call the static methods directly. */
-  @Deprecated
-  public static Logger getInstance() {
-    return instance;
-  }
-
   /**
    * Sets the source to use for replaying data. Use null to disable replay. This
    * method only works during setup before starting to log.

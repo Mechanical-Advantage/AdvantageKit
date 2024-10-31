@@ -9,8 +9,8 @@ Many units tests are unaffected by AdvantageKit's WPILib shims, but those which 
 ```java
 private void refreshAkitData() {
   ConduitApi.getInstance().captureData();
-  LoggedDriverStation.getInstance().periodic();
-  LoggedSystemStats.getInstance().periodic();
+  LoggedDriverStation.periodic();
+  LoggedSystemStats.periodic();
 }
 ```
 
