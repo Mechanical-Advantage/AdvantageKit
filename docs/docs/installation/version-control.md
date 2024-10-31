@@ -59,53 +59,16 @@ The metadata values can be viewed using AdvantageScope's 🔍 [Metadata](https:/
 
 ## Event Deploy
 
-Code often changes repeatedly during competition, which would normally mean running code with uncommitted change. This is a problem for log replay, since the version of code running in a particular match may be impossible to recreate afterwards.
-
-This can be addressed by including a Gradle task to automatically commit working changes to a temporary branch before every deploy.
+Code often changes repeatedly during competition, which would normally mean running code with uncommitted change. This is a problem for log replay, since the version of code running in a particular match may be impossible to recreate afterwards. We have developed a VSCode extension to help with this issue by creating automatic commits to a temporary branch before every deploy.
 
 ### Installation
 
-The Gradle task is preconfigured in the AdvantageKit example projects. Add the following lines to `build.gradle`:
-
-```groovy
-// Create commit with working changes on event branches
-task(eventDeploy) {
-    doLast {
-        if (project.gradle.startParameter.taskNames.any({ it.toLowerCase().contains("deploy") })) {
-            def branchPrefix = "event"
-            def branch = 'git branch --show-current'.execute().text.trim()
-            def commitMessage = "Update at '${new Date().toString()}'"
-
-            if (branch.startsWith(branchPrefix)) {
-                exec {
-                    workingDir(projectDir)
-                    executable 'git'
-                    args 'add', '-A'
-                }
-                exec {
-                    workingDir(projectDir)
-                    executable 'git'
-                    args 'commit', '-m', commitMessage
-                    ignoreExitValue = true
-                }
-
-                println "Committed to branch: '$branch'"
-                println "Commit message: '$commitMessage'"
-            } else {
-                println "Not on an event branch, skipping commit"
-            }
-        } else {
-            println "Not running deploy task, skipping commit"
-        }
-    }
-}
-createVersionFile.dependsOn(eventDeploy)
-```
+To install the extension, search for "Event Deploy for WPILib" in the VSCode extensions window and click "Install". Alternatively, it can be installed it from the [online marketplace](https://marketplace.visualstudio.com/items?itemName=Mechanical-Advantage.event-deploy-wpilib) or by cloning the [GitHub repository](https://github.com/Mechanical-Advantage/EventDeployExtension) (instructions in the README).
 
 ### Usage
 
 1. Before the event, create and check out a branch that starts with "event" such as "event_nhgrs". We recommend creating a new branch for each event.
-2. Deploy robot code through any method supported by WPILib.
-3. A commit is automatically created with all changes since the last commit before the deploy begins. The name of the commit includes the current timestamp (e.g. "Update at "1/31/2022, 8:30:00 AM").
+2. When deploying, click "Deploy Robot Code (Event)" in the editor menu. This option appears directly under the normal "Deploy Robot Code" option from WPILib.
+3. A commit is automatically created with all changes since the last commit, and a deploy is started normally. The name of the commit includes the current timestamp (e.g. "Update at "1/31/2022, 8:30:00 AM").
 4. At the end of the event, the branch can be ["squashed and merged"](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) back to a normal development branch, keeping the Git history clean.
 5. When running log replay, find the commit hash in the log file metadata and run `git checkout` as described in the previous section. This will return to the exact version of code running on the robot (even if the commits were later squashed and merged). Since all of the changes were committed before each deploy, the simulated code is guaranteed to be identical to the original robot code.
