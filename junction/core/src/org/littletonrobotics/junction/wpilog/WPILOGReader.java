@@ -83,8 +83,15 @@ public class WPILOGReader implements LogReplaySource {
     }
 
     // Iterate over log
+    boolean readError = false;
     while (iterator.hasNext()) {
-      DataLogRecord record = iterator.next();
+      DataLogRecord record;
+      try {
+        record = iterator.next();
+      } catch (Exception e) {
+        readError = true;
+        break;
+      }
 
       if (record.isControl()) {
         if (record.isStart()) { // Ignore other control records
@@ -154,6 +161,6 @@ public class WPILOGReader implements LogReplaySource {
     }
 
     // Continue if there is more data
-    return iterator.hasNext();
+    return iterator.hasNext() && !readError;
   }
 }
