@@ -228,68 +228,6 @@ public class LogTable {
   }
 
   /**
-   * Writes a new Integer value to the table. Skipped if the key already exists as
-   * a different type.
-   */
-  public void put(String key, int value) {
-    put(key, (long) value);
-  }
-
-  /**
-   * Writes a new Integer value to the table. Skipped if the key already exists as
-   * a different type.
-   */
-  public void put(String key, long value) {
-    put(key, new LogValue(value, null));
-  }
-
-  /**
-   * Writes a new Float value to the table. Skipped if the key already exists as
-   * a different type.
-   */
-  public void put(String key, float value) {
-    put(key, new LogValue(value, null));
-  }
-
-  /**
-   * Writes a new Double value to the table. Skipped if the key already exists as
-   * a different type.
-   */
-  public void put(String key, double value) {
-    put(key, new LogValue(value, null));
-  }
-
-  /**
-   * Writes a new String value to the table. Skipped if the key already exists as
-   * a different type.
-   */
-  public void put(String key, String value) {
-    if (value == null)
-      return;
-    put(key, new LogValue(value, null));
-  }
-
-  /**
-   * Writes a new enum value to the table. Skipped if the key already exists as
-   * a different type.
-   */
-  public <E extends Enum<E>> void put(String key, E value) {
-    if (value == null)
-      return;
-    put(key, new LogValue(value.name(), null));
-  }
-
-  /**
-   * Writes a new Measure value to the table. Skipped if the key already exists as
-   * a different type.
-   */
-  public <U extends Unit> void put(String key, Measure<U> value) {
-    if (value == null)
-      return;
-    put(key, new LogValue(value.baseUnitMagnitude(), null));
-  }
-
-  /**
    * Writes a new BooleanArray value to the table. Skipped if the key already
    * exists as a different type.
    */
@@ -312,6 +250,14 @@ public class LogTable {
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
     }
+  }
+
+  /**
+   * Writes a new Integer value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public void put(String key, int value) {
+    put(key, (long) value);
   }
 
   /**
@@ -342,6 +288,14 @@ public class LogTable {
   }
 
   /**
+   * Writes a new Integer value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public void put(String key, long value) {
+    put(key, new LogValue(value, null));
+  }
+
+  /**
    * Writes a new IntegerArray value to the table. Skipped if the key already
    * exists as a different type.
    */
@@ -364,6 +318,14 @@ public class LogTable {
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
     }
+  }
+
+  /**
+   * Writes a new Float value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public void put(String key, float value) {
+    put(key, new LogValue(value, null));
   }
 
   /**
@@ -392,6 +354,14 @@ public class LogTable {
   }
 
   /**
+   * Writes a new Double value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public void put(String key, double value) {
+    put(key, new LogValue(value, null));
+  }
+
+  /**
    * Writes a new DoubleArray value to the table. Skipped if the key already
    * exists as a different type.
    */
@@ -417,6 +387,16 @@ public class LogTable {
   }
 
   /**
+   * Writes a new String value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public void put(String key, String value) {
+    if (value == null)
+      return;
+    put(key, new LogValue(value, null));
+  }
+
+  /**
    * Writes a new StringArray value to the table. Skipped if the key already
    * exists as a different type.
    */
@@ -439,6 +419,26 @@ public class LogTable {
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
     }
+  }
+
+  /**
+   * Writes a new enum value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public <E extends Enum<E>> void put(String key, E value) {
+    if (value == null)
+      return;
+    put(key, new LogValue(value.name(), null));
+  }
+
+  /**
+   * Writes a new Measure value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public <U extends Unit> void put(String key, Measure<U> value) {
+    if (value == null)
+      return;
+    put(key, new LogValue(value.baseUnitMagnitude(), null));
   }
 
   private void addStructSchema(Struct<?> struct, Set<String> seen) {
@@ -690,83 +690,6 @@ public class LogTable {
     }
   }
 
-  /** Reads an Integer value from the table. */
-  public int get(String key, int defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      return (int) get(key).getInteger(defaultValue);
-    } else {
-      return defaultValue;
-    }
-  }
-
-  /** Reads an Integer value from the table. */
-  public long get(String key, long defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      return get(key).getInteger(defaultValue);
-    } else {
-      return defaultValue;
-    }
-  }
-
-  /** Reads a Float value from the table. */
-  public float get(String key, float defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      return get(key).getFloat(defaultValue);
-    } else {
-      return defaultValue;
-    }
-  }
-
-  /** Reads a Double value from the table. */
-  public double get(String key, double defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      return get(key).getDouble(defaultValue);
-    } else {
-      return defaultValue;
-    }
-  }
-
-  /** Reads a String value from the table. */
-  public String get(String key, String defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      return get(key).getString(defaultValue);
-    } else {
-      return defaultValue;
-    }
-  }
-
-  /** Reads an enum value from the table. */
-  public <E extends Enum<E>> E get(String key, E defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      String name = get(key).getString(defaultValue.name());
-      return (E) Enum.valueOf(defaultValue.getClass(), name);
-    } else {
-      return defaultValue;
-    }
-  }
-
-  /** Reads a Measure value from the table. */
-  public <U extends Unit, M extends Measure<U>> M get(String key, M defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      double value = get(key).getDouble(defaultValue.baseUnitMagnitude());
-      return (M) defaultValue.unit().ofBaseUnits(value);
-    } else {
-      return defaultValue;
-    }
-  }
-
-  /** Reads a MutableMeasure value from the table. */
-  public <U extends Unit, Base extends Measure<U>, M extends MutableMeasure<U, Base, M>> M get(
-      String key, M defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      double baseValue = get(key).getDouble(defaultValue.baseUnitMagnitude());
-      double relativeValue = defaultValue.unit().fromBaseUnits(baseValue);
-      return (M) new GenericMutableMeasureImpl<>(relativeValue, baseValue, defaultValue.unit());
-    } else {
-      return defaultValue;
-    }
-  }
-
   /** Reads a BooleanArray value from the table. */
   public boolean[] get(String key, boolean[] defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -784,6 +707,15 @@ public class LogTable {
         value[i] = get(key + "/" + Integer.toString(i), new boolean[0]);
       }
       return value;
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads an Integer value from the table. */
+  public int get(String key, int defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      return (int) get(key).getInteger(defaultValue);
     } else {
       return defaultValue;
     }
@@ -820,6 +752,15 @@ public class LogTable {
     }
   }
 
+  /** Reads an Integer value from the table. */
+  public long get(String key, long defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      return get(key).getInteger(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
   /** Reads an IntegerArray value from the table. */
   public long[] get(String key, long[] defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -837,6 +778,15 @@ public class LogTable {
         value[i] = get(key + "/" + Integer.toString(i), new long[0]);
       }
       return value;
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a Float value from the table. */
+  public float get(String key, float defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      return get(key).getFloat(defaultValue);
     } else {
       return defaultValue;
     }
@@ -864,6 +814,15 @@ public class LogTable {
     }
   }
 
+  /** Reads a Double value from the table. */
+  public double get(String key, double defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      return get(key).getDouble(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
   /** Reads a DoubleArray value from the table. */
   public double[] get(String key, double[] defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -886,6 +845,15 @@ public class LogTable {
     }
   }
 
+  /** Reads a String value from the table. */
+  public String get(String key, String defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      return get(key).getString(defaultValue);
+    } else {
+      return defaultValue;
+    }
+  }
+
   /** Reads a StringArray value from the table. */
   public String[] get(String key, String[] defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -903,6 +871,38 @@ public class LogTable {
         value[i] = get(key + "/" + Integer.toString(i), new String[0]);
       }
       return value;
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads an enum value from the table. */
+  public <E extends Enum<E>> E get(String key, E defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      String name = get(key).getString(defaultValue.name());
+      return (E) Enum.valueOf(defaultValue.getClass(), name);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a Measure value from the table. */
+  public <U extends Unit, M extends Measure<U>> M get(String key, M defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      double value = get(key).getDouble(defaultValue.baseUnitMagnitude());
+      return (M) defaultValue.unit().ofBaseUnits(value);
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a MutableMeasure value from the table. */
+  public <U extends Unit, Base extends Measure<U>, M extends MutableMeasure<U, Base, M>> M get(
+      String key, M defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      double baseValue = get(key).getDouble(defaultValue.baseUnitMagnitude());
+      double relativeValue = defaultValue.unit().fromBaseUnits(baseValue);
+      return (M) new GenericMutableMeasureImpl<>(relativeValue, baseValue, defaultValue.unit());
     } else {
       return defaultValue;
     }
