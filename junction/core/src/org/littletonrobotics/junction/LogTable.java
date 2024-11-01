@@ -432,6 +432,33 @@ public class LogTable {
   }
 
   /**
+   * Writes a new enum array value to the table. Skipped if the key already exists
+   * as a different type.
+   */
+  public <E extends Enum<E>> void put(String key, E[] value) {
+    if (value == null)
+      return;
+    String[] stringValues = new String[value.length];
+    for (int i = 0; i < value.length; i++) {
+      stringValues[i] = value[i].name();
+    }
+    put(key, new LogValue(stringValues, null));
+  }
+
+  /**
+   * Writes a new 2D enum array value to the table. Skipped if the key already
+   * exists as a different type.
+   */
+  public <E extends Enum<E>> void put(String key, E[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
+  }
+
+  /**
    * Writes a new Measure value to the table. Skipped if the key already exists as
    * a different type.
    */
@@ -886,6 +913,39 @@ public class LogTable {
     }
   }
 
+  /** Reads an enum array value from the table. */
+  public <E extends Enum<E>> E[] get(String key, E[] defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      String[] names = get(key).getStringArray(null);
+      if (names == null)
+        return defaultValue;
+      Class<? extends Enum> enumClass = (Class<? extends Enum>) defaultValue.getClass().getComponentType();
+      E[] values = (E[]) Array.newInstance(enumClass, names.length);
+      for (int i = 0; i < names.length; i++) {
+        values[i] = (E) Enum.valueOf(enumClass, names[i]);
+      }
+      return values;
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a 2D enum array value from the table. */
+  public <E extends Enum<E>> E[][] get(String key, E[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      int length = get(key + "/length", 0);
+      E[][] value = (E[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
+      for (int i = 0; i < length; i++) {
+        E[] defaultItemValue = (E[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
+            0);
+        value[i] = get(key + "/" + Integer.toString(i), defaultItemValue);
+      }
+      return value;
+    } else {
+      return defaultValue;
+    }
+  }
+
   /** Reads a Measure value from the table. */
   public <U extends Unit, M extends Measure<U>> M get(String key, M defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -942,7 +1002,7 @@ public class LogTable {
     if (data.containsKey(prefix + key + "/length")) {
       int length = get(key + "/length", 0);
       T[][] value = (T[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
-      for (int i = 0; i < value.length; i++) {
+      for (int i = 0; i < length; i++) {
         T[] defaultItemValue = (T[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
             0);
         value[i] = get(key + "/" + Integer.toString(i), struct, defaultItemValue);
@@ -1014,7 +1074,7 @@ public class LogTable {
     if (data.containsKey(prefix + key + "/length")) {
       int length = get(key + "/length", 0);
       T[][] value = (T[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
-      for (int i = 0; i < value.length; i++) {
+      for (int i = 0; i < length; i++) {
         T[] defaultItemValue = (T[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
             0);
         value[i] = get(key + "/" + Integer.toString(i), defaultItemValue);
