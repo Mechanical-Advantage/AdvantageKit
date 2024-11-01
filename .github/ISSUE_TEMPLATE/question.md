@@ -1,6 +1,6 @@
 ---
 name: Question
-about: Ask about features or parts of AdvantageScope
+about: Ask about features or parts of AdvantageKit
 title: ''
 labels: question
 assignees: ''
