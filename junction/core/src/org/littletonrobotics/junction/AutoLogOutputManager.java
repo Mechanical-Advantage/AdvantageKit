@@ -312,75 +312,7 @@ public class AutoLogOutputManager {
    * @param supplier A supplier for the field values.
    */
   private static void registerField(String key, Class<?> type, Supplier<?> supplier) {
-    if (type.isArray()) {
-      // Array types
-      Class<?> componentType = type.getComponentType();
-      if (componentType.equals(byte.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (byte[]) value);
-            });
-      } else if (componentType.equals(boolean.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (boolean[]) value);
-            });
-      } else if (componentType.equals(int.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (int[]) value);
-            });
-      } else if (componentType.equals(long.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (long[]) value);
-            });
-      } else if (componentType.equals(float.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (float[]) value);
-            });
-      } else if (componentType.equals(double.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (double[]) value);
-            });
-      } else if (componentType.equals(String.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (String[]) value);
-            });
-      } else {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null) {
-                try {
-                  Logger.recordOutput(key, (StructSerializable[]) value);
-                } catch (ClassCastException e) {
-                  DriverStation.reportError(
-                      "[AdvantageKit] Auto serialization is not supported for array type "
-                          + componentType.getSimpleName(),
-                      false);
-                }
-              }
-            });
-      }
-    } else {
+    if (!type.isArray()) {
       // Single types
       if (type.equals(boolean.class)) {
         callbacks.add(
@@ -432,7 +364,7 @@ public class AutoLogOutputManager {
                 // Cannot cast to enum subclass, log the name directly
                 Logger.recordOutput(key, ((Enum<?>) value).name());
             });
-      } else if (type.equals(Measure.class)) {
+      } else if (Measure.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
@@ -458,6 +390,174 @@ public class AutoLogOutputManager {
                       "[AdvantageKit] Auto serialization is not supported for type " + type.getSimpleName(),
                       false);
                 }
+            });
+      }
+    } else if (!type.getComponentType().isArray()) {
+      // Array types
+      Class<?> componentType = type.getComponentType();
+      if (componentType.equals(byte.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (byte[]) value);
+            });
+      } else if (componentType.equals(boolean.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (boolean[]) value);
+            });
+      } else if (componentType.equals(int.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (int[]) value);
+            });
+      } else if (componentType.equals(long.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (long[]) value);
+            });
+      } else if (componentType.equals(float.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (float[]) value);
+            });
+      } else if (componentType.equals(double.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (double[]) value);
+            });
+      } else if (componentType.equals(String.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (String[]) value);
+            });
+      } else if (componentType.isEnum()) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null) {
+                // Cannot cast to enum subclass, log the names directly
+                Enum<?>[] enumValue = (Enum<?>[]) value;
+                String[] names = new String[enumValue.length];
+                for (int i = 0; i < enumValue.length; i++) {
+                  names[i] = enumValue[i].name();
+                }
+                Logger.recordOutput(key, names);
+              }
+            });
+      } else {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null) {
+                try {
+                  Logger.recordOutput(key, (StructSerializable[]) value);
+                } catch (ClassCastException e) {
+                  DriverStation.reportError(
+                      "[AdvantageKit] Auto serialization is not supported for array type "
+                          + componentType.getSimpleName(),
+                      false);
+                }
+              }
+            });
+      }
+    } else {
+      // 2D array types
+      Class<?> componentType = type.getComponentType().getComponentType();
+      if (componentType.equals(byte.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (byte[][]) value);
+            });
+      } else if (componentType.equals(boolean.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (boolean[][]) value);
+            });
+      } else if (componentType.equals(int.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (int[][]) value);
+            });
+      } else if (componentType.equals(long.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (long[][]) value);
+            });
+      } else if (componentType.equals(float.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (float[][]) value);
+            });
+      } else if (componentType.equals(double.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (double[][]) value);
+            });
+      } else if (componentType.equals(String.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (String[][]) value);
+            });
+      } else if (componentType.isEnum()) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null) {
+                // Cannot cast to enum subclass, log the names directly
+                Enum<?>[][] enumValue = (Enum<?>[][]) value;
+                String[][] names = new String[enumValue.length][];
+                for (int row = 0; row < enumValue.length; row++) {
+                  Enum<?>[] rowValue = enumValue[row];
+                  names[row] = new String[rowValue.length];
+                  for (int column = 0; column < rowValue.length; column++) {
+                    names[row][column] = rowValue[column].name();
+                  }
+                }
+                Logger.recordOutput(key, names);
+              }
+            });
+      } else {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null) {
+                try {
+                  Logger.recordOutput(key, (StructSerializable[][]) value);
+                } catch (ClassCastException e) {
+                  DriverStation.reportError(
+                      "[AdvantageKit] Auto serialization is not supported for 2D array type "
+                          + componentType.getSimpleName(),
+                      false);
+                }
+              }
             });
       }
     }
