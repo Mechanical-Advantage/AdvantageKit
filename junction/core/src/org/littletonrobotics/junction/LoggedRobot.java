@@ -73,11 +73,6 @@ public class LoggedRobot extends IterativeRobotBase {
   @Override
   @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
-    // Check for invalid AdvantageKit install in sim
-    if (isSimulation()) {
-      CheckInstall.run();
-    }
-
     // Robot init methods
     long initStart = Logger.getRealTimestamp();
     robotInit();
@@ -141,7 +136,7 @@ public class LoggedRobot extends IterativeRobotBase {
     private List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
     private final long[] lastTimes = new long[gcBeans.size()];
     private final long[] lastCounts = new long[gcBeans.size()];
-  
+
     public void update() {
       long accumTime = 0;
       long accumCounts = 0;
@@ -150,11 +145,11 @@ public class LoggedRobot extends IterativeRobotBase {
         long gcCount = gcBeans.get(i).getCollectionCount();
         accumTime += gcTime - lastTimes[i];
         accumCounts += gcCount - lastCounts[i];
-  
+
         lastTimes[i] = gcTime;
         lastCounts[i] = gcCount;
       }
-  
+
       Logger.recordOutput("LoggedRobot/GCTimeMS", (double) accumTime);
       Logger.recordOutput("LoggedRobot/GCCounts", (double) accumCounts);
     }
