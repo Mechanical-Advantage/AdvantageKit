@@ -38,16 +38,6 @@ repositories {
     mavenLocal()
 }
 
-configurations.all {
-    exclude group: "edu.wpi.first.wpilibj"
-}
-
-task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
-    mainClass = "org.littletonrobotics.junction.CheckInstall"
-    classpath = sourceSets.main.runtimeClasspath
-}
-compileJava.finalizedBy checkAkitInstall
-
 dependencies {
     // ...
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)

@@ -263,13 +263,18 @@ public class Logger {
         }
       }
 
+      // Update Driver Station
+      long dsStart = getRealTimestamp();
+      if (hasReplaySource()) {
+        LoggedDriverStation.replayFromLog(entry.getSubtable("DriverStation"));
+      }
+
       // Update default inputs
       long saveDataStart = getRealTimestamp();
-      LoggedDriverStation.periodic();
-      LoggedSystemStats.periodic();
+      LoggedSystemStats.periodic(entry.getSubtable("SystemStats"));
       LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
       if (loggedPowerDistribution != null) {
-        loggedPowerDistribution.periodic();
+        loggedPowerDistribution.periodic(entry.getSubtable("PowerDistribution"));
       }
       for (int i = 0; i < dashboardInputs.size(); i++) {
         dashboardInputs.get(i).periodic();
@@ -300,18 +305,12 @@ public class Logger {
       long saveDataEnd = getRealTimestamp();
 
       // Log output data
-      recordOutput("Logger/ConduitPeriodicMS", (conduitCaptureEnd - conduitCaptureStart) / 1000.0);
-      recordOutput("Logger/SavePeriodicMS", (saveDataEnd - saveDataStart) / 1000.0);
-      recordOutput("Logger/QueuedCycles", receiverQueue.size());
-    } else {
-      // Retrieve new data even if logger is disabled
-      ConduitApi.getInstance().captureData();
-      LoggedDriverStation.periodic();
-      LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
-      if (loggedPowerDistribution != null) {
-        loggedPowerDistribution.periodic();
+      if (hasReplaySource()) {
+        recordOutput("Logger/DriverStationPeriodicMS", (saveDataEnd - saveDataStart) / 1000.0);
       }
-      LoggedSystemStats.periodic();
+      recordOutput("Logger/ConduitPeriodicMS", (conduitCaptureEnd - conduitCaptureStart) / 1000.0);
+      recordOutput("Logger/SavePeriodicMS", (saveDataStart - dsStart) / 1000.0);
+      recordOutput("Logger/QueuedCycles", receiverQueue.size());
     }
   }
 
@@ -322,6 +321,12 @@ public class Logger {
    */
   static void periodicAfterUser(long userCodeLength, long periodicBeforeLength) {
     if (running) {
+      // Update Driver Station
+      long dsStart = getRealTimestamp();
+      if (!hasReplaySource()) {
+        LoggedDriverStation.saveToLog(entry.getSubtable("DriverStation"));
+      }
+
       // Update final outputs
       long autoLogStart = getRealTimestamp();
       AutoLogOutputManager.periodic();
@@ -337,6 +342,9 @@ public class Logger {
       long consoleCaptureEnd = getRealTimestamp();
 
       // Record timing data
+      if (!hasReplaySource()) {
+        recordOutput("Logger/DriverStationPeriodicMS", (autoLogStart - dsStart) / 1000.0);
+      }
       recordOutput("Logger/AutoLogPeriodicMS", (alertLogStart - autoLogStart) / 1000.0);
       recordOutput("Logger/AlertLogPeriodicMS", (consoleCaptureStart - alertLogStart) / 1000.0);
       recordOutput("Logger/ConsolePeriodicMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);

@@ -27,8 +27,6 @@ public class LoggedPowerDistribution {
 
   private static LoggedPowerDistribution instance;
 
-  private final PowerDistributionInputs pdpInputs = new PowerDistributionInputs();
-
   private int moduleID;
   private int moduleType;
 
@@ -61,75 +59,23 @@ public class LoggedPowerDistribution {
     return instance;
   }
 
-  public static class PowerDistributionInputs implements LoggableInputs {
-    public double pdpTemperature = 0.0;
-    public double pdpVoltage = 12.0;
-    public double[] pdpChannelCurrents = new double[24];
-    public double pdpTotalCurrent = 0.0;
-    public double pdpTotalPower = 0.0;
-    public double pdpTotalEnergy = 0.0;
-
-    public int channelCount = 24;
-    public int handle = 0;
-    public int type = 0;
-    public int moduleId = 0;
-    public long faults = 0;
-    public long stickyFaults = 0;
-
-    @Override
-    public void toLog(LogTable table) {
-      table.put("Temperature", pdpTemperature);
-      table.put("Voltage", pdpVoltage);
-      table.put("ChannelCurrent", pdpChannelCurrents);
-      table.put("TotalCurrent", pdpTotalCurrent);
-      table.put("TotalPower", pdpTotalPower);
-      table.put("TotalEnergy", pdpTotalEnergy);
-
-      table.put("ChannelCount", channelCount);
-      table.put("Faults", faults);
-      table.put("StickyFaults", stickyFaults);
-    }
-
-    @Override
-    public void fromLog(LogTable table) {
-      pdpTemperature = table.get("Temperature", pdpTemperature);
-      pdpVoltage = table.get("Voltage", pdpVoltage);
-      pdpChannelCurrents = table.get("ChannelCurrent", pdpChannelCurrents);
-      pdpTotalCurrent = table.get("TotalCurrent", pdpTotalCurrent);
-      pdpTotalPower = table.get("TotalPower", pdpTotalPower);
-      pdpTotalEnergy = table.get("TotalEnergy", pdpTotalEnergy);
-
-      channelCount = table.get("ChannelCount", channelCount);
-      faults = table.get("Faults", faults);
-      stickyFaults = table.get("StickyFaults", stickyFaults);
-    }
-  }
-
-  public void periodic() {
-    // Update inputs from conduit
+  public void periodic(LogTable table) {
     if (!Logger.hasReplaySource()) {
       ConduitApi conduit = ConduitApi.getInstance();
-      pdpInputs.pdpTemperature = conduit.getPDPTemperature();
-      pdpInputs.pdpVoltage = conduit.getPDPVoltage();
+      table.put("Temperature", conduit.getPDPTemperature());
+      table.put("Voltage", conduit.getPDPVoltage());
+      double[] currents = new double[24];
       for (int i = 0; i < 24; i++) {
-        pdpInputs.pdpChannelCurrents[i] = conduit.getPDPChannelCurrent(i);
+        currents[i] = conduit.getPDPChannelCurrent(i);
       }
-      pdpInputs.pdpTotalCurrent = conduit.getPDPTotalCurrent();
-      pdpInputs.pdpTotalPower = conduit.getPDPTotalPower();
-      pdpInputs.pdpTotalEnergy = conduit.getPDPTotalEnergy();
-      pdpInputs.channelCount = conduit.getPDPChannelCount();
-      pdpInputs.handle = conduit.getPDPHandle();
-      pdpInputs.type = conduit.getPDPType();
-      pdpInputs.moduleId = conduit.getPDPModuleId();
-      pdpInputs.faults = conduit.getPDPFaults();
-      pdpInputs.stickyFaults = conduit.getPDPStickyFaults();
+      table.put("ChannelCurrent", currents);
+      table.put("TotalCurrent", conduit.getPDPTotalCurrent());
+      table.put("TotalPower", conduit.getPDPTotalPower());
+      table.put("TotalEnergy", conduit.getPDPTotalEnergy());
+
+      table.put("ChannelCount", conduit.getPDPChannelCount());
+      table.put("Faults", conduit.getPDPFaults());
+      table.put("StickyFaults", conduit.getPDPStickyFaults());
     }
-
-    Logger.processInputs("PowerDistribution", pdpInputs);
   }
-
-  public PowerDistributionInputs getInputs() {
-    return pdpInputs;
-  }
-
 }
