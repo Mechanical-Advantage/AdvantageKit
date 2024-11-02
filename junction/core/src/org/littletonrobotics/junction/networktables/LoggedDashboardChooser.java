@@ -24,7 +24,10 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class LoggedDashboardChooser<V> implements LoggedDashboardInput {
+/**
+ * Manages a chooser value published to the "SmartDashboard" table of NT.
+ */
+public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
   private final String key;
   private String selectedValue = null;
   private SendableChooser<String> sendableChooser = new SendableChooser<>();
@@ -46,7 +49,7 @@ public class LoggedDashboardChooser<V> implements LoggedDashboardInput {
    *
    * @param key The key for the chooser, published to "/SmartDashboard/{key}" for
    *            NT or
-   *            "/DashboardInputs/{key}" when logged.
+   *            "/DashboardInputs/SmartDashboard/{key}" when logged.
    */
   public LoggedDashboardChooser(String key) {
     this.key = key;
@@ -137,6 +140,6 @@ public class LoggedDashboardChooser<V> implements LoggedDashboardInput {
     if (!Logger.hasReplaySource()) {
       selectedValue = sendableChooser.getSelected();
     }
-    Logger.processInputs(prefix, inputs);
+    Logger.processInputs(prefix + "/SmartDashboard", inputs);
   }
 }

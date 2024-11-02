@@ -34,7 +34,7 @@ import org.littletonrobotics.junction.inputs.LoggedDriverStation;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
+import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -65,7 +65,7 @@ public class Logger {
   private static LogTable outputTable;
   private static Map<String, String> metadata = new HashMap<>();
   private static ConsoleSource console = null;
-  private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
+  private static List<LoggedNetworkInput> dashboardInputs = new ArrayList<>();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean deterministicTimestamps = true;
   private static boolean enableConsole = true;
@@ -102,7 +102,7 @@ public class Logger {
    * Registers a new dashboard input to be included in the periodic loop. This
    * function should not be called by the user.
    */
-  public static void registerDashboardInput(LoggedDashboardInput dashboardInput) {
+  public static void registerDashboardInput(LoggedNetworkInput dashboardInput) {
     dashboardInputs.add(dashboardInput);
   }
 
