@@ -54,6 +54,7 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private DataLogWriter log;
   private boolean isOpen = false;
+  private final AdvantageScopeOpenBehavior openBehavior;
   private LogTable lastTable;
   private int timestampID;
   private Map<String, Integer> entryIDs;
@@ -62,11 +63,15 @@ public class WPILOGWriter implements LogDataReceiver {
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
-   * @param path Path to log file or folder. If only a folder is provided, the
-   *             filename will be generated based on the current time and match
-   *             number (if applicable).
+   * @param path         Path to log file or folder. If only a folder is provided,
+   *                     the filename will be generated based on the current time
+   *                     and match number (if applicable).
+   * @param openBehavior Whether to automatically open the log file in
+   *                     AdvantageScope.
    */
-  public WPILOGWriter(String path) {
+  public WPILOGWriter(String path, AdvantageScopeOpenBehavior openBehavior) {
+    this.openBehavior = openBehavior;
+
     // Create random identifier
     Random random = new Random();
     StringBuilder randomIdentifierBuilder = new StringBuilder();
@@ -91,13 +96,39 @@ public class WPILOGWriter implements LogDataReceiver {
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
+   * @param path Path to log file or folder. If only a folder is provided, the
+   *             filename will be generated based on the current time and match
+   *             number (if applicable).
+   */
+  public WPILOGWriter(String path) {
+    this(path, AdvantageScopeOpenBehavior.AUTO);
+  }
+
+  /**
+   * Create a new WPILOGWriter for writing to a ".wpilog" file.
+   *
+   * <p>
+   * The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The
+   * filename will be generated based on the current time and match number (if
+   * applicable).
+   * 
+   * @param openBehavior Whether to automatically open the log file in
+   *                     AdvantageScope.
+   */
+  public WPILOGWriter(AdvantageScopeOpenBehavior openBehavior) {
+    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRio, openBehavior);
+  }
+
+  /**
+   * Create a new WPILOGWriter for writing to a ".wpilog" file.
+   *
    * <p>
    * The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The
    * filename will be generated based on the current time and match number (if
    * applicable).
    */
   public WPILOGWriter() {
-    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRio);
+    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRio, AdvantageScopeOpenBehavior.AUTO);
   }
 
   public void start() {
@@ -137,8 +168,13 @@ public class WPILOGWriter implements LogDataReceiver {
   public void end() {
     log.close();
 
-    // Send log path to AdvantageScope in replay
-    if (Logger.hasReplaySource()) {
+    // Send log path to AdvantageScope
+    boolean shouldOpen = switch (openBehavior) {
+      case ALWAYS -> RobotBase.isSimulation();
+      case AUTO -> RobotBase.isSimulation() && Logger.hasReplaySource();
+      case NEVER -> false;
+    };
+    if (shouldOpen) {
       try {
         String fullLogPath = FileSystems.getDefault().getPath(folder, filename).normalize().toAbsolutePath()
             .toString();
@@ -314,5 +350,16 @@ public class WPILOGWriter implements LogDataReceiver {
 
     // Update last table
     lastTable = table;
+  }
+
+  public static enum AdvantageScopeOpenBehavior {
+    /** Always open the log file in AdvantageScope when running in sim. */
+    ALWAYS,
+
+    /** Open the log file in AdvantageScope when running in replay. */
+    AUTO,
+
+    /** Never open the log file in AdvantageScope */
+    NEVER
   }
 }
