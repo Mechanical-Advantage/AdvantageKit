@@ -3,7 +3,7 @@
 AdvantageKit includes two swerve project templates with built-in support for advanced features:
 
 - High-frequency odometry
-- On-controller feedback loops
+- On-controller feedback loops, including MAXMotion for turn control
 - Physics simulation
 - Automated characterization routines
 - Dashboard alerts for disconnected devices

@@ -8,7 +8,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Easy setup with Tuner X swerve project generator
 - High-frequency odometry
 - CANivore time sync (for Phoenix Pro users)
-- On-controller feedback loops
+- On-controller feedback loops, including Motion Magic for turn control
 - Physics simulation
 - Automated characterization routines
 - Dashboard alerts for disconnected devices
