@@ -49,6 +49,8 @@ CTRE only permits the swerve project generator to be used on swerve robots with 
 
 5. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L18) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L171-L175). Before removing them, both lines will be marked as errors in VSCode.
 
+6. In `TunerConstants.java`, change `kSteerInertia` to 0.004 and `kDriveInertia` to 0.025. These values affect the response of motor simulations, but the default values used in the generated file produce unrealistic results.
+
 </TabItem>
 <TabItem value="manual" label="Manual" default>
 
