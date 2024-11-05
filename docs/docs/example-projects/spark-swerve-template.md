@@ -211,3 +211,11 @@ tryUntilOk(turnSpark, 5, () -> turnEncoder.setPosition(customEncoder.getPosition
 The `Drive` subsystem uses WPILib's [`SwerveDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/SwerveDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples. Additional methods can be easily exposed as desired.
 
 Alternatively, other pose estimation systems can be easily integrated in place of the WPILib solution. The `periodic` method includes a call to `poseEstimator.updateWithTime` that includes the sample timestamp, gyro rotation, and module positions. This call can be replaced to integrate with any other odometry or pose estimation system.
+
+### Swerve Setpoint Generator
+
+The project already includes basic mechanisms to reduce skidding, such as drive current limits and cosine optimization. Users who prefer more control over module skidding may wish to utilize Team 254's [`SwerveSetpointGenerator`](https://github.com/Team254/FRC-2023-Public/blob/main/src/main/java/com/team254/lib/swerve/SwerveSetpointGenerator.java) in the `runSetpoint` method of the `Drive` subsystem.
+
+### Advanced Physics Simulation
+
+The project can be easily adapted to utilize Team 5516's [maple-sim](https://github.com/Shenzhen-Robotics-Alliance/Maple-Sim) library for simulation, which provides a full rigid-body simulation of the swerve drive and its interactions with the field. Check the documentation for more details on how to install and use the library.
