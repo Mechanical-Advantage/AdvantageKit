@@ -146,7 +146,7 @@ The value of `driveMotorCurrentLimit` can be tuned to avoid slipping the wheels.
 
 The project includes a built-in configuration for [PathPlanner](https://pathplanner.dev), located in the constructor of `Drive.java`. You may wish to manually adjust the following values:
 
-- Robot configuration in the PathPlanner GUI ([docs](https://pathplanner.dev/robot-config.html)).
+- Robot mass, MOI, and wheel coefficient as configured at the bottom of `DriveConstants.java`
 - Drive PID constants as configured in `AutoBuilder`.
 - Turn PID constants as configured in `AutoBuilder`.
 
