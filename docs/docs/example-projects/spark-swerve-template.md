@@ -214,7 +214,28 @@ Alternatively, other pose estimation systems can be easily integrated in place o
 
 ### Swerve Setpoint Generator
 
-The project already includes basic mechanisms to reduce skidding, such as drive current limits and cosine optimization. Users who prefer more control over module skidding may wish to utilize Team 254's [`SwerveSetpointGenerator`](https://github.com/Team254/FRC-2023-Public/blob/main/src/main/java/com/team254/lib/swerve/SwerveSetpointGenerator.java) in the `runSetpoint` method of the `Drive` subsystem.
+The project already includes basic mechanisms to reduce skidding, such as drive current limits and cosine optimization. Users who prefer more control over module skidding may wish to utilize Team 254's swerve setpoint generator. Documentation for using the version of this algorithm bundled with PathPlanner can be found [here](https://pathplanner.dev/pplib-swerve-setpoint-generator.html). The `SwerveSetpointGenerator` should be instantiated in the `Drive` subsystem and used in the `runVelocity` method, as shown below:
+
+```java
+private final SwerveSetpointGenerator setpointGenerator;
+private SwerveSetpoint previousSetpoint;
+
+public Drive(...) {
+    // ...
+
+    setpointGenerator = new SwerveSetpointGenerator(...);
+    previousSetpoint = new SwerveSetpoint(getChassisSpeeds(), getModuleStates(), DriveFeedforwards.zeroes(4));
+
+    // ...
+}
+
+public void runVelocity(ChassisSpeeds speeds) {
+    previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, speeds, 0.02);
+    SwerveModuleStatep[] setpointStates = previousSetpoint.moduleStates();
+
+    // ...
+}
+```
 
 ### Advanced Physics Simulation
 
