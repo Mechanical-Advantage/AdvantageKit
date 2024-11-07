@@ -35,7 +35,7 @@ This example project is part of the 2025 AdvantageKit beta release. If you encou
 
 4. Update the values of `driveMotorReduction` and `turnMotorReduction` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
 
-5. Update the values of `trackWidth` and `wheelBase` based on the distance between the left-right and front-back modules (respectively)
+5. Update the values of `trackWidth` and `wheelBase` based on the distance between the left-right and front-back modules (respectively).
 
 6. Update the value of `wheelRadiusMeters` to the theoretical radius on each wheel. This value can be further refined as described in the "Tuning" section below.
 
@@ -47,17 +47,17 @@ This example project is part of the 2025 AdvantageKit beta release. If you encou
 
 10. For each module, set the value of `...ZeroRotation` to `new Rotation2d(0.0)`.
 
-11. Deploy the project to the robot and connect using AdvantageScope. Verify the following:
+11. Deploy the project to the robot and connect using AdvantageScope.
 
-    - There are no dashboard alerts or errors in the Driver Station console.
+12. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify tha CAN IDs, firmware versions, and configurations of all devices.
 
-    - Manually rotate each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module.
+13. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `turnEncoderInverted` or `turnMotorReduction`.
 
-    - Manually rotate each drive wheel and view the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`) is **increasing**. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module.
+14. Manually rotate each drive wheel and view that the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `driveMotorReduction`.
 
-12. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position increases when the wheel rotates such that the robot would be propelled forwards.**
+15. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forwards.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
 
-13. Record the value of `/Drive/Module.../TurnAbsolutePosition` for each aligned module. Update the value of `...ZeroRotation` for each module to `new Rotation2d(<insert value>)`.
+16. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `...ZeroRotation` for each module to `new Rotation2d(<insert value>)`.
 
 ## Tuning
 

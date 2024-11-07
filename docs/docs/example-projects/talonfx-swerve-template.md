@@ -76,17 +76,17 @@ CTRE only permits the swerve project generator to be used on swerve robots with 
 
 11. For each module, set the value of `k...EncoderOffset` to `Radians.of(0.0)`.
 
-12. Deploy the project to the robot and connect using AdvantageScope. Verify the following:
+12. Deploy the project to the robot and connect using AdvantageScope.
 
-    - There are no dashboard alerts or errors in the Driver Station console.
+13. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify tha CAN IDs, firmware versions, and configurations of all devices.
 
-    - Manually rotate each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module.
+14. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `k...SteerMotorInverted` or `kSteerGearRatio`.
 
-    - Manually rotate each drive wheel and view the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`) is **increasing**. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module.
+15. Manually rotate each drive wheel and view that the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `kDriveGearRatio`.
 
-13. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position increases when the wheel rotates such that the robot would be propelled forwards.**
+16. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forwards.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
 
-14. Record the value of `/Drive/Module.../TurnAbsolutePosition` for each aligned module. Update the value of `k...EncoderOffset` for each module to `Radians.of(<insert value>)`. **The value saved in `TunerConstants` must be the _negative_ of the value displayed in AdvantageScope (i.e. positive values become negative and vice versa).**
+17. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `k...EncoderOffset` for each module to `Radians.of(<insert value>)`. **The value saved in `TunerConstants` must be the _negative_ of the value displayed in AdvantageScope (i.e. positive values become negative and vice versa).**
 
 </TabItem>
 </Tabs>
