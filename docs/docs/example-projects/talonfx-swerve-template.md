@@ -130,6 +130,25 @@ Users who wish to characterize acceleration gains (`kA`) or turn gains can choos
 - Export the Hoot log file as described [here](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/wpilib-integration/sysid-integration/index.html).
 - Export the AdvantageKit log file as described [here](../sysid-compatibility.md). Note that AdvantageKit values are logged in radians while Phoenix requires rotation to be used. Gains must be converted appropriately.
 
+:::tip
+The built-in SysId routines can be easily adapted to characterize the turn motor feedforward or the angular motion of the robot (for example, to estimate the robot's [moment of inertia](https://sleipnirgroup.github.io/Choreo/usage/estimating-moi/)). The code below shows how the `runCharacterization` method can be adapted for these use cases.
+
+```java
+/** Characterize turn motor feedforward. */
+public void runCharacterization(double output) {
+    io.setDriveOpenLoop(0.0);
+    io.setTurnOpenLoop(output);
+}
+
+/** Characterize robot angular motion. */
+public void runCharacterization(double output) {
+    io.setDriveOpenLoop(output);
+    io.setTurnPosition(new Rotation2d(constants.LocationX, constants.LocationY).plus(Rotation2d.kCCW_Pi_2));
+}
+```
+
+:::
+
 ### Wheel Radius Characterization
 
 The effective wheel radius of a robot tends to change over time as wheels are worn down, swapped, or compress into the carpet. This can have significant impacts on odometry accuracy. We recommend regularly recharacterizing wheel radius to combat these issues.

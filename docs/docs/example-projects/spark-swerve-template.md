@@ -86,6 +86,33 @@ Users who wish to characterize acceleration gains (`kA`) can choose to use the f
 - The project is configured to use [URCL](https://docs.advantagescope.org/more-features/urcl) by default. This data can be exported as described [here](https://docs.advantagescope.org/more-features/urcl#sysid-usage).
 - Export the AdvantageKit log file as described [here](../sysid-compatibility.md).
 
+:::tip
+The built-in SysId routines can be easily adapted to characterize the turn motor feedforward or the angular motion of the robot (for example, to estimate the robot's [moment of inertia](https://sleipnirgroup.github.io/Choreo/usage/estimating-moi/)). The code below shows how the `runCharacterization` method can be adapted for these use cases.
+
+```java
+/** Characterize turn motor feedforward. */
+public void runCharacterization(double output) {
+    io.setDriveOpenLoop(0.0);
+    io.setTurnOpenLoop(output);
+}
+
+/** Characterize robot angular motion. */
+public void runCharacterization(double output) {
+    io.setDriveOpenLoop(output);
+    io.setTurnPosition(
+        Rotation2d.fromDegrees(
+            switch (index) {
+              case 0 -> 135.0;
+              case 1 -> 45.0;
+              case 2 -> -135.0;
+              case 3 -> -45.0;
+              default -> 0.0;
+            }));
+}
+```
+
+:::
+
 ### Wheel Radius Characterization
 
 The effective wheel radius of a robot tends to change over time as wheels are worn down, swapped, or compress into the carpet. This can have significant impacts on odometry accuracy. We recommend regularly recharacterizing wheel radius to combat these issues.
