@@ -67,15 +67,17 @@ The project includes default [feedforward gains](https://docs.wpilib.org/en/stab
 
 The project includes a simple feedforward routine that can be used to quicly measure the drive `kS` and `kV` values without requiring [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html):
 
-1. Place the robot in an open space.
+1. Tune turning PID gains as described [here](#driveturn-pid-tuning).
 
-2. Select the "Drive Simple FF Characterization" auto routine.
+2. Place the robot in an open space.
 
-3. Enable the robot in autonomous. The robot will slowly accelerate forwards, similar to a SysId quasistic test.
+3. Select the "Drive Simple FF Characterization" auto routine.
 
-4. Disable the robot after at least ~5-10 seconds.
+4. Enable the robot in autonomous. The robot will slowly accelerate forwards, similar to a SysId quasistic test.
 
-5. Check the console output for the measured `kS` and `kV` values, and copy them to the `driveKs` and `driveKv` constants in `DriveConstants.java`.
+5. Disable the robot after at least ~5-10 seconds.
+
+6. Check the console output for the measured `kS` and `kV` values, and copy them to the `driveKs` and `driveKv` constants in `DriveConstants.java`.
 
 :::info
 The feedforward model used in simulation can be characterized using the same method. **Simulation gains are stored in the `driveSimKs` and `driveSimKv` constants.**
