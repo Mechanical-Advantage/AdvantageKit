@@ -242,20 +242,15 @@ public class Logger {
 
   /**
    * Periodic method to be called before robotInit and each loop cycle. Updates
-   * timestamp and globally logged data.
+   * timestamp, replay entry, and dashboard inputs.
    */
   static void periodicBeforeUser() {
     cycleCount++;
     if (running) {
-      // Capture conduit data
-      ConduitApi conduit = ConduitApi.getInstance();
-      long conduitCaptureStart = getRealTimestamp();
-      conduit.captureData();
-      long conduitCaptureEnd = getRealTimestamp();
-
       // Get next entry
+      long entryUpdateStart = getRealTimestamp();
       if (replaySource == null) {
-        entry.setTimestamp(conduit.getTimestamp());
+        entry.setTimestamp(getRealTimestamp());
       } else {
         if (!replaySource.updateTable(entry)) {
           end();
@@ -269,65 +264,73 @@ public class Logger {
         LoggedDriverStation.replayFromLog(entry.getSubtable("DriverStation"));
       }
 
-      // Update default inputs
-      long saveDataStart = getRealTimestamp();
-      LoggedSystemStats.periodic(entry.getSubtable("SystemStats"));
-      LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
-      if (loggedPowerDistribution != null) {
-        loggedPowerDistribution.periodic(entry.getSubtable("PowerDistribution"));
-      }
+      // Update dashboard inputs
+      long dashboardInputsStart = getRealTimestamp();
       for (int i = 0; i < dashboardInputs.size(); i++) {
         dashboardInputs.get(i).periodic();
       }
-      if (urclSupplier != null
-          && replaySource == null
-          && RobotBase.isReal()) {
-        ByteBuffer[] buffers = urclSupplier.get();
-        if (buffers.length == 3) {
-          for (int i = 0; i < 3; i++) {
-            buffers[i].rewind();
-            byte[] bytes = new byte[buffers[i].remaining()];
-            buffers[i].get(bytes);
-            switch (i) {
-              case 0:
-                entry.put("URCL/Raw/Persistent", new LogValue(bytes, "URCLr3_persistent"));
-                break;
-              case 1:
-                entry.put("URCL/Raw/Periodic", new LogValue(bytes, "URCLr3_periodic"));
-                break;
-              case 2:
-                entry.put("URCL/Raw/Aliases", new LogValue(bytes, "URCLr3_aliases"));
-                break;
-            }
-          }
-        }
-      }
-      long saveDataEnd = getRealTimestamp();
+      long dashboardInputsEnd = getRealTimestamp();
 
-      // Log output data
+      // Record timing data
+      recordOutput("Logger/EntryUpdateMs", (dsStart - entryUpdateStart) / 1000.0);
       if (hasReplaySource()) {
-        recordOutput("Logger/DriverStationPeriodicMS", (saveDataEnd - saveDataStart) / 1000.0);
+        recordOutput("Logger/DriverStationMS", (dashboardInputsStart - dsStart) / 1000.0);
       }
-      recordOutput("Logger/ConduitPeriodicMS", (conduitCaptureEnd - conduitCaptureStart) / 1000.0);
-      recordOutput("Logger/SavePeriodicMS", (saveDataStart - dsStart) / 1000.0);
-      recordOutput("Logger/QueuedCycles", receiverQueue.size());
+      recordOutput("Logger/DashboardInputsMs", (dashboardInputsEnd - dashboardInputsStart) / 1000.0);
     }
   }
 
   /**
-   * Periodic method to be called after robotInit and each loop cycle. Sends data
-   * to data receivers. Running this after user code allows IO operations to
-   * occur between cycles rather than interferring with the main thread.
+   * Periodic method to be called after robotInit and each loop cycle. Update
+   * default log values and sends data to data receivers. Running this after user
+   * code allows IO operations to occur between cycles rather than interferring
+   * with the main thread.
    */
   static void periodicAfterUser(long userCodeLength, long periodicBeforeLength) {
     if (running) {
+      // Capture conduit data
+      ConduitApi conduit = ConduitApi.getInstance();
+      long conduitCaptureStart = getRealTimestamp();
+      conduit.captureData();
+
       // Update Driver Station
       long dsStart = getRealTimestamp();
       if (!hasReplaySource()) {
         LoggedDriverStation.saveToLog(entry.getSubtable("DriverStation"));
       }
 
-      // Update final outputs
+      // Save other conduit inputs
+      long conduitSaveStart = getRealTimestamp();
+      if (!hasReplaySource()) {
+        LoggedSystemStats.saveToLog(entry.getSubtable("SystemStats"));
+        LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
+        if (loggedPowerDistribution != null) {
+          loggedPowerDistribution.saveToLog(entry.getSubtable("PowerDistribution"));
+        }
+        if (urclSupplier != null && RobotBase.isReal()) {
+          ByteBuffer[] buffers = urclSupplier.get();
+          if (buffers.length == 3) {
+            for (int i = 0; i < 3; i++) {
+              buffers[i].rewind();
+              byte[] bytes = new byte[buffers[i].remaining()];
+              buffers[i].get(bytes);
+              switch (i) {
+                case 0:
+                  entry.put("URCL/Raw/Persistent", new LogValue(bytes, "URCLr3_persistent"));
+                  break;
+                case 1:
+                  entry.put("URCL/Raw/Periodic", new LogValue(bytes, "URCLr3_periodic"));
+                  break;
+                case 2:
+                  entry.put("URCL/Raw/Aliases", new LogValue(bytes, "URCLr3_aliases"));
+                  break;
+              }
+            }
+          }
+        }
+      }
+
+      // Update automatic outputs from user code
       long autoLogStart = getRealTimestamp();
       AutoLogOutputManager.periodic();
       long alertLogStart = getRealTimestamp();
@@ -342,16 +345,19 @@ public class Logger {
       long consoleCaptureEnd = getRealTimestamp();
 
       // Record timing data
+      recordOutput("Logger/ConduitCaptureMS", (dsStart - conduitCaptureStart) / 1000.0);
       if (!hasReplaySource()) {
-        recordOutput("Logger/DriverStationPeriodicMS", (autoLogStart - dsStart) / 1000.0);
+        recordOutput("Logger/DriverStationMS", (conduitSaveStart - dsStart) / 1000.0);
       }
-      recordOutput("Logger/AutoLogPeriodicMS", (alertLogStart - autoLogStart) / 1000.0);
-      recordOutput("Logger/AlertLogPeriodicMS", (consoleCaptureStart - alertLogStart) / 1000.0);
-      recordOutput("Logger/ConsolePeriodicMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
+      recordOutput("Logger/ConduitSaveMS", (autoLogStart - conduitSaveStart) / 1000.0);
+      recordOutput("Logger/AutoLogMS", (alertLogStart - autoLogStart) / 1000.0);
+      recordOutput("Logger/AlertLogMS", (consoleCaptureStart - alertLogStart) / 1000.0);
+      recordOutput("Logger/ConsoleMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
       recordOutput("LoggedRobot/UserCodeMS", userCodeLength / 1000.0);
-      long periodicAfterLength = consoleCaptureEnd - autoLogStart;
+      long periodicAfterLength = consoleCaptureEnd - conduitCaptureStart;
       recordOutput("LoggedRobot/LogPeriodicMS", (periodicBeforeLength + periodicAfterLength) / 1000.0);
       recordOutput("LoggedRobot/FullCycleMS", (periodicBeforeLength + userCodeLength + periodicAfterLength) / 1000.0);
+      recordOutput("Logger/QueuedCycles", receiverQueue.size());
 
       try {
         // Send a copy of the data to the receivers. The original object will be

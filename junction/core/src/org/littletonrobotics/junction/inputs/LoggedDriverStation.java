@@ -93,12 +93,13 @@ public class LoggedDriverStation {
     DriverStationSim.setMatchType(MatchType.values()[table.get("MatchType", 0)]);
     DriverStationSim.setMatchTime(table.get("MatchTime", -1.0));
 
+    boolean dsAttached = table.get("DSAttached", false);
     DriverStationSim.setEnabled(table.get("Enabled", false));
     DriverStationSim.setAutonomous(table.get("Autonomous", false));
     DriverStationSim.setTest(table.get("Test", false));
     DriverStationSim.setEStop(table.get("EmergencyStop", false));
     DriverStationSim.setFmsAttached(table.get("FMSAttached", false));
-    DriverStationSim.setDsAttached(table.get("DSAttached", false));
+    DriverStationSim.setDsAttached(dsAttached);
 
     for (int id = 0; id < DriverStation.kJoystickPorts; id++) {
       LogTable joystickTable = table.getSubtable("Joystick" + Integer.toString(id));
@@ -123,6 +124,9 @@ public class LoggedDriverStation {
       }
     }
 
-    DriverStationSim.notifyNewData();
+    if (dsAttached) {
+      // https://wpilib.slack.com/archives/C05ATJ3A2TC/p1730995258684039
+      DriverStationSim.notifyNewData();
+    }
   }
 }

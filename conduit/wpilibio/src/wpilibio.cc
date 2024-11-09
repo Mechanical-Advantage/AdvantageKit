@@ -43,7 +43,7 @@ DsReader ds_reader;
 PDPReader pdp_reader;
 SystemReader sys_reader;
 
-void start() { ds_reader.start(); }
+void start() {}
 
 void make_buffer() {
   // Allocate shared buffer
