@@ -87,7 +87,7 @@ fun enableAutoLogOutputFor(vararg roots: Any) {
 This provides a replacement for the @AutoLog annotation as well as the ability to manually register @AutoLogOutput roots.
 
 Here is an example of using auto-logged inputs in kotlin:
-```
+```kt
 class ArmInputs: AutoLogInputs() {
     var angle by log(Rotation2d())
     var voltage by log(Volts.mutable(0.0), "ArmVoltage")
@@ -111,7 +111,7 @@ class Arm: SubsystemBase() {
 ```
 
 And here is an example of registering a singleton for the @AutoLogOutput annotation:
-```
+```kt
 object LoggedSingleton {
     init {
       enableAutoLogOutputFor(this)
