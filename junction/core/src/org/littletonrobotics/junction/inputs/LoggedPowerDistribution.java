@@ -59,23 +59,21 @@ public class LoggedPowerDistribution {
     return instance;
   }
 
-  public void periodic(LogTable table) {
-    if (!Logger.hasReplaySource()) {
-      ConduitApi conduit = ConduitApi.getInstance();
-      table.put("Temperature", conduit.getPDPTemperature());
-      table.put("Voltage", conduit.getPDPVoltage());
-      double[] currents = new double[24];
-      for (int i = 0; i < 24; i++) {
-        currents[i] = conduit.getPDPChannelCurrent(i);
-      }
-      table.put("ChannelCurrent", currents);
-      table.put("TotalCurrent", conduit.getPDPTotalCurrent());
-      table.put("TotalPower", conduit.getPDPTotalPower());
-      table.put("TotalEnergy", conduit.getPDPTotalEnergy());
-
-      table.put("ChannelCount", conduit.getPDPChannelCount());
-      table.put("Faults", conduit.getPDPFaults());
-      table.put("StickyFaults", conduit.getPDPStickyFaults());
+  public void saveToLog(LogTable table) {
+    ConduitApi conduit = ConduitApi.getInstance();
+    table.put("Temperature", conduit.getPDPTemperature());
+    table.put("Voltage", conduit.getPDPVoltage());
+    double[] currents = new double[24];
+    for (int i = 0; i < 24; i++) {
+      currents[i] = conduit.getPDPChannelCurrent(i);
     }
+    table.put("ChannelCurrent", currents);
+    table.put("TotalCurrent", conduit.getPDPTotalCurrent());
+    table.put("TotalPower", conduit.getPDPTotalPower());
+    table.put("TotalEnergy", conduit.getPDPTotalEnergy());
+
+    table.put("ChannelCount", conduit.getPDPChannelCount());
+    table.put("Faults", conduit.getPDPFaults());
+    table.put("StickyFaults", conduit.getPDPStickyFaults());
   }
 }
