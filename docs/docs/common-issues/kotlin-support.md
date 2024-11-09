@@ -34,7 +34,7 @@ abstract class AutoLogInputs: LoggableInputs {
         LoggedInput(value, key, {k,v -> put(k, struct, v)}, {k,v -> get(k, struct, v)})
     fun <U: WPIUnit> log(value: Measure<U>, key: String? = null) =
         LoggedInput(value, key, LogTable::put, LogTable::get)
-    fun <U: WPIUnit, Base: Measure<WPIUnit>, M: MutableMeasure<U, Base, M>> log(value: M, key: String? = null) =
+    fun <U: WPIUnit, Base: Measure<U>, M: MutableMeasure<U, Base, M>> log(value: M, key: String? = null) =
         LoggedInput(value, key, LogTable::put, LogTable::get)
 
     fun log(value: DoubleArray, key: String? = null) = LoggedInput(value, key, LogTable::put, LogTable::get)
