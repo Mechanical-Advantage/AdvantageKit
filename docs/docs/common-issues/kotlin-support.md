@@ -4,8 +4,8 @@ sidebar_position: 5
 
 # Kotlin Support
 
-Although advantagekit supports kotlin out of the box, there are a couple of features(such as the @AutoLog annotation and the @AutoLogOutput annotation for kotlin singletons)
-that do not currently work within kotlin files.
+Although advantagekit supports kotlin out of the box, there are a couple of features that do not work within kotlin files.
+For instance, the @AutoLogOutput annotation does not work within singletons(or anonymous class scopes), and the @AutoLog annotation does not work with any kotlin files.
 
 If your team uses kotlin with advantagekit, it is recommended to paste the code below into a kotlin file named "AdvantageKitExtensions.kt"
 (preferrably located within a "lib" or "util" folder of your robot code):
@@ -84,7 +84,7 @@ fun enableAutoLogOutputFor(vararg roots: Any) {
 }
 ```
 
-This provides a replacement for the @AutoLog annotation as well as the ability to manually register @AutoLogOutput roots.
+This code provides a replacement for the @AutoLog annotation as well as the ability to manually register @AutoLogOutput roots.
 
 Here is an example of using auto-logged inputs in kotlin:
 ```kt
