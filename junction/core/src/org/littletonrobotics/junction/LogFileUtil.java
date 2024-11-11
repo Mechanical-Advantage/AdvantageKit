@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class LogFileUtil {
-  private static final String environmentVariable = "AKIT_LOG_PATH";
+  static final String environmentVariable = "AKIT_LOG_PATH";
   private static final String advantageScopeFileName = "akit-log-path.txt";
 
   private LogFileUtil() {
@@ -54,7 +54,7 @@ public class LogFileUtil {
    */
   public static String findReplayLog() {
     // Read environment variables
-    String envPath = System.getenv(environmentVariable);
+    String envPath = findReplayLogEnvVar();
     if (envPath != null) {
       System.out.println(
           "[AdvantageKit] Replaying log from " + environmentVariable + " environment variable: \"" + envPath + "\"");
@@ -62,26 +62,43 @@ public class LogFileUtil {
     }
 
     // Read file from AdvantageScope
-    Path advantageScopeTempPath = Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
-    String advantageScopeLogPath = null;
-    try (Scanner fileScanner = new Scanner(advantageScopeTempPath)) {
-      advantageScopeLogPath = fileScanner.nextLine();
-    } catch (IOException e) {
-    }
+    String advantageScopeLogPath = findReplayLogAdvantageScope();
     if (advantageScopeLogPath != null) {
       System.out.println("[AdvantageKit] Replaying log from AdvantageScope: \"" + advantageScopeLogPath + "\"");
       return advantageScopeLogPath;
     }
 
     // Prompt on stdin
-    Scanner scanner = new Scanner(System.in);
     System.out.print("No log provided with the " + environmentVariable
         + " environment variable or through AdvantageScope. Enter path to file: ");
-    String filename = scanner.nextLine();
-    scanner.close();
+    String filename = findReplayLogUser();
     if (filename.charAt(0) == '\'' || filename.charAt(0) == '"') {
       filename = filename.substring(1, filename.length() - 1);
     }
+    return filename;
+  }
+
+  /** Read the replay log from the environment variable. */
+  static String findReplayLogEnvVar() {
+    return System.getenv(environmentVariable);
+  }
+
+  /** Read the replay log from AdvantageScope. */
+  static String findReplayLogAdvantageScope() {
+    Path advantageScopeTempPath = Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
+    String advantageScopeLogPath = null;
+    try (Scanner fileScanner = new Scanner(advantageScopeTempPath)) {
+      advantageScopeLogPath = fileScanner.nextLine();
+    } catch (IOException e) {
+    }
+    return advantageScopeLogPath;
+  }
+
+  /** Read the replay log from the user. */
+  static String findReplayLogUser() {
+    Scanner scanner = new Scanner(System.in);
+    String filename = scanner.nextLine();
+    scanner.close();
     return filename;
   }
 }
