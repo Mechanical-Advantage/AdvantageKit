@@ -3,7 +3,7 @@
 AdvantageKit includes two swerve project templates with built-in support for advanced features:
 
 - High-frequency odometry
-- On-controller feedback loops, including MAXMotion for turn control
+- On-controller feedback loops
 - Physics simulation
 - Automated characterization routines
 - Dashboard alerts for disconnected devices
@@ -49,9 +49,9 @@ This example project is part of the 2025 AdvantageKit beta release. If you encou
 
 11. Deploy the project to the robot and connect using AdvantageScope.
 
-12. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify tha CAN IDs, firmware versions, and configurations of all devices.
+12. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify that CAN IDs, firmware versions, and configurations of all devices.
 
-13. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `turnEncoderInverted` or `turnMotorReduction`.
+13. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `turnInverted`, `turnEncoderInverted`, or `turnMotorReduction`.
 
 14. Manually rotate each drive wheel and view that the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `driveMotorReduction`.
 
@@ -189,6 +189,8 @@ By default, the project runs at **100Hz**. This value is stored as `odometryFreq
 
 Switching between the Spark Max and Spark Max for drive and turn motors is very simple. In the constructor of `ModuleIOSpark`, change the call instantiating the Spark object to use `CANSparkMax` or `CANSparkFlex`. The configuration object must also be changed to the corresponding `SparkMaxConfig` or `SparkFlexConfig` class.
 
+When switching between motor types, the `driveGearbox` and `turnGearbox` constants in `DriveConstants` should be updated accordingly.
+
 ### Custom Gyro Implementations
 
 The project defaults to the Pigeon 2 gyro, but can be integrated with any standard gyro. An example implementation for a NavX is included.
@@ -219,14 +221,18 @@ By default, the project uses a duty cycle encoder connected to a turn Spark Max.
 
 ```java
 turnEncoder = turnSpark.getEncoder(); // Change the type of turnEncoder to RelativeEncoder
-turnConfig.closedLoopConfig.feedbackSensor(FeedbackSensor.kMainEncoder); // Was: kAbsoluteEncoder
+turnConfig.closedLoopConfig.feedbackSensor(FeedbackSensor.kPrimaryEncoder); // Was: kAbsoluteEncoder
 ```
 
-3. Incorporate the turn motor reduction in the encoder position and velocity factors:
+3. Replace `turnConfig.absoluteEncoder...` with `turnConfig.encoder...`, and `averageDepth` with `uvwAverageDepth`. Remove the setter for `inverted(...)`.
+
+4. In the signal config for the turn motor, change all instances of `absoluteEncoderPosition...` and `absoluteEncoderVelocity...` to `primaryEncoderPosition...` and `primaryEncoderVelocity...`.
+
+5. Incorporate the turn motor reduction in the encoder position and velocity factors:
 
 ```java
 public static final double turnEncoderPositionFactor = 2 * Math.PI / turnMotorReduction; // Rotor Rotations -> Wheel Radians
-public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0 / turnMotorReduction; // Roto RPM -> Wheel Rad/Sec
+public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0 / turnMotorReduction; // Rotor RPM -> Wheel Rad/Sec
 ```
 
 4. Reset the relative encoder position at startup:
