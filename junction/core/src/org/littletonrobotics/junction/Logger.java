@@ -176,6 +176,26 @@ public class Logger {
     if (!running) {
       running = true;
 
+      // Exit if LoggedRobot not present
+      var stackTrace = Thread.currentThread().getStackTrace();
+      boolean isValid = false;
+      for (var element : stackTrace) {
+        try {
+          Class<?> elementClass = Class.forName(element.getClassName());
+          if (LoggedRobot.class.isAssignableFrom(elementClass)) {
+            isValid = true;
+            break;
+          }
+        } catch (ClassNotFoundException e) {
+        }
+      }
+      if (!isValid) {
+        DriverStation.reportError(
+            "The main robot class must inherit from LoggedRobot when using AdvantageKit. For more details, check the AdvantageKit installation documentation: https://docs.advantagekit.org/installation\n\n*** EXITING DUE TO INVALID ADVANTAGEKIT INSTALLATION, SEE ABOVE. ***",
+            false);
+        System.exit(1);
+      }
+
       // Start console capture
       if (enableConsole) {
         if (RobotBase.isReal()) {
