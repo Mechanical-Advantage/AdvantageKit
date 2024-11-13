@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.littletonrobotics.junction.LogTable.LogValue;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
 import edu.wpi.first.units.ImmutableMeasure;
@@ -49,6 +50,7 @@ import us.hebi.quickbuf.ProtoMessage;
 public class LogTable {
   private static boolean disableProtobufWarning = false;
   private final String prefix;
+  private final int depth;
   private final SharedTimestamp timestamp;
   private final Map<String, LogValue> data;
   private final Map<String, StructBuffer<?>> structBuffers;
@@ -71,10 +73,11 @@ public class LogTable {
   }
 
   /** Creates a new LogTable. */
-  private LogTable(String prefix, SharedTimestamp timestamp, Map<String, LogValue> data,
+  private LogTable(String prefix, int depth, SharedTimestamp timestamp, Map<String, LogValue> data,
       Map<String, StructBuffer<?>> structBuffers, Map<String, ProtobufBuffer<?, ?>> protoBuffers,
       Map<String, Struct<?>> structTypeCache, Map<String, Protobuf<?, ?>> protoTypeCache) {
     this.prefix = prefix;
+    this.depth = depth;
     this.timestamp = timestamp;
     this.data = data;
     this.structBuffers = structBuffers;
@@ -87,7 +90,7 @@ public class LogTable {
    * Creates a new LogTable, to serve as the root table.
    */
   public LogTable(long timestamp) {
-    this("/", new SharedTimestamp(timestamp), new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(),
+    this("/", 0, new SharedTimestamp(timestamp), new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(),
         new HashMap<>());
   }
 
@@ -95,7 +98,7 @@ public class LogTable {
    * Creates a new LogTable, to reference a subtable.
    */
   private LogTable(String prefix, LogTable parent) {
-    this(prefix, parent.timestamp, parent.data, parent.structBuffers, parent.protoBuffers, parent.structTypeCache,
+    this(prefix, parent.depth + 1, parent.timestamp, parent.data, parent.structBuffers, parent.protoBuffers, parent.structTypeCache,
         parent.protoTypeCache);
   }
 
@@ -106,7 +109,7 @@ public class LogTable {
   public static LogTable clone(LogTable source) {
     Map<String, LogValue> data = new HashMap<String, LogValue>();
     data.putAll(source.data);
-    return new LogTable(source.prefix, new SharedTimestamp(source.timestamp.value), data, new HashMap<>(),
+    return new LogTable(source.prefix, source.depth, new SharedTimestamp(source.timestamp.value), data, new HashMap<>(),
         new HashMap<>(), new HashMap<>(), new HashMap<>());
 
   }
@@ -466,6 +469,23 @@ public class LogTable {
     if (value == null)
       return;
     put(key, new LogValue(value.baseUnitMagnitude(), null));
+  }
+
+  /**
+   * Writes a new LoggableInput subtable to the table.
+   */
+  public <T extends LoggableInputs> void put(String key, T value) {
+    if (value == null) return;
+    if (this.depth > 100) {
+      DriverStation.reportWarning(
+            "[AdvantageKit] Detected recursive table structure when logging value to field \""
+                + prefix
+                + key
+                + "\". using LoggableInputs. Consider revising the table structure or refactoring to avoid recursion.",
+            false);
+      return;
+    }
+    value.toLog(getSubtable(key));
   }
 
   private void addStructSchema(Struct<?> struct, Set<String> seen) {
@@ -966,6 +986,13 @@ public class LogTable {
     } else {
       return defaultValue;
     }
+  }
+
+  /** Reads a LoggableInput subtable from the table. */
+  public <T extends LoggableInputs> T get(String key, T defaultValue) {
+    if (defaultValue == null) return null;
+    defaultValue.fromLog(getSubtable(key));
+    return defaultValue;
   }
 
   /** Reads a struct value from the table. */
