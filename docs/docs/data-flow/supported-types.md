@@ -10,13 +10,15 @@ Data is stored using string keys where slashes are used to denote subtables (sim
 
 The following simple data types are currently supported:
 
-`boolean, int, long, float, double, String, boolean[], int[], long[], float[], double[], String[], byte[]`
+- Single values: `boolean, int, long, float, double, String`
+- Arrays: `boolean[], int[], long[], float[], double[], String[], byte[]`
+- 2D Arrays: `boolean[][], int[][], long[][], float[][], double[][], String[][], byte[][]`
 
 ### Structured
 
-Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). Supported classes include `Translation2d`, `Pose3d`, and `SwerveModuleState` with more coming soon. These classes can be logged as single values or arrays just like any simple type, and used as input or output fields.
+Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). Supported classes include `Translation2d`, `Pose3d`, and `SwerveModuleState` with more coming soon. These classes can be logged as single values, arrays, or 2D arrays just like any simple type, and used as input or output fields.
 
-AdvantageKit also supports logging the state of a `Mechanism2d` object as an output. For details, see [here](/recording-outputs/mechanism2d).
+AdvantageKit also supports logging the state of a 2D mechanism object as an output. For details, see [here](/recording-outputs/mechanism2d).
 
 ### Units
 
