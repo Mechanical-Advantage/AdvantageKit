@@ -1,3 +1,7 @@
+---
+sidebar_position: 4
+---
+
 # Spark Swerve Template
 
 AdvantageKit includes two swerve project templates with built-in support for advanced features:
