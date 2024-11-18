@@ -1,6 +1,14 @@
+---
+sidebar_position: 2
+---
+
 # Version Control
 
 Typically, log replay requires that the code running on the robot and in the simulator are identical. We recommend the following tools to achieve that, enabled by version control with Git.
+
+:::tip
+These tools are already installed in the AdvantageKit [template projects](../category/template-projects), but this page explains their intended usage in more detail.
+:::
 
 ## Gversion
 

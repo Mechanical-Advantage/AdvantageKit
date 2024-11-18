@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 4
 ---
 
 import Tabs from '@theme/Tabs';
@@ -16,7 +16,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Physics simulation
 - Automated characterization routines
 - Dashboard alerts for disconnected devices
-- Pose estimator integration (not including vision)
+- Pose estimator integration
 - **Deterministic replay** with a **guarantee of accuracy**
 
 By default, the TalonFX version of the swerve template is configured for robots with **four TalonFX drive motors, four TalonFX turn motors, four CANcoder, and a NavX or Pigeon 2 gyro**. See the [Spark Swerve Template](spark-swerve-template.md) for swerve robots using Spark Max/Flex.
@@ -47,13 +47,15 @@ CTRE only permits the swerve project generator to be used on swerve robots with 
 
 2. Click the WPILib icon in the VSCode toolbar and find the task `WPILib: Set Team Number`. Enter your team number and press enter.
 
-3. Follow the instructions in the Phoenix documentation for the [Tuner X Swerve Project Generator](https://v6.docs.ctr-electronics.com/en/latest/docs/tuner/tuner-swerve/index.html).
+3. If not already available, download and install [Git](https://git-scm.com/downloads).
 
-4. On the final screen in Tuner X, choose "Generate only TunerConstants" and overwrite the file located at `src/main/java/frc/robot/generated/TunerConstants.java`.
+4. Follow the instructions in the Phoenix documentation for the [Tuner X Swerve Project Generator](https://v6.docs.ctr-electronics.com/en/latest/docs/tuner/tuner-swerve/index.html).
 
-5. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L18) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L171-L175). Before removing them, both lines will be marked as errors in VSCode.
+5. On the final screen in Tuner X, choose "Generate only TunerConstants" and overwrite the file located at `src/main/java/frc/robot/generated/TunerConstants.java`.
 
-6. In `TunerConstants.java`, change `kSteerInertia` to 0.004 and `kDriveInertia` to 0.025.
+6. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L18) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L171-L175). Before removing them, both lines will be marked as errors in VSCode.
+
+7. In `TunerConstants.java`, change `kSteerInertia` to 0.004 and `kDriveInertia` to 0.025.
 
 </TabItem>
 <TabItem value="manual" label="Manual" default>
@@ -62,35 +64,37 @@ CTRE only permits the swerve project generator to be used on swerve robots with 
 
 2. Click the WPILib icon in the VSCode toolbar and find the task `WPILib: Set Team Number`. Enter your team number and press enter.
 
-3. Navigate to `src/main/java/frc/robot/generated/TunerConstants.java` in the AdvantageKit project.
+3. If not already available, download and install [Git](https://git-scm.com/downloads).
 
-4. Update the values of `kDriveGearRatio` and `kSteerGearRatio` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
+4. Navigate to `src/main/java/frc/robot/generated/TunerConstants.java` in the AdvantageKit project.
 
-5. Update the value of `kWheelRadius` to the theoretical radius on each wheel. This value can be further refined as described in the "Tuning" section below.
+5. Update the values of `kDriveGearRatio` and `kSteerGearRatio` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
 
-6. Update the value of `kSpeedAt12Volts` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
+6. Update the value of `kWheelRadius` to the theoretical radius of each wheel. This value can be further refined as described in the "Tuning" section below.
 
-7. Update the value of `kCANBus` based on the CAN bus used by the drive devices. Check the [`CANBus`](https://api.ctr-electronics.com/phoenix6/latest/java/com/ctre/phoenix6/CANBus.html) API documentation for details on possible values.
+7. Update the value of `kSpeedAt12Volts` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
 
-8. Set the value of `kPigeonId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
+8. Update the value of `kCANBus` based on the CAN bus used by the drive devices. Check the [`CANBus`](https://api.ctr-electronics.com/phoenix6/latest/java/com/ctre/phoenix6/CANBus.html) API documentation for details on possible values.
 
-9. For each module, set the values of `k...DriveMotorId`, `k...SteerMotorId`, and `k...EncoderId` to the correct CAN IDs of the drive TalonFX, turn TalonFX, and CANcoder (as configured in Tuner X).
+9. Set the value of `kPigeonId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
 
-10. For each module, set the values of `k...XPos` and `k...YPos` based on the distance from each module to the center of the robot. Positive X values are closer to the front of the robot and positive Y values are closer to the left side of the robot.
+10. For each module, set the values of `k...DriveMotorId`, `k...SteerMotorId`, and `k...EncoderId` to the correct CAN IDs of the drive TalonFX, turn TalonFX, and CANcoder (as configured in Tuner X).
 
-11. For each module, set the value of `k...EncoderOffset` to `Radians.of(0.0)`.
+11. For each module, set the values of `k...XPos` and `k...YPos` based on the distance from each module to the center of the robot. Positive X values are closer to the front of the robot and positive Y values are closer to the left side of the robot.
 
-12. Deploy the project to the robot and connect using AdvantageScope.
+12. For each module, set the value of `k...EncoderOffset` to `Radians.of(0.0)`.
 
-13. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify tha CAN IDs, firmware versions, and configurations of all devices.
+13. Deploy the project to the robot and connect using AdvantageScope.
 
-14. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `k...SteerMotorInverted` or `kSteerGearRatio`.
+14. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify tha CAN IDs, firmware versions, and configurations of all devices.
 
-15. Manually rotate each drive wheel and view that the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `kDriveGearRatio`.
+15. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `k...SteerMotorInverted` or `kSteerGearRatio`.
 
-16. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forwards.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
+16. Manually rotate each drive wheel and view the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `kDriveGearRatio`.
 
-17. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `k...EncoderOffset` for each module to `Radians.of(<insert value>)`. **The value saved in `TunerConstants` must be the _negative_ of the value displayed in AdvantageScope (i.e. positive values become negative and vice versa).**
+17. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forwards.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
+
+18. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `k...EncoderOffset` for each module to `Radians.of(<insert value>)`. **The value saved in `TunerConstants` must be the _negative_ of the value displayed in AdvantageScope (i.e. positive values become negative and vice versa).**
 
 </TabItem>
 </Tabs>
@@ -274,9 +278,11 @@ private final MotionMagicExpoTorqueCurrentFOC positionTorqueCurrentRequest = new
 
 ### Vision Integration
 
-The `Drive` subsystem uses WPILib's [`SwerveDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/SwerveDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples. Additional methods can be easily exposed as desired.
+The `Drive` subsystem uses WPILib's [`DifferentialDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/DifferentialDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples.
 
-Alternatively, other pose estimation systems can be easily integrated in place of the WPILib solution. The `periodic` method includes a call to `poseEstimator.updateWithTime` that includes the sample timestamp, gyro rotation, and module positions. This call can be replaced to integrate with any other odometry or pose estimation system.
+:::tip
+This project is compatible with AdvantageKit's [vision template project](./vision-template.md), which provides a starting point for implementing a pose estimation algorithm based on Limelight or PhotonVision.
+:::
 
 ### Swerve Setpoint Generator
 

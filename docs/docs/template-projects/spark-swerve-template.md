@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 ---
 
 # Spark Swerve Template
@@ -11,7 +11,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Physics simulation
 - Automated characterization routines
 - Dashboard alerts for disconnected devices
-- Pose estimator integration (not including vision)
+- Pose estimator integration
 - **Deterministic replay** with a **guarantee of accuracy**
 
 By default, the Spark version of the swerve template is configured for robots with **MAXSwerve modules, four NEO Vortex drive motors, four NEO 550 turn motors, four duty cycle absolute encoders, and a NavX or Pigeon 2 gyro**. See the [TalonFX Swerve Template](talonfx-swerve-template.md) for swerve robots using Talon FX.
@@ -35,33 +35,35 @@ This example project is part of the 2025 AdvantageKit beta release. If you encou
 
 2. Click the WPILib icon in the VSCode toolbar and find the task `WPILib: Set Team Number`. Enter your team number and press enter.
 
-3. Navigate to `src/main/java/frc/robot/subsystems/drive/DriveConstants.java` in the AdvantageKit project.
+3. If not already available, download and install [Git](https://git-scm.com/downloads).
 
-4. Update the values of `driveMotorReduction` and `turnMotorReduction` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
+4. Navigate to `src/main/java/frc/robot/subsystems/drive/DriveConstants.java` in the AdvantageKit project.
 
-5. Update the values of `trackWidth` and `wheelBase` based on the distance between the left-right and front-back modules (respectively).
+5. Update the values of `driveMotorReduction` and `turnMotorReduction` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
 
-6. Update the value of `wheelRadiusMeters` to the theoretical radius on each wheel. This value can be further refined as described in the "Tuning" section below.
+6. Update the values of `trackWidth` and `wheelBase` based on the distance between the left-right and front-back modules (respectively).
 
-7. Update the value of `maxSpeedMetersPerSec` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
+7. Update the value of `wheelRadiusMeters` to the theoretical radius of each wheel. This value can be further refined as described in the "Tuning" section below.
 
-8. Set the value of `pigeonCanId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
+8. Update the value of `maxSpeedMetersPerSec` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
 
-9. For each module, set the values of `...DriveMotorId` and `...TurnMotorId` to the correct CAN IDs of the drive Spark FLex and turn Spark Max (as configured in the REV Hardware Client).
+9. Set the value of `pigeonCanId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
 
-10. For each module, set the value of `...ZeroRotation` to `new Rotation2d(0.0)`.
+10. For each module, set the values of `...DriveMotorId` and `...TurnMotorId` to the correct CAN IDs of the drive Spark Flex and turn Spark Max (as configured in the REV Hardware Client).
 
-11. Deploy the project to the robot and connect using AdvantageScope.
+11. For each module, set the value of `...ZeroRotation` to `new Rotation2d(0.0)`.
 
-12. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify that CAN IDs, firmware versions, and configurations of all devices.
+12. Deploy the project to the robot and connect using AdvantageScope.
 
-13. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `turnInverted`, `turnEncoderInverted`, or `turnMotorReduction`.
+13. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify that CAN IDs, firmware versions, and configurations of all devices.
 
-14. Manually rotate each drive wheel and view that the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `driveMotorReduction`.
+14. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `turnInverted`, `turnEncoderInverted`, or `turnMotorReduction`.
 
-15. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forwards.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
+15. Manually rotate each drive wheel and view the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `driveMotorReduction`.
 
-16. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `...ZeroRotation` for each module to `new Rotation2d(<insert value>)`.
+16. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forwards.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
+
+17. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `...ZeroRotation` for each module to `new Rotation2d(<insert value>)`.
 
 ## Tuning
 
@@ -247,9 +249,11 @@ tryUntilOk(turnSpark, 5, () -> turnEncoder.setPosition(customEncoder.getPosition
 
 ### Vision Integration
 
-The `Drive` subsystem uses WPILib's [`SwerveDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/SwerveDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples. Additional methods can be easily exposed as desired.
+The `Drive` subsystem uses WPILib's [`DifferentialDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/DifferentialDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples.
 
-Alternatively, other pose estimation systems can be easily integrated in place of the WPILib solution. The `periodic` method includes a call to `poseEstimator.updateWithTime` that includes the sample timestamp, gyro rotation, and module positions. This call can be replaced to integrate with any other odometry or pose estimation system.
+:::tip
+This project is compatible with AdvantageKit's [vision template project](./vision-template.md), which provides a starting point for implementing a pose estimation algorithm based on Limelight or PhotonVision.
+:::
 
 ### Swerve Setpoint Generator
 
