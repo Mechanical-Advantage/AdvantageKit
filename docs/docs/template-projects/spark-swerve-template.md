@@ -12,6 +12,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Automated characterization routines
 - Dashboard alerts for disconnected devices
 - Pose estimator integration
+- Step-by-step setup and tuning instructions with a prebuilt AdvantageScope layout
 - **Deterministic replay** with a **guarantee of accuracy**
 
 By default, the Spark version of the swerve template is configured for robots with **MAXSwerve modules, four NEO Vortex drive motors, four NEO 550 turn motors, four duty cycle absolute encoders, and a NavX or Pigeon 2 gyro**. See the [TalonFX Swerve Template](talonfx-swerve-template.md) for swerve robots using Talon FX.
