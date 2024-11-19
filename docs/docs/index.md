@@ -6,7 +6,9 @@ slug: /
 
 import DocCardList from "@theme/DocCardList";
 
-# AdvantageKit
+#
+
+![AdvantageKit](./img/banner.png)
 
 AdvantageKit is a logging, telemetry, and replay framework developed by [Team 6328](https://littletonrobotics.org). AdvantageKit enables **log replay**, where the full state of the robot code can be replayed in simulation based on a log file ([What is AdvantageKit?](/what-is-advantagekit)). See also:
 
