@@ -36,6 +36,10 @@ The AdvantageKit swerve templates are **open-source** and **fully customizable**
 This example project is part of the 2025 AdvantageKit beta release. If you encounter any issues during setup, please [open an issue](https://github.com/Mechanical-Advantage/AdvantageKit/issues).
 :::
 
+:::tip
+The swerve project folder includes a predefined AdvantageScope layout with tabs for each setup and tuning step described below. To open it, click `File` > `Import Layout...` in the tab bar of AdvantageScope and select the file `AdvantageScope Swerve Calibration.json` in the swerve project folder.
+:::
+
 <Tabs>
 <TabItem value="tuner-x" label="Swerve Project Generator" default>
 
@@ -138,7 +142,7 @@ The feedforward model used in simulation can be characterized using the same met
 Users who wish to characterize acceleration gains (`kA`) or turn gains can choose to use the full [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html) application. The project includes auto routines for each of the four required SysId tests. Two options are available to load data in SysId:
 
 - Export the Hoot log file as described [here](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/wpilib-integration/sysid-integration/index.html).
-- Export the AdvantageKit log file as described [here](../sysid-compatibility.md). Note that AdvantageKit values are logged in radians while Phoenix requires rotation to be used. Gains must be converted appropriately.
+- Export the AdvantageKit log file as described [here](../sysid-compatibility.md). Note that AdvantageKit values are logged in radians while Phoenix requires rotations to be used. Gains must be converted appropriately.
 
 :::tip
 The built-in SysId routines can be easily adapted to characterize the turn motor feedforward or the angular motion of the robot (for example, to estimate the robot's [moment of inertia](https://sleipnirgroup.github.io/Choreo/usage/estimating-moi/)). The code below shows how the `runCharacterization` method can be adapted for these use cases.

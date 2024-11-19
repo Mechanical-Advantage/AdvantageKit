@@ -31,6 +31,10 @@ The AdvantageKit swerve templates are **open-source** and **fully customizable**
 This example project is part of the 2025 AdvantageKit beta release. If you encounter any issues during setup, please [open an issue](https://github.com/Mechanical-Advantage/AdvantageKit/issues).
 :::
 
+:::tip
+The swerve project folder includes a predefined AdvantageScope layout with tabs for each setup and tuning step described below. To open it, click `File` > `Import Layout...` in the tab bar of AdvantageScope and select the file `AdvantageScope Swerve Calibration.json` in the swerve project folder.
+:::
+
 1. Download the Spark swerve template project from the AdvantageKit release on GitHub and open it in VSCode.
 
 2. Click the WPILib icon in the VSCode toolbar and find the task `WPILib: Set Team Number`. Enter your team number and press enter.
