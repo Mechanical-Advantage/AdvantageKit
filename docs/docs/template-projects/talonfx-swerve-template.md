@@ -17,6 +17,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Automated characterization routines
 - Dashboard alerts for disconnected devices
 - Pose estimator integration
+- Step-by-step setup and tuning instructions with a prebuilt AdvantageScope layout
 - **Deterministic replay** with a **guarantee of accuracy**
 
 By default, the TalonFX version of the swerve template is configured for robots with **four TalonFX drive motors, four TalonFX turn motors, four CANcoder, and a NavX or Pigeon 2 gyro**. See the [Spark Swerve Template](spark-swerve-template.md) for swerve robots using Spark Max/Flex.
