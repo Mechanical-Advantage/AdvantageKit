@@ -67,9 +67,9 @@ public class AutoLogOutputManager {
    *
    * @param root The object to scan recursively.
    */
-  static void registerFields(Object root) {
+  public static void addObject(Object root) {
     allowedPackages.add(root.getClass().getPackageName());
-    registerFieldsImpl(root);
+    addObjectImpl(root);
   }
 
   /**
@@ -77,7 +77,7 @@ public class AutoLogOutputManager {
    *
    * @param root The object to scan recursively.
    */
-  private static void registerFieldsImpl(Object root) {
+  private static void addObjectImpl(Object root) {
     // Check if package name is valid
     String packageName = root.getClass().getPackageName();
     boolean packageNameValid = false;
@@ -100,7 +100,7 @@ public class AutoLogOutputManager {
       Object[] rootArray = (Object[]) root;
       for (Object item : rootArray) {
         if (item != null) {
-          registerFieldsImpl(item);
+          addObjectImpl(item);
         }
       }
       return;
@@ -179,7 +179,7 @@ public class AutoLogOutputManager {
         return;
       }
       if (fieldValue != null) {
-        registerFieldsImpl(fieldValue);
+        addObjectImpl(fieldValue);
       }
     });
   }
