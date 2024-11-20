@@ -116,9 +116,6 @@ public class Logger {
    * <pre>
    * <code>Logger.registerURCL(URCL.startExternal());</code>
    * </pre>
-   * 
-   * <p>
-   * <b>Important: This function requires URCL 2024.1.0 or later.</b>
    */
   public static void registerURCL(Supplier<ByteBuffer[]> logSupplier) {
     urclSupplier = logSupplier;
