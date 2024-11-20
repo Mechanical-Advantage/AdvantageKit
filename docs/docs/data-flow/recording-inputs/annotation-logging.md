@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Annotation Logging
 
-By adding the `@AutoLog` annotation to your inputs class, AdvantageKit will automatically generate implementations of `toLog` and `fromLog` for your inputs. All simple data types (including single values and arrays) are supported. [Structured data types](/data-flow/supported-types#structured) and enum values are also supported, so geometry objects like `Rotation2d` and `Pose3d` can be directly used as inputs.
+By adding the `@AutoLog` annotation to your inputs class, AdvantageKit will automatically generate implementations of `toLog` and `fromLog` for your inputs. All [data types](../supported-types.md) are supported with the exception of mechanism states. Loggable inputs can also be nested and used as fields.
 
 For example:
 
