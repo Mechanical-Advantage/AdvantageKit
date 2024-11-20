@@ -27,6 +27,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -231,7 +235,7 @@ public class AutoLogOutputManager {
   };
 
   /**
-   * Finds the field in the provided class and its superclasses (must be publicor
+   * Finds the field in the provided class and its superclasses (must be public or
    * protected in superclasses). Returns null if the field cannot be found.
    */
   private static Field findField(Class<?> type, String fieldName) {
@@ -363,6 +367,34 @@ public class AutoLogOutputManager {
               if (value != null)
                 // Cannot cast to enum subclass, log the name directly
                 Logger.recordOutput(key, ((Enum<?>) value).name());
+            });
+      } else if (BooleanSupplier.class.isAssignableFrom(type)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (BooleanSupplier) value);
+            });
+      } else if (IntSupplier.class.isAssignableFrom(type)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (IntSupplier) value);
+            });
+      } else if (LongSupplier.class.isAssignableFrom(type)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (LongSupplier) value);
+            });
+      } else if (DoubleSupplier.class.isAssignableFrom(type)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (DoubleSupplier) value);
             });
       } else if (Measure.class.isAssignableFrom(type)) {
         callbacks.add(
