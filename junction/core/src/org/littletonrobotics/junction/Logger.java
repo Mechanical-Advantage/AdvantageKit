@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.conduit.ConduitApi;
@@ -588,6 +592,25 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
+  public static void recordOutput(String key, BooleanSupplier value) {
+    if (running) {
+      outputTable.put(key, value.getAsBoolean());
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
   public static void recordOutput(String key, boolean[] value) {
     if (running) {
       outputTable.put(key, value);
@@ -645,6 +668,25 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
+  public static void recordOutput(String key, IntSupplier value) {
+    if (running) {
+      outputTable.put(key, value.getAsInt());
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
   public static void recordOutput(String key, int[] value) {
     if (running) {
       outputTable.put(key, value);
@@ -686,6 +728,25 @@ public class Logger {
   public static void recordOutput(String key, long value) {
     if (running) {
       outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public static void recordOutput(String key, LongSupplier value) {
+    if (running) {
+      outputTable.put(key, value.getAsLong());
     }
   }
 
@@ -800,6 +861,25 @@ public class Logger {
   public static void recordOutput(String key, double value) {
     if (running) {
       outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public static void recordOutput(String key, DoubleSupplier value) {
+    if (running) {
+      outputTable.put(key, value.getAsDouble());
     }
   }
 
