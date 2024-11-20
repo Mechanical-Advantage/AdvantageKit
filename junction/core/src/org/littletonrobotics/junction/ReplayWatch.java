@@ -125,7 +125,15 @@ public class ReplayWatch {
 
     // Launch Gradle
     boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-    var gradleBuilder = new ProcessBuilder(isWindows ? "gradlew.bat" : "./gradlew", "simulateJava");
+    var gradleBuilder = new ProcessBuilder(
+        isWindows ? "gradlew.bat" : "./gradlew",
+        "simulateJava",
+        "-x",
+        "test",
+        "-x",
+        "spotlessApply",
+        "-x",
+        "spotlessCheck");
     gradleBuilder.environment().put(LogFileUtil.environmentVariable, inputLog);
     var gradle = gradleBuilder.start();
 
