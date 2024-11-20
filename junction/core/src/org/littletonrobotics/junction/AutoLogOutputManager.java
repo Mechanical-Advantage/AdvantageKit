@@ -410,6 +410,13 @@ public class AutoLogOutputManager {
               if (value != null)
                 Logger.recordOutput(key, (LoggedMechanism2d) value);
             });
+      } else if (type.isRecord()) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (Record) value);
+            });
       } else {
         callbacks.add(
             () -> {
@@ -489,6 +496,13 @@ public class AutoLogOutputManager {
                 }
                 Logger.recordOutput(key, names);
               }
+            });
+      } else if (componentType.isRecord()) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (Record[]) value);
             });
       } else {
         callbacks.add(
@@ -575,6 +589,13 @@ public class AutoLogOutputManager {
                 }
                 Logger.recordOutput(key, names);
               }
+            });
+      } else if (componentType.isRecord()) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (Record[][]) value);
             });
       } else {
         callbacks.add(
