@@ -18,7 +18,20 @@ The following simple data types are currently supported:
 
 Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). Supported classes include `Translation2d`, `Pose3d`, and `SwerveModuleState` with more coming soon. These classes can be logged as single values, arrays, or 2D arrays just like any simple type, and used as input or output fields.
 
-AdvantageKit also supports logging the state of a 2D mechanism object as an output. For details, see [here](/recording-outputs/mechanism2d).
+### Records
+
+Custom [record](https://www.baeldung.com/java-record-keyword) classes can be logged as structs, including support for single values and arrays as inputs or outputs. This enables efficient logging of custom complex data types, such as pose observations (check the [vision template](/getting-started/template-projects/vision-template) for examples).
+
+Note that record fields must use only the following struct-compatible types:
+
+- Primitives: `boolean`, `short`, `int`, `long`, `float`, `double`
+- Enum values
+- Struct-compatible types (`Pose2d`, `SwerveModuleState`, etc.)
+- Record values (i.e. nested records)
+
+:::warning
+Array types are not supported for record fields. We recommend logging using multiple top-level record arrays as needed.
+:::
 
 ### Units
 
@@ -27,3 +40,24 @@ WPILib includes a [units library](https://docs.wpilib.org/en/latest/docs/softwar
 ### Enums
 
 [Enum](https://www.w3schools.com/java/java_enums.asp) values can be logged and replayed by AdvantageKit. These values will be stored in the log as string values (using the [`name()`](https://docs.oracle.com/javase/8/docs/api/java/lang/Enum.html#name--) method).
+
+### Mechanisms
+
+AdvantageKit can log 2D mechanism objects as outputs, which can be viewed using AdvantageScope. If not using `@AutoLogOutput`, note that the logging call only records the current state of the `Mechanism2d` and so it must be called periodically.
+
+:::warning
+Mechanism objects must use the **`LoggedMechanism2d`** class to be compatible with AdvantageKit. This class is otherwise equivalent to the standard `Mechanism2d` class. Equivalent `LoggedMechanismRoot2d`, `LoggedMechanismObject2d`, and `LoggedMechanismLigament2d` classes are also provided.
+:::
+
+```java
+public class Example {
+    @AutoLogOutput // Auto logged as "Example/Mechanism"
+    private LoggedMechanism2d mechanism = new LoggedMechanism2d(3, 3);
+
+    public void periodic() {
+        // Alternative approach if not using @AutoLogOutput
+        // (Must be called periodically)
+        Logger.recordOutput("Example/Mechanism", mechanism);
+    }
+}
+```
