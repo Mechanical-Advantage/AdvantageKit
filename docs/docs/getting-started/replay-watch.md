@@ -8,6 +8,10 @@ Some use cases of log replay benefit from rapid iteration, such as tuning pose e
 
 <iframe width="100%" style={{"aspect-ratio": "16 / 9"}} src="https://www.youtube.com/embed/TYRNqW8SrkE" title="AdvantageKit Replay Watch Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
+:::info
+Check the replay example on [rapid iteration](./what-is-advantagekit/example-rapid-iteration.md) for a more detailed example of this feature in the context of tuning a pose estimation algorithm.
+:::
+
 ## Usage
 
 Replay watch requires a custom Gradle task defined in `build.gradle`. This task is included in the AdvantageKit example projects and documented in the installation instructions for [existing projects](./installation/existing-projects.md).
