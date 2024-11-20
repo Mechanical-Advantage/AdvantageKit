@@ -20,7 +20,7 @@ Many WPILib classes can be serialized to binary data using [structs](https://git
 
 ### Records
 
-Custom [record](https://www.baeldung.com/java-record-keyword) classes can be logged as structs, including support for single values and arrays as inputs or outputs. This enables efficient logging of custom complex data types, such as pose observations (check the [vision template](/getting-started/template-projects/vision-template) for examples).
+Custom [record](https://www.baeldung.com/java-record-keyword) classes can be logged as structs, including support for single values, arrays, and 2D arrays as inputs or outputs. This enables efficient logging of custom complex data types, such as pose observations (check the [vision template](/getting-started/template-projects/vision-template) for examples).
 
 Note that record fields must use only the following struct-compatible types:
 

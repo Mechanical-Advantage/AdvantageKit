@@ -1231,6 +1231,81 @@ public class Logger {
    * simulator, use this method to record extra data based on the original inputs.
    * 
    * <p>
+   * This method serializes a single object as a struct or protobuf automatically.
+   * Struct is preferred if both methods are supported.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param T     The type
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <R extends Record> void recordOutput(String key, R value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method serializes an array of objects as a struct automatically.
+   * Top-level protobuf arrays are not supported.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param T     The type
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <R extends Record> void recordOutput(String key, R... value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method serializes an array of objects as a struct automatically.
+   * Top-level protobuf arrays are not supported.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param T     The type
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <R extends Record> void recordOutput(String key, R[][] value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
    * The current position of the Mechanism2d is logged once as a set of nested
    * fields. If the position is updated, this method must be called again.
    * 

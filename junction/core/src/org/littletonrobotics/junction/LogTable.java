@@ -98,7 +98,8 @@ public class LogTable {
    * Creates a new LogTable, to reference a subtable.
    */
   private LogTable(String prefix, LogTable parent) {
-    this(prefix, parent.depth + 1, parent.timestamp, parent.data, parent.structBuffers, parent.protoBuffers, parent.structTypeCache,
+    this(prefix, parent.depth + 1, parent.timestamp, parent.data, parent.structBuffers, parent.protoBuffers,
+        parent.structTypeCache,
         parent.protoTypeCache);
   }
 
@@ -475,14 +476,15 @@ public class LogTable {
    * Writes a new LoggableInput subtable to the table.
    */
   public <T extends LoggableInputs> void put(String key, T value) {
-    if (value == null) return;
+    if (value == null)
+      return;
     if (this.depth > 100) {
       DriverStation.reportWarning(
-            "[AdvantageKit] Detected recursive table structure when logging value to field \""
-                + prefix
-                + key
-                + "\". using LoggableInputs. Consider revising the table structure or refactoring to avoid recursion.",
-            false);
+          "[AdvantageKit] Detected recursive table structure when logging value to field \""
+              + prefix
+              + key
+              + "\". using LoggableInputs. Consider revising the table structure or refactoring to avoid recursion.",
+          false);
       return;
     }
     value.toLog(getSubtable(key));
@@ -693,6 +695,57 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <T extends StructSerializable> void put(String key, T[][] value) {
+    if (value == null)
+      return;
+    put(key + "/length", value.length);
+    for (int i = 0; i < value.length; i++) {
+      put(key + "/" + Integer.toString(i), value[i]);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Struct<?> findRecordStructType(Class<?> classObj) {
+    if (!structTypeCache.containsKey(classObj.getName())) {
+      structTypeCache.put(classObj.getName(), new RecordStruct(classObj));
+    }
+    return structTypeCache.get(classObj.getName());
+  }
+
+  /**
+   * Writes a new auto serialized record value to the table. Skipped if the key
+   * already exists as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <R extends Record> void put(String key, R value) {
+    if (value == null)
+      return;
+    Struct<R> struct = (Struct<R>) findRecordStructType(value.getClass());
+    if (struct != null) {
+      put(key, struct, value);
+    }
+  }
+
+  /**
+   * Writes a new auto serialized record array value to the table. Skipped if the
+   * key already exists as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <R extends Record> void put(String key, R... value) {
+    if (value == null)
+      return;
+    // If struct is supported, write as struct
+    Struct<R> struct = (Struct<R>) findRecordStructType(value.getClass().getComponentType());
+    if (struct != null) {
+      put(key, struct, value);
+    }
+  }
+
+  /**
+   * Writes a new auto serialized 2D record array value to the table. Skipped if
+   * the key already exists as a different type.
+   */
+  @SuppressWarnings("unchecked")
+  public <R extends Record> void put(String key, R[][] value) {
     if (value == null)
       return;
     put(key + "/length", value.length);
@@ -990,7 +1043,8 @@ public class LogTable {
 
   /** Reads a LoggableInput subtable from the table. */
   public <T extends LoggableInputs> T get(String key, T defaultValue) {
-    if (defaultValue == null) return null;
+    if (defaultValue == null)
+      return null;
     defaultValue.fromLog(getSubtable(key));
     return defaultValue;
   }
@@ -1095,7 +1149,7 @@ public class LogTable {
     return defaultValue;
   }
 
-  /** Reads a serialized (struct) array value from the table. */
+  /** Reads a serialized 2D (struct) array value from the table. */
   @SuppressWarnings("unchecked")
   public <T extends StructSerializable> T[][] get(String key, T[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
@@ -1103,6 +1157,53 @@ public class LogTable {
       T[][] value = (T[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
       for (int i = 0; i < length; i++) {
         T[] defaultItemValue = (T[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
+            0);
+        value[i] = get(key + "/" + Integer.toString(i), defaultItemValue);
+      }
+      return value;
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a serialized record value from the table. */
+  @SuppressWarnings("unchecked")
+  public <R extends Record> R get(String key, R defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      String typeString = data.get(prefix + key).customTypeStr;
+      if (typeString.startsWith("struct:")) {
+        Struct<R> struct = (Struct<R>) findRecordStructType(defaultValue.getClass());
+        if (struct != null) {
+          return get(key, struct, defaultValue);
+        }
+      }
+    }
+    return defaultValue;
+  }
+
+  /** Reads a serialized record array value from the table. */
+  @SuppressWarnings("unchecked")
+  public <R extends Record> R[] get(String key, R... defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      String typeString = data.get(prefix + key).customTypeStr;
+      if (typeString.startsWith("struct:")) {
+        Struct<R> struct = (Struct<R>) findRecordStructType(defaultValue.getClass().getComponentType());
+        if (struct != null) {
+          return get(key, struct, defaultValue);
+        }
+      }
+    }
+    return defaultValue;
+  }
+
+  /** Reads a serialized 2D record array value from the table. */
+  @SuppressWarnings("unchecked")
+  public <R extends Record> R[][] get(String key, R[][] defaultValue) {
+    if (data.containsKey(prefix + key + "/length")) {
+      int length = get(key + "/length", 0);
+      R[][] value = (R[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
+      for (int i = 0; i < length; i++) {
+        R[] defaultItemValue = (R[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
             0);
         value[i] = get(key + "/" + Integer.toString(i), defaultItemValue);
       }
