@@ -82,7 +82,7 @@ public class LoggedRobot extends IterativeRobotBase {
     long initEnd = Logger.getRealTimestamp();
 
     // Register auto logged outputs
-    AutoLogOutputManager.registerFields(this);
+    AutoLogOutputManager.addObject(this);
 
     // Save data from init cycle
     Logger.periodicAfterUser(initEnd - initStart, 0);

@@ -37,6 +37,12 @@ By default, the parent class where `@AutoLogOutput` is used must be within the s
 AutoLogOutputManager.addPackage("frc.lib");
 ```
 
+The `addObject` method can also be used to manually scan an object for loggable fields. This method should only be called during initialization:
+
+```java
+AutoLogOutputManager.addObject(this);
+```
+
 :::warning
 The parent class where `@AutoLogOutput` is used must also be instantiated within the first loop cycle and be accessible by a recursive search of the fields of `Robot`. This feature is primarily intended to log outputs from subsystems and other similar classes. For classes that do not fit the criteria above, call `Logger.recordOutput` periodically to record outputs.
 :::
