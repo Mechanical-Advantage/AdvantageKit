@@ -56,7 +56,7 @@ class RadioLogger {
     statusURLBuilder.append(teamNumber / 100);
     statusURLBuilder.append(".");
     statusURLBuilder.append(teamNumber % 100);
-    statusURLBuilder.append(".0/status");
+    statusURLBuilder.append(".1/status");
     try {
       statusURL = new URL(statusURLBuilder.toString());
     } catch (MalformedURLException e) {
