@@ -1,2 +1,0 @@
-CompileFlags:
-    Remove: [-fno-canonical-system-headers] # GCC uses this but clang doesn't recognize it, so clangd doesn't work with it.
