@@ -51,6 +51,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.protobuf.Protobuf;
@@ -71,7 +72,6 @@ public class Logger {
   private static ConsoleSource console = null;
   private static List<LoggedNetworkInput> dashboardInputs = new ArrayList<>();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
-  private static boolean deterministicTimestamps = true;
   private static boolean enableConsole = true;
 
   private static LogReplaySource replaySource;
@@ -136,23 +136,6 @@ public class Logger {
     if (!running) {
       metadata.put(key, value);
     }
-  }
-
-  /**
-   * Causes the timestamp returned by "Timer.getFPGATimestamp()" and similar to
-   * match the "real" time as reported by the FPGA instead of the logged time from
-   * AdvantageKit.
-   * 
-   * <p>
-   * Not recommended for most users as the behavior of the replayed
-   * code will NOT match the real robot. Only use this method if your control
-   * logic requires precise timestamps WITHIN a single cycle and you have no way
-   * to move timestamp-critical operations to an IO interface. Also consider using
-   * "getRealTimestamp()" for logic that doesn't need to match the replayed
-   * version (like for analyzing performance).
-   */
-  public static void disableDeterministicTimestamps() {
-    deterministicTimestamps = false;
   }
 
   /**
@@ -227,8 +210,8 @@ public class Logger {
       // Start receiver thread
       receiverThread.start();
 
-      // Update MathShared to mock timestamp
-      setMathShared(true);
+      // Update RobotController to AdvantageKit timestamp
+      RobotController.setTimeSource(Logger::getTimestamp);
 
       // Start first periodic cycle
       periodicBeforeUser();
@@ -257,7 +240,7 @@ public class Logger {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      setMathShared(false);
+      RobotController.setTimeSource(RobotController::getFPGATime);
     }
   }
 
@@ -269,9 +252,11 @@ public class Logger {
     cycleCount++;
     if (running) {
       // Get next entry
-      long entryUpdateStart = getRealTimestamp();
+      long entryUpdateStart = RobotController.getFPGATime();
       if (replaySource == null) {
-        entry.setTimestamp(getRealTimestamp());
+        synchronized (entry) {
+          entry.setTimestamp(RobotController.getFPGATime());
+        }
       } else {
         if (!replaySource.updateTable(entry)) {
           end();
@@ -280,17 +265,17 @@ public class Logger {
       }
 
       // Update Driver Station
-      long dsStart = getRealTimestamp();
+      long dsStart = RobotController.getFPGATime();
       if (hasReplaySource()) {
         LoggedDriverStation.replayFromLog(entry.getSubtable("DriverStation"));
       }
 
       // Update dashboard inputs
-      long dashboardInputsStart = getRealTimestamp();
+      long dashboardInputsStart = RobotController.getFPGATime();
       for (int i = 0; i < dashboardInputs.size(); i++) {
         dashboardInputs.get(i).periodic();
       }
-      long dashboardInputsEnd = getRealTimestamp();
+      long dashboardInputsEnd = RobotController.getFPGATime();
 
       // Record timing data
       recordOutput("Logger/EntryUpdateMs", (dsStart - entryUpdateStart) / 1000.0);
@@ -311,17 +296,17 @@ public class Logger {
     if (running) {
       // Capture conduit data
       ConduitApi conduit = ConduitApi.getInstance();
-      long conduitCaptureStart = getRealTimestamp();
+      long conduitCaptureStart = RobotController.getFPGATime();
       conduit.captureData();
 
       // Update Driver Station
-      long dsStart = getRealTimestamp();
+      long dsStart = RobotController.getFPGATime();
       if (!hasReplaySource()) {
         LoggedDriverStation.saveToLog(entry.getSubtable("DriverStation"));
       }
 
       // Save other conduit inputs
-      long conduitSaveStart = getRealTimestamp();
+      long conduitSaveStart = RobotController.getFPGATime();
       if (!hasReplaySource()) {
         LoggedSystemStats.saveToLog(entry.getSubtable("SystemStats"));
         LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
@@ -352,20 +337,20 @@ public class Logger {
       }
 
       // Update automatic outputs from user code
-      long autoLogStart = getRealTimestamp();
+      long autoLogStart = RobotController.getFPGATime();
       AutoLogOutputManager.periodic();
-      long alertLogStart = getRealTimestamp();
+      long alertLogStart = RobotController.getFPGATime();
       AlertLogger.periodic();
-      long radioLogStart = getRealTimestamp();
+      long radioLogStart = RobotController.getFPGATime();
       RadioLogger.periodic(outputTable.getSubtable("Radio"));
-      long consoleCaptureStart = getRealTimestamp();
+      long consoleCaptureStart = RobotController.getFPGATime();
       if (enableConsole) {
         String consoleData = console.getNewData();
         if (!consoleData.isEmpty()) {
           recordOutput("Console", consoleData.trim());
         }
       }
-      long consoleCaptureEnd = getRealTimestamp();
+      long consoleCaptureEnd = RobotController.getFPGATime();
 
       // Record timing data
       recordOutput("Logger/ConduitCaptureMS", (dsStart - conduitCaptureStart) / 1000.0);
@@ -397,68 +382,6 @@ public class Logger {
   }
 
   /**
-   * Updates the MathShared object for wpimath to enable or disable AdvantageKit's
-   * mocked timestamps.
-   */
-  private static void setMathShared(boolean mocked) {
-    MathSharedStore.setMathShared(
-        new MathShared() {
-          @Override
-          public void reportError(String error, StackTraceElement[] stackTrace) {
-            DriverStation.reportError(error, stackTrace);
-          }
-
-          @Override
-          public void reportUsage(MathUsageId id, int count) {
-            switch (id) {
-              case kKinematics_DifferentialDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Kinematics,
-                    tInstances.kKinematics_DifferentialDrive);
-                break;
-              case kKinematics_MecanumDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
-                break;
-              case kKinematics_SwerveDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
-                break;
-              case kTrajectory_TrapezoidProfile:
-                HAL.report(tResourceType.kResourceType_TrapezoidProfile, count);
-                break;
-              case kFilter_Linear:
-                HAL.report(tResourceType.kResourceType_LinearFilter, count);
-                break;
-              case kOdometry_DifferentialDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
-                break;
-              case kOdometry_SwerveDrive:
-                HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
-                break;
-              case kOdometry_MecanumDrive:
-                HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
-                break;
-              case kController_PIDController2:
-                HAL.report(tResourceType.kResourceType_PIDController2, count);
-                break;
-              case kController_ProfiledPIDController:
-                HAL.report(tResourceType.kResourceType_ProfiledPIDController, count);
-                break;
-              default:
-                break;
-            }
-          }
-
-          @Override
-          public double getTimestamp() {
-            return (mocked ? Logger.getTimestamp() : Logger.getRealTimestamp()) * 1.0e-6;
-          }
-        });
-  }
-
-  /**
    * Returns the state of the receiver queue fault. This is tripped when the
    * receiver queue fills up, meaning that data is no longer being saved.
    */
@@ -471,10 +394,12 @@ public class Logger {
    * entry (microseconds).
    */
   public static long getTimestamp() {
-    if (!running || entry == null || (!deterministicTimestamps && !hasReplaySource())) {
-      return getRealTimestamp();
-    } else {
-      return entry.getTimestamp();
+    synchronized (entry) {
+      if (!running || entry == null) {
+        return RobotController.getFPGATime();
+      } else {
+        return entry.getTimestamp();
+      }
     }
   }
 
@@ -482,9 +407,12 @@ public class Logger {
    * Returns the true FPGA timestamp in microseconds, regardless of the timestamp
    * used for logging. Useful for analyzing performance. DO NOT USE this method
    * for any logic which might need to be replayed.
+   * 
+   * @deprecated Use {@code RobotController.getFPGATime()} instead.
    */
+  @Deprecated
   public static long getRealTimestamp() {
-    return HALUtil.getFPGATime();
+    return RobotController.getFPGATime();
   }
 
   /**
