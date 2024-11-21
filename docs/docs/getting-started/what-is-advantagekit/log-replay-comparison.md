@@ -14,7 +14,7 @@ Skip to the [summary section](#summary) to compare the features of each logging 
 
 _(DataLogManager, Epilogue, Monologue, etc.)_
 
-These tools allow for logging and/or live streaming of data published from robot code, which can be viewed using AdvantageScope. This is sufficient for the majority of debugging tasks, such as verifying pose estimation accuracy, checking joystick values, and debugging simple issues in code that was configured for logging ahead of time. However, these tools **do not support replaying data to simulated robot code** (as explained [here](/what-is-advantagekit/)).
+These tools allow for logging and/or live streaming of data published from robot code, which can be viewed using AdvantageScope. This is sufficient for the majority of debugging tasks, such as verifying pose estimation accuracy, checking joystick values, and debugging simple issues in code that was configured for logging ahead of time. However, these tools **do not support replaying data to simulated robot code** (as explained [here](/getting-started/what-is-advantagekit)).
 
 ### CTRE Signal Logging & Hoot Replay
 
@@ -38,7 +38,7 @@ AdvantageKit guarantees **deterministic replay of robot code in simulation**, al
 - Replay logs at **any speed** without losing accuracy. This allows entire log files to be replayed many times faster than real-time, allowing for **rapid iteration and testing** in replay. AdvantageKit automatically **merges original and replayed fields** in the same output log file, allowing for easy comparison.
 - Breakpoints can be used to pause replay and **inspect code line-by-line** with no impact on replay accuracy.
 
-AdvantageKit is not enabled by default. Code bases not already using [hardware abstraction](../recording-inputs/io-interfaces.md) for subsystems must be restructured when switching to AdvantageKit.
+AdvantageKit is not enabled by default. Code bases not already using [hardware abstraction](/data-flow/recording-inputs/io-interfaces) for subsystems must be restructured when switching to AdvantageKit.
 
 :::info
 AdvantageKit is **free** and **open-source**. It can be used with hardware from any vendor, including CTRE, REV, and more.

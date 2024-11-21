@@ -101,7 +101,7 @@ The feedforward model used in simulation can be characterized using the same met
 Users who wish to characterize acceleration gains (`kA`) can choose to use the full [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html) application. The project includes auto routines for each of the four required SysId tests. Two options are available to load data in SysId:
 
 - The project is configured to use [URCL](https://docs.advantagescope.org/more-features/urcl) by default. This data can be exported as described [here](https://docs.advantagescope.org/more-features/urcl#sysid-usage).
-- Export the AdvantageKit log file as described [here](../sysid-compatibility.md).
+- Export the AdvantageKit log file as described [here](/data-flow/sysid-compatibility).
 
 :::tip
 The built-in SysId routines can be easily adapted to characterize the turn motor feedforward or the angular motion of the robot (for example, to estimate the robot's [moment of inertia](https://sleipnirgroup.github.io/Choreo/usage/estimating-moi/)). The code below shows how the `runCharacterization` method can be adapted for these use cases.
@@ -210,7 +210,7 @@ When switching between motor types, the `driveGearbox` and `turnGearbox` constan
 
 The project defaults to the Pigeon 2 gyro, but can be integrated with any standard gyro. An example implementation for a NavX is included.
 
-To change the gyro implementation, switch `new GyroIOPigeon2()` in the `RobotContainer` constructor to any other implementation. For example, the `GyroIONavX` implementation is pre-configured to use a NavX connected to the MXP SPI port. See the page on [IO interfaces](../recording-inputs/io-interfaces.md) for more details on how hardware abstraction works.
+To change the gyro implementation, switch `new GyroIOPigeon2()` in the `RobotContainer` constructor to any other implementation. For example, the `GyroIONavX` implementation is pre-configured to use a NavX connected to the MXP SPI port. See the page on [IO interfaces](/data-flow/recording-inputs/io-interfaces) for more details on how hardware abstraction works.
 
 The `SparkOdometryThread` class reads high-frequency gyro data for odometry alongside samples from drive encoders. This class supports both Spark devices and generic signals. Note that the gyro should be configured to publish signals at the same frequency as odometry. Call `registerSignal` with a double supplier to create a queue, as shown in the `GyroIONavX` implementation:
 

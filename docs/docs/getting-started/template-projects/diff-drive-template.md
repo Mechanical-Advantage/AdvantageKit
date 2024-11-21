@@ -85,7 +85,7 @@ Users who wish to characterize acceleration gains (`kA`) can choose to use the f
 
 - For Spark users, the project is configured to use [URCL](https://docs.advantagescope.org/more-features/urcl) by default. This data can be exported as described [here](https://docs.advantagescope.org/more-features/urcl#sysid-usage).
 - TalonFX (**not Talon SRX**) users can export the Hoot log file as described [here](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/wpilib-integration/sysid-integration/index.html).
-- Export the AdvantageKit log file as described [here](../sysid-compatibility.md).
+- Export the AdvantageKit log file as described [here](/data-flow/sysid-compatibility).
 
 ### Wheel Radius Characterization
 
@@ -143,7 +143,7 @@ The project includes a built-in configuration for [PathPlanner](https://pathplan
 
 The project defaults to the Pigeon 2 gyro, but can be integrated with any standard gyro. An example implementation for a NavX is included.
 
-To change the gyro implementation, switch `new GyroIOPigeon2()` in the `RobotContainer` constructor to any other implementation. For example, the `GyroIONavX` implementation is pre-configured to use a NavX connected to the MXP SPI port. See the page on [IO interfaces](../recording-inputs/io-interfaces.md) for more details on how hardware abstraction works.
+To change the gyro implementation, switch `new GyroIOPigeon2()` in the `RobotContainer` constructor to any other implementation. For example, the `GyroIONavX` implementation is pre-configured to use a NavX connected to the MXP SPI port. See the page on [IO interfaces](/data-flow/recording-inputs/io-interfaces) for more details on how hardware abstraction works.
 
 ### Custom Motor Implementations
 
