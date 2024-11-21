@@ -55,7 +55,7 @@ Git must be installed and available on the PATH to use the Gversion plugin. See 
 Metadata can be recorded in the log file as shown below:
 
 ```java
-public void robotInit() {
+public Robot() {
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     // ...
 

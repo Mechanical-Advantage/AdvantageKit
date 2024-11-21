@@ -245,8 +245,8 @@ public class Logger {
   }
 
   /**
-   * Periodic method to be called before robotInit and each loop cycle. Updates
-   * timestamp, replay entry, and dashboard inputs.
+   * Periodic method to be called during the constructor of Robot and each loop
+   * cycle. Updates timestamp, replay entry, and dashboard inputs.
    */
   static void periodicBeforeUser() {
     cycleCount++;
@@ -287,10 +287,10 @@ public class Logger {
   }
 
   /**
-   * Periodic method to be called after robotInit and each loop cycle. Update
-   * default log values and sends data to data receivers. Running this after user
-   * code allows IO operations to occur between cycles rather than interferring
-   * with the main thread.
+   * Periodic method to be called after the constructor of Robot and each loop cycle.
+   * Updates default log values and sends data to data receivers. Running this after user
+   * code allows IO operations to occur between cycles rather than interferring with the
+   * main thread.
    */
   static void periodicAfterUser(long userCodeLength, long periodicBeforeLength) {
     if (running) {

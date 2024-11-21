@@ -47,7 +47,7 @@ public class AutoLogOutputManager {
    * new allowed package, such as a "lib" package outside of normal robot code.
    * 
    * <p>
-   * This method must be called within {@code robotInit}.
+   * This method must be called within the constructor of {@code Robot}.
    * 
    * @param packageName The new allowed package name (e.g. "frc.lib")
    */

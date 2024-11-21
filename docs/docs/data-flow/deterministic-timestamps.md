@@ -26,7 +26,7 @@ Optionally, AdvantageKit allows you to disable deterministic timestamps. This re
 2. The sensor values used in the loop cannot be associated with timestamps in an IO implementation. See solution #1.
 3. The IO (sensors, actuators, etc) involved in the loop are sufficiently low-latency that the exact timestamp on the RIO is significant. For example, CAN motor controllers are limited by the rate of their CAN frames, so the extra precision on the RIO is insignificant in most cases.
 
-If you need to disable deterministic timestamps globally, add the following line to `robotInit()` _after_ `Logger.start()`:
+If you need to disable deterministic timestamps globally, add the following line to the constructor of `Robot` _after_ `Logger.start()`:
 
 ```java
 RobotController.setTimeSource(RobotController::getFPGATime);

@@ -31,7 +31,7 @@ public class SwerveModule {
 }
 ```
 
-By default, the parent class where `@AutoLogOutput` is used must be within the same package as `Robot` (or a subpackage). The following method can be called in `robotInit` to allow additional packages, such as a "lib" package outside of normal robot code:
+By default, the parent class where `@AutoLogOutput` is used must be within the same package as `Robot` (or a subpackage). The following method can be called in the constructor of `Robot` to allow additional packages, such as a "lib" package outside of normal robot code:
 
 ```java
 AutoLogOutputManager.addPackage("frc.lib");
