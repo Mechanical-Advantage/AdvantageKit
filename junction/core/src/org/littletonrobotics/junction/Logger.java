@@ -356,6 +356,8 @@ public class Logger {
       AutoLogOutputManager.periodic();
       long alertLogStart = getRealTimestamp();
       AlertLogger.periodic();
+      long radioLogStart = getRealTimestamp();
+      RadioLogger.periodic(outputTable.getSubtable("Radio"));
       long consoleCaptureStart = getRealTimestamp();
       if (enableConsole) {
         String consoleData = console.getNewData();
@@ -372,7 +374,8 @@ public class Logger {
       }
       recordOutput("Logger/ConduitSaveMS", (autoLogStart - conduitSaveStart) / 1000.0);
       recordOutput("Logger/AutoLogMS", (alertLogStart - autoLogStart) / 1000.0);
-      recordOutput("Logger/AlertLogMS", (consoleCaptureStart - alertLogStart) / 1000.0);
+      recordOutput("Logger/AlertLogMS", (radioLogStart - alertLogStart) / 1000.0);
+      recordOutput("Logger/RadioLogMS", (consoleCaptureStart - radioLogStart) / 1000.0);
       recordOutput("Logger/ConsoleMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
       recordOutput("LoggedRobot/UserCodeMS", userCodeLength / 1000.0);
       long periodicAfterLength = consoleCaptureEnd - conduitCaptureStart;
