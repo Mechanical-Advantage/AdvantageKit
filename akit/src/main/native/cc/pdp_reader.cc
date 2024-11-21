@@ -27,7 +27,7 @@
 #include <mutex>
 
 #include "conduit/HALUtil.h"
-#ifdef AKIT_ATHENA
+#ifdef __FRC_ROBORIO__
 #include "conduit/pdh_util.h"
 #include "conduit/pdp_util.h"
 #endif
