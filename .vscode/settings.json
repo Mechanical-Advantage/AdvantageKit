@@ -1,21 +1,3 @@
 {
-    "files.exclude": {
-        "external": false,
-        "bazel-*": false,
-        "compile_commands.json": false,
-        "**/.classpath": true,
-        "**/.project": true,
-        "**/.settings": true,
-        "**/.factorypath": true
-    },
-    "java.import.gradle.enabled": false,
-    "java.import.maven.enabled": false,
-    "java.import.bazel.enabled": true,
-    "java.import.bazel.src.path": "/src",
-    "java.import.bazel.test.path": "/test",
-    "clangd.arguments": [
-        "--header-insertion=never",
-        "--compile-commands-dir=${workspaceFolder}/"
-    ],
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
