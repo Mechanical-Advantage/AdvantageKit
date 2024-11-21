@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "AdvantageKit"
-include("akit")
+includeBuild("akit")
