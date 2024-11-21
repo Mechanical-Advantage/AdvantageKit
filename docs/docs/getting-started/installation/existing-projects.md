@@ -55,7 +55,7 @@ public class Robot extends LoggedRobot {
 }
 ```
 
-The user program is responsible for configuring and initializing the logging framework. This setup should be placed in `robotInit()` _before any other initialization_. An example configuration is provided below:
+The user program is responsible for configuring and initializing the logging framework. This setup should be placed in the constructor of `Robot` _before any other initialization_. An example configuration is provided below:
 
 ```java
 Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
@@ -71,7 +71,6 @@ if (isReal()) {
     Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
 }
 
-// Logger.disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
 Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 ```
 
