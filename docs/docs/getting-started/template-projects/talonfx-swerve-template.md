@@ -151,7 +151,7 @@ The feedforward model used in simulation can be characterized using the same met
 Users who wish to characterize acceleration gains (`kA`) or turn gains can choose to use the full [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html) application. The project includes auto routines for each of the four required SysId tests. Two options are available to load data in SysId:
 
 - Export the Hoot log file as described [here](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/wpilib-integration/sysid-integration/index.html).
-- Export the AdvantageKit log file as described [here](../sysid-compatibility.md). Note that AdvantageKit values are logged in radians while Phoenix requires rotations to be used. Gains must be converted appropriately.
+- Export the AdvantageKit log file as described [here](/data-flow/sysid-compatibility). Note that AdvantageKit values are logged in radians while Phoenix requires rotations to be used. Gains must be converted appropriately.
 
 :::tip
 The built-in SysId routines can be easily adapted to characterize the turn motor feedforward or the angular motion of the robot (for example, to estimate the robot's [moment of inertia](https://sleipnirgroup.github.io/Choreo/usage/estimating-moi/)). The code below shows how the `runCharacterization` method can be adapted for these use cases.
@@ -246,7 +246,7 @@ By default, the project runs at **100Hz** on the RIO CAN bus and **250Hz** on CA
 
 The project defaults to the Pigeon 2 gyro, but can be integrated with any standard gyro. An example implementation for a NavX is included.
 
-To change the gyro implementation, switch `new GyroIOPigeon2()` in the `RobotContainer` constructor to any other implementation. For example, the `GyroIONavX` implementation is pre-configured to use a NavX connected to the MXP SPI port. See the page on [IO interfaces](../recording-inputs/io-interfaces.md) for more details on how hardware abstraction works.
+To change the gyro implementation, switch `new GyroIOPigeon2()` in the `RobotContainer` constructor to any other implementation. For example, the `GyroIONavX` implementation is pre-configured to use a NavX connected to the MXP SPI port. See the page on [IO interfaces](/data-flow/recording-inputs/io-interfaces) for more details on how hardware abstraction works.
 
 The `PhoenixOdometryThread` class reads high-frequency gyro data for odometry alongside samples from drive encoders. This class supports both Phoenix signals and generic signals. Note that the gyro should be configured to publish signals at the same frequency as odometry. Call `registerSignal` with a double supplier to create a queue, as shown in the `GyroIONavX` implementation:
 
