@@ -30,10 +30,12 @@ class AlertLogger {
 
   static {
     try {
-      Field groupsField = Alert.class.getDeclaredField("groups");
+      Class<?> sendableAlertsClass = Class.forName("edu.wpi.first.wpilibj.Alert$SendableAlerts");
+      Field groupsField = sendableAlertsClass.getDeclaredField("groups");
       groupsField.setAccessible(true);
       groups = (Map<String, Object>) groupsField.get(null);
-    } catch (IllegalArgumentException
+    } catch (ClassNotFoundException
+        | IllegalArgumentException
         | IllegalAccessException
         | NoSuchFieldException
         | SecurityException e) {
