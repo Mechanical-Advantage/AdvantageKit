@@ -48,7 +48,6 @@ import us.hebi.quickbuf.ProtoMessage;
  * table.
  */
 public class LogTable {
-  private static boolean disableProtobufWarning = false;
   private final String prefix;
   private final int depth;
   private final SharedTimestamp timestamp;
@@ -65,11 +64,6 @@ public class LogTable {
     public SharedTimestamp(long value) {
       this.value = value;
     }
-  }
-
-  /** Disables warning message print when logging protobuf values. */
-  public static void disableProtobufWarning() {
-    disableProtobufWarning = true;
   }
 
   /** Creates a new LogTable. */
@@ -581,6 +575,13 @@ public class LogTable {
           .put("/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto")));
       if (!protoBuffers.containsKey(proto.getTypeString())) {
         protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
+
+        // Warn about protobuf logging when enabled
+        if (DriverStation.isEnabled()) {
+          DriverStation.reportWarning(
+            "[AdvantageKit] Logging protobuf value with type \"" + proto.getTypeString() + "\" for the first time. Logging a protobuf type for the first time when the robot is enabled is likely to cause high loop overruns. Protobuf types should be always logged for the first time when the robot is disabled.",
+            false);
+        }
       }
       ProtobufBuffer<T, MessageType> buffer = (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
       ByteBuffer bb;
@@ -592,16 +593,6 @@ public class LogTable {
         put(key, new LogValue(array, proto.getTypeString()));
       } catch (IOException e) {
         e.printStackTrace();
-      }
-
-      // Driver Station alert
-      if (!disableProtobufWarning) {
-        DriverStation.reportWarning(
-            "[AdvantageKit] Logging value to field \""
-                + prefix
-                + key
-                + "\" using protobuf encoding. This may cause high loop overruns, please monitor performance or save the value in a different format. Call \"LogTable.disableProtobufWarning()\" to disable this message.",
-            false);
       }
     }
   }
@@ -707,6 +698,13 @@ public class LogTable {
   private Struct<?> findRecordStructType(Class<?> classObj) {
     if (!structTypeCache.containsKey(classObj.getName())) {
       structTypeCache.put(classObj.getName(), new RecordStruct(classObj));
+
+      // Warn about record logging when enabled
+      if (DriverStation.isEnabled()) {
+        DriverStation.reportWarning(
+          "[AdvantageKit] Logging record value with type \"" + classObj.getName() + "\" for the first time. Logging a record type for the first time when the robot is enabled is likely to cause high loop overruns. Record types should be always logged for the first time when the robot is disabled.",
+          false);
+      }
     }
     return structTypeCache.get(classObj.getName());
   }
