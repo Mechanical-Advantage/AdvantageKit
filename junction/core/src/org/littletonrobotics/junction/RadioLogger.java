@@ -27,9 +27,9 @@ import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 
 class RadioLogger {
-  private static final double requestPeriodSecs = 0.25;
-  private static final int connectTimeout = 100;
-  private static final int readTimeout = 100;
+  private static final double requestPeriodSecs = 5.0;
+  private static final int connectTimeout = 500;
+  private static final int readTimeout = 500;
 
   private static URL statusURL;
   private static Notifier notifier;
