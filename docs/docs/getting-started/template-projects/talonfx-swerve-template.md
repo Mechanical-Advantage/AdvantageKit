@@ -12,7 +12,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Easy setup with Tuner X swerve project generator
 - High-frequency odometry
 - CANivore time sync (for Phoenix Pro users)
-- On-controller feedback loops, including Motion Magic for turn control
+- On-controller feedback loops
 - Physics simulation
 - Automated characterization routines
 - Dashboard alerts for disconnected devices
@@ -280,13 +280,13 @@ turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor
 tryUntilOk(5, () -> turnTalon.setPosition(customEncoder.getPositionRotations(), 0.25));
 ```
 
-### Exponential Turning Profile
+### Profiled Turning PID
 
-By default, the project uses a standard trapezoidal profile for turn control. Users may choose to replace the trapezoidal profile with an exponential version using the Phoenix [Motion Magic Expo](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html#motion-magic-expo) API. To implement this, simply replace the position request in `ModuleIOTalonFX` with the new request type, as shown below. The `kV` and `kA` constraints are already configured in the `ModuleIOTalonFX` constructor, but can be adjusted.
+By default, the project uses a standard PID controllers for turn control. Users may choose to replace the standard control request with [Motion Magic](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html#motion-magic) or [Motion Magic Expo](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html#motion-magic-expo) control requests. To implement this, simply replace the position request in `ModuleIOTalonFX` with the new request type, as shown below. The Motion Magic constraints are already configured in the `ModuleIOTalonFX` constructor, but can be adjusted.
 
 ```java
-private final MotionMagicExpoVoltage positionVoltageRequest = new MotionMagicExpoVoltage(0.0);
-private final MotionMagicExpoTorqueCurrentFOC positionTorqueCurrentRequest = new MotionMagicExpoTorqueCurrentFOC(0.0);
+private final MotionMagicVoltage positionVoltageRequest = new MotionMagicVoltage(0.0);
+private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest = new MotionMagicTorqueCurrentFOC(0.0);
 ```
 
 ### Vision Integration
