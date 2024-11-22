@@ -278,11 +278,11 @@ public class Logger {
       long dashboardInputsEnd = RobotController.getFPGATime();
 
       // Record timing data
-      recordOutput("Logger/EntryUpdateMs", (dsStart - entryUpdateStart) / 1000.0);
+      recordOutput("Logger/EntryUpdateMS", (dsStart - entryUpdateStart) / 1000.0);
       if (hasReplaySource()) {
         recordOutput("Logger/DriverStationMS", (dashboardInputsStart - dsStart) / 1000.0);
       }
-      recordOutput("Logger/DashboardInputsMs", (dashboardInputsEnd - dashboardInputsStart) / 1000.0);
+      recordOutput("Logger/DashboardInputsMS", (dashboardInputsEnd - dashboardInputsStart) / 1000.0);
     }
   }
 
