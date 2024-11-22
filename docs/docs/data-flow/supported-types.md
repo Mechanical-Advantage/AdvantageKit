@@ -18,9 +18,19 @@ The following simple data types are currently supported:
 
 Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). Supported classes include `Translation2d`, `Pose3d`, and `SwerveModuleState` with more coming soon. These classes can be logged as single values, arrays, or 2D arrays just like any simple type, and used as input or output fields.
 
+:::danger
+Protobuf logging can take an extended period (>100ms) the first time that a value with any given type is logged. Subsequent logging calls using an object of the same type will be significantly faster. **Protobuf values should always be logged for the first time when the robot is disabled.**
+
+_This issue is not applicable to struct logging, which is the default for all data types._
+:::
+
 ### Records
 
 Custom [record](https://www.baeldung.com/java-record-keyword) classes can be logged as structs, including support for single values, arrays, and 2D arrays as inputs or outputs. This enables efficient logging of custom complex data types, such as pose observations (check the [vision template](/getting-started/template-projects/vision-template) for examples).
+
+:::danger
+Record logging can take an extended period (>100ms) the first time that a value with any given type is logged. Subsequent logging calls using an object of the same type will be significantly faster. **Record values should always be logged for the first time when the robot is disabled.**
+:::
 
 Note that record fields must use only the following struct-compatible types:
 
