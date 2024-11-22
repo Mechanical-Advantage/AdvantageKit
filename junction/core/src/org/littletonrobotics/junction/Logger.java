@@ -342,7 +342,9 @@ public class Logger {
       long alertLogStart = RobotController.getFPGATime();
       AlertLogger.periodic();
       long radioLogStart = RobotController.getFPGATime();
-      RadioLogger.periodic(outputTable.getSubtable("Radio"));
+      if (!hasReplaySource()) {
+        RadioLogger.periodic(entry.getSubtable("RadioStatus"));
+      }
       long consoleCaptureStart = RobotController.getFPGATime();
       if (enableConsole) {
         String consoleData = console.getNewData();
