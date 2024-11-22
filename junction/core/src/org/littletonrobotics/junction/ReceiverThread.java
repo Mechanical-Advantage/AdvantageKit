@@ -23,7 +23,7 @@ public class ReceiverThread extends Thread {
   private List<LogDataReceiver> dataReceivers = new ArrayList<>();
 
   ReceiverThread(BlockingQueue<LogTable> queue) {
-    super("LogReceiver");
+    super("AdvantageKit_LogReceiver");
     this.setDaemon(true);
     this.queue = queue;
   }
