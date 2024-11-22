@@ -8,7 +8,7 @@ Output data consists of any calculated values which could be recreated in the si
 - Status data for drivers
 - Internal object state
 
-The logging framework supports recording this output data on the real robot and during replay. Essential data like the odometry pose are recorded on the real robot for convenience; even if it can be recreated in a simulator, that's often not a viable option in the rush to fix a problem between matches. During replay, recording extra output data is the primary method of debugging the code - logging calls can be added anywhere as they don't interfere with the replayed control logic. Any loggable data type ([see here](/data-flow/supported-types#simple)) can be saved as an output like so:
+The logging framework supports recording this output data on the real robot and during replay. Essential data like the odometry pose are recorded on the real robot for convenience; even if it can be recreated in a simulator, that's often not a viable option in the rush to fix a problem between matches. During replay, recording extra output data is the primary method of debugging the code - logging calls can be added anywhere as they don't interfere with the replayed control logic. Any loggable data type ([see here](/data-flow/supported-types)) can be saved as an output like so:
 
 ```java
 Logger.recordOutput("Flywheel/Setpoint", setpointSpeed);
