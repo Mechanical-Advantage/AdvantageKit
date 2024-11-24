@@ -51,7 +51,7 @@ WPILib includes a [units library](https://docs.wpilib.org/en/latest/docs/softwar
 
 [Enum](https://www.w3schools.com/java/java_enums.asp) values can be logged and replayed by AdvantageKit. These values will be stored in the log as string values (using the [`name()`](https://docs.oracle.com/javase/8/docs/api/java/lang/Enum.html#name--) method).
 
-## Supplier (Output Only)
+### Suppliers (Output Only)
 
 Primitive suppliers (`BooleanSupplier`, `IntSupplier`, `LongSupplier`, and `DoubleSupplier`) can be used in place of their single values for output logging, including annotation logging with `@AutoLogOutput`. One application of this feature is logging [`Trigger`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/button/Trigger.html) values, which extend from `BooleanSupplier`.
 

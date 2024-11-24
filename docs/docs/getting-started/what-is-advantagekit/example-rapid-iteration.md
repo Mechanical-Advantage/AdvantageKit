@@ -10,7 +10,7 @@ AdvantageKit includes a feature called [replay watch](../replay-watch.md) which 
 
 The video below demonstrates how vision standard deviations (trust values) can be tuned in replay based on the output of the pose estimator. The original outputs are shown in red, and the replayed outputs are shown in blue.
 
-<iframe width="100%" style={{"aspect-ratio": "2708 / 1748"}} src="https://www.youtube.com/embed/HQy6cZAfJL0" title="FRC Log Replay and Simulation (2024) -  FRC 6328 FIRST Championship Conference" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="100%" style={{"aspect-ratio": "2708 / 1748"}} src="https://www.youtube.com/embed/HQy6cZAfJL0" title="AdvantageKit Replay Watch Demo (Pose Estimation)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 :::note
 The replay process shown in the video is in running in real-time. The replay duration depends on the size of the log file, complexity of robot project, and CPU performance of the development computer.
