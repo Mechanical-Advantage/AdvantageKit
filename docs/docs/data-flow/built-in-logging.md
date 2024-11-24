@@ -14,7 +14,11 @@ Built-in input values are available during replay with guaranteed accuracy, and 
 
 ### Timestamp
 
-AdvantageKit logs and replays the value of `RobotController.getFPGATime()`, `Timer.getTimestamp()`, etc. See [this page](./deterministic-timestamps.md) for more details on timestamps in AdvantageKit.
+AdvantageKit logs and replays the value of `RobotController.getTime()`, `Timer.getTimestamp()`, etc. See [this page](./deterministic-timestamps.md) for more details on timestamps in AdvantageKit.
+
+:::warning
+The methods `RobotController.getFPGATime()` and `Timer.getFPGATimestamp()` are used for accessing the real (non-deterministic) timestamp, and should only be used within IO implementations or for performance profiling.
+:::
 
 ### Driver Station
 
