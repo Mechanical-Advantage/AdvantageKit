@@ -282,7 +282,7 @@ tryUntilOk(5, () -> turnTalon.setPosition(customEncoder.getPositionRotations(), 
 
 ### Profiled Turning PID
 
-By default, the project uses a standard PID controllers for turn control. Users may choose to replace the standard control request with [Motion Magic](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html#motion-magic) or [Motion Magic Expo](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html#motion-magic-expo) control requests. To implement this, simply replace the position request in `ModuleIOTalonFX` with the new request type, as shown below. The Motion Magic constraints are already configured in the `ModuleIOTalonFX` constructor, but can be adjusted.
+By default, the project uses standard PID controllers for turn control. Users may choose to replace the standard control request with [Motion Magic](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html#motion-magic) or [Motion Magic Expo](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html#motion-magic-expo) control requests. To implement this, simply replace the position request in `ModuleIOTalonFX` with the new request type, as shown below. The Motion Magic constraints are already configured in the `ModuleIOTalonFX` constructor, but can be adjusted.
 
 ```java
 private final MotionMagicVoltage positionVoltageRequest = new MotionMagicVoltage(0.0);
