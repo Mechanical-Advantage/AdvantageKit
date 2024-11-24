@@ -14,7 +14,7 @@ The AdvantageKit template projects have been reimagined from the ground up with 
 We recommend checking the documentation pages linked above for more information about the new features available in each template project.
 
 :::info
-The AdvantageKit swerve templates are **open-source** and **fully customizable**:
+Every AdvantageKit template is **open-source** and **fully customizable**:
 
 - **No black boxes:** Users can view and adjust all layers of the control stack, including advanced features of the swerve and vision templates.
 - **Customizable:** IO implementations can be adjusted to support any hardware configuration, including a combination of devices from multiple vendors.
