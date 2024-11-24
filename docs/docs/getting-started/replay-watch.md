@@ -6,7 +6,7 @@ sidebar_position: 5
 
 Some use cases of log replay benefit from rapid iteration, such as tuning pose estimation algorithms. **Replay watch** addresses this use case by automatically updating replayed outputs when code is modified. An example is shown below, where the replayed output in AdvantageScope updates in real time as the code is modified:
 
-<iframe width="100%" style={{"aspect-ratio": "16 / 9"}} src="https://www.youtube.com/embed/TYRNqW8SrkE" title="AdvantageKit Replay Watch Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="100%" style={{"aspect-ratio": "16 / 9"}} src="https://www.youtube.com/embed/TYRNqW8SrkE" title="AdvantageKit Replay Watch Demo (Simple)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 :::info
 Check the replay example on [rapid iteration](./what-is-advantagekit/example-rapid-iteration.md) for a more detailed example of this feature in the context of tuning a pose estimation algorithm.
