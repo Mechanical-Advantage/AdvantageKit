@@ -86,7 +86,7 @@ public class RLOGServer implements LogDataReceiver {
     List<Double> lastHeartbeats = new ArrayList<>();
 
     public ServerThread(int port) {
-      super("RLOGServer");
+      super("AdvantageKit_RLOGServer");
       this.setDaemon(true);
       try {
         server = new ServerSocket(port);
@@ -102,7 +102,7 @@ public class RLOGServer implements LogDataReceiver {
 
       // Start broadcast thread
       broadcastThread = new Thread(this::runBroadcast);
-      broadcastThread.setName("RLOGServerBroadcast");
+      broadcastThread.setName("AdvantageKit_RLOGServerBroadcast");
       broadcastThread.setDaemon(true);
       broadcastThread.start();
 

@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.conduit.ConduitApi;
@@ -47,6 +51,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.protobuf.Protobuf;
@@ -67,7 +72,6 @@ public class Logger {
   private static ConsoleSource console = null;
   private static List<LoggedNetworkInput> dashboardInputs = new ArrayList<>();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
-  private static boolean deterministicTimestamps = true;
   private static boolean enableConsole = true;
 
   private static LogReplaySource replaySource;
@@ -116,9 +120,6 @@ public class Logger {
    * <pre>
    * <code>Logger.registerURCL(URCL.startExternal());</code>
    * </pre>
-   * 
-   * <p>
-   * <b>Important: This function requires URCL 2024.1.0 or later.</b>
    */
   public static void registerURCL(Supplier<ByteBuffer[]> logSupplier) {
     urclSupplier = logSupplier;
@@ -135,23 +136,6 @@ public class Logger {
     if (!running) {
       metadata.put(key, value);
     }
-  }
-
-  /**
-   * Causes the timestamp returned by "Timer.getFPGATimestamp()" and similar to
-   * match the "real" time as reported by the FPGA instead of the logged time from
-   * AdvantageKit.
-   * 
-   * <p>
-   * Not recommended for most users as the behavior of the replayed
-   * code will NOT match the real robot. Only use this method if your control
-   * logic requires precise timestamps WITHIN a single cycle and you have no way
-   * to move timestamp-critical operations to an IO interface. Also consider using
-   * "getRealTimestamp()" for logic that doesn't need to match the replayed
-   * version (like for analyzing performance).
-   */
-  public static void disableDeterministicTimestamps() {
-    deterministicTimestamps = false;
   }
 
   /**
@@ -226,8 +210,8 @@ public class Logger {
       // Start receiver thread
       receiverThread.start();
 
-      // Update MathShared to mock timestamp
-      setMathShared(true);
+      // Update RobotController to AdvantageKit timestamp
+      RobotController.setTimeSource(Logger::getTimestamp);
 
       // Start first periodic cycle
       periodicBeforeUser();
@@ -256,21 +240,23 @@ public class Logger {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      setMathShared(false);
+      RobotController.setTimeSource(RobotController::getFPGATime);
     }
   }
 
   /**
-   * Periodic method to be called before robotInit and each loop cycle. Updates
-   * timestamp, replay entry, and dashboard inputs.
+   * Periodic method to be called during the constructor of Robot and each loop
+   * cycle. Updates timestamp, replay entry, and dashboard inputs.
    */
   static void periodicBeforeUser() {
     cycleCount++;
     if (running) {
       // Get next entry
-      long entryUpdateStart = getRealTimestamp();
+      long entryUpdateStart = RobotController.getFPGATime();
       if (replaySource == null) {
-        entry.setTimestamp(getRealTimestamp());
+        synchronized (entry) {
+          entry.setTimestamp(RobotController.getFPGATime());
+        }
       } else {
         if (!replaySource.updateTable(entry)) {
           end();
@@ -279,48 +265,48 @@ public class Logger {
       }
 
       // Update Driver Station
-      long dsStart = getRealTimestamp();
+      long dsStart = RobotController.getFPGATime();
       if (hasReplaySource()) {
         LoggedDriverStation.replayFromLog(entry.getSubtable("DriverStation"));
       }
 
       // Update dashboard inputs
-      long dashboardInputsStart = getRealTimestamp();
+      long dashboardInputsStart = RobotController.getFPGATime();
       for (int i = 0; i < dashboardInputs.size(); i++) {
         dashboardInputs.get(i).periodic();
       }
-      long dashboardInputsEnd = getRealTimestamp();
+      long dashboardInputsEnd = RobotController.getFPGATime();
 
       // Record timing data
-      recordOutput("Logger/EntryUpdateMs", (dsStart - entryUpdateStart) / 1000.0);
+      recordOutput("Logger/EntryUpdateMS", (dsStart - entryUpdateStart) / 1000.0);
       if (hasReplaySource()) {
         recordOutput("Logger/DriverStationMS", (dashboardInputsStart - dsStart) / 1000.0);
       }
-      recordOutput("Logger/DashboardInputsMs", (dashboardInputsEnd - dashboardInputsStart) / 1000.0);
+      recordOutput("Logger/DashboardInputsMS", (dashboardInputsEnd - dashboardInputsStart) / 1000.0);
     }
   }
 
   /**
-   * Periodic method to be called after robotInit and each loop cycle. Update
-   * default log values and sends data to data receivers. Running this after user
-   * code allows IO operations to occur between cycles rather than interferring
-   * with the main thread.
+   * Periodic method to be called after the constructor of Robot and each loop cycle.
+   * Updates default log values and sends data to data receivers. Running this after user
+   * code allows IO operations to occur between cycles rather than interferring with the
+   * main thread.
    */
   static void periodicAfterUser(long userCodeLength, long periodicBeforeLength) {
     if (running) {
       // Capture conduit data
       ConduitApi conduit = ConduitApi.getInstance();
-      long conduitCaptureStart = getRealTimestamp();
+      long conduitCaptureStart = RobotController.getFPGATime();
       conduit.captureData();
 
       // Update Driver Station
-      long dsStart = getRealTimestamp();
+      long dsStart = RobotController.getFPGATime();
       if (!hasReplaySource()) {
         LoggedDriverStation.saveToLog(entry.getSubtable("DriverStation"));
       }
 
       // Save other conduit inputs
-      long conduitSaveStart = getRealTimestamp();
+      long conduitSaveStart = RobotController.getFPGATime();
       if (!hasReplaySource()) {
         LoggedSystemStats.saveToLog(entry.getSubtable("SystemStats"));
         LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
@@ -351,18 +337,22 @@ public class Logger {
       }
 
       // Update automatic outputs from user code
-      long autoLogStart = getRealTimestamp();
+      long autoLogStart = RobotController.getFPGATime();
       AutoLogOutputManager.periodic();
-      long alertLogStart = getRealTimestamp();
+      long alertLogStart = RobotController.getFPGATime();
       AlertLogger.periodic();
-      long consoleCaptureStart = getRealTimestamp();
+      long radioLogStart = RobotController.getFPGATime();
+      if (!hasReplaySource()) {
+        RadioLogger.periodic(entry.getSubtable("RadioStatus"));
+      }
+      long consoleCaptureStart = RobotController.getFPGATime();
       if (enableConsole) {
         String consoleData = console.getNewData();
         if (!consoleData.isEmpty()) {
           recordOutput("Console", consoleData.trim());
         }
       }
-      long consoleCaptureEnd = getRealTimestamp();
+      long consoleCaptureEnd = RobotController.getFPGATime();
 
       // Record timing data
       recordOutput("Logger/ConduitCaptureMS", (dsStart - conduitCaptureStart) / 1000.0);
@@ -371,7 +361,8 @@ public class Logger {
       }
       recordOutput("Logger/ConduitSaveMS", (autoLogStart - conduitSaveStart) / 1000.0);
       recordOutput("Logger/AutoLogMS", (alertLogStart - autoLogStart) / 1000.0);
-      recordOutput("Logger/AlertLogMS", (consoleCaptureStart - alertLogStart) / 1000.0);
+      recordOutput("Logger/AlertLogMS", (radioLogStart - alertLogStart) / 1000.0);
+      recordOutput("Logger/RadioLogMS", (consoleCaptureStart - radioLogStart) / 1000.0);
       recordOutput("Logger/ConsoleMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
       recordOutput("LoggedRobot/UserCodeMS", userCodeLength / 1000.0);
       long periodicAfterLength = consoleCaptureEnd - conduitCaptureStart;
@@ -393,68 +384,6 @@ public class Logger {
   }
 
   /**
-   * Updates the MathShared object for wpimath to enable or disable AdvantageKit's
-   * mocked timestamps.
-   */
-  private static void setMathShared(boolean mocked) {
-    MathSharedStore.setMathShared(
-        new MathShared() {
-          @Override
-          public void reportError(String error, StackTraceElement[] stackTrace) {
-            DriverStation.reportError(error, stackTrace);
-          }
-
-          @Override
-          public void reportUsage(MathUsageId id, int count) {
-            switch (id) {
-              case kKinematics_DifferentialDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Kinematics,
-                    tInstances.kKinematics_DifferentialDrive);
-                break;
-              case kKinematics_MecanumDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
-                break;
-              case kKinematics_SwerveDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
-                break;
-              case kTrajectory_TrapezoidProfile:
-                HAL.report(tResourceType.kResourceType_TrapezoidProfile, count);
-                break;
-              case kFilter_Linear:
-                HAL.report(tResourceType.kResourceType_LinearFilter, count);
-                break;
-              case kOdometry_DifferentialDrive:
-                HAL.report(
-                    tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
-                break;
-              case kOdometry_SwerveDrive:
-                HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
-                break;
-              case kOdometry_MecanumDrive:
-                HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
-                break;
-              case kController_PIDController2:
-                HAL.report(tResourceType.kResourceType_PIDController2, count);
-                break;
-              case kController_ProfiledPIDController:
-                HAL.report(tResourceType.kResourceType_ProfiledPIDController, count);
-                break;
-              default:
-                break;
-            }
-          }
-
-          @Override
-          public double getTimestamp() {
-            return (mocked ? Logger.getTimestamp() : Logger.getRealTimestamp()) * 1.0e-6;
-          }
-        });
-  }
-
-  /**
    * Returns the state of the receiver queue fault. This is tripped when the
    * receiver queue fills up, meaning that data is no longer being saved.
    */
@@ -467,10 +396,12 @@ public class Logger {
    * entry (microseconds).
    */
   public static long getTimestamp() {
-    if (!running || entry == null || (!deterministicTimestamps && !hasReplaySource())) {
-      return getRealTimestamp();
-    } else {
-      return entry.getTimestamp();
+    synchronized (entry) {
+      if (!running || entry == null) {
+        return RobotController.getFPGATime();
+      } else {
+        return entry.getTimestamp();
+      }
     }
   }
 
@@ -478,9 +409,12 @@ public class Logger {
    * Returns the true FPGA timestamp in microseconds, regardless of the timestamp
    * used for logging. Useful for analyzing performance. DO NOT USE this method
    * for any logic which might need to be replayed.
+   * 
+   * @deprecated Use {@code RobotController.getFPGATime()} instead.
    */
+  @Deprecated
   public static long getRealTimestamp() {
-    return HALUtil.getFPGATime();
+    return RobotController.getFPGATime();
   }
 
   /**
@@ -591,6 +525,25 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
+  public static void recordOutput(String key, BooleanSupplier value) {
+    if (running) {
+      outputTable.put(key, value.getAsBoolean());
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
   public static void recordOutput(String key, boolean[] value) {
     if (running) {
       outputTable.put(key, value);
@@ -648,6 +601,25 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
+  public static void recordOutput(String key, IntSupplier value) {
+    if (running) {
+      outputTable.put(key, value.getAsInt());
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
   public static void recordOutput(String key, int[] value) {
     if (running) {
       outputTable.put(key, value);
@@ -689,6 +661,25 @@ public class Logger {
   public static void recordOutput(String key, long value) {
     if (running) {
       outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public static void recordOutput(String key, LongSupplier value) {
+    if (running) {
+      outputTable.put(key, value.getAsLong());
     }
   }
 
@@ -803,6 +794,25 @@ public class Logger {
   public static void recordOutput(String key, double value) {
     if (running) {
       outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public static void recordOutput(String key, DoubleSupplier value) {
+    if (running) {
+      outputTable.put(key, value.getAsDouble());
     }
   }
 
@@ -1144,6 +1154,81 @@ public class Logger {
    */
   @SuppressWarnings("unchecked")
   public static <T extends StructSerializable> void recordOutput(String key, T[][] value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method serializes a single object as a struct or protobuf automatically.
+   * Struct is preferred if both methods are supported.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param T     The type
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <R extends Record> void recordOutput(String key, R value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method serializes an array of objects as a struct automatically.
+   * Top-level protobuf arrays are not supported.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param T     The type
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <R extends Record> void recordOutput(String key, R... value) {
+    if (running) {
+      outputTable.put(key, value);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method serializes an array of objects as a struct automatically.
+   * Top-level protobuf arrays are not supported.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
+   * @param T     The type
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <R extends Record> void recordOutput(String key, R[][] value) {
     if (running) {
       outputTable.put(key, value);
     }

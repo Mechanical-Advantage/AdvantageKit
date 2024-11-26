@@ -74,18 +74,17 @@ public class LoggedRobot extends IterativeRobotBase {
   @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
     // Robot init methods
-    long initStart = Logger.getRealTimestamp();
     robotInit();
     if (isSimulation()) {
       simulationInit();
     }
-    long initEnd = Logger.getRealTimestamp();
+    long initEnd = Logger.getRealTimestamp(); // Includes Robot constructor and robotInit
 
     // Register auto logged outputs
-    AutoLogOutputManager.registerFields(this);
+    AutoLogOutputManager.addObject(this);
 
     // Save data from init cycle
-    Logger.periodicAfterUser(initEnd - initStart, 0);
+    Logger.periodicAfterUser(initEnd, 0);
 
     // Tell the DS that the robot is ready to be enabled
     System.out.println("********** Robot program startup complete **********");

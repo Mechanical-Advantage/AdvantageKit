@@ -41,7 +41,7 @@ public class RIOConsoleSource implements ConsoleSource {
   private final List<String> lines = new ArrayList<>();
 
   public RIOConsoleSource() {
-    thread = new Thread(this::run, "RIOConsoleSource");
+    thread = new Thread(this::run, "AdvantageKit_RIOConsoleSource");
     thread.setDaemon(true);
     thread.start();
   }

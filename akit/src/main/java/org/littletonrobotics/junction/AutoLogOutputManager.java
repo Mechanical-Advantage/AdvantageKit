@@ -27,6 +27,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -43,7 +47,7 @@ public class AutoLogOutputManager {
    * new allowed package, such as a "lib" package outside of normal robot code.
    * 
    * <p>
-   * This method must be called within {@code robotInit}.
+   * This method must be called within the constructor of {@code Robot}.
    * 
    * @param packageName The new allowed package name (e.g. "frc.lib")
    */
@@ -63,9 +67,9 @@ public class AutoLogOutputManager {
    *
    * @param root The object to scan recursively.
    */
-  static void registerFields(Object root) {
+  public static void addObject(Object root) {
     allowedPackages.add(root.getClass().getPackageName());
-    registerFieldsImpl(root);
+    addObjectImpl(root);
   }
 
   /**
@@ -73,7 +77,7 @@ public class AutoLogOutputManager {
    *
    * @param root The object to scan recursively.
    */
-  private static void registerFieldsImpl(Object root) {
+  private static void addObjectImpl(Object root) {
     // Check if package name is valid
     String packageName = root.getClass().getPackageName();
     boolean packageNameValid = false;
@@ -96,7 +100,7 @@ public class AutoLogOutputManager {
       Object[] rootArray = (Object[]) root;
       for (Object item : rootArray) {
         if (item != null) {
-          registerFieldsImpl(item);
+          addObjectImpl(item);
         }
       }
       return;
@@ -175,7 +179,7 @@ public class AutoLogOutputManager {
         return;
       }
       if (fieldValue != null) {
-        registerFieldsImpl(fieldValue);
+        addObjectImpl(fieldValue);
       }
     });
   }
@@ -231,7 +235,7 @@ public class AutoLogOutputManager {
   };
 
   /**
-   * Finds the field in the provided class and its superclasses (must be publicor
+   * Finds the field in the provided class and its superclasses (must be public or
    * protected in superclasses). Returns null if the field cannot be found.
    */
   private static Field findField(Class<?> type, String fieldName) {
@@ -364,6 +368,34 @@ public class AutoLogOutputManager {
                 // Cannot cast to enum subclass, log the name directly
                 Logger.recordOutput(key, ((Enum<?>) value).name());
             });
+      } else if (BooleanSupplier.class.isAssignableFrom(type)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (BooleanSupplier) value);
+            });
+      } else if (IntSupplier.class.isAssignableFrom(type)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (IntSupplier) value);
+            });
+      } else if (LongSupplier.class.isAssignableFrom(type)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (LongSupplier) value);
+            });
+      } else if (DoubleSupplier.class.isAssignableFrom(type)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (DoubleSupplier) value);
+            });
       } else if (Measure.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
@@ -377,6 +409,13 @@ public class AutoLogOutputManager {
               Object value = supplier.get();
               if (value != null)
                 Logger.recordOutput(key, (LoggedMechanism2d) value);
+            });
+      } else if (type.isRecord()) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (Record) value);
             });
       } else {
         callbacks.add(
@@ -457,6 +496,13 @@ public class AutoLogOutputManager {
                 }
                 Logger.recordOutput(key, names);
               }
+            });
+      } else if (componentType.isRecord()) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (Record[]) value);
             });
       } else {
         callbacks.add(
@@ -543,6 +589,13 @@ public class AutoLogOutputManager {
                 }
                 Logger.recordOutput(key, names);
               }
+            });
+      } else if (componentType.isRecord()) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null)
+                Logger.recordOutput(key, (Record[][]) value);
             });
       } else {
         callbacks.add(
