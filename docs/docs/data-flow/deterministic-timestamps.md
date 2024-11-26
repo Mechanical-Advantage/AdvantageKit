@@ -1,14 +1,14 @@
 ---
-sidebar_position: 2
+sidebar_position: 5
 ---
 
 # Deterministic Timestamps
 
 ### The Problem
 
-To guarantee accurate replay, all of the data used by the robot code must be included in the log file and replayed in simulation. This includes the current timestamp, which may be used for calculations in control loops. WPILib's default behavior is to read the timestamp directly from the FPGA every time a method like `Timer.getFPGATimestamp()` is called. Every return value will be slightly different as the timestamp continues increasing throughout each loop cycle. This behavior is problematic for AdvantageKit replay, because the return values from those method calls are not logged and **cannot be accurately replayed in simulation**.
+To guarantee accurate replay, all of the data used by the robot code must be included in the log file and replayed in simulation. This includes the current timestamp, which may be used for calculations in control loops. WPILib's default behavior is to read the timestamp directly from the FPGA every time a method like `Timer.getTimestamp()` is called. Every return value will be slightly different as the timestamp continues increasing throughout each loop cycle. This behavior is problematic for AdvantageKit replay, because the return values from those method calls are not logged and **cannot be accurately replayed in simulation**.
 
-AdvantageKit's solution is to use _synchronized timestamps_. The timestamp is read once from the FPGA at the start of the loop cycle and injected into WPILib. By default, all calls to `Timer.getFPGATimestamp()` or similar return the synchronized timestamp from AdvantageKit instead of the "real" FPGA time. During replay, the logged timestamp is used for each loop cycle. The result is that all of the control logic is _deterministic_ and will **exactly match the behavior of the real robot**.
+AdvantageKit's solution is to use _synchronized timestamps_. The timestamp is read once from the FPGA at the start of the loop cycle and injected into WPILib. By default, all calls to `Timer.getTimestamp()` or similar return the synchronized timestamp from AdvantageKit instead of the "real" FPGA time. During replay, the logged timestamp is used for each loop cycle. The result is that all of the control logic is _deterministic_ and will **exactly match the behavior of the real robot**.
 
 ### Solution #1
 
@@ -16,7 +16,7 @@ Where precise timestamps are required, the best solution is to record measuremen
 
 ### Solution #2
 
-`Logger.getRealTimestamp()` can always be used to access the "real" FPGA timestamp where necessary, like within IO implementations or for analyzing performance. This method is not affected by log replay (i.e. it will not reflect the accelerated rate of replay). One use case for this method is measuring code execution time, since those values don't need to be recreated during log replay. AdvantageKit shims WPILib classes like `Watchdog` to use this method because they use the timestamp for analyzing performance and are not part of the robot's control logic.
+`Timer.getFPGATimestamp()` can always be used to access the "real" FPGA timestamp where necessary, like within IO implementations or for analyzing performance. This method is not affected by log replay (i.e. it will not reflect the accelerated rate of replay). One use case for this method is measuring code execution time, since those values don't need to be recreated during log replay. WPILib classes like `Watchdog` use this method because they use the timestamp for analyzing performance and are not part of the robot's control logic.
 
 ### Solution #3
 
@@ -26,8 +26,10 @@ Optionally, AdvantageKit allows you to disable deterministic timestamps. This re
 2. The sensor values used in the loop cannot be associated with timestamps in an IO implementation. See solution #1.
 3. The IO (sensors, actuators, etc) involved in the loop are sufficiently low-latency that the exact timestamp on the RIO is significant. For example, CAN motor controllers are limited by the rate of their CAN frames, so the extra precision on the RIO is insignificant in most cases.
 
-If you need to disable deterministic timestamps globally, add the following line to `robotInit()` before `Logger.start()`:
+If you need to disable deterministic timestamps globally, add the following lines to the constructor of `Robot` _after_ `Logger.start()`:
 
 ```java
-Logger.disableDeterministicTimestamps();
+if (!Logger.hasReplaySource()) {
+    RobotController.setTimeSource(RobotController::getFPGATime);
+}
 ```
