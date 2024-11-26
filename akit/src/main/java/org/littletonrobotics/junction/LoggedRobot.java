@@ -21,6 +21,7 @@ import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 
@@ -78,7 +79,7 @@ public class LoggedRobot extends IterativeRobotBase {
     if (isSimulation()) {
       simulationInit();
     }
-    long initEnd = Logger.getRealTimestamp(); // Includes Robot constructor and robotInit
+    long initEnd = RobotController.getFPGATime(); // Includes Robot constructor and robotInit
 
     // Register auto logged outputs
     AutoLogOutputManager.addObject(this);
@@ -93,7 +94,7 @@ public class LoggedRobot extends IterativeRobotBase {
     // Loop forever, calling the appropriate mode-dependent function
     while (true) {
       if (useTiming) {
-        long currentTimeUs = Logger.getRealTimestamp();
+        long currentTimeUs = RobotController.getFPGATime();
         if (nextCycleUs < currentTimeUs) {
           // Loop overrun, start next cycle immediately
           nextCycleUs = currentTimeUs;
@@ -109,11 +110,11 @@ public class LoggedRobot extends IterativeRobotBase {
         nextCycleUs += periodUs;
       }
 
-      long periodicBeforeStart = Logger.getRealTimestamp();
+      long periodicBeforeStart = RobotController.getFPGATime();
       Logger.periodicBeforeUser();
-      long userCodeStart = Logger.getRealTimestamp();
+      long userCodeStart = RobotController.getFPGATime();
       loopFunc();
-      long userCodeEnd = Logger.getRealTimestamp();
+      long userCodeEnd = RobotController.getFPGATime();
 
       gcStatsCollector.update();
       Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);

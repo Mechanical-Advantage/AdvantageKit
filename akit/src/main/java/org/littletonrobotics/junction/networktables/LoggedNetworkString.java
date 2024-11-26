@@ -18,7 +18,6 @@ import edu.wpi.first.networktables.StringEntry;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
-import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
 
 /** Manages a String value published to the root table of NT. */
 public class LoggedNetworkString extends LoggedNetworkInput {

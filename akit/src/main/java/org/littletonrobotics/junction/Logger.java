@@ -13,8 +13,6 @@
 
 package org.littletonrobotics.junction;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,15 +38,6 @@ import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.math.MathShared;
-import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
@@ -287,9 +276,12 @@ public class Logger {
   }
 
   /**
-   * Periodic method to be called after the constructor of Robot and each loop cycle.
-   * Updates default log values and sends data to data receivers. Running this after user
-   * code allows IO operations to occur between cycles rather than interferring with the
+   * Periodic method to be called after the constructor of Robot and each loop
+   * cycle.
+   * Updates default log values and sends data to data receivers. Running this
+   * after user
+   * code allows IO operations to occur between cycles rather than interferring
+   * with the
    * main thread.
    */
   static void periodicAfterUser(long userCodeLength, long periodicBeforeLength) {
@@ -1051,7 +1043,6 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  @SuppressWarnings("unchecked")
   public static <T> void recordOutput(String key, Struct<T> struct, T[][] value) {
     if (running) {
       outputTable.put(key, struct, value);
@@ -1076,7 +1067,6 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  @SuppressWarnings("unchecked")
   public static <T, MessageType extends ProtoMessage<?>> void recordOutput(String key, Protobuf<T, MessageType> proto,
       T value) {
     if (running) {
@@ -1102,7 +1092,6 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  @SuppressWarnings("unchecked")
   public static <T extends WPISerializable> void recordOutput(String key, T value) {
     if (running) {
       outputTable.put(key, value);
@@ -1152,7 +1141,6 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  @SuppressWarnings("unchecked")
   public static <T extends StructSerializable> void recordOutput(String key, T[][] value) {
     if (running) {
       outputTable.put(key, value);
@@ -1177,7 +1165,6 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  @SuppressWarnings("unchecked")
   public static <R extends Record> void recordOutput(String key, R value) {
     if (running) {
       outputTable.put(key, value);
@@ -1227,7 +1214,6 @@ public class Logger {
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
    */
-  @SuppressWarnings("unchecked")
   public static <R extends Record> void recordOutput(String key, R[][] value) {
     if (running) {
       outputTable.put(key, value);

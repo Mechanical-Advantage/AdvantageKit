@@ -26,11 +26,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
-import edu.wpi.first.units.ImmutableMeasure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
@@ -552,7 +550,6 @@ public class LogTable {
    * Writes a new 2D struct array value to the table. Skipped if the key already
    * exists as a different type.
    */
-  @SuppressWarnings("unchecked")
   public <T> void put(String key, Struct<T> struct, T[][] value) {
     if (value == null)
       return;
@@ -579,8 +576,9 @@ public class LogTable {
         // Warn about protobuf logging when enabled
         if (DriverStation.isEnabled()) {
           DriverStation.reportWarning(
-            "[AdvantageKit] Logging protobuf value with type \"" + proto.getTypeString() + "\" for the first time. Logging a protobuf type for the first time when the robot is enabled is likely to cause high loop overruns. Protobuf types should be always logged for the first time when the robot is disabled.",
-            false);
+              "[AdvantageKit] Logging protobuf value with type \"" + proto.getTypeString()
+                  + "\" for the first time. Logging a protobuf type for the first time when the robot is enabled is likely to cause high loop overruns. Protobuf types should be always logged for the first time when the robot is disabled.",
+              false);
         }
       }
       ProtobufBuffer<T, MessageType> buffer = (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
@@ -597,7 +595,6 @@ public class LogTable {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private Struct<?> findStructType(Class<?> classObj) {
     if (!structTypeCache.containsKey(classObj.getName())) {
       structTypeCache.put(classObj.getName(), null);
@@ -616,7 +613,6 @@ public class LogTable {
     return structTypeCache.get(classObj.getName());
   }
 
-  @SuppressWarnings("unchecked")
   private Protobuf<?, ?> findProtoType(Class<?> classObj) {
     if (!protoTypeCache.containsKey(classObj.getName())) {
       protoTypeCache.put(classObj.getName(), null);
@@ -684,7 +680,6 @@ public class LogTable {
    * Writes a new auto serialized 2D array value to the table. Skipped if the key
    * already exists as a different type.
    */
-  @SuppressWarnings("unchecked")
   public <T extends StructSerializable> void put(String key, T[][] value) {
     if (value == null)
       return;
@@ -694,7 +689,6 @@ public class LogTable {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private Struct<?> findRecordStructType(Class<?> classObj) {
     if (!structTypeCache.containsKey(classObj.getName())) {
       structTypeCache.put(classObj.getName(), new RecordStruct(classObj));
@@ -702,8 +696,9 @@ public class LogTable {
       // Warn about record logging when enabled
       if (DriverStation.isEnabled()) {
         DriverStation.reportWarning(
-          "[AdvantageKit] Logging record value with type \"" + classObj.getName() + "\" for the first time. Logging a record type for the first time when the robot is enabled is likely to cause high loop overruns. Record types should be always logged for the first time when the robot is disabled.",
-          false);
+            "[AdvantageKit] Logging record value with type \"" + classObj.getName()
+                + "\" for the first time. Logging a record type for the first time when the robot is enabled is likely to cause high loop overruns. Record types should be always logged for the first time when the robot is disabled.",
+            false);
       }
     }
     return structTypeCache.get(classObj.getName());
@@ -742,7 +737,6 @@ public class LogTable {
    * Writes a new auto serialized 2D record array value to the table. Skipped if
    * the key already exists as a different type.
    */
-  @SuppressWarnings("unchecked")
   public <R extends Record> void put(String key, R[][] value) {
     if (value == null)
       return;
@@ -975,6 +969,7 @@ public class LogTable {
   }
 
   /** Reads an enum value from the table. */
+  @SuppressWarnings("unchecked")
   public <E extends Enum<E>> E get(String key, E defaultValue) {
     if (data.containsKey(prefix + key)) {
       String name = get(key).getString(defaultValue.name());
@@ -985,6 +980,7 @@ public class LogTable {
   }
 
   /** Reads an enum array value from the table. */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <E extends Enum<E>> E[] get(String key, E[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       String[] names = get(key).getStringArray(null);
@@ -1002,6 +998,7 @@ public class LogTable {
   }
 
   /** Reads a 2D enum array value from the table. */
+  @SuppressWarnings("unchecked")
   public <E extends Enum<E>> E[][] get(String key, E[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
       int length = get(key + "/length", 0);
@@ -1018,6 +1015,7 @@ public class LogTable {
   }
 
   /** Reads a Measure value from the table. */
+  @SuppressWarnings("unchecked")
   public <U extends Unit, M extends Measure<U>> M get(String key, M defaultValue) {
     if (data.containsKey(prefix + key)) {
       double value = get(key).getDouble(defaultValue.baseUnitMagnitude());
@@ -1028,6 +1026,7 @@ public class LogTable {
   }
 
   /** Reads a MutableMeasure value from the table. */
+  @SuppressWarnings("unchecked")
   public <U extends Unit, Base extends Measure<U>, M extends MutableMeasure<U, Base, M>> M get(
       String key, M defaultValue) {
     if (data.containsKey(prefix + key)) {

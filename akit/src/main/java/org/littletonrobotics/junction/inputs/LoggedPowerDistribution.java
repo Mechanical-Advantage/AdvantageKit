@@ -15,7 +15,6 @@ package org.littletonrobotics.junction.inputs;
 
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable;
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.hal.PowerDistributionJNI;

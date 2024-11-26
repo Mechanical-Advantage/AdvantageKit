@@ -17,6 +17,8 @@ import edu.wpi.first.util.datalog.DataLogWriter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -203,8 +205,8 @@ public class WPILOGWriter implements LogDataReceiver {
             && table.get("SystemStats/SystemTimeValid", false))
             || RobotBase.isSimulation()) {
           if (dsAttachedTime == null) {
-            dsAttachedTime = Logger.getRealTimestamp() / 1000000.0;
-          } else if (Logger.getRealTimestamp() / 1000000.0 - dsAttachedTime > timestampUpdateDelay
+            dsAttachedTime = RobotController.getFPGATime() / 1000000.0;
+          } else if (RobotController.getFPGATime() / 1000000.0 - dsAttachedTime > timestampUpdateDelay
               || RobotBase.isSimulation()) {
             logDate = LocalDateTime.now();
           }
