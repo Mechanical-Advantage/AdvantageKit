@@ -178,8 +178,7 @@ ext.includeStandardZipFormat = { task, value ->
 
 nativeUtils {
     privateExportsConfigs {
-        // Only export explicit symbols from driver library
-        VendorDriver {
+        wpilibio {
             exportsFile = project.file("src/main/native/symbols.txt")
         }
     }
@@ -187,7 +186,7 @@ nativeUtils {
 
 model {
     components {
-        VendorDriver(JniNativeLibrarySpec) {
+        wpilibio(JniNativeLibrarySpec) {
             enableCheckTask true
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
@@ -210,7 +209,7 @@ model {
         }
     }
     testSuites {
-        VendorDriverTest {
+        wpilibioTest {
             sources.cpp {
                 source {
                     srcDir 'src/test/native/cc'
