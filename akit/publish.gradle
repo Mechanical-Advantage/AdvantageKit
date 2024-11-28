@@ -1,0 +1,99 @@
+apply plugin: 'maven-publish'
+
+ext.licenseFile = files("${rootDir.parent}/LICENSE")
+
+def pubVersion = '0.0.1'
+
+def outputsFolder = file("$buildDir/outputs")
+
+def versionFile = file("$outputsFolder/version.txt")
+
+task outputVersions() {
+    description = 'Prints the versions of wpilib to a file for use by the downstream packaging project'
+    group = 'Build'
+    outputs.files(versionFile)
+
+    doFirst {
+        buildDir.mkdir()
+        outputsFolder.mkdir()
+    }
+
+    doLast {
+        versionFile.write pubVersion
+    }
+}
+
+task libraryBuild() {}
+
+build.dependsOn outputVersions
+
+task copyAllOutputs(type: Copy) {
+    destinationDir file("$buildDir/allOutputs")
+    from versionFile
+    dependsOn outputVersions
+}
+
+build.dependsOn copyAllOutputs
+copyAllOutputs.dependsOn outputVersions
+
+ext.addTaskToCopyAllOutputs = { task ->
+    copyAllOutputs.dependsOn task
+    copyAllOutputs.inputs.file task.archiveFile
+    copyAllOutputs.from task.archiveFile
+}
+
+def artifactGroupId = 'org.littletonrobotics.akit'
+def baseArtifactId = 'akit'
+def wpilibioZipBaseName = "_GROUP_${artifactGroupId.replace('.', '_')}_ID_${baseArtifactId}-wpilibio_CLS"
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+libraryBuild.dependsOn build
+
+def releasesRepoUrl = "$buildDir/repos/releases"
+
+publishing {
+    repositories {
+        maven {
+
+            url = releasesRepoUrl
+        }
+    }
+}
+
+task cleanReleaseRepo(type: Delete) {
+    delete releasesRepoUrl
+}
+
+tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
+
+model {
+    publishing {
+        def wpilibioTaskList = createComponentZipTasks($.components, ['wpilibio'], wpilibioZipBaseName, Zip, project, includeStandardZipFormat)
+        println(wpilibioTaskList)
+        publications {
+            wpilibio(MavenPublication) {
+                wpilibioTaskList.each {
+                    artifact it
+                }
+
+                artifactId = "${baseArtifactId}-wpilibio"
+                groupId artifactGroupId
+                version pubVersion
+            }
+
+            java(MavenPublication) {
+                artifact jar
+                artifact sourcesJar
+                artifact javadocJar
+
+                artifactId = "${baseArtifactId}-java"
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}

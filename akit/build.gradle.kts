@@ -9,7 +9,6 @@ plugins {
 }
 
 sourceSets["main"].java {
-    srcDir("src/main/java")
     srcDir("src/main/thirdparty/java")
     srcDir("src/main/generated/java")
 }
@@ -41,4 +40,14 @@ dependencies {
     implementation("us.hebi.quickbuf:quickbuf-runtime:1.3.2")
 }
 
+tasks.withType<Javadoc> {
+    exclude("com/google/flatbuffers/**")
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 apply(from = "native.gradle")
+apply(from = "publish.gradle")
