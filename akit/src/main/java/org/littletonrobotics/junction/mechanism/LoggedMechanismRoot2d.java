@@ -31,7 +31,7 @@ import org.littletonrobotics.junction.LogTable;
  *
  * <p>
  * Do not create objects of this class directly! Obtain instances from the
- * {@link Mechanism2d#getRoot(String, double, double)} factory method.
+ * {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d#getRoot(String, double, double)} factory method.
  *
  * <p>
  * Append other nodes by using {@link #append(MechanismObject2d)}.

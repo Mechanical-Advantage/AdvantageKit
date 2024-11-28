@@ -1087,7 +1087,7 @@ public class Logger {
    * main thread. See the "Common Issues" page in the documentation for more
    * details.
    * 
-   * @param T     The type
+   * @param <T>   The type
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -1111,7 +1111,7 @@ public class Logger {
    * main thread. See the "Common Issues" page in the documentation for more
    * details.
    * 
-   * @param T     The type
+   * @param <T>   The type
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -1136,7 +1136,7 @@ public class Logger {
    * main thread. See the "Common Issues" page in the documentation for more
    * details.
    * 
-   * @param T     The type
+   * @param <T>   The type
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -1160,7 +1160,7 @@ public class Logger {
    * main thread. See the "Common Issues" page in the documentation for more
    * details.
    * 
-   * @param T     The type
+   * @param <R>   The type
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -1184,7 +1184,7 @@ public class Logger {
    * main thread. See the "Common Issues" page in the documentation for more
    * details.
    * 
-   * @param T     The type
+   * @param <R>   The type
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.
@@ -1209,7 +1209,7 @@ public class Logger {
    * main thread. See the "Common Issues" page in the documentation for more
    * details.
    * 
-   * @param T     The type
+   * @param <R>   The type
    * @param key   The name of the field to record. It will be stored under
    *              "/RealOutputs" or "/ReplayOutputs"
    * @param value The value of the field.

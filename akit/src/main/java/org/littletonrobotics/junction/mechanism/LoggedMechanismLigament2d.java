@@ -29,7 +29,7 @@ import org.littletonrobotics.junction.LogTable;
  * Ligament node on a Mechanism2d. A ligament can have its length changed (like
  * an elevator) or angle changed, like an arm.
  *
- * @see Mechanism2d
+ * @see edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
  */
 public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
   private StringPublisher m_typePub;

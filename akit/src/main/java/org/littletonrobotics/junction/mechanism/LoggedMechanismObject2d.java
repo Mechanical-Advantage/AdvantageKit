@@ -26,11 +26,11 @@ import org.littletonrobotics.junction.LogTable;
  * Common base class for all Mechanism2d node types.
  *
  * <p>
- * To append another node, call {@link #append(MechanismObject2d)}. Objects that
- * aren't appended to a published {@link Mechanism2d} container are
+ * To append another node, call {@link #append(LoggedMechanismObject2d)}. Objects that
+ * aren't appended to a published {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d} container are
  * nonfunctional.
  *
- * @see Mechanism2d
+ * @see edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
  */
 public abstract class LoggedMechanismObject2d implements AutoCloseable {
   /** Relative to parent. */
