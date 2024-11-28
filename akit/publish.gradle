@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 
 ext.licenseFile = files("${rootDir.parent}/LICENSE")
 
-def pubVersion = '0.0.1'
+def pubVersion = 'dev'
 
 def outputsFolder = file("$buildDir/outputs")
 
@@ -57,6 +57,7 @@ def releasesRepoUrl = "$buildDir/repos/releases"
 
 publishing {
     repositories {
+        mavenLocal()
         maven {
 
             url = releasesRepoUrl
