@@ -95,6 +95,14 @@ model {
                 groupId artifactGroupId
                 version pubVersion
             }
+
+            autolog(MavenPublication) {
+                artifact project(":autolog").jar
+
+                artifactId = "junction-autolog"
+                groupId "${artifactGroupId}.junction"
+                version pubVersion
+            }
         }
     }
 }
