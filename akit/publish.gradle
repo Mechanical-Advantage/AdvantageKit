@@ -4,37 +4,15 @@ ext.licenseFile = files("${rootDir.parent}/LICENSE")
 
 def pubVersion = 'dev'
 
-def outputsFolder = file("$buildDir/outputs")
-
-def versionFile = file("$outputsFolder/version.txt")
-
-task outputVersions() {
-    description = 'Prints the versions of wpilib to a file for use by the downstream packaging project'
-    group = 'Build'
-    outputs.files(versionFile)
-
-    doFirst {
-        buildDir.mkdir()
-        outputsFolder.mkdir()
-    }
-
-    doLast {
-        versionFile.write pubVersion
-    }
-}
+def frcYear = '2025'
 
 task libraryBuild() {}
 
-build.dependsOn outputVersions
-
 task copyAllOutputs(type: Copy) {
     destinationDir file("$buildDir/allOutputs")
-    from versionFile
-    dependsOn outputVersions
 }
 
 build.dependsOn copyAllOutputs
-copyAllOutputs.dependsOn outputVersions
 
 ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.dependsOn task
@@ -43,8 +21,9 @@ ext.addTaskToCopyAllOutputs = { task ->
 }
 
 def artifactGroupId = 'org.littletonrobotics.akit'
-def baseArtifactId = 'akit'
-def wpilibioZipBaseName = "_GROUP_${artifactGroupId.replace('.', '_')}_ID_${baseArtifactId}-wpilibio_CLS"
+def javaArtifactId = 'akit-java'
+def wpilibioArtifactId = 'akit-wpilibio'
+def wpilibioZipBaseName = "_GROUP_${artifactGroupId.replace('.', '_')}_ID_${wpilibioArtifactId}_CLS"
 
 artifacts {
     archives sourcesJar
@@ -71,6 +50,20 @@ task cleanReleaseRepo(type: Delete) {
 
 tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
 
+task vendordep(type: Copy) {
+    from "$rootDir/AdvantageKit.json"
+    into "$buildDir/vendordep"
+    expand ("version": pubVersion,
+            "groupId": artifactGroupId,
+            "javaArtifactId": javaArtifactId,
+            "jniArtifactId": wpilibioArtifactId,
+            "frcYear": frcYear)
+}
+
+build.dependsOn vendordep
+
+publish.dependsOn build
+
 model {
     publishing {
         def wpilibioTaskList = createComponentZipTasks($.components, ['wpilibio'], wpilibioZipBaseName, Zip, project, includeStandardZipFormat)
@@ -81,7 +74,7 @@ model {
                     artifact it
                 }
 
-                artifactId = "${baseArtifactId}-wpilibio"
+                artifactId = wpilibioArtifactId
                 groupId artifactGroupId
                 version pubVersion
             }
@@ -91,7 +84,7 @@ model {
                 artifact sourcesJar
                 artifact javadocJar
 
-                artifactId = "${baseArtifactId}-java"
+                artifactId = javaArtifactId
                 groupId artifactGroupId
                 version pubVersion
             }
