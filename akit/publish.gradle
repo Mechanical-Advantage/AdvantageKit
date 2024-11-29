@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 
 ext.licenseFile = files("${rootDir.parent}/LICENSE")
 
-def pubVersion = 'dev'
+def pubVersion = findProperty("publishingVersion") ?: "dev"
 
 def frcYear = '2025'
 
@@ -51,6 +51,8 @@ task cleanReleaseRepo(type: Delete) {
 tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
 
 task vendordep(type: Copy) {
+    inputs.property("publishingVersion", pubVersion) // Force task to invalidate if the property changes
+
     from "$rootDir/AdvantageKit.json"
     into "$buildDir/vendordep"
     expand ("version": pubVersion,

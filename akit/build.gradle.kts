@@ -16,21 +16,19 @@ sourceSets["main"].java {
 repositories {
     mavenCentral()
 }
-if (project.hasProperty("releaseMode")) {
-    wpilibRepositories.addAllReleaseRepositories(project)
-} else {
-    wpilibRepositories.addAllDevelopmentRepositories(project)
-}
+wpilibRepositories.addAllReleaseRepositories(project)
+
+val wpilibVersion = "2025.1.1-beta-2"
 
 dependencies {
-    implementation("edu.wpi.first.cscore:cscore-java:2025.+")
-    implementation("edu.wpi.first.cameraserver:cameraserver-java:2025.+")
-    implementation("edu.wpi.first.ntcore:ntcore-java:2025.+")
-    implementation("edu.wpi.first.wpilibj:wpilibj-java:2025.+")
-    implementation("edu.wpi.first.wpiutil:wpiutil-java:2025.+")
-    implementation("edu.wpi.first.wpimath:wpimath-java:2025.+")
-    implementation("edu.wpi.first.wpiunits:wpiunits-java:2025.+")
-    implementation("edu.wpi.first.hal:hal-java:2025.+")
+    implementation("edu.wpi.first.cscore:cscore-java:$wpilibVersion")
+    implementation("edu.wpi.first.cameraserver:cameraserver-java:$wpilibVersion")
+    implementation("edu.wpi.first.ntcore:ntcore-java:$wpilibVersion")
+    implementation("edu.wpi.first.wpilibj:wpilibj-java:$wpilibVersion")
+    implementation("edu.wpi.first.wpiutil:wpiutil-java:$wpilibVersion")
+    implementation("edu.wpi.first.wpimath:wpimath-java:$wpilibVersion")
+    implementation("edu.wpi.first.wpiunits:wpiunits-java:$wpilibVersion")
+    implementation("edu.wpi.first.hal:hal-java:$wpilibVersion")
     implementation("org.ejml:ejml-simple:0.43.1")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
