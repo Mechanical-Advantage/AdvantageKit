@@ -35,7 +35,7 @@ jobs:
           distribution: "temurin"
           java-version: "17"
       - name: "Install RoboRIO toolchain"
-        if: ${{ matrix.name }} == "Athena"
+        if: ${{ matrix.name }} == 'Athena'
         run: ./gradlew :akit:installRoboRioToolchain
       - name: "Build and test"
         run: ./gradlew :akit:build ${{ matrix.build-options }}
