@@ -110,11 +110,13 @@ jobs:
           path: maven_offline
       - name: "Release: Get release info"
         id: get_release_info
+        if: github.event_name == 'release'
         uses: bruceadams/get-release@v1.2.3
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: "Release: Upload artifact"
         uses: actions/upload-release-asset@v1
+        if: github.event_name == 'release'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
