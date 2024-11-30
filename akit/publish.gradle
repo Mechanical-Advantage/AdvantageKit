@@ -38,8 +38,15 @@ publishing {
     repositories {
         mavenLocal()
         maven {
-
             url = releasesRepoUrl
+        }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
