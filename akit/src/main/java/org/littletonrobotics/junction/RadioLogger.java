@@ -21,10 +21,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 
 class RadioLogger {
@@ -59,8 +58,8 @@ class RadioLogger {
     statusURLBuilder.append(teamNumber % 100);
     statusURLBuilder.append(".1/status");
     try {
-      statusURL = new URI(statusURLBuilder.toString()).toURL();
-    } catch (URISyntaxException | MalformedURLException e) {
+      statusURL = new URL(statusURLBuilder.toString());
+    } catch (MalformedURLException e) {
       return;
     }
 
@@ -91,6 +90,7 @@ class RadioLogger {
           }
         });
     notifier.setName("AdvantageKit_RadioLogger");
+    notifier.setHALThreadPriority(false, 0);
     notifier.startPeriodic(requestPeriodSecs);
   }
 }

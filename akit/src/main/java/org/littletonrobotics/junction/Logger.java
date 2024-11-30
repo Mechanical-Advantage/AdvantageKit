@@ -276,12 +276,9 @@ public class Logger {
   }
 
   /**
-   * Periodic method to be called after the constructor of Robot and each loop
-   * cycle.
-   * Updates default log values and sends data to data receivers. Running this
-   * after user
-   * code allows IO operations to occur between cycles rather than interferring
-   * with the
+   * Periodic method to be called after the constructor of Robot and each loop cycle.
+   * Updates default log values and sends data to data receivers. Running this after user
+   * code allows IO operations to occur between cycles rather than interferring with the
    * main thread.
    */
   static void periodicAfterUser(long userCodeLength, long periodicBeforeLength) {
