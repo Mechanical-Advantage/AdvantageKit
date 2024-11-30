@@ -46,9 +46,25 @@ jobs:
         id: get_version
         if: github.event_name == 'release'
         uses: battila7/get-version-action@v2
+      - name: "Release: Get release info"
+        id: get_release_info
+        if: github.event_name == 'release' && matrix.name == 'Athena'
+        uses: bruceadams/get-release@v1.2.3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: "Release: Publish"
         if: github.event_name == 'release'
         run: ./gradlew :akit:publish -PpublishingVersion=${{ steps.get_version.outputs.version-without-v }} ${{ matrix.build-options }}
+      - name: "Release: Upload vendordep"
+        if: github.event_name == 'release' && matrix.name == 'Athena'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: akit/build/vendordep/AdvantageKit.json
+          asset_name: AdvantageKit.json
+          asset_content_type: application/json
       - name: "Upload local repo"
         uses: actions/upload-artifact@v4
         with:
