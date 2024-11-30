@@ -17,13 +17,13 @@ jobs:
             build-options: "-Ponlylinuxathena"
           - name: "Linux"
             runner-image: ubuntu-latest
-            build-options: "-Ponlylinuxx86-64"
+            build-options: "-Ponlylinuxx86-64 -PskipJava=1"
           - name: "macOS"
             runner-image: macos-latest
-            build-options: "-Ponlyosxuniversal"
+            build-options: "-Ponlyosxuniversal -PskipJava=1"
           - name: "Windows"
             runner-image: windows-latest
-            build-options: "-Ponlywindowsx86-64"
+            build-options: "-Ponlywindowsx86-64 -PskipJava=1"
     name: "Build for ${{ matrix.name }}"
     runs-on: ${{ matrix.runner-image }}
     steps:
