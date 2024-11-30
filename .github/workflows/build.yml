@@ -39,3 +39,18 @@ jobs:
         run: ./gradlew :akit:installRoboRioToolchain
       - name: "Build and test"
         run: ./gradlew :akit:build ${{ matrix.build-options }}
+      - name: "Development: Publish local"
+        if: github.event_name != "release"
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository ${{ matrix.build-options }}
+      - name: "Release: Get version number"
+        id: get_version
+        if: github.event_name == "release"
+        uses: battila7/get-version-action@v2
+      - name: "Release: Publish"
+        if: github.event_name == "release"
+        run: ./gradlew :akit:publish -PpublishingVersion=${{ steps.get_version.outputs.version-without-v }} ${{ matrix.build-options }}
+      - name: "Upload local repo"
+        uses: actions/upload-artifact@v3
+        with:
+          name: maven_${{ matrix.name }}
+          path: akit/build/repos/releases
