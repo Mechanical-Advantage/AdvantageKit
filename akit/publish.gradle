@@ -103,8 +103,8 @@ model {
                 autolog(MavenPublication) {
                     artifact project(":autolog").jar
 
-                    artifactId = "junction-autolog"
-                    groupId "${artifactGroupId}.junction"
+                    artifactId = "akit-autolog"
+                    groupId artifactGroupId
                     version pubVersion
                 }
             }
