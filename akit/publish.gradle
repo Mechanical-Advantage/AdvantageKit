@@ -77,6 +77,7 @@ model {
     publishing {
         def wpilibioTaskList = createComponentZipTasks($.components, ['wpilibio'], wpilibioZipBaseName, Zip, project, includeStandardZipFormat)
         println(wpilibioTaskList)
+        def skipJava = project.hasProperty("skipJava")
         publications {
             wpilibio(MavenPublication) {
                 wpilibioTaskList.each {
@@ -88,22 +89,24 @@ model {
                 version pubVersion
             }
 
-            java(MavenPublication) {
-                artifact jar
-                artifact sourcesJar
-                artifact javadocJar
+            if (!skipJava) {
+                java(MavenPublication) {
+                    artifact jar
+                    artifact sourcesJar
+                    artifact javadocJar
 
-                artifactId = javaArtifactId
-                groupId artifactGroupId
-                version pubVersion
-            }
+                    artifactId = javaArtifactId
+                    groupId artifactGroupId
+                    version pubVersion
+                }
 
-            autolog(MavenPublication) {
-                artifact project(":autolog").jar
+                autolog(MavenPublication) {
+                    artifact project(":autolog").jar
 
-                artifactId = "junction-autolog"
-                groupId "${artifactGroupId}.junction"
-                version pubVersion
+                    artifactId = "junction-autolog"
+                    groupId "${artifactGroupId}.junction"
+                    version pubVersion
+                }
             }
         }
     }
