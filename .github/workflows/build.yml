@@ -50,7 +50,59 @@ jobs:
         if: github.event_name == 'release'
         run: ./gradlew :akit:publish -PpublishingVersion=${{ steps.get_version.outputs.version-without-v }} ${{ matrix.build-options }}
       - name: "Upload local repo"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: maven_${{ matrix.name }}
           path: akit/build/repos/releases
+
+  combine:
+    name: "Combine Maven Offline"
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: "Download Athena"
+        uses: actions/download-artifact@v3
+        with:
+          name: maven_Athena
+          path: maven_Athena
+      - name: "Download Linux"
+        uses: actions/download-artifact@v3
+        with:
+          name: maven_Linux
+          path: maven_Linux
+      - name: "Download macOS"
+        uses: actions/download-artifact@v3
+        with:
+          name: maven_macOS
+          path: maven_macOS
+      - name: "Download Windows"
+        uses: actions/download-artifact@v3
+        with:
+          name: maven_Windows
+          path: maven_Windows
+      - name: "Combine"
+        run: |
+          rsync -a maven_Athena/* maven_offline
+          rsync -a maven_macOS/* maven_offline
+          rsync -a maven_Linux/* maven_offline
+          rsync -a maven_Windows/* maven_offline
+          zip -r maven_offline.zip maven_offline
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven
+          path: maven_offline
+      - name: "Release: Get release info"
+        id: get_release_info
+        uses: bruceadams/get-release@v1.2.3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: "Release: Upload artifact"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: maven_offline.zip
+          asset_name: maven_offline.zip
+          asset_content_type: application/zip
