@@ -18,12 +18,15 @@ jobs:
           - name: "Linux"
             runner-image: ubuntu-latest
             build-options: "-Ponlylinuxx86-64 -PskipJava=1"
+            classifier: "linuxx86-64"
           - name: "macOS"
             runner-image: macos-latest
             build-options: "-Ponlyosxuniversal -PskipJava=1"
+            classifier: "osxuniversal"
           - name: "Windows"
             runner-image: windows-latest
             build-options: "-Ponlywindowsx86-64 -PskipJava=1"
+            classifier: "windowsx86-64"
     name: "Build for ${{ matrix.name }}"
     runs-on: ${{ matrix.runner-image }}
     steps:
@@ -34,6 +37,8 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
+      - name: "Setup Python"
+        uses: actions/setup-python@v5
       - name: "Install RoboRIO toolchain"
         if: matrix.name == 'Athena'
         run: ./gradlew :akit:installRoboRioToolchain
@@ -52,12 +57,18 @@ jobs:
         uses: bruceadams/get-release@v1.2.3
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - name: "Release: Publish"
-        if: github.event_name == 'release'
-        run: ./gradlew :akit:publish -PpublishingVersion=${{ steps.get_version.outputs.version-without-v }} ${{ matrix.build-options }}
+      - name: "Release: Publish (Gradle)"
+        if: github.event_name == 'release' && matrix.name == 'Athena'
+        run: ./gradlew :akit:publish "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}" ${{ matrix.build-options }}
         env:
-          GITHUB_ACTOR: Mechanical-Advantage
+          GITHUB_ACTOR: jwbonner
           GITHUB_TOKEN: ${{ github.token }}
+      - name: "Release: Publish (Manual)"
+        if: github.event_name == 'release' && matrix.name != 'Athena'
+        run: |
+          ./gradlew :akit:publishAllPublicationsToMavenRepository "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}" ${{ matrix.build-options }}
+          pip install requests
+          python publish_zip.py --url https://maven.pkg.github.com/jwbonner/AdvantageKit --group_id org.littletonrobotics.akit --artifact_id akit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.classifier }} --file_path akit/build/outputs/_M__GROUP_org_littletonrobotics_akit_ID_akit-wpilibio_CLS-${{ matrix.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
       - name: "Release: Upload vendordep"
         if: github.event_name == 'release' && matrix.name == 'Athena'
         uses: actions/upload-release-asset@v1
