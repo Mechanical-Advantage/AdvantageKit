@@ -61,14 +61,14 @@ jobs:
         if: github.event_name == 'release' && matrix.name == 'Athena'
         run: ./gradlew :akit:publish "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}" ${{ matrix.build-options }}
         env:
-          GITHUB_ACTOR: jwbonner
+          GITHUB_ACTOR: Mechanical-Advantage
           GITHUB_TOKEN: ${{ github.token }}
       - name: "Release: Publish (Manual)"
         if: github.event_name == 'release' && matrix.name != 'Athena'
         run: |
           ./gradlew :akit:publishAllPublicationsToMavenRepository "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}" ${{ matrix.build-options }}
           pip install requests
-          python publish_zip.py --url https://maven.pkg.github.com/jwbonner/AdvantageKit --group_id org.littletonrobotics.akit --artifact_id akit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.classifier }} --file_path akit/build/outputs/_M__GROUP_org_littletonrobotics_akit_ID_akit-wpilibio_CLS-${{ matrix.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
+          python publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit --artifact_id akit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.classifier }} --file_path akit/build/outputs/_M__GROUP_org_littletonrobotics_akit_ID_akit-wpilibio_CLS-${{ matrix.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
       - name: "Release: Upload vendordep"
         if: github.event_name == 'release' && matrix.name == 'Athena'
         uses: actions/upload-release-asset@v1
