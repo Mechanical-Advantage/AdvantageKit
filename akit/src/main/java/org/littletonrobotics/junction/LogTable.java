@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
@@ -577,8 +576,9 @@ public class LogTable {
         // Warn about protobuf logging when enabled
         if (DriverStation.isEnabled()) {
           DriverStation.reportWarning(
-            "[AdvantageKit] Logging protobuf value with type \"" + proto.getTypeString() + "\" for the first time. Logging a protobuf type for the first time when the robot is enabled is likely to cause high loop overruns. Protobuf types should be always logged for the first time when the robot is disabled.",
-            false);
+              "[AdvantageKit] Logging protobuf value with type \"" + proto.getTypeString()
+                  + "\" for the first time. Logging a protobuf type for the first time when the robot is enabled is likely to cause high loop overruns. Protobuf types should be always logged for the first time when the robot is disabled.",
+              false);
         }
       }
       ProtobufBuffer<T, MessageType> buffer = (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
@@ -689,7 +689,6 @@ public class LogTable {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private Struct<?> findRecordStructType(Class<?> classObj) {
     if (!structTypeCache.containsKey(classObj.getName())) {
       structTypeCache.put(classObj.getName(), new RecordStruct(classObj));
@@ -697,8 +696,9 @@ public class LogTable {
       // Warn about record logging when enabled
       if (DriverStation.isEnabled()) {
         DriverStation.reportWarning(
-          "[AdvantageKit] Logging record value with type \"" + classObj.getName() + "\" for the first time. Logging a record type for the first time when the robot is enabled is likely to cause high loop overruns. Record types should be always logged for the first time when the robot is disabled.",
-          false);
+            "[AdvantageKit] Logging record value with type \"" + classObj.getName()
+                + "\" for the first time. Logging a record type for the first time when the robot is enabled is likely to cause high loop overruns. Record types should be always logged for the first time when the robot is disabled.",
+            false);
       }
     }
     return structTypeCache.get(classObj.getName());
@@ -737,7 +737,6 @@ public class LogTable {
    * Writes a new auto serialized 2D record array value to the table. Skipped if
    * the key already exists as a different type.
    */
-  @SuppressWarnings("unchecked")
   public <R extends Record> void put(String key, R[][] value) {
     if (value == null)
       return;
