@@ -1,0 +1,113 @@
+apply plugin: 'maven-publish'
+
+ext.licenseFile = files("${rootDir.parent}/LICENSE")
+
+def pubVersion = findProperty("publishingVersion") ?: "dev"
+
+def frcYear = '2025'
+
+task libraryBuild() {}
+
+task copyAllOutputs(type: Copy) {
+    destinationDir file("$buildDir/allOutputs")
+}
+
+build.dependsOn copyAllOutputs
+
+ext.addTaskToCopyAllOutputs = { task ->
+    copyAllOutputs.dependsOn task
+    copyAllOutputs.inputs.file task.archiveFile
+    copyAllOutputs.from task.archiveFile
+}
+
+def artifactGroupId = 'org.littletonrobotics.akit'
+def javaArtifactId = 'akit-java'
+def wpilibioArtifactId = 'akit-wpilibio'
+def wpilibioZipBaseName = "_GROUP_${artifactGroupId.replace('.', '_')}_ID_${wpilibioArtifactId}_CLS"
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+libraryBuild.dependsOn build
+
+def releasesRepoUrl = "$buildDir/repos/releases"
+
+publishing {
+    repositories {
+        mavenLocal()
+        maven {
+            url = releasesRepoUrl
+        }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
+task cleanReleaseRepo(type: Delete) {
+    delete releasesRepoUrl
+}
+
+tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
+
+task vendordep(type: Copy) {
+    inputs.property("publishingVersion", pubVersion) // Force task to invalidate if the property changes
+
+    from "$rootDir/AdvantageKit.json"
+    into "$buildDir/vendordep"
+    expand ("version": pubVersion,
+            "groupId": artifactGroupId,
+            "javaArtifactId": javaArtifactId,
+            "jniArtifactId": wpilibioArtifactId,
+            "frcYear": frcYear)
+}
+
+build.dependsOn vendordep
+
+publish.dependsOn build
+
+model {
+    publishing {
+        def wpilibioTaskList = createComponentZipTasks($.components, ['wpilibio'], wpilibioZipBaseName, Zip, project, includeStandardZipFormat)
+        println(wpilibioTaskList)
+        def skipJava = project.hasProperty("skipJava")
+        publications {
+            wpilibio(MavenPublication) {
+                wpilibioTaskList.each {
+                    artifact it
+                }
+
+                artifactId = wpilibioArtifactId
+                groupId artifactGroupId
+                version pubVersion
+            }
+
+            if (!skipJava) {
+                java(MavenPublication) {
+                    artifact jar
+                    artifact sourcesJar
+                    artifact javadocJar
+
+                    artifactId = javaArtifactId
+                    groupId artifactGroupId
+                    version pubVersion
+                }
+
+                autolog(MavenPublication) {
+                    artifact project(":autolog").jar
+
+                    artifactId = "akit-autolog"
+                    groupId artifactGroupId
+                    version pubVersion
+                }
+            }
+        }
+    }
+}
