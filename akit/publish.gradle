@@ -101,7 +101,7 @@ model {
                 }
 
                 autolog(MavenPublication) {
-                    artifact project(":autolog").jar
+                    from project(":autolog").components.java
 
                     artifactId = "akit-autolog"
                     groupId artifactGroupId
