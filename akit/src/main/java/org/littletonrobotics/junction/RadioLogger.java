@@ -90,7 +90,6 @@ class RadioLogger {
           }
         });
     notifier.setName("AdvantageKit_RadioLogger");
-    notifier.setHALThreadPriority(false, 0);
     notifier.startPeriodic(requestPeriodSecs);
   }
 }
