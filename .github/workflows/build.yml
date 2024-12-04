@@ -98,7 +98,7 @@ jobs:
         uses: battila7/get-version-action@v2
       - name: "Release: Publish local"
         if: github.event_name == 'release'
-        run: /gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
       - name: "Release: Publish zip"
         if: github.event_name == 'release'
         run: |
