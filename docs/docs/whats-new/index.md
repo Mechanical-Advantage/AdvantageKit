@@ -104,3 +104,17 @@ The state of any alerts created through WPILib's [persistent alerts](https://doc
 Status data from the VH-109 radio is automatically logged as an output. This includes useful information about the connection status, bandwidth usage, etc. Check the [documentation](/data-flow/built-in-logging#radio-status) for details.
 
 ![Radio data](../data-flow/img/radio-1.png)
+
+### 📖 New Documentation Site
+
+You're viewing the updated version of the AdvantageKit documentation, with a **reorganized layout** and detailed **template project documentation**. The new documentation site also supports **easier navigation** via the sidebar, a **built-in search feature**, and a **refined mobile interface**.
+
+:::tip
+Check the [**log replay comparison**](/getting-started/what-is-advantagekit/log-replay-comparison) page for a breakdown of AdvantageKit's features and capabilities compared to similar logging tools like [Hoot Replay](https://v6.docs.ctr-electronics.com/en/latest/docs/yearly-changes/yearly-changelog.html#hoot-replay).
+:::
+
+![Documentation screenshot](./img/docs-screenshot.png)
+
+### 🚧 Build System Updates
+
+AdvantageKit is currently transitioning to a new build system, which will simplify development and the process of external contribution. We will have more updates to share soon. Additionally, AdvantageKit is in the process of moving Maven hosting from GitHub Packages to the WPILib Artifactory site. This change is intended to provide a more stable and seamless experience when installing and using AdvantageKit. **AdvantageKit v4.0.0-beta-1 remains hosted on GitHub Packages, but look for updates soon.**
