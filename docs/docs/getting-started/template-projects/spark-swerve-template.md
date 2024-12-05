@@ -258,7 +258,7 @@ tryUntilOk(turnSpark, 5, () -> turnEncoder.setPosition(customEncoder.getPosition
 
 ### Vision Integration
 
-The `Drive` subsystem uses WPILib's [`DifferentialDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/DifferentialDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples.
+The `Drive` subsystem uses WPILib's [`SwerveDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/SwerveDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples.
 
 :::tip
 This project is compatible with AdvantageKit's [vision template project](./vision-template.md), which provides a starting point for implementing a pose estimation algorithm based on Limelight or PhotonVision.
