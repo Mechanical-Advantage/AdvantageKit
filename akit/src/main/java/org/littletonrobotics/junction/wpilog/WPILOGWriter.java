@@ -184,7 +184,7 @@ public class WPILOGWriter implements LogDataReceiver {
         PrintWriter writer = new PrintWriter(advantageScopeTempPath.toString(), "UTF-8");
         writer.println(fullLogPath);
         writer.close();
-        System.out.println("[AdvantageKit] Replay log sent to AdvantageScope.");
+        System.out.println("[AdvantageKit] Log sent to AdvantageScope.");
       } catch (Exception e) {
         DriverStation.reportError("[AdvantageKit] Failed to send log to AdvantageScope.", false);
       }
