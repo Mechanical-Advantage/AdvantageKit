@@ -101,7 +101,7 @@ The state of any alerts created through WPILib's [persistent alerts](https://doc
 
 ### 📡 Radio Logging
 
-Status data from the VH-109 radio is automatically logged as an output. This includes useful information about the connection status, bandwidth usage, etc. Check the [documentation](/data-flow/built-in-logging#radio-status) for details.
+Status data from the VH-109 radio is automatically logged. This includes useful information about the connection status, bandwidth usage, etc. Check the [documentation](/data-flow/built-in-logging#radio-status) for details.
 
 ![Radio data](../data-flow/img/radio-1.png)
 

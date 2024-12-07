@@ -48,7 +48,7 @@ Output from native code is not included when running in simulation.
 
 ### Radio Status
 
-Status data from the VH-109 radio is automatically logged every ~5 seconds as an output. This includes useful information about the connection status, bandwidth usage, etc. These fields are available under the `RadioStatus` table.
+Status data from the VH-109 radio is automatically logged every ~5 seconds. This includes useful information about the connection status, bandwidth usage, etc. These fields are available under the `RadioStatus` table.
 
 ![Radio data](img/radio-1.png)
 
