@@ -42,25 +42,27 @@ The swerve project folder includes a predefined AdvantageScope layout with tabs 
 
 3. If not already available, download and install [Git](https://git-scm.com/downloads).
 
-4. Navigate to `src/main/java/frc/robot/subsystems/drive/DriveConstants.java` in the AdvantageKit project.
+4. If the project will run **only on the roboRIO 2**, uncomment lines 39-42 of `build.gradle`. These contain additional [garbage collection](https://www.geeksforgeeks.org/garbage-collection-java/) optimizations for the RIO 2 to improve performance.
 
-5. Update the values of `driveMotorReduction` and `turnMotorReduction` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
+5. Navigate to `src/main/java/frc/robot/subsystems/drive/DriveConstants.java` in the AdvantageKit project.
 
-6. Update the values of `trackWidth` and `wheelBase` based on the distance between the left-right and front-back modules (respectively).
+6. Update the values of `driveMotorReduction` and `turnMotorReduction` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
 
-7. Update the value of `wheelRadiusMeters` to the theoretical radius of each wheel. This value can be further refined as described in the "Tuning" section below.
+7. Update the values of `trackWidth` and `wheelBase` based on the distance between the left-right and front-back modules (respectively).
 
-8. Update the value of `maxSpeedMetersPerSec` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
+8. Update the value of `wheelRadiusMeters` to the theoretical radius of each wheel. This value can be further refined as described in the "Tuning" section below.
 
-9. Set the value of `pigeonCanId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
+9. Update the value of `maxSpeedMetersPerSec` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
 
-10. For each module, set the values of `...DriveMotorId` and `...TurnMotorId` to the correct CAN IDs of the drive Spark Flex and turn Spark Max (as configured in the REV Hardware Client).
+10. Set the value of `pigeonCanId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
 
-11. For each module, set the value of `...ZeroRotation` to `new Rotation2d(0.0)`.
+11. For each module, set the values of `...DriveMotorId` and `...TurnMotorId` to the correct CAN IDs of the drive Spark Flex and turn Spark Max (as configured in the REV Hardware Client).
 
-12. Deploy the project to the robot and connect using AdvantageScope.
+12. For each module, set the value of `...ZeroRotation` to `new Rotation2d(0.0)`.
 
-13. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify that CAN IDs, firmware versions, and configurations of all devices.
+13. Deploy the project to the robot and connect using AdvantageScope.
+
+14. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify that CAN IDs, firmware versions, and configurations of all devices.
 
 :::warning
 The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**

@@ -29,16 +29,17 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
-                    // https://www.chiefdelphi.com/t/2024-wpilib-feedback/464322/141
-                    final MAX_JAVA_HEAP_SIZE_MB = 100;
                     jvmArgs.add("-XX:+UnlockExperimentalVMOptions")
-
-                    // Set the minimum heap size to the maximum heap size to avoid resizing
-                    jvmArgs.add("-Xmx" + MAX_JAVA_HEAP_SIZE_MB + "M")
-                    jvmArgs.add("-Xms" + MAX_JAVA_HEAP_SIZE_MB + "M")
                     jvmArgs.add("-XX:GCTimeRatio=5")
                     jvmArgs.add("-XX:+UseSerialGC")
                     jvmArgs.add("-XX:MaxGCPauseMillis=50")
+
+                    // The options below may improve performance, but should only be enabled on the RIO 2
+                    //
+                    // final MAX_JAVA_HEAP_SIZE_MB = 100;
+                    // jvmArgs.add("-Xmx" + MAX_JAVA_HEAP_SIZE_MB + "M")
+                    // jvmArgs.add("-Xms" + MAX_JAVA_HEAP_SIZE_MB + "M")
+                    // jvmArgs.add("-XX:+AlwaysPreTouch")
                 }
 
                 // Static files artifact
