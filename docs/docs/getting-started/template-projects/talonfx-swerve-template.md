@@ -54,13 +54,15 @@ CTRE only permits the swerve project generator to be used on swerve robots with 
 
 3. If not already available, download and install [Git](https://git-scm.com/downloads).
 
-4. Follow the instructions in the Phoenix documentation for the [Tuner X Swerve Project Generator](https://v6.docs.ctr-electronics.com/en/latest/docs/tuner/tuner-swerve/index.html).
+4. If the project will run **only on the roboRIO 2**, uncomment lines 39-42 of `build.gradle`. These contain additional [garbage collection](https://www.geeksforgeeks.org/garbage-collection-java/) optimizations for the RIO 2 to improve performance.
 
-5. On the final screen in Tuner X, choose "Generate only TunerConstants" and overwrite the file located at `src/main/java/frc/robot/generated/TunerConstants.java`.
+5. Follow the instructions in the Phoenix documentation for the [Tuner X Swerve Project Generator](https://v6.docs.ctr-electronics.com/en/latest/docs/tuner/tuner-swerve/index.html).
 
-6. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L18) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L171-L175). Before removing them, both lines will be marked as errors in VSCode.
+6. On the final screen in Tuner X, choose "Generate only TunerConstants" and overwrite the file located at `src/main/java/frc/robot/generated/TunerConstants.java`.
 
-7. In `TunerConstants.java`, change `kSteerInertia` to 0.004 and `kDriveInertia` to 0.025.
+7. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L18) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L171-L175). Before removing them, both lines will be marked as errors in VSCode.
+
+8. In `TunerConstants.java`, change `kSteerInertia` to 0.004 and `kDriveInertia` to 0.025.
 
 :::warning
 The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**
@@ -75,27 +77,29 @@ The project is configured to save log files when running on a real robot. **A FA
 
 3. If not already available, download and install [Git](https://git-scm.com/downloads).
 
-4. Navigate to `src/main/java/frc/robot/generated/TunerConstants.java` in the AdvantageKit project.
+4. If the project will run **only on the roboRIO 2**, uncomment lines 39-42 of `build.gradle`. These contain additional [garbage collection](https://www.geeksforgeeks.org/garbage-collection-java/) optimizations for the RIO 2 to improve performance.
 
-5. Update the values of `kDriveGearRatio` and `kSteerGearRatio` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
+5. Navigate to `src/main/java/frc/robot/generated/TunerConstants.java` in the AdvantageKit project.
 
-6. Update the value of `kWheelRadius` to the theoretical radius of each wheel. This value can be further refined as described in the "Tuning" section below.
+6. Update the values of `kDriveGearRatio` and `kSteerGearRatio` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
 
-7. Update the value of `kSpeedAt12Volts` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
+7. Update the value of `kWheelRadius` to the theoretical radius of each wheel. This value can be further refined as described in the "Tuning" section below.
 
-8. Update the value of `kCANBus` based on the CAN bus used by the drive devices. Check the [`CANBus`](https://api.ctr-electronics.com/phoenix6/latest/java/com/ctre/phoenix6/CANBus.html) API documentation for details on possible values.
+8. Update the value of `kSpeedAt12Volts` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
 
-9. Set the value of `kPigeonId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
+9. Update the value of `kCANBus` based on the CAN bus used by the drive devices. Check the [`CANBus`](https://api.ctr-electronics.com/phoenix6/latest/java/com/ctre/phoenix6/CANBus.html) API documentation for details on possible values.
 
-10. For each module, set the values of `k...DriveMotorId`, `k...SteerMotorId`, and `k...EncoderId` to the correct CAN IDs of the drive TalonFX, turn TalonFX, and CANcoder (as configured in Tuner X).
+10. Set the value of `kPigeonId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
 
-11. For each module, set the values of `k...XPos` and `k...YPos` based on the distance from each module to the center of the robot. Positive X values are closer to the front of the robot and positive Y values are closer to the left side of the robot.
+11. For each module, set the values of `k...DriveMotorId`, `k...SteerMotorId`, and `k...EncoderId` to the correct CAN IDs of the drive TalonFX, turn TalonFX, and CANcoder (as configured in Tuner X).
 
-12. For each module, set the value of `k...EncoderOffset` to `Radians.of(0.0)`.
+12. For each module, set the values of `k...XPos` and `k...YPos` based on the distance from each module to the center of the robot. Positive X values are closer to the front of the robot and positive Y values are closer to the left side of the robot.
 
-13. Deploy the project to the robot and connect using AdvantageScope.
+13. For each module, set the value of `k...EncoderOffset` to `Radians.of(0.0)`.
 
-14. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify tha CAN IDs, firmware versions, and configurations of all devices.
+14. Deploy the project to the robot and connect using AdvantageScope.
+
+15. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify tha CAN IDs, firmware versions, and configurations of all devices.
 
 :::warning
 The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**
