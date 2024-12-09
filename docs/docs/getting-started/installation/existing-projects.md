@@ -4,6 +4,10 @@ sidebar_position: 1
 
 # Existing Projects
 
+:::info
+The instructions below are for the 2025 beta of AdvantageKit. To install the latest stable release (v3.2.1), following the instructions [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/v3.2.1/docs/INSTALLATION.md#existing-projects).
+:::
+
 To install the AdvantageKit vendordep, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" and paste in the URL below.
 
 ```
