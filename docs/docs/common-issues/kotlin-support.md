@@ -5,9 +5,24 @@ sidebar_position: 5
 # Kotlin Support
 
 Although advantagekit supports kotlin out of the box, there are a couple of features that do not work within kotlin files.
-For instance, the @AutoLogOutput annotation does not work within singletons(or anonymous class scopes), and the @AutoLog annotation does not work with any kotlin files.
 
-If your team uses kotlin with advantagekit, it is recommended to paste the code below into a kotlin file named "AdvantageKitExtensions.kt"
+## @AutoLogOutput
+
+Kotlin singletons(or objects) must be registered through a ```AutoLogOutput.addObject(this)``` call within the constructor. For instance:
+```
+object SomeSingleton {
+    init {
+        AutoLogOutput.addObject(this)
+    }
+    
+    @AutoLogOutput
+    fun getValue() = 2.0
+}
+```
+
+## @AutoLog
+
+If your team plans to use @AutoLog, it is recommended to paste the code below into a kotlin file named "AdvantageKitExtensions.kt"
 (preferrably located within a "lib" or "util" folder of your robot code):
 
 ```kt
@@ -72,19 +87,9 @@ abstract class AutoLogInputs: LoggableInputs {
         toLogRunners.forEach { it(table) }
     }
 }
-
-fun enableAutoLogOutputFor(vararg roots: Any) {
-    val autoLogOutputClazz = AutoLogOutputManager::class.java
-    val objectClazz = Object::class.java
-    for (root in roots) {
-        val method = autoLogOutputClazz.getDeclaredMethod("registerFields", objectClazz)
-        method.isAccessible = true
-        method.invoke(null, root)
-    }
-}
 ```
 
-This code provides a replacement for the @AutoLog annotation as well as the ability to manually register @AutoLogOutput roots.
+This base class gives a replacement for the @AutoLog annotation for kotlin.
 
 Here is an example of using auto-logged inputs in kotlin:
 ```kt
@@ -110,16 +115,4 @@ class Arm: SubsystemBase() {
 }
 ```
 
-And here is an example of registering a singleton for the @AutoLogOutput annotation:
-```kt
-object LoggedSingleton {
-    init {
-      enableAutoLogOutputFor(this)
-    }
 
-    @AutoLogOutput
-    fun getValue() {
-      return 2.0
-    }
-}
-```
