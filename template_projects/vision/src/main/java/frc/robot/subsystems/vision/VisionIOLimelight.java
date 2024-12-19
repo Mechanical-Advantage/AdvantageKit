@@ -78,7 +78,7 @@ public class VisionIOLimelight implements VisionIO {
     List<PoseObservation> poseObservations = new LinkedList<>();
     for (var rawSample : megatag1Subscriber.readQueue()) {
       if (rawSample.value.length == 0) continue;
-      for (int i = 10; i < rawSample.value.length; i += 7) {
+      for (int i = 11; i < rawSample.value.length; i += 7) {
         tagIds.add((int) rawSample.value[i]);
       }
       poseObservations.add(
@@ -90,20 +90,20 @@ public class VisionIOLimelight implements VisionIO {
               parsePose(rawSample.value),
 
               // Ambiguity, using only the first tag because ambiguity isn't applicable for multitag
-              rawSample.value.length >= 17 ? rawSample.value[16] : 0.0,
+              rawSample.value.length >= 18 ? rawSample.value[17] : 0.0,
 
               // Tag count
-              (int) rawSample.value[8],
+              (int) rawSample.value[7],
 
               // Average tag distance
-              rawSample.value[10],
+              rawSample.value[9],
 
               // Observation type
               PoseObservationType.MEGATAG_1));
     }
     for (var rawSample : megatag2Subscriber.readQueue()) {
       if (rawSample.value.length == 0) continue;
-      for (int i = 10; i < rawSample.value.length; i += 7) {
+      for (int i = 11; i < rawSample.value.length; i += 7) {
         tagIds.add((int) rawSample.value[i]);
       }
       poseObservations.add(
@@ -118,10 +118,10 @@ public class VisionIOLimelight implements VisionIO {
               0.0,
 
               // Tag count
-              (int) rawSample.value[8],
+              (int) rawSample.value[7],
 
               // Average tag distance
-              rawSample.value[10],
+              rawSample.value[9],
 
               // Observation type
               PoseObservationType.MEGATAG_2));
