@@ -78,7 +78,7 @@ public class VisionIOLimelight implements VisionIO {
     List<PoseObservation> poseObservations = new LinkedList<>();
     for (var rawSample : megatag1Subscriber.readQueue()) {
       if (rawSample.value.length == 0) continue;
-      for (int i = 10; i < rawSample.value.length; i += 7) {
+      for (int i = 11; i < rawSample.value.length; i += 7) {
         tagIds.add((int) rawSample.value[i]);
       }
       poseObservations.add(
@@ -103,7 +103,7 @@ public class VisionIOLimelight implements VisionIO {
     }
     for (var rawSample : megatag2Subscriber.readQueue()) {
       if (rawSample.value.length == 0) continue;
-      for (int i = 10; i < rawSample.value.length; i += 7) {
+      for (int i = 11; i < rawSample.value.length; i += 7) {
         tagIds.add((int) rawSample.value[i]);
       }
       poseObservations.add(
