@@ -130,6 +130,10 @@ Torque-current control requires different gains than voltage control. We recomme
 
 The project includes default [feedforward gains](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-feedforward.html#introduction-to-dc-motor-feedforward) for velocity control of the drive motors (`kS` and `kV`), acceleration control of the drive motors (`kA`), and velocity control of the turn motors (`kS` and `kV`).
 
+:::info
+The AdvantageKit template requires different feedforward gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX firmware and not on the RIO.
+:::
+
 :::tip
 The drive `kS` and `kV` gains should **always** be characterized (as described below). The drive/turn `kA` gains and turn `kS` and `kV` gains are unnecessary in most cases, but can be tuned by advanced users.
 :::
@@ -195,6 +199,10 @@ The project includes an automated wheel radius characterization routine, which o
 ### Drive/Turn PID Tuning
 
 The project includes default gains for the drive velocity PID controllers and turn position PID controllers, which can be found in the `steerGains` and `driveGains` configs in `TunerConstants.java`. These gains should be tuned for each robot.
+
+:::info
+The AdvantageKit template requires different PID gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX firmware and not on the RIO.
+:::
 
 :::tip
 More information about PID tuning can be found in the [WPILib documentation](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-pid.html#introduction-to-pid).
