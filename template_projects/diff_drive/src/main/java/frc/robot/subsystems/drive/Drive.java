@@ -49,9 +49,9 @@ public class Drive extends SubsystemBase {
   private final double kS = Constants.currentMode == Mode.SIM ? simKs : realKs;
   private final double kV = Constants.currentMode == Mode.SIM ? simKv : realKv;
   private final DifferentialDrivePoseEstimator poseEstimator =
-      new DifferentialDrivePoseEstimator(kinematics, new Rotation2d(), 0.0, 0.0, new Pose2d());
+      new DifferentialDrivePoseEstimator(kinematics, Rotation2d.kZero, 0.0, 0.0, new Pose2d());
   private final SysIdRoutine sysId;
-  private Rotation2d rawGyroRotation = new Rotation2d();
+  private Rotation2d rawGyroRotation = Rotation2d.kZero;
   private double lastLeftPositionMeters = 0.0;
   private double lastRightPositionMeters = 0.0;
 

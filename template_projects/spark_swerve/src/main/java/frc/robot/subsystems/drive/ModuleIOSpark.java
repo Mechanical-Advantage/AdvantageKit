@@ -70,7 +70,7 @@ public class ModuleIOSpark implements ModuleIO {
           case 1 -> frontRightZeroRotation;
           case 2 -> backLeftZeroRotation;
           case 3 -> backRightZeroRotation;
-          default -> new Rotation2d();
+          default -> Rotation2d.kZero;
         };
     driveSpark =
         new SparkFlex(
