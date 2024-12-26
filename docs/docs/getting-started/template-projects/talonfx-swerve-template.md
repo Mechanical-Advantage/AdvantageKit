@@ -286,7 +286,13 @@ By default, the project uses a CANcoder in remote/fused/sync mode. When using an
 turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 ```
 
-3. Reset the relative encoder position at startup:
+3. Replace `RotorToSensorRatio` with `SensorToMechanismRatio` as shown below:
+
+```java
+turnConfig.Feedback.SensorToMechanismRatio = constants.SteerMotorGearRatio;
+```
+
+4. Reset the relative encoder position at startup:
 
 ```java
 tryUntilOk(5, () -> turnTalon.setPosition(customEncoder.getPositionRotations(), 0.25));
