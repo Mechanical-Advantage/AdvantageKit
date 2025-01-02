@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-// Copyright 2021-2024 FRC 6328
+// Copyright 2021-2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // This program is free software; you can redistribute it and/or
@@ -26,8 +26,10 @@ import org.littletonrobotics.junction.LogTable;
  * Common base class for all Mechanism2d node types.
  *
  * <p>
- * To append another node, call {@link #append(LoggedMechanismObject2d)}. Objects that
- * aren't appended to a published {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d} container are
+ * To append another node, call {@link #append(LoggedMechanismObject2d)}.
+ * Objects that
+ * aren't appended to a published
+ * {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d} container are
  * nonfunctional.
  *
  * @see edu.wpi.first.wpilibj.smartdashboard.Mechanism2d

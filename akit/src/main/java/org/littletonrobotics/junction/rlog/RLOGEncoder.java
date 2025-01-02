@@ -1,4 +1,4 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright 2021-2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@ import java.util.Map;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 
-/** 
+/**
  * Converts log tables to the RLOG format. Based on RLOG R2 with
  * support for custom type strings.
  */
@@ -137,8 +137,7 @@ class RLOGEncoder {
       byte[] keyBytes = key.getBytes("UTF-8");
       byte[] typeBytes = type.getBytes("UTF-8");
       ByteBuffer buffer = ByteBuffer.allocate(
-        1 + Short.BYTES + Short.BYTES + keyBytes.length + Short.BYTES + typeBytes.length
-      );
+          1 + Short.BYTES + Short.BYTES + keyBytes.length + Short.BYTES + typeBytes.length);
       buffer.put((byte) 1);
       buffer.putShort(keyID);
       buffer.putShort((short) keyBytes.length);

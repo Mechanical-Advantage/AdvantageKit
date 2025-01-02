@@ -1,4 +1,4 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright 2021-2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // This program is free software; you can redistribute it and/or
@@ -22,10 +22,10 @@
 #include <cstdint>
 #include <iostream>
 
-#include "conduit_schema_generated.h"
 #include "conduit/ds_reader.h"
 #include "conduit/pdp_reader.h"
 #include "conduit/system_reader.h"
+#include "conduit_schema_generated.h"
 
 namespace akit {
 namespace conduit {

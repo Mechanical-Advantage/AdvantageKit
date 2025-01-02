@@ -1,4 +1,4 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright 2021-2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // This program is free software; you can redistribute it and/or
@@ -276,9 +276,12 @@ public class Logger {
   }
 
   /**
-   * Periodic method to be called after the constructor of Robot and each loop cycle.
-   * Updates default log values and sends data to data receivers. Running this after user
-   * code allows IO operations to occur between cycles rather than interferring with the
+   * Periodic method to be called after the constructor of Robot and each loop
+   * cycle.
+   * Updates default log values and sends data to data receivers. Running this
+   * after user
+   * code allows IO operations to occur between cycles rather than interferring
+   * with the
    * main thread.
    */
   static void periodicAfterUser(long userCodeLength, long periodicBeforeLength) {

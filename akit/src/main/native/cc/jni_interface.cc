@@ -1,4 +1,4 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright 2021-2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // This program is free software; you can redistribute it and/or
@@ -13,8 +13,8 @@
 
 #include <jni.h>
 
-#include "org_littletonrobotics_conduit_ConduitJni.h"
 #include "conduit/wpilibio.h"
+#include "org_littletonrobotics_conduit_ConduitJni.h"
 
 JNIEXPORT jobject JNICALL
 Java_org_littletonrobotics_conduit_ConduitJni_getBuffer(JNIEnv* env,
