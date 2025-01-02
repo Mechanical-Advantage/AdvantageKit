@@ -79,7 +79,7 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ["java"]
+      additionalLanguages: ["java", "groovy"]
     },
     algolia: {
       appId: "7JW2R5AY94",
