@@ -30,7 +30,7 @@ public class LoggedDashboardBoolean extends LoggedNetworkBoolean {
    *            "/DashboardInputs/{key}" when logged.
    */
   public LoggedDashboardBoolean(String key) {
-    super("SmartDashboard/" + key);
+    super("/SmartDashboard/" + key);
   }
 
   /**
@@ -42,6 +42,6 @@ public class LoggedDashboardBoolean extends LoggedNetworkBoolean {
    * @param defaultValue The default value if no value in NT is found.
    */
   public LoggedDashboardBoolean(String key, boolean defaultValue) {
-    super("SmartDashboard/" + key, defaultValue);
+    super("/SmartDashboard/" + key, defaultValue);
   }
 }

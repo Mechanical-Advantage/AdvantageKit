@@ -30,7 +30,7 @@ public class LoggedDashboardString extends LoggedNetworkString {
    *            "/DashboardInputs/{key}" when logged.
    */
   public LoggedDashboardString(String key) {
-    super("SmartDashboard/" + key);
+    super("/SmartDashboard/" + key);
   }
 
   /**
@@ -42,6 +42,6 @@ public class LoggedDashboardString extends LoggedNetworkString {
    * @param defaultValue The default value if no value in NT is found.
    */
   public LoggedDashboardString(String key, String defaultValue) {
-    super("SmartDashboard/" + key, defaultValue);
+    super("/SmartDashboard/" + key, defaultValue);
   }
 }
