@@ -12,7 +12,7 @@ These tools are already installed in the AdvantageKit [template projects](/categ
 
 ## Gversion
 
-The [gversion](https://github.com/lessthanoptimal/gversion-plugin) Gradle plugin produces a constants file with important metadata, including the [Git hash](https://www.mikestreety.co.uk/blog/the-git-commit-hash/) uniquely identifying each commit. It also includes whether the tree is "dirty" (if it included uncommitted changes). The example projects include Gversion already. Otherwise, follow the installation instructions below.
+The [gversion](https://github.com/lessthanoptimal/gversion-plugin) Gradle plugin produces a constants file with important metadata, including the [Git hash](https://www.mikestreety.co.uk/blog/the-git-commit-hash/) uniquely identifying each commit. It also includes whether the tree is "dirty" (if it included uncommitted changes). The template projects include Gversion already. Otherwise, follow the installation instructions below.
 
 <details>
 <summary>Installation</summary>
@@ -73,7 +73,7 @@ This can be addressed by including a Gradle task to automatically commit working
 
 ### Installation
 
-The Gradle task is preconfigured in the AdvantageKit example projects. Add the following lines to `build.gradle`:
+The Gradle task is preconfigured in the AdvantageKit template projects. Add the following lines to `build.gradle`:
 
 ```groovy
 // Create commit with working changes on event branches

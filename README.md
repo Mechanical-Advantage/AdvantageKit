@@ -7,6 +7,6 @@ AdvantageKit is a logging, telemetry, and replay framework developed by [Team 63
 - [AdvantageScope](https://github.com/Mechanical-Advantage/AdvantageScope), our robot telemetry application which **does not require AdvantageKit to use**.
 - [WPILib Data Logging](https://docs.wpilib.org/en/stable/docs/software/telemetry/datalog.html), a simpler logging system included in WPILib (does not support log replay in simulation, but covers the needs of most teams).
 
-**View the [online documentation](https://docs.advantagekit.org), or download example projects from the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases).**
+**View the [online documentation](https://docs.advantagekit.org), or download template projects from the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases).**
 
 Feedback, feature requests, and bug reports are welcome on the [issues page](https://github.com/Mechanical-Advantage/AdvantageKit/issues). For non-public inquires, please send a message to software@team6328.org.

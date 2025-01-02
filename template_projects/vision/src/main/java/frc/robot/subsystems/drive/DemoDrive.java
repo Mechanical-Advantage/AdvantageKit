@@ -32,7 +32,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
  * <b>IMPORTANT: This is a simple simulator for a differential drive, and has no support for real
  * hardware or IO implementations. It it intended only for simple testing in simulation.</b>
  *
- * <p>Please reference the other AdvantageKit example projects for more complete examples of drive
+ * <p>Please reference the other AdvantageKit template projects for more complete examples of drive
  * subsystems, including swerve and differential drive. Any subsystem with equivalent {@link
  * #getPose()}, {@link #getRotation()}, and {@link #addVisionMeasurement(Pose2d, double, Matrix)}
  * methods is compatible with this project's vision code.
