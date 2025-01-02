@@ -23,7 +23,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 public class LoggedNetworkBoolean extends LoggedNetworkInput {
   private final String key;
   private final BooleanEntry entry;
-  private boolean defaultValue;
+  private boolean defaultValue = false;
   private boolean value;
 
   /**
@@ -34,7 +34,10 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput {
    *            "/DashboardInputs/{key}" when logged.
    */
   public LoggedNetworkBoolean(String key) {
-    this(key, false);
+    this.key = key;
+    this.entry = NetworkTableInstance.getDefault().getBooleanTopic(key).getEntry(false);
+    this.value = defaultValue;
+    Logger.registerDashboardInput(this);
   }
 
   /**
@@ -46,17 +49,15 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput {
    * @param defaultValue The default value if no value in NT is found.
    */
   public LoggedNetworkBoolean(String key, boolean defaultValue) {
-    this.key = key;
-    this.entry = NetworkTableInstance.getDefault().getBooleanTopic(key).getEntry(false);
-    this.defaultValue = defaultValue;
-    this.value = defaultValue;
-    entry.set(entry.get(defaultValue));
-    Logger.registerDashboardInput(this);
+    this(key);
+    setDefault(defaultValue);
   }
 
   /** Updates the default value, which is used if no value in NT is found. */
   public void setDefault(boolean defaultValue) {
     this.defaultValue = defaultValue;
+    entry.set(entry.get(defaultValue));
+
   }
 
   /**
