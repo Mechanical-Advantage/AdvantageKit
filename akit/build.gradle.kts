@@ -18,7 +18,7 @@ repositories {
 }
 wpilibRepositories.addAllReleaseRepositories(project)
 
-val wpilibVersion = "2025.1.1-beta-3"
+val wpilibVersion = "2025.1.1"
 
 dependencies {
     implementation("edu.wpi.first.cscore:cscore-java:$wpilibVersion")
@@ -33,9 +33,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-    implementation("edu.wpi.first.thirdparty.frc2024.opencv:opencv-java:4.8.0-4")
-
-    implementation("us.hebi.quickbuf:quickbuf-runtime:1.3.2")
+    implementation("edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3")
+    implementation("us.hebi.quickbuf:quickbuf-runtime:1.3.3")
 }
 
 tasks.withType<Javadoc> {
