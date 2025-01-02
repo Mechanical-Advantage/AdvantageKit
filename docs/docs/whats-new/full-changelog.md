@@ -15,7 +15,7 @@ sidebar_position: 1
 - Added check for `LoggedRobot` when calling `Logger.start()`
 - Synchronously read DS data in conduit
 - Removed WPILib version check
-- Added support for WPILib 2025.1.1-beta-2
+- Added support for WPILib 2025
 - Switched to WPILib maven for distribution
 
 ### Library: Features

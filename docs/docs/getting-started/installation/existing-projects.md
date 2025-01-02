@@ -4,11 +4,7 @@ sidebar_position: 1
 
 # Existing Projects
 
-:::info
-The instructions below are for the 2025 beta of AdvantageKit. To install the latest stable release (v3.2.1), following the instructions [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/v3.2.1/docs/INSTALLATION.md#existing-projects).
-:::
-
-To install the AdvantageKit vendordep, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" and paste in the URL below.
+To install the AdvantageKit vendordep, follow the instructions in the WPILib documentation for [installing vendor libraries](https://docs.wpilib.org/en/stable/docs/software/vscode-overview/3rd-party-libraries.html#installing-libraries) and choose "AdvantageKit" from the list. Alternatively, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" in VSCode and paste the URL below.
 
 ```
 https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest/download/AdvantageKit.json
@@ -17,17 +13,6 @@ https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest/download/Ad
 Next, add the following blocks to the `build.gradle` file. Note that the lines under `dependencies` should be combined with the existing `dependencies` block.
 
 ```groovy
-repositories {
-    maven {
-        url = uri("https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit")
-        credentials {
-            username = "Mechanical-Advantage-Bot"
-            password = "\u0067\u0068\u0070\u005f\u006e\u0056\u0051\u006a\u0055\u004f\u004c\u0061\u0079\u0066\u006e\u0078\u006e\u0037\u0051\u0049\u0054\u0042\u0032\u004c\u004a\u006d\u0055\u0070\u0073\u0031\u006d\u0037\u004c\u005a\u0030\u0076\u0062\u0070\u0063\u0051"
-        }
-    }
-    mavenLocal()
-}
-
 task(replayWatch, type: JavaExec) {
     mainClass = "org.littletonrobotics.junction.ReplayWatch"
     classpath = sourceSets.main.runtimeClasspath
@@ -39,12 +24,6 @@ dependencies {
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 }
 ```
-
-AdvantageKit is available through GitHub Packages. Per [this issue](https://github.community/t/download-from-github-package-registry-without-authentication/14407), downloading packages from GitHub requires authentication, even for public repositories. The configuration above includes an access token so that anyone can download AdvantageKit. The obfuscation of the string hides it from GitHub's bot; **do not include the plain text token in any GitHub repository.** This will cause the token to be automatically revoked, requiring us to create and distribute a new token.
-
-:::tip
-A token for accessing GitHub packages and AdvantageKit can be created using any GitHub account. Under account settings, go to "Developer settings" > "Personal access token" > "Tokens (classic)" > "Generate new token" > "Generate new token (classic)" and enable the "read:packages" scope. Keep in mind that GitHub will revoke this token if the plaintext version appears in a GitHub repository.
-:::
 
 ## Robot Configuration
 

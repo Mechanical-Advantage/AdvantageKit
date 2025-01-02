@@ -28,10 +28,6 @@ The AdvantageKit swerve templates are **open-source** and **fully customizable**
 
 ## Setup
 
-:::warning
-This example project is part of the 2025 AdvantageKit beta release. If you encounter any issues during setup, please [open an issue](https://github.com/Mechanical-Advantage/AdvantageKit/issues).
-:::
-
 :::tip
 The swerve project folder includes a predefined AdvantageScope layout with tabs for each setup and tuning step described below. To open it, click `File` > `Import Layout...` in the tab bar of AdvantageScope and select the file `AdvantageScope Swerve Calibration.json` in the swerve project folder.
 :::

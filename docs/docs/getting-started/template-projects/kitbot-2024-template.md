@@ -17,10 +17,6 @@ The AdvantageKit 2024 KitBot template is **open-source** and **fully customizabl
 
 ## Setup
 
-:::warning
-This example project is part of the 2025 AdvantageKit beta release. If you encounter any issues during setup, please [open an issue](https://github.com/Mechanical-Advantage/AdvantageKit/issues).
-:::
-
 1. Download the 2024 KitBot template project from the AdvantageKit release on GitHub and open it in VSCode.
 
 2. Set up the drive subsystem using the instructions found [here](./diff-drive-template.md#setup).

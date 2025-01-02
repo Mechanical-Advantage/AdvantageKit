@@ -117,4 +117,4 @@ Check the [**log replay comparison**](/getting-started/what-is-advantagekit/log-
 
 ### 🚧 Build System Updates
 
-AdvantageKit is currently transitioning to a new build system, which will simplify development and the process of external contribution. We will have more updates to share soon. Additionally, AdvantageKit is in the process of moving Maven hosting from GitHub Packages to the WPILib Artifactory site. This change is intended to provide a more stable and seamless experience when installing and using AdvantageKit. **AdvantageKit v4.0.0-beta-1 remains hosted on GitHub Packages, but look for updates soon.**
+The build system for the AdvantageKit **library** has moved from Bazel to Gradle in order to simplify development and the process of external contribution. We have also moved Maven hosting from GitHub Packages to the WPILib Artifactory site, which will provide a more stable and seamless experience when installing and using AdvantageKit. Check the documentation for details on the updated installation process.
