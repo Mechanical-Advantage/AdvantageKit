@@ -41,11 +41,11 @@ publishing {
             url = releasesRepoUrl
         }
         maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit"
+            name = "frcmaven"
+            url = "https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release/"
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("ARTIFACTORY_USERNAME")
+                password = System.getenv("ARTIFACTORY_PASSWORD")
             }
         }
     }
