@@ -57,6 +57,16 @@ jobs:
         with:
           name: maven_Athena
           path: akit/build/repos/releases
+      - name: "Generate template projects"
+        working-directory: template_projects
+        run: |
+          chmod +x generate_projects.sh
+          ./generate_projects.sh
+      - name: "Build template projects"
+        working-directory: template_projects
+        run: |
+          chmod +x build_generated_projects.sh
+          ./build_generated_projects.sh
 
   build-desktop:
     strategy:
