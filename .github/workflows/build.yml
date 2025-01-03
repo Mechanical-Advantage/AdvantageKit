@@ -62,15 +62,15 @@ jobs:
         run: |
           chmod +x generate_projects.sh
           ./generate_projects.sh
-      - name: "Release: Upload template project (kitbot_2024)"
+      - name: "Release: Upload template project (kitbot_2025)"
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-          asset_path: template_projects/generated/kitbot_2024.zip
-          asset_name: AdvantageKit_KitBot2024Template.zip
+          asset_path: template_projects/generated/kitbot_2025.zip
+          asset_name: AdvantageKit_KitBot2025Template.zip
           asset_content_type: application/zip
       - name: "Release: Upload template project (diff_drive)"
         if: github.event_name == 'release'

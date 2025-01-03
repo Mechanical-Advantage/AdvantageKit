@@ -49,6 +49,7 @@ public class DriveIOSpark implements DriveIO {
     config.closedLoop.pidf(realKp, 0.0, realKd, 0.0);
     config
         .encoder
+        .countsPerRevolution(currentLimit)
         .positionConversionFactor(2 * Math.PI / motorReduction) // Rotor Rotations -> Wheel Radians
         .velocityConversionFactor(
             (2 * Math.PI) / 60.0 / motorReduction) // Rotor RPM -> Wheel Rad/Sec

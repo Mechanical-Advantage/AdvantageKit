@@ -29,7 +29,6 @@ import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
 
   private DriveCommands() {}
@@ -68,18 +67,8 @@ public class DriveCommands {
             () -> {
               velocitySamples.clear();
               voltageSamples.clear();
+              timer.restart();
             }),
-
-        // Allow modules to orient
-        Commands.run(
-                () -> {
-                  drive.runOpenLoop(0.0, 0.0);
-                },
-                drive)
-            .withTimeout(FF_START_DELAY),
-
-        // Start timer
-        Commands.runOnce(timer::restart),
 
         // Accelerate and gather data
         Commands.run(

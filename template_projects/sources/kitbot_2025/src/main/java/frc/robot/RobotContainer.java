@@ -17,7 +17,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -27,11 +26,6 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOTalonSRX;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.launcher.Launcher;
-import frc.robot.subsystems.launcher.LauncherIO;
-import frc.robot.subsystems.launcher.LauncherIOSim;
-import frc.robot.subsystems.launcher.LauncherIOTalonSRX;
-import frc.robot.util.NoteVisualizer;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -43,7 +37,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final Launcher launcher;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -57,32 +50,21 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive = new Drive(new DriveIOTalonSRX(), new GyroIOPigeon2());
-        launcher = new Launcher(new LauncherIOTalonSRX());
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         drive = new Drive(new DriveIOSim(), new GyroIO() {});
-        launcher = new Launcher(new LauncherIOSim());
         break;
 
       default:
         // Replayed robot, disable IO implementations
         drive = new Drive(new DriveIO() {}, new GyroIO() {});
-        launcher = new Launcher(new LauncherIO() {});
         break;
     }
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    autoChooser.addOption(
-        "Launch & Leave (No Encoders)",
-        launcher
-            .launchCommand()
-            .withTimeout(3.0)
-            .andThen(
-                Commands.startEnd(() -> drive.runOpenLoop(-3.0, -3.0), drive::stop, drive)
-                    .withTimeout(3.0)));
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -97,9 +79,6 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    // Set up note visualizer
-    NoteVisualizer.setRobotPoseSupplier(drive::getPose);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -116,10 +95,6 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.arcadeDrive(
             drive, () -> -controller.getLeftY(), () -> -controller.getRightX()));
-
-    // Launcher controls
-    controller.leftBumper().whileTrue(launcher.intakeCommand());
-    controller.rightBumper().whileTrue(launcher.launchCommand());
   }
 
   /**
