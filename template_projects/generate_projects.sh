@@ -2,14 +2,14 @@
 
 # Constants
 WPILIB_VERSION="2025.1.1"
-PROJECTS=(diff_drive kitbot_2024 skeleton spark_swerve talonfx_swerve vision)
+PROJECTS=(kitbot_2024 diff_drive spark_swerve talonfx_swerve vision skeleton)
 VENDORDEPS=(
-    "NavX PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # diff_drive
     "NavX PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # kitbot_2024
-    "WPILibNewCommands" # skeleton
+    "NavX PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # diff_drive
     "NavX PathplannerLib Phoenix6 REVLib URCL WPILibNewCommands" # spark_swerve
     "NavX PathplannerLib Phoenix6 WPILibNewCommands" # talonfx_swerve
     "photonlib WPILibNewCommands" # vision
+    "WPILibNewCommands" # skeleton
 )
 
 # Clear old projects
