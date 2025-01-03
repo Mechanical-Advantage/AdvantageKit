@@ -44,7 +44,7 @@ public class DemoDrive extends SubsystemBase {
   private final DifferentialDrivePoseEstimator poseEstimator =
       new DifferentialDrivePoseEstimator(
           new DifferentialDriveKinematics(Units.inchesToMeters(26)),
-          new Rotation2d(),
+          Rotation2d.kZero,
           0.0,
           0.0,
           new Pose2d());
