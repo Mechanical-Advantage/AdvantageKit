@@ -103,7 +103,7 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.arcadeDrive(
             drive, () -> -controller.getLeftY(), () -> -controller.getRightX()));
-    controller.leftTrigger(0.0).or(controller.rightTrigger(0.0)).whileTrue(roller.runRoller(controller.getRightTriggerAxis(), controller.getLeftTriggerAxis()));
+    controller.leftTrigger(0.0).or(controller.rightTrigger(0.0)).whileTrue(roller.runRoller(() -> controller.getRightTriggerAxis(), () -> controller.getLeftTriggerAxis()));
   }
 
   /**
