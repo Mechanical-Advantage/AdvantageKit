@@ -26,6 +26,10 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOTalonSRX;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.roller.Roller;
+import frc.robot.subsystems.roller.RollerIO;
+import frc.robot.subsystems.roller.RollerSim;
+import frc.robot.subsystems.roller.RollerTalonSRX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -37,6 +41,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Roller roller;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -50,16 +55,19 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive = new Drive(new DriveIOTalonSRX(), new GyroIOPigeon2());
+        roller = new Roller(new RollerIOTalonSRX());
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         drive = new Drive(new DriveIOSim(), new GyroIO() {});
+        roller = new Roller(new RollerIOSim());
         break;
 
       default:
         // Replayed robot, disable IO implementations
         drive = new Drive(new DriveIO() {}, new GyroIO() {});
+        roller = new Roller(new RollerIO() {});
         break;
     }
 
@@ -95,6 +103,7 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.arcadeDrive(
             drive, () -> -controller.getLeftY(), () -> -controller.getRightX()));
+    controller.leftTrigger(0.0).or(controller.rightTrigger(0.0)).whileTrue(roller.runRoller(controller.getRightTriggerAxis(), controller.getLeftTriggerAxis()));
   }
 
   /**
