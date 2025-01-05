@@ -25,8 +25,6 @@ import edu.wpi.first.math.util.Units;
 
 /** This drive implementation is for Talon SRXs driving brushed motors (e.g. CIMS) with encoders. */
 public class RollerIOTalonSRX implements RollerIO {
-    private static final double tickPerRevolution = 1440;
-
     private final TalonSRX roller = new TalonSRX(rollerCanId);
     
     public RollerIOTalonSRX() {
@@ -35,15 +33,12 @@ public class RollerIOTalonSRX implements RollerIO {
         config.continuousCurrentLimit = currentLimit - 15;
         config.peakCurrentDuration = 250;
         config.voltageCompSaturation = 12.0;
-        config.primaryPID.selectedFeedbackSensor = FeedbackDevice.QuadEncoder;
 
         tryUntilOkV5(5, () -> roller.configAllSettings(config));
     }
 
     @Override
     public void updateInputs(RollerIOInputs inputs) {
-        inputs.positionRad = Units.rotationsToRadians(roller.getSelectedSensorPosition() / tickPerRevolution);
-        inputs.velocityRadPerSec = Units.rotationsToRadians(roller.getSelectedSensorVelocity() / tickPerRevolution * 10.0); // Raw units are ticks per 100ms
         inputs.appliedVolts = roller.getMotorOutputVoltage();
         inputs.currentAmps = roller.getStatorCurrent();
     }
