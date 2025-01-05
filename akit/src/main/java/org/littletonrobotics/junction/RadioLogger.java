@@ -21,6 +21,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.littletonrobotics.junction.LogTable.LogValue;
@@ -57,8 +59,8 @@ class RadioLogger {
     statusURLBuilder.append(teamNumber % 100);
     statusURLBuilder.append(".1/status");
     try {
-      statusURL = new URL(statusURLBuilder.toString());
-    } catch (MalformedURLException e) {
+      statusURL = new URI(statusURLBuilder.toString()).toURL();
+    } catch (MalformedURLException | URISyntaxException e) {
       return;
     }
 

@@ -39,7 +39,7 @@ class RecordStruct implements Struct {
   private final List<BiConsumer<ByteBuffer, Object>> packFunctions = new ArrayList<>();
   private final List<Function<ByteBuffer, Object>> unpackFunctions = new ArrayList<>();
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "unused" })
   public RecordStruct(Class<?> recordClass) {
     this.recordClass = recordClass;
     typeName = recordClass.getSimpleName();
