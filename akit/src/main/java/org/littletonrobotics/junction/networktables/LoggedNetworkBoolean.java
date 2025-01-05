@@ -57,7 +57,6 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput {
   public void setDefault(boolean defaultValue) {
     this.defaultValue = defaultValue;
     entry.set(entry.get(defaultValue));
-
   }
 
   /**

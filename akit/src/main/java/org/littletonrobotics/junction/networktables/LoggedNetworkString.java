@@ -57,7 +57,6 @@ public class LoggedNetworkString extends LoggedNetworkInput {
   public void setDefault(String defaultValue) {
     this.defaultValue = defaultValue;
     entry.set(entry.get(defaultValue));
-
   }
 
   /**
