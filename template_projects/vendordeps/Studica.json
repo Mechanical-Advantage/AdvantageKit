@@ -1,0 +1,71 @@
+{
+    "fileName": "Studica.json",
+    "name": "Studica",
+    "version": "2025.0.0",
+    "uuid": "cb311d09-36e9-4143-a032-55bb2b94443b",
+    "frcYear": "2025",
+    "mavenUrls": [
+        "https://dev.studica.com/maven/release/2025/"
+    ],
+    "jsonUrl": "https://dev.studica.com/releases/2025/Studica-2025.0.0.json",
+    "cppDependencies": [
+        {
+            "artifactId": "Studica-cpp",
+            "binaryPlatforms": [
+                "linuxathena",
+                "linuxarm32",
+                "linuxarm64",
+                "linuxx86-64",
+                "osxuniversal",
+                "windowsx86-64"
+            ],
+            "groupId": "com.studica.frc",
+            "headerClassifier": "headers",
+            "libName": "Studica",
+            "sharedLibrary": false,
+            "skipInvalidPlatforms": true,
+            "version": "2025.0.0"
+        },
+        {
+            "artifactId": "Studica-driver",
+            "binaryPlatforms": [
+                "linuxathena",
+                "linuxarm32",
+                "linuxarm64",
+                "linuxx86-64",
+                "osxuniversal",
+                "windowsx86-64"
+            ],
+            "groupId": "com.studica.frc",
+            "headerClassifier": "headers",
+            "libName": "StudicaDriver",
+            "sharedLibrary": false,
+            "skipInvalidPlatforms": true,
+            "version": "2025.0.0"
+        }
+    ],
+    "javaDependencies": [
+        {
+            "artifactId": "Studica-java",
+            "groupId": "com.studica.frc",
+            "version": "2025.0.0"
+        }
+    ],
+    "jniDependencies": [
+        {
+            "artifactId": "Studica-driver",
+            "groupId": "com.studica.frc",
+            "isJar": false,
+            "skipInvalidPlatforms": true,
+            "validPlatforms": [
+                "linuxathena",
+                "linuxarm32",
+                "linuxarm64",
+                "linuxx86-64",
+                "osxuniversal",
+                "windowsx86-64"
+            ],
+            "version": "2025.0.0"
+        }
+    ]
+}
