@@ -16,35 +16,32 @@ package frc.robot.subsystems.roller;
 import static frc.robot.subsystems.roller.RollerConstants.*;
 import static frc.robot.util.PhoenixUtil.tryUntilOkV5;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 
-import edu.wpi.first.math.util.Units;
-
-/** This drive implementation is for Talon SRXs driving brushed motors (e.g. CIMS) with encoders. */
+/** This drive implementation is for a Talon SRX driving a brushed motor. */
 public class RollerIOTalonSRX implements RollerIO {
-    private final TalonSRX roller = new TalonSRX(rollerCanId);
-    
-    public RollerIOTalonSRX() {
-        var config = new TalonSRXConfiguration();
-        config.peakCurrentLimit = currentLimit;
-        config.continuousCurrentLimit = currentLimit - 15;
-        config.peakCurrentDuration = 250;
-        config.voltageCompSaturation = 12.0;
+  private final TalonSRX roller = new TalonSRX(rollerCanId);
 
-        tryUntilOkV5(5, () -> roller.configAllSettings(config));
-    }
+  public RollerIOTalonSRX() {
+    var config = new TalonSRXConfiguration();
+    config.peakCurrentLimit = currentLimit;
+    config.continuousCurrentLimit = currentLimit - 15;
+    config.peakCurrentDuration = 250;
+    config.voltageCompSaturation = 12.0;
 
-    @Override
-    public void updateInputs(RollerIOInputs inputs) {
-        inputs.appliedVolts = roller.getMotorOutputVoltage();
-        inputs.currentAmps = roller.getStatorCurrent();
-    }
+    tryUntilOkV5(5, () -> roller.configAllSettings(config));
+  }
 
-    @Override
-    public void setVoltage(double volts) {
-        roller.set(TalonSRXControlMode.PercentOutput, volts * 12.0);
-    }
+  @Override
+  public void updateInputs(RollerIOInputs inputs) {
+    inputs.appliedVolts = roller.getMotorOutputVoltage();
+    inputs.currentAmps = roller.getStatorCurrent();
+  }
+
+  @Override
+  public void setVoltage(double volts) {
+    roller.set(TalonSRXControlMode.PercentOutput, volts * 12.0);
+  }
 }

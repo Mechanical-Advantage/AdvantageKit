@@ -14,6 +14,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,8 +29,8 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.roller.Roller;
 import frc.robot.subsystems.roller.RollerIO;
-import frc.robot.subsystems.roller.RollerSim;
-import frc.robot.subsystems.roller.RollerTalonSRX;
+import frc.robot.subsystems.roller.RollerIOSim;
+import frc.robot.subsystems.roller.RollerIOTalonSRX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -72,6 +73,7 @@ public class RobotContainer {
     }
 
     // Set up auto routines
+    NamedCommands.registerCommand("Score", roller.runPercent(1.0).withTimeout(3.0));
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
@@ -99,11 +101,15 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command, normal arcade drive
+    // Default drive command, normal arcade drive
     drive.setDefaultCommand(
         DriveCommands.arcadeDrive(
             drive, () -> -controller.getLeftY(), () -> -controller.getRightX()));
-    controller.leftTrigger(0.0).or(controller.rightTrigger(0.0)).whileTrue(roller.runRoller(() -> controller.getRightTriggerAxis(), () -> controller.getLeftTriggerAxis()));
+
+    // Default roller command, control with triggers
+    roller.setDefaultCommand(
+        roller.runTeleop(
+            () -> controller.getRightTriggerAxis(), () -> controller.getLeftTriggerAxis()));
   }
 
   /**
