@@ -23,7 +23,7 @@ sidebar_position: 1
 - Added replay watch feature ([docs](/getting-started/replay-watch), [example](/getting-started/what-is-advantagekit/example-rapid-iteration))
 - Added record logging with structs ([docs](/data-flow/supported-types#records))
 - Added support for 2D array logging ([docs](/data-flow/supported-types#simple))
-- Added support for primitive supplier logging as outputs ([docs](/data-flow/supported-types#supplier-output-only))
+- Added support for primitive supplier logging as outputs ([docs](/data-flow/supported-types#suppliers-output-only))
 - Added support for recursive input logging
 - Added automatic alerts logging ([docs](/data-flow/built-in-logging#alerts))
 - Added automatic logging for VH-109 radio ([docs](/data-flow/built-in-logging#radio-status))
