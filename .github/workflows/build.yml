@@ -128,7 +128,7 @@ jobs:
       matrix:
         include:
           - name: "Linux"
-            runner-image: ubuntu-latest
+            runner-image: ubuntu-22.04
             classifier: "linuxx86-64"
           - name: "macOS"
             runner-image: macos-latest
