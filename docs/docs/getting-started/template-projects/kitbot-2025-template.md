@@ -21,6 +21,6 @@ The AdvantageKit 2025 KitBot template is **open-source** and **fully customizabl
 
 2. Set up the drive subsystem using the instructions found [here](./diff-drive-template.md#setup).
 
-3. In the constructor of RobotContainer, switch the IO implementation instantiated for the rollers based on your chosen hardware. The default is the Talon SRX.
+3. In the constructor of `RobotContainer`, switch the IO implementation instantiated for the rollers based on your chosen hardware. The default is the Talon SRX.
 
 4. In `RollerConstants`, update the device CAN ID to the correct CAN ID of the motor controller (as configured in Phoenix Tuner or REV Hardware Client)
