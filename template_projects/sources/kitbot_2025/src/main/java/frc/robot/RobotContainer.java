@@ -14,6 +14,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +27,10 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOTalonSRX;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.roller.Roller;
+import frc.robot.subsystems.roller.RollerIO;
+import frc.robot.subsystems.roller.RollerIOSim;
+import frc.robot.subsystems.roller.RollerIOTalonSRX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -37,6 +42,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Roller roller;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -50,20 +56,24 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive = new Drive(new DriveIOTalonSRX(), new GyroIOPigeon2());
+        roller = new Roller(new RollerIOTalonSRX());
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         drive = new Drive(new DriveIOSim(), new GyroIO() {});
+        roller = new Roller(new RollerIOSim());
         break;
 
       default:
         // Replayed robot, disable IO implementations
         drive = new Drive(new DriveIO() {}, new GyroIO() {});
+        roller = new Roller(new RollerIO() {});
         break;
     }
 
     // Set up auto routines
+    NamedCommands.registerCommand("Score", roller.runPercent(1.0).withTimeout(3.0));
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
@@ -91,10 +101,15 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command, normal arcade drive
+    // Default drive command, normal arcade drive
     drive.setDefaultCommand(
         DriveCommands.arcadeDrive(
             drive, () -> -controller.getLeftY(), () -> -controller.getRightX()));
+
+    // Default roller command, control with triggers
+    roller.setDefaultCommand(
+        roller.runTeleop(
+            () -> controller.getRightTriggerAxis(), () -> controller.getLeftTriggerAxis()));
   }
 
   /**
