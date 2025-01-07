@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Annotation Logging
 
-The `@AutoLogOutput` annotation can also be used to automatically log the value of a field or getter method as an output periodically (including private fields and methods). The key will be selected automatically, or it can be overriden using the `key` parameter. All data types are supported, including arrays and structured data types.
+The `@AutoLogOutput` annotation can also be used to automatically log the value of a field or getter method as an output periodically (including private fields and methods). The key will be selected automatically, or it can be overridden using the `key` parameter. All data types are supported, including arrays and structured data types.
 
 ```java
 public class Example {
