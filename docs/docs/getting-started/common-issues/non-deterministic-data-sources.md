@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Non-Deterministic Data Sources
 
-AdvantageKit replay relies on all data sources being deterministic and synchronized. IO interfaces ensure this is the case for subsystems, and AdvantageKit automatically handles replay for some core WPILib classes (see [here](/data-flow/built-in-logging) for details). However, it's easy to accidentally use data from sources that are not properly logged. **We recommend regularly testing out log replay during development to confirm that the replay outputs match the real outputs.** Spotting mistakes like this early is the key to fixing them before it becomes a critical issue at an event.
+AdvantageKit replay relies on all data sources being deterministic and synchronized. IO interfaces ensure this is the case for subsystems, and AdvantageKit automatically handles replay for some core WPILib classes (see [here](/data-flow/built-in-logging) for details). However, it's easy to accidentally use data from sources that are not properly logged. **We recommend regularly testing out log replay during development to confirm that the replay outputs match the real outputs.** Spotting mistakes like this early is the key to fixing them before they become a critical issue at an event.
 
 Some common non-deterministic data sources to watch out for include:
 
