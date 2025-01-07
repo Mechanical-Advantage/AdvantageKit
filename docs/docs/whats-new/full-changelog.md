@@ -42,7 +42,7 @@ sidebar_position: 1
 - Improved warnings for protobuf and record logging
 - Removed deprecated `LogTable` getters
 - Removed deprecated `Logger.getInstance()` method
-- Changed user code time for first cycle to include `Robot` constructor
+- Changed user code time for the first cycle to include the `Robot` constructor
 - Added `[AdvantageKit]` prefix to all console message
 - Added `AdvantageKit_` prefix to all thread names
 
@@ -58,4 +58,4 @@ sidebar_position: 1
 - Added search to docs
 - Added log replay comparison docs ([link](/getting-started/what-is-advantagekit/log-replay-comparison))
 - Updated recommended auto-commit system
-- Switchd recommended setup location from `robotInit` to constructor of `Robot`
+- Switched recommended setup location from `robotInit` to the constructor of `Robot`
