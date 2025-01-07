@@ -24,7 +24,7 @@ Every AdvantageKit template is **open-source** and **fully customizable**:
 
 ### 🎉 No Shims
 
-Since its initial release, AdvantageKit has relied on shimming some WPILib classes to enable deterministic replay. Thanks to a collaborative effort with the WPILib team, we are thrilled to announce that **AdvantageKit no longer uses WPILib shims**. Deterministic logging and replay is still fully supported with minimal changes to the user experience. See [this page](/data-flow/built-in-logging) for details on the data available during replay.
+Since its initial release, AdvantageKit has relied on shimming some WPILib classes to enable deterministic replay. Thanks to a collaborative effort with the WPILib team, we are thrilled to announce that **AdvantageKit no longer uses WPILib shims**. Deterministic logging and replay are still fully supported with minimal changes to the user experience. See [this page](/data-flow/built-in-logging) for details on the data available during replay.
 
 :::warning
 Deterministic timestamps are now provided by the `RobotController.getTime()` and `Timer.getTimestamp()` methods, used by default by built-in WPILib classes. The older `RobotController.getFPGATime()` and `Timer.getFPGATimestamp()` methods are now used for accessing the real (non-deterministic) timestamp, and should only be used within IO implementations or for performance profiling.
@@ -57,7 +57,7 @@ Custom [record](https://www.baeldung.com/java-record-keyword) classes can be log
 
 ![Record struct](./img/record-struct.png)
 
-This code below shows how this feature is used in the new [vision template](/getting-started/template-projects/vision-template) for logging pose observations:
+The code below shows how this feature is used in the new [vision template](/getting-started/template-projects/vision-template) for logging pose observations:
 
 ```java
 @AutoLog
