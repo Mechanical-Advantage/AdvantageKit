@@ -44,7 +44,7 @@ The project is primarily configured via the `VisionConstants` class, with commen
 In addition to pose estimation, this project include an example of simple targeting with AprilTags. For many games and robots, this is a significantly simpler method of accomplishing game objectives. Check the `getTargetX` method of `Vision` and `configureButtonBindings` method of `RobotContainer` for details.
 :::
 
-The vision subsystems logs a large set of outputs that can be used for debugging and tuning. Each camera logs the following fields:
+The vision subsystems log a large set of outputs that can be used for debugging and tuning. Each camera logs the following fields:
 
 - `TagPoses`: A list of 3D poses representing the set of visible tags. We recommend visualizing this field using the "Vision Target" object on the 3D field tab in AdvantageScope.
 - `RobotPoses`: A list of 3D poses representing the raw pose estimates from the last cycle. We recommend visualizing this field using the "Ghost" object on the 3D field tab in AdvantageScope.
