@@ -6,7 +6,7 @@ sidebar_position: 4
 
 Some uses cases of log replay benefit from rapid iteration. One such example is tuning pose estimation algorithms. WPILib's [built-in pose estimators](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-pose-estimators.html) include gains that adjust the trust in odometry and vision values. Adjusting these gains affects the stability and responsiveness of the pose estimates, but accurate testing requires real-world conditions (since the algorithm needs to be tuned to deal with the noise of real match conditions).
 
-AdvantageKit includes a feature called [replay watch](../replay-watch.md) which is intended to address use cases that benefit from rapid iteration. The task is launched in the background, then changes to the code are immediately replayed and displayed in AdvantageScope.
+AdvantageKit includes a feature called [replay watch](../replay-watch.md) which is intended to address use cases that benefit from rapid iteration. The task is launched in the background, and then changes to the code are immediately replayed and displayed in AdvantageScope.
 
 The video below demonstrates how vision standard deviations (trust values) can be tuned in replay based on the output of the pose estimator. The original outputs are shown in red, and the replayed outputs are shown in blue.
 
@@ -18,11 +18,11 @@ The replay process shown in the video is in running in real-time. The replay dur
 
 Several versions of the vision gains are tested in the video:
 
-- **Normal trust in vision** produces identical outputs to the original pose estimates, which validates that deterministic replay is working correctly.
+- **Normal trust in vision** produces identical outputs to the original pose estimates, which validate that deterministic replay is working correctly.
 
 ![Normal tuning](./img/example-iteration-1.png)
 
-- **High trust in vision** produces more reponsive but much noisier pose estimates.
+- **High trust in vision** produces more responsive but much noisier pose estimates.
 
 ![High trust in vision](./img/example-iteration-2.png)
 
