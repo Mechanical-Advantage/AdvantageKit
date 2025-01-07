@@ -27,7 +27,7 @@ for project in "${PROJECTS[@]}"; do
     sed -i '' -e "s/WPILIB_VERSION/$WPILIB_VERSION/g" generated/$project/build.gradle
 
     # Add sources
-    cp -r sources/$project/ generated/$project
+    rsync -r sources/$project/ generated/$project/
 
     # Add AdvantageKit vendordep
     mkdir generated/$project/vendordeps
