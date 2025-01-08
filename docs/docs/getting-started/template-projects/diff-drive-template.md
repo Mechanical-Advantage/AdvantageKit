@@ -91,7 +91,7 @@ The effective wheel radius of a robot tends to change over time as wheels are wo
 
 We recommend the following process to measure wheel radius:
 
-1. Place the robot on a carpet. Characterizing on a hard floor may produce errors in the measurement, as the robot's effective wheel radius is affected by carpet compression.
+1. Place the robot on carpet. Characterizing on a hard floor may produce errors in the measurement, as the robot's effective wheel radius is affected by carpet compression.
 
 2. Using AdvantageScope, record the values of `/Drive/LeftPositionRad` and `/Drive/RightPositionRad`.
 

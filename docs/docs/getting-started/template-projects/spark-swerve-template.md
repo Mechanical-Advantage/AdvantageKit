@@ -134,11 +134,11 @@ The effective wheel radius of a robot tends to change over time as wheels are wo
 
 The project includes an automated wheel radius characterization routine, which only requires enough space for the robot to rotate in place.
 
-1. Place the robot on a carpet. Characterizing on a hard floor may produce errors in the measurement, as the robot's effective wheel radius is affected by carpet compression.
+1. Place the robot on carpet. Characterizing on a hard floor may produce errors in the measurement, as the robot's effective wheel radius is affected by carpet compression.
 
 2. Select the "Drive Wheel Radius Characterization" auto routine.
 
-3. Enable the robot to be autonomous. The robot will slowly rotate in place.
+3. Enable the robot in autonomous. The robot will slowly rotate in place.
 
 4. Disable the robot after at least one full rotation.
 

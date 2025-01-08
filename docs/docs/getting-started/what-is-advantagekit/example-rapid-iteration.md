@@ -18,7 +18,7 @@ The replay process shown in the video is in running in real-time. The replay dur
 
 Several versions of the vision gains are tested in the video:
 
-- **Normal trust in vision** produces identical outputs to the original pose estimates, which validate that deterministic replay is working correctly.
+- **Normal trust in vision** produces identical outputs to the original pose estimates, which validates that deterministic replay is working correctly.
 
 ![Normal tuning](./img/example-iteration-1.png)
 

@@ -73,5 +73,5 @@ Several important fields are automatically recorded to measure the performance o
 - `LoggedRobot/LogPeriodicMS`: The execution time of all AdvantageKit periodic code.
 - `LoggedRobot/GCTimeMS`: The total execution time of the Java garbage collector within the last loop cycle, may or may not overlap with other code execution.
 - `LoggedRobot/GCCount`: The total number of collections performed by the Java garbage collector within the last loop cycle.
-- `Logger/QueuedCycle`: The number of cycles of data in the queue to be written to data receivers.
+- `Logger/QueuedCycle`: The number of cycles of data in queue to be written to data receivers.
 - `Logger/...MS`: The execution time of each step of the AdvantageKit periodic code.
