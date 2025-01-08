@@ -20,7 +20,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Step-by-step setup and tuning instructions with a prebuilt AdvantageScope layout
 - **Deterministic replay** with a **guarantee of accuracy**
 
-By default, the TalonFX version of the swerve template is configured for robots with **four TalonFX drive motors, four TalonFX turn motors, four CANcoder, and a NavX or Pigeon 2 gyro**. See the [Spark Swerve Template](spark-swerve-template.md) for swerve robots using Spark Max/Flex.
+By default, the TalonFX version of the swerve template is configured for robots with **four TalonFX drive motors, four TalonFX turn motors, four CANcoders, and a NavX or Pigeon 2 gyro**. See the [Spark Swerve Template](spark-swerve-template.md) for swerve robots using Spark Max/Flex.
 
 :::info
 The AdvantageKit swerve templates are **open-source** and **fully customizable**:
@@ -101,11 +101,11 @@ The project is configured to save log files when running on a real robot. **A FA
 The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**
 :::
 
-15. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `k...SteerMotorInverted` or `kSteerGearRatio`.
+15. Manually rotate the turning position of each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `k...SteerMotorInverted` or `kSteerGearRatio`.
 
 16. Manually rotate each drive wheel and view the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `kDriveGearRatio`.
 
-17. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forwards.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
+17. Manually rotate each module to align it directly forward. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forward.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
 
 18. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `k...EncoderOffset` for each module to `Radians.of(<insert value>)`. **The value saved in `TunerConstants` must be the _negative_ of the value displayed in AdvantageScope (i.e. positive values become negative and vice versa).**
 
@@ -134,7 +134,7 @@ The AdvantageKit template requires different feedforward gains than CTRE's defau
 The drive `kS` and `kV` gains should **always** be characterized (as described below). The drive/turn `kA` gains and turn `kS` and `kV` gains are unnecessary in most cases, but can be tuned by advanced users.
 :::
 
-The project includes a simple feedforward routine that can be used to quicly measure the drive `kS` and `kV` values without requiring [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html):
+The project includes a simple feedforward routine that can be used to quickly measure the drive `kS` and `kV` values without requiring [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html):
 
 1. Tune turning PID gains as described [here](#driveturn-pid-tuning).
 
@@ -186,7 +186,7 @@ The project includes an automated wheel radius characterization routine, which o
 
 2. Select the "Drive Wheel Radius Characterization" auto routine.
 
-3. Enable the robot is autonomous. The robot will slowly rotate in place.
+3. Enable the robot in autonomous. The robot will slowly rotate in place.
 
 4. Disable the robot after at least one full rotation.
 
@@ -216,11 +216,11 @@ The effective maximum speed of a robot is typically slightly less than the thero
 
 1. Set `kSpeedAt12Volts` in `TunerConstants.java` to the theoretical max speed of the robot based on motor free speed and gearing. This value can typically be found on the product page for your chosen swerve modules.
 
-2. Place the robot in a open space.
+2. Place the robot in an open space.
 
 3. Plot the measured robot speed in AdvantageScope using the `/RealOutputs/SwerveChassisSpeeds/Measured` field.
 
-4. In teleop, drive forwards at full speed until the robot velocity is no longer increasing.
+4. In teleop, drive forward at full speed until the robot's velocity is no longer increasing.
 
 5. Record the maximum velocity achieved and update the value of `kSpeedAt12Volts`.
 
@@ -232,7 +232,7 @@ The value of `kSlipCurrent` can be tuned to avoid slipping the wheels.
 
 2. Using AdvantageScope, plot the current of a drive motor from the `/Drive/Module.../DriveCurrentAmps` key, and the velocity of the motor from the `/Drive/Module.../DriveVelocityRadPerSec` key.
 
-3. Accelerate forwards until the drive velocity increases (the wheel slips). Note the current at this time.
+3. Accelerate forward until the drive velocity increases (the wheel slips). Note the current at this time.
 
 4. Update the value of `kSlipCurrent` to this value.
 

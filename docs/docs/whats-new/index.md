@@ -57,7 +57,7 @@ Custom [record](https://www.baeldung.com/java-record-keyword) classes can be log
 
 ![Record struct](./img/record-struct.png)
 
-This code below shows how this feature is used in the new [vision template](/getting-started/template-projects/vision-template) for logging pose observations:
+The code below shows how this feature is used in the new [vision template](/getting-started/template-projects/vision-template) for logging pose observations:
 
 ```java
 @AutoLog

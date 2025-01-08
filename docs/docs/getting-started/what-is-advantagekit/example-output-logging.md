@@ -10,7 +10,7 @@ Let's look at a concrete example of AdvantageKit in action. Below is a plot from
 
 During teleop, this speed is based on the distance between the robot and the target. We might want to check that the flywheel speed calculation is working correctly, but this log doesn't include the calculated distance that was used. **Let's use AdvantageKit to replay the log and produce this new data.**
 
-First, we need to run the replay using the same version of code that generated this log. AdvantageKit can save metadata with the log file, and we've already stored the Git hash (uniquely identifying the version of code that was running on the robot):
+First, we need to run the replay using the same version of the code that generated this log. AdvantageKit can save metadata with the log file, and we've already stored the Git hash (uniquely identifying the version of code that was running on the robot):
 
 ![Viewing metadata](img/example-2.png)
 

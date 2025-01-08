@@ -13,7 +13,7 @@ var flywheelSetpoint = SmartDashboard.getNumber("FlywheelSpeed", 0.0);
 AdvantageKit provides several solutions to deal with this issue:
 
 - For subsystems that use NT input data (reading from coprocessors), we recommend treating the NetworkTables interaction as a hardware interface using an IO layer. See the [vision template project](/getting-started/template-projects/vision-template) as an example.
-- When reading dashboard inputs from NT (auto selector, tuning values, etc) AdvantageKit includes the following classes which correctly handle periodic logging and replay:
+- When reading dashboard inputs from NT (auto selector, tuning values, etc) AdvantageKit includes the following classes that correctly handle periodic logging and replay:
   - [`LoggedDashboardChooser`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/junction/core/src/org/littletonrobotics/junction/networktables/LoggedDashboardChooser.java) - Replaces `SendableChooser` with equivalent functionality. See the example below.
   - [`LoggedNetworkNumber`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/junction/core/src/org/littletonrobotics/junction/networktables/LoggedNetworkNumber.java) - Simple number field
   - [`LoggedNetworkString`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/junction/core/src/org/littletonrobotics/junction/networktables/LoggedNetworkString.java) - Simple string field
@@ -41,7 +41,7 @@ public Command getAutonomousCommand() {
 AdvantageScope supports tuning via NetworkTables when running in the AdvantageKit NetworkTables mode. Tunable values must be published to the "/Tuning" table using `LoggedNetworkNumber`, `LoggedNetworkString`, or `LoggedNetworkBoolean`. Check the [AdvantageScope docs](https://docs.advantagescope.org/getting-started/connect-live#tuning-with-advantagekit) for details.
 :::
 
-A `LoggedDashboardChooser` can also be constructed using an existing `SendableChooser`, which allows for compatibility PathPlanner's `AutoBuilder` API:
+A `LoggedDashboardChooser` can also be constructed using an existing `SendableChooser`, which allows for compatibility with PathPlanner's `AutoBuilder` API:
 
 ```java
 private final LoggedDashboardChooser<Command> autoChooser;

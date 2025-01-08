@@ -63,7 +63,7 @@ The project is configured to save log files when running on a real robot. **A FA
 
 The project includes default [feedforward gains](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-feedforward.html#introduction-to-dc-motor-feedforward) for velocity control (`kS` and `kV`).
 
-The project includes a simple feedforward routine that can be used to quicly measure the drive `kS` and `kV` values without requiring [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html):
+The project includes a simple feedforward routine that can be used to quickly measure the drive `kS` and `kV` values without requiring [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html):
 
 1. Place the robot in an open space.
 
@@ -89,13 +89,13 @@ Users who wish to characterize acceleration gains (`kA`) can choose to use the f
 
 The effective wheel radius of a robot tends to change over time as wheels are worn down, swapped, or compress into the carpet. This can have significant impacts on odometry accuracy. We recommend regularly recharacterizing wheel radius to combat these issues.
 
-We recommend the follow process to measure wheel radius:
+We recommend the following process to measure wheel radius:
 
 1. Place the robot on carpet. Characterizing on a hard floor may produce errors in the measurement, as the robot's effective wheel radius is affected by carpet compression.
 
 2. Using AdvantageScope, record the values of `/Drive/LeftPositionRad` and `/Drive/RightPositionRad`.
 
-3. Manually push the robot directly forwards as far as possible (at least 10 feet).
+3. Manually push the robot directly forward as far as possible (at least 10 feet).
 
 4. Using a tape measure, record the linear distance traveled by the robot.
 
@@ -123,11 +123,11 @@ The effective maximum speed of a robot is typically slightly less than the thero
 
 1. Set `maxSpeedMetersPerSec` in `DriveConstants.java` to the theoretical max speed of the robot based on motor free speed and gearing.
 
-2. Place the robot in a open space.
+2. Place the robot in an open space.
 
 3. Plot the measured robot speed in AdvantageScope using the `/RealOutputs/Drive/LeftVelocityMetersPerSec` and `/RealOutputs/Drive/RightVelocityMetersPerSec` fields.
 
-4. In teleop, drive forwards at full speed until the robot velocity is no longer increasing.
+4. In teleop, drive forward at full speed until the robot's velocity is no longer increasing.
 
 5. Record the maximum velocity achieved and update the value of `maxSpeedMetersPerSec`.
 
@@ -145,7 +145,7 @@ To change the gyro implementation, switch `new GyroIOPigeon2()` in the `RobotCon
 
 ### Custom Motor Implementations
 
-The implementation of `ModuleIO` can be freely customized to support alternative hardware configurations, including robot without encoders. For example, the `DriveIOSpark` implementation can be customized for brushed motors by changing `MotorType.kBrushless` to `MotorType.kBrushed` and configuring the encoder counts per revolution by calling `config.encoder.countsPerRevolution(...)`.
+The implementation of `ModuleIO` can be freely customized to support alternative hardware configurations, including robots without encoders. For example, the `DriveIOSpark` implementation can be customized for brushed motors by changing `MotorType.kBrushless` to `MotorType.kBrushed` and configuring the encoder counts per revolution by calling `config.encoder.countsPerRevolution(...)`.
 
 ### Vision Integration
 

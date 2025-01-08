@@ -7,7 +7,7 @@ sidebar_position: 2
 AdvantageKit automatically logs many important fields as inputs or outputs. No configuration is required to use these features.
 
 :::info
-Built-in input values are available during replay with guaranteed accuracy, and can be freely accessed in user code without manual logging. **All other inputs must be logged using an [IO interface](./recording-inputs/io-interfaces.md).**
+Built-in input values are available during replay with guaranteed accuracy and can be freely accessed in user code without manual logging. **All other inputs must be logged using an [IO interface](./recording-inputs/io-interfaces.md).**
 :::
 
 ## Inputs
@@ -38,7 +38,7 @@ The state of any alerts created through WPILib's [persistent alerts](https://doc
 
 ### Console
 
-Console output is automatically logged by AdvantageKit to the `Console"`field, and can be viewed using AdvantageScope's 💬 [Console](https://docs.advantagescope.org/tab-reference/console) tab. This field are available under the `RealOutputs` or `ReplayOutputs` table.
+Console output is automatically logged by AdvantageKit to the `Console` field, and can be viewed using AdvantageScope's 💬 [Console](https://docs.advantagescope.org/tab-reference/console) tab. This field is available under the `RealOutputs` or `ReplayOutputs` table.
 
 :::info
 Output from native code is not included when running in simulation.
@@ -72,6 +72,6 @@ Several important fields are automatically recorded to measure the performance o
 - `LoggedRobot/UserCodeMs`: The execution time of all user periodic code.
 - `LoggedRobot/LogPeriodicMS`: The execution time of all AdvantageKit periodic code.
 - `LoggedRobot/GCTimeMS`: The total execution time of the Java garbage collector within the last loop cycle, may or may not overlap with other code execution.
-- `LoggedRobot/GCCount`: The total number of collections performance by the Java garbage collector within the last loop cycle.
+- `LoggedRobot/GCCount`: The total number of collections performed by the Java garbage collector within the last loop cycle.
 - `Logger/QueuedCycle`: The number of cycles of data in queue to be written to data receivers.
-- `Logger/...MS`: The excution time of each step of the AdvantageKit periodic code.
+- `Logger/...MS`: The execution time of each step of the AdvantageKit periodic code.

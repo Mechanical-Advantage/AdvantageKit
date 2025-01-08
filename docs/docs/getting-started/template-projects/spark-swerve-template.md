@@ -64,11 +64,11 @@ The swerve project folder includes a predefined AdvantageScope layout with tabs 
 The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**
 :::
 
-14. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `turnInverted`, `turnEncoderInverted`, or `turnMotorReduction`.
+14. Manually rotate the turning position of each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `turnInverted`, `turnEncoderInverted`, or `turnMotorReduction`.
 
 15. Manually rotate each drive wheel and view the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `driveMotorReduction`.
 
-16. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forwards.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
+16. Manually rotate each module to align it directly forward. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forward.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
 
 17. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `...ZeroRotation` for each module to `new Rotation2d(<insert value>)`.
 
@@ -78,7 +78,7 @@ The project is configured to save log files when running on a real robot. **A FA
 
 The project includes default [feedforward gains](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-feedforward.html#introduction-to-dc-motor-feedforward) for velocity control of the drive motors (`kS` and `kV`).
 
-The project includes a simple feedforward routine that can be used to quicly measure the drive `kS` and `kV` values without requiring [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html):
+The project includes a simple feedforward routine that can be used to quickly measure the drive `kS` and `kV` values without requiring [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html):
 
 1. Tune turning PID gains as described [here](#driveturn-pid-tuning).
 
@@ -86,7 +86,7 @@ The project includes a simple feedforward routine that can be used to quicly mea
 
 3. Select the "Drive Simple FF Characterization" auto routine.
 
-4. Enable the robot in autonomous. The robot will slowly accelerate forwards, similar to a SysId quasistic test.
+4. Enable the robot in autonomous. The robot will slowly accelerate forward, similar to a SysId quasistic test.
 
 5. Disable the robot after at least ~5-10 seconds.
 
@@ -138,7 +138,7 @@ The project includes an automated wheel radius characterization routine, which o
 
 2. Select the "Drive Wheel Radius Characterization" auto routine.
 
-3. Enable the robot is autonomous. The robot will slowly rotate in place.
+3. Enable the robot in autonomous. The robot will slowly rotate in place.
 
 4. Disable the robot after at least one full rotation.
 
@@ -180,7 +180,7 @@ The value of `driveMotorCurrentLimit` can be tuned to avoid slipping the wheels.
 
 2. Using AdvantageScope, plot the current of a drive motor from the `/Drive/Module.../DriveCurrentAmps` key, and the velocity of the motor from the `/Drive/Module.../DriveVelocityRadPerSec` key.
 
-3. Accelerate forwards until the drive velocity increases (the wheel slips). Note the current at this time.
+3. Accelerate forward until the drive velocity increases (the wheel slips). Note the current at this time.
 
 4. Update the value of `driveMotorCurrentLimit` to this value.
 
@@ -226,7 +226,7 @@ The implementation of `ModuleIOSpark` can be freely customized to support altern
 
 As described in the previous section, the `SparkOdometryThread` supports non-Spark signals through the `registerSignal` method. This allows devices from different vendors to be freely mixed.
 
-By default, the project uses a duty cycle encoder connected to a turn Spark Max. When using another absolute encoder (such as a CANcoder or HELIUM Canandmag), we recommend reseting the relative encoder based on the absolute encoder; the relative encoder can then be used for PID control. In this case, the following changes are required:
+By default, the project uses a duty cycle encoder connected to a turn Spark Max. When using another absolute encoder (such as a CANcoder or HELIUM Canandmag), we recommend resetting the relative encoder based on the absolute encoder; the relative encoder can then be used for PID control. In this case, the following changes are required:
 
 1. Create the encoder object in `ModuleIOSpark` and configure it appropriately.
 
