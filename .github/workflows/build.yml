@@ -146,6 +146,7 @@ jobs:
             classifier: "windowsx86-64"
     name: "Build for ${{ matrix.name }}"
     runs-on: ${{ matrix.runner-image }}
+    container: ""
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
