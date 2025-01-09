@@ -139,7 +139,7 @@ jobs:
           - name: "Linux (arm64)"
             runner-image: ubuntu-22.04
             classifier: "linuxarm64"
-            container: wpilib/raspbian-cross-ubuntu:bookworm-22.04
+            container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
           - name: "macOS"
             runner-image: macos-latest
             classifier: "osxuniversal"
@@ -160,6 +160,7 @@ jobs:
           distribution: "temurin"
           java-version: "17"
       - name: "Setup Python"
+        if: matrix.classifier != "linuxarm64"
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
