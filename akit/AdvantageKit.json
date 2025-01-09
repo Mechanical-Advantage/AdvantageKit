@@ -24,10 +24,10 @@
       "isJar": false,
       "validPlatforms": [
         "linuxathena",
-        "windowsx86-64",
         "linuxx86-64",
         "linuxarm64",
-        "osxuniversal"
+        "osxuniversal",
+        "windowsx86-64"
       ]
     }
   ],
