@@ -168,9 +168,6 @@ jobs:
       - name: "Install Python dependencies"
         if: matrix.classifier != 'linuxarm64'
         run: pip install requests
-      - name: Install arm64 toolchain
-        if: matrix.classifier == 'linuxarm64'
-        run: curl -SL https://github.com/wpilibsuite/opensdk/releases/download/v2025-1/arm64-bookworm-2025-x86_64-linux-gnu-Toolchain-12.2.0.tgz | sh -c 'mkdir -p /usr/local && cd /usr/local && tar xzf - --strip-components=2'
       - name: "Build and test"
         run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1
       - name: "Development: Publish local"
