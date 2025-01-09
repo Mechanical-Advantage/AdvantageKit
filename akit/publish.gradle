@@ -76,7 +76,6 @@ publish.dependsOn build
 model {
     publishing {
         def wpilibioTaskList = createComponentZipTasks($.components, ['wpilibio'], wpilibioZipBaseName, Zip, project, includeStandardZipFormat)
-        println(wpilibioTaskList)
         def skipJava = project.hasProperty("skipJava")
         publications {
             wpilibio(MavenPublication) {
