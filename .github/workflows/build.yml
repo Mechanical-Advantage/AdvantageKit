@@ -55,7 +55,7 @@ jobs:
       - name: "Upload local repo"
         uses: actions/upload-artifact@v4
         with:
-          name: maven_Athena
+          name: maven_linuxathena
           path: akit/build/repos/releases
       - name: "Generate template projects"
         working-directory: template_projects
@@ -132,27 +132,37 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: "Linux"
+          - name: "Linux (x64)"
             runner-image: ubuntu-22.04
             classifier: "linuxx86-64"
+            container: ""
+          - name: "Linux (arm64)"
+            runner-image: ubuntu-22.04
+            classifier: "linuxarm64"
+            container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
           - name: "macOS"
             runner-image: macos-latest
             classifier: "osxuniversal"
+            container: ""
           - name: "Windows"
             runner-image: windows-latest
             classifier: "windowsx86-64"
+            container: ""
     name: "Build for ${{ matrix.name }}"
     runs-on: ${{ matrix.runner-image }}
+    container: ${{ matrix.container }}
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
       - name: "Setup Java"
         uses: actions/setup-java@v3
+        if: matrix.classifier != 'linuxarm64'
         with:
           distribution: "temurin"
           java-version: "17"
       - name: "Setup Python"
         uses: actions/setup-python@v5
+        if: matrix.classifier != 'linuxarm64'
         with:
           python-version: "3.13"
       - name: "Install Python dependencies"
@@ -176,7 +186,7 @@ jobs:
       - name: "Upload local repo"
         uses: actions/upload-artifact@v4
         with:
-          name: maven_${{ matrix.name }}
+          name: maven_${{ matrix.classifier }}
           path: akit/build/repos/releases
 
   combine:
@@ -187,29 +197,35 @@ jobs:
       - name: "Download Athena"
         uses: actions/download-artifact@v4
         with:
-          name: maven_Athena
-          path: maven_Athena
-      - name: "Download Linux"
+          name: maven_linuxathena
+          path: maven_linuxathena
+      - name: "Download Linux (x64)"
         uses: actions/download-artifact@v4
         with:
-          name: maven_Linux
-          path: maven_Linux
+          name: maven_linuxx86-64
+          path: maven_linuxx86-64
+      - name: "Download Linux (arm64)"
+        uses: actions/download-artifact@v4
+        with:
+          name: maven_linuxarm64
+          path: maven_linuxarm64
       - name: "Download macOS"
         uses: actions/download-artifact@v4
         with:
-          name: maven_macOS
-          path: maven_macOS
+          name: maven_osxuniversal
+          path: maven_osxuniversal
       - name: "Download Windows"
         uses: actions/download-artifact@v4
         with:
-          name: maven_Windows
-          path: maven_Windows
+          name: maven_windowsx86-64
+          path: maven_windowsx86-64
       - name: "Combine"
         run: |
-          rsync -a maven_Athena/* maven_offline
-          rsync -a maven_macOS/* maven_offline
-          rsync -a maven_Linux/* maven_offline
-          rsync -a maven_Windows/* maven_offline
+          rsync -a maven_linuxathena/* maven_offline
+          rsync -a maven_linuxx86-64/* maven_offline
+          rsync -a maven_linuxarm64/* maven_offline
+          rsync -a maven_osxuniversal/* maven_offline
+          rsync -a maven_windowsx86-64/* maven_offline
           zip -r maven_offline.zip maven_offline
       - name: "Upload artifact"
         uses: actions/upload-artifact@v4

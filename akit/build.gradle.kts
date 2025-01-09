@@ -2,8 +2,8 @@ plugins {
     id("cpp")
     id("java")
     id("google-test")
-    id("edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin") version "2020.2"
-    id("edu.wpi.first.NativeUtils") version "2025.3.0"
+    id("edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin") version "2025.0"
+    id("edu.wpi.first.NativeUtils") version "2025.9.0"
     id("edu.wpi.first.GradleJni") version "1.1.0"
     id("edu.wpi.first.GradleVsCode") version "2.1.0"
 }
