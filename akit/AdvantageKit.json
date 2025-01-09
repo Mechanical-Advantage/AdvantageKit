@@ -26,6 +26,7 @@
         "linuxathena",
         "windowsx86-64",
         "linuxx86-64",
+        "linuxarm64",
         "osxuniversal"
       ]
     }
