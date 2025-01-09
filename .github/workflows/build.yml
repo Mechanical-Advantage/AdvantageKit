@@ -135,18 +135,22 @@ jobs:
           - name: "Linux (x64)"
             runner-image: ubuntu-22.04
             classifier: "linuxx86-64"
+            container: ""
           - name: "Linux (arm64)"
             runner-image: ubuntu-22.04
             classifier: "linuxarm64"
+            container: wpilib/raspbian-cross-ubuntu:bookworm-22.04
           - name: "macOS"
             runner-image: macos-latest
             classifier: "osxuniversal"
+            container: ""
           - name: "Windows"
             runner-image: windows-latest
             classifier: "windowsx86-64"
+            container: ""
     name: "Build for ${{ matrix.name }}"
     runs-on: ${{ matrix.runner-image }}
-    container: ""
+    container: ${{ matrix.container }}
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
