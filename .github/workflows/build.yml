@@ -166,6 +166,7 @@ jobs:
         with:
           python-version: "3.13"
       - name: "Install Python dependencies"
+        if: matrix.classifier != 'linuxarm64'
         run: pip install requests
       - name: "Build and test"
         run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1
