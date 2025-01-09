@@ -160,7 +160,7 @@ jobs:
           distribution: "temurin"
           java-version: "17"
       - name: "Setup Python"
-        if: matrix.classifier != "linuxarm64"
+        if: matrix.classifier != 'linuxarm64'
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
