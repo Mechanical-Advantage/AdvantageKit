@@ -259,7 +259,7 @@ To change the gyro implementation, switch `new GyroIOPigeon2()` in the `RobotCon
 The `PhoenixOdometryThread` class reads high-frequency gyro data for odometry alongside samples from drive encoders. This class supports both Phoenix signals and generic signals. Note that the gyro should be configured to publish signals at the same frequency as odometry. Call `registerSignal` with a double supplier to create a queue, as shown in the `GyroIONavX` implementation:
 
 ```java
-Queue<Double> yawPositionQueue = SparkOdometryThread.getInstance().registerSignal(navX::getAngle);
+Queue<Double> yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(navX::getAngle);
 ```
 
 :::info
