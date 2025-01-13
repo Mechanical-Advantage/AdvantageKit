@@ -20,6 +20,8 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.HashMap;
@@ -84,41 +86,60 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
           .addCode("$L copy = new $L();\n", autologgedClassName, autologgedClassName)
           .returns(ClassName.get(autologgedPackage, autologgedClassName));
 
-      classElement.getEnclosedElements().stream().filter(f -> f.getKind().equals(ElementKind.FIELD))
-          .forEach(fieldElement -> {
-            String simpleName = fieldElement.getSimpleName().toString();
-            String logName = simpleName.substring(0, 1).toUpperCase() + simpleName.substring(1);
-
-            String fieldType = fieldElement.asType().toString();
-            String typeSuggestion = UNLOGGABLE_TYPES_SUGGESTIONS.get(fieldType);
-
-            // Check for unloggable types
-            if (typeSuggestion != null || (fieldType.startsWith("java") && !fieldType.startsWith("java.lang.String"))) {
-              String extraText = "";
-              if (typeSuggestion != null) {
-                extraText = "Did you mean to use \"" + typeSuggestion + "\" instead?";
-              } else {
-                extraText = "\"" + fieldType + "\" is not supported";
+      Types util = processingEnv.getTypeUtils();
+      TypeElement typeElement = (TypeElement) classElement;
+      boolean isSuperclass = false;
+      while (typeElement != null) {
+        final TypeElement finalTypeElement = typeElement;
+        final boolean finalIsSuperclass = isSuperclass;
+        typeElement.getEnclosedElements().stream().filter(f -> f.getKind().equals(ElementKind.FIELD))
+            .forEach(fieldElement -> {
+              if (finalIsSuperclass && fieldElement.getModifiers().contains(Modifier.PRIVATE)) {
+                return;
               }
-              throw new RuntimeException(
-                  "[AutoLog] Unkonwn type for \"" + simpleName + "\" from \"" +
-                      classElement.getSimpleName()
-                      + "\" (" + extraText + ")");
-            }
 
-            // Log data (might be serialized)
-            toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
-            fromLogBuilder.addCode("$L = table.get($S, $L);\n", simpleName, logName, simpleName);
-            if (fieldElement.asType().getKind().equals(TypeKind.ARRAY)) {
-              // Need to deep copy arrays
-              cloneBuilder.addCode("copy.$L = this.$L.clone();\n", simpleName, simpleName);
-            } else if (fieldElement.asType().toString().startsWith("edu.wpi.first.units.MutableMeasure")) {
-              // Need to clone mutable measure
-              cloneBuilder.addCode("copy.$L = this.$L.mutableCopy();\n", simpleName, simpleName);
-            } else {
-              cloneBuilder.addCode("copy.$L = this.$L;\n", simpleName, simpleName);
-            }
-          });
+              String simpleName = fieldElement.getSimpleName().toString();
+              String logName = simpleName.substring(0, 1).toUpperCase() + simpleName.substring(1);
+
+              String fieldType = fieldElement.asType().toString();
+              String typeSuggestion = UNLOGGABLE_TYPES_SUGGESTIONS.get(fieldType);
+
+              // Check for unloggable types
+              if (typeSuggestion != null
+                  || (fieldType.startsWith("java") && !fieldType.startsWith("java.lang.String"))) {
+                String extraText = "";
+                if (typeSuggestion != null) {
+                  extraText = "Did you mean to use \"" + typeSuggestion + "\" instead?";
+                } else {
+                  extraText = "\"" + fieldType + "\" is not supported";
+                }
+                throw new RuntimeException(
+                    "[AutoLog] Unkonwn type for \"" + simpleName + "\" from \"" +
+                        finalTypeElement.getSimpleName()
+                        + "\" (" + extraText + ")");
+              }
+
+              // Log data (might be serialized)
+              toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
+              fromLogBuilder.addCode("$L = table.get($S, $L);\n", simpleName, logName, simpleName);
+              if (fieldElement.asType().getKind().equals(TypeKind.ARRAY)) {
+                // Need to deep copy arrays
+                cloneBuilder.addCode("copy.$L = this.$L.clone();\n", simpleName, simpleName);
+              } else if (fieldElement.asType().toString().startsWith("edu.wpi.first.units.MutableMeasure")) {
+                // Need to clone mutable measure
+                cloneBuilder.addCode("copy.$L = this.$L.mutableCopy();\n", simpleName, simpleName);
+              } else {
+                cloneBuilder.addCode("copy.$L = this.$L;\n", simpleName, simpleName);
+              }
+            });
+        TypeMirror mirror = (typeElement).getSuperclass();
+        if (mirror.getKind() == TypeKind.DECLARED) {
+          typeElement = (TypeElement) util.asElement(mirror);
+          isSuperclass = true;
+        } else {
+          typeElement = null;
+        }
+      }
 
       cloneBuilder.addCode("return copy;\n");
 
