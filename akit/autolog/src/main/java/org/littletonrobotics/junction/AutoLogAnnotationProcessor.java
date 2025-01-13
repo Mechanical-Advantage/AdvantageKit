@@ -88,10 +88,16 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
 
       Types util = processingEnv.getTypeUtils();
       TypeElement typeElement = (TypeElement) classElement;
+      boolean isSuperclass = false;
       while (typeElement != null) {
         final TypeElement finalTypeElement = typeElement;
+        final boolean finalIsSuperclass = isSuperclass;
         typeElement.getEnclosedElements().stream().filter(f -> f.getKind().equals(ElementKind.FIELD))
             .forEach(fieldElement -> {
+              if (finalIsSuperclass && fieldElement.getModifiers().contains(Modifier.PRIVATE)) {
+                return;
+              }
+
               String simpleName = fieldElement.getSimpleName().toString();
               String logName = simpleName.substring(0, 1).toUpperCase() + simpleName.substring(1);
 
@@ -99,7 +105,8 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
               String typeSuggestion = UNLOGGABLE_TYPES_SUGGESTIONS.get(fieldType);
 
               // Check for unloggable types
-              if (typeSuggestion != null || (fieldType.startsWith("java") && !fieldType.startsWith("java.lang.String"))) {
+              if (typeSuggestion != null
+                  || (fieldType.startsWith("java") && !fieldType.startsWith("java.lang.String"))) {
                 String extraText = "";
                 if (typeSuggestion != null) {
                   extraText = "Did you mean to use \"" + typeSuggestion + "\" instead?";
@@ -128,10 +135,11 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
         TypeMirror mirror = (typeElement).getSuperclass();
         if (mirror.getKind() == TypeKind.DECLARED) {
           typeElement = (TypeElement) util.asElement(mirror);
+          isSuperclass = true;
         } else {
           typeElement = null;
         }
-    }
+      }
 
       cloneBuilder.addCode("return copy;\n");
 
