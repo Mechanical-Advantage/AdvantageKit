@@ -51,6 +51,7 @@ public class LoggedNetworkString extends LoggedNetworkInput {
   public LoggedNetworkString(String key, String defaultValue) {
     this(key);
     setDefault(defaultValue);
+    this.value = defaultValue;
   }
 
   /** Updates the default value, which is used if no value in NT is found. */
