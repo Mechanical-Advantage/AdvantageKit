@@ -1,13 +1,13 @@
 {
-    "fileName": "Studica.json",
+    "fileName": "Studica-2025.0.1.json",
     "name": "Studica",
-    "version": "2025.0.0",
+    "version": "2025.0.1",
     "uuid": "cb311d09-36e9-4143-a032-55bb2b94443b",
     "frcYear": "2025",
     "mavenUrls": [
         "https://dev.studica.com/maven/release/2025/"
     ],
-    "jsonUrl": "https://dev.studica.com/releases/2025/Studica-2025.0.0.json",
+    "jsonUrl": "https://dev.studica.com/releases/2025/Studica-2025.0.1.json",
     "cppDependencies": [
         {
             "artifactId": "Studica-cpp",
@@ -24,7 +24,7 @@
             "libName": "Studica",
             "sharedLibrary": false,
             "skipInvalidPlatforms": true,
-            "version": "2025.0.0"
+            "version": "2025.0.1"
         },
         {
             "artifactId": "Studica-driver",
@@ -41,14 +41,14 @@
             "libName": "StudicaDriver",
             "sharedLibrary": false,
             "skipInvalidPlatforms": true,
-            "version": "2025.0.0"
+            "version": "2025.0.1"
         }
     ],
     "javaDependencies": [
         {
             "artifactId": "Studica-java",
             "groupId": "com.studica.frc",
-            "version": "2025.0.0"
+            "version": "2025.0.1"
         }
     ],
     "jniDependencies": [
@@ -65,7 +65,7 @@
                 "osxuniversal",
                 "windowsx86-64"
             ],
-            "version": "2025.0.0"
+            "version": "2025.0.1"
         }
     ]
 }
