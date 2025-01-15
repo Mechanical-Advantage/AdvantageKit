@@ -93,9 +93,9 @@ public class DriveIOTalonSRX implements DriveIO {
         Units.radiansToRotations(leftRadPerSec) / 10.0, // Raw units are ticks per 100ms :(
         DemandType.ArbitraryFeedForward,
         leftFFVolts / 12.0);
-    leftLeader.set(
+    rightLeader.set(
         TalonSRXControlMode.Velocity,
-        Units.radiansToRotations(rightFFVolts) / 10.0, // Raw units are ticks per 100ms :(
+        Units.radiansToRotations(rightRadPerSec) / 10.0, // Raw units are ticks per 100ms :(
         DemandType.ArbitraryFeedForward,
         rightFFVolts / 12.0);
   }
