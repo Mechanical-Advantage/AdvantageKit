@@ -162,7 +162,6 @@ jobs:
           java-version: "17"
       - name: "Setup Python"
         uses: actions/setup-python@v5
-        if: matrix.classifier != 'linuxarm64'
         with:
           python-version: "3.13"
       - name: "Install Python dependencies"
