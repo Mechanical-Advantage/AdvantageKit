@@ -16,7 +16,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Physics simulation
 - Automated characterization routines
 - Dashboard alerts for disconnected devices
-- Pose estimator integration
+- Pose estimator integration using standard FPGA timestamps
 - Step-by-step setup and tuning instructions with a prebuilt AdvantageScope layout
 - **Deterministic replay** with a **guarantee of accuracy**
 
@@ -306,6 +306,8 @@ private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest = new Mot
 ### Vision Integration
 
 The `Drive` subsystem uses WPILib's [`SwerveDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/SwerveDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples.
+
+Users migrating from CTRE's swerve library should note that the AdvantageKit template uses **standard FPGA timestamps** for pose estimation rather than CTRE's "current time." This means that pose estimates from Limelight or PhotonVision can be passed _directly_ to the pose estimator without needing to call [`Utils.fpgaToCurrentTime`](<https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/Utils.html#fpgaToCurrentTime(double)>).
 
 :::tip
 This project is compatible with AdvantageKit's [vision template project](./vision-template.md), which provides a starting point for implementing a pose estimation algorithm based on Limelight or PhotonVision.
