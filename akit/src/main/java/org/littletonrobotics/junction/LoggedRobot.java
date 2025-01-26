@@ -61,6 +61,7 @@ public class LoggedRobot extends IterativeRobotBase {
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_AdvantageKit);
+    HAL.report(tResourceType.kResourceType_LoggingFramework, tInstances.kLoggingFramework_AdvantageKit);
   }
 
   @Override
