@@ -44,6 +44,8 @@ The project is primarily configured via the `VisionConstants` class, with commen
 In addition to pose estimation, this project include an example of simple targeting with AprilTags. For many games and robots, this is a significantly simpler method of accomplishing game objectives. Check the `getTargetX` method of `Vision` and `configureButtonBindings` method of `RobotContainer` for details.
 :::
 
+### Logging
+
 The vision subsystem logs a large set of outputs that can be used for debugging and tuning. Each camera logs the following fields:
 
 - `TagPoses`: A list of 3D poses representing the set of visible tags. We recommend visualizing this field using the "Vision Target" object on the 3D field tab in AdvantageScope.
@@ -52,3 +54,11 @@ The vision subsystem logs a large set of outputs that can be used for debugging 
 - `RobotPosesRejected`: A subset of the `RobotPoses` list with the set of estimates that were removed during filtering.
 
 The `Summary` table includes identical fields which include samples from every camera.
+
+### Limelight 4
+
+This project is compatible with all variants of Limelight by default (in addition to PhotonVision). **Limelight 4** users who wish to take advantage of the built-in IMU for MegaTag 2 should check the [Limelight documentation](https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-robot-localization-megatag2#using-limelight-4s-built-in-imu-with-imumode_set--setimumode) for details. Note that the template already publishes the robot orientation every loop cycle.
+
+:::info
+Users can configure the IMU mode by importing [LimelightLib](https://docs.limelightvision.io/docs/docs-limelight/apis/limelight-lib) or by publishing an integer to the `imumode_set` key in NetworkTables.
+:::
