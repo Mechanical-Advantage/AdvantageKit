@@ -42,6 +42,6 @@ public class RollerIOTalonSRX implements RollerIO {
 
   @Override
   public void setVoltage(double volts) {
-    roller.set(TalonSRXControlMode.PercentOutput, volts * 12.0);
+    roller.set(TalonSRXControlMode.PercentOutput, volts / 12.0);
   }
 }

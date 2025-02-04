@@ -79,9 +79,9 @@ public class DriveIOTalonSRX implements DriveIO {
 
   @Override
   public void setVoltage(double leftVolts, double rightVolts) {
-    // OK to just multiply by 12 because voltage compensation is enabled
-    leftLeader.set(TalonSRXControlMode.PercentOutput, leftVolts * 12.0);
-    rightLeader.set(TalonSRXControlMode.PercentOutput, rightVolts * 12.0);
+    // OK to just divide by 12 because voltage compensation is enabled
+    leftLeader.set(TalonSRXControlMode.PercentOutput, leftVolts / 12.0);
+    rightLeader.set(TalonSRXControlMode.PercentOutput, rightVolts / 12.0);
   }
 
   @Override
