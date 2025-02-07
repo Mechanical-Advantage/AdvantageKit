@@ -42,7 +42,7 @@ public class DriveIOSim implements DriveIO {
           leftFFVolts + leftPID.calculate(sim.getLeftVelocityMetersPerSecond() / wheelRadiusMeters);
       rightAppliedVolts =
           rightFFVolts
-              + leftPID.calculate(sim.getRightVelocityMetersPerSecond() / wheelRadiusMeters);
+              + rightPID.calculate(sim.getRightVelocityMetersPerSecond() / wheelRadiusMeters);
     }
 
     // Update simulation state
