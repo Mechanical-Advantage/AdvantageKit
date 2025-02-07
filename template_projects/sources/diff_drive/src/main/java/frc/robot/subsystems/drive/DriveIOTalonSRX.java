@@ -87,7 +87,7 @@ public class DriveIOTalonSRX implements DriveIO {
   @Override
   public void setVelocity(
       double leftRadPerSec, double rightRadPerSec, double leftFFVolts, double rightFFVolts) {
-    // OK to just multiply FF by 12 because voltage compensation is enabled
+    // OK to just divide FF by 12 because voltage compensation is enabled
     leftLeader.set(
         TalonSRXControlMode.Velocity,
         Units.radiansToRotations(leftRadPerSec) / 10.0, // Raw units are ticks per 100ms :(
