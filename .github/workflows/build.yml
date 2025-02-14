@@ -164,8 +164,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - name: "Install Python dependencies"
-        run: pip install requests
       - name: "Build and test"
         run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1
       - name: "Development: Publish local"
@@ -181,6 +179,7 @@ jobs:
       - name: "Release: Publish zip"
         if: github.event_name == 'release'
         run: |
+          pip install requests
           python publish_zip.py --url https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release --group_id org.littletonrobotics.akit --artifact_id akit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.classifier }} --file_path akit/build/outputs/_M__GROUP_org_littletonrobotics_akit_ID_akit-wpilibio_CLS-${{ matrix.classifier }}.zip --username ${{ secrets.ARTIFACTORY_USERNAME }} --password ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: "Upload local repo"
         uses: actions/upload-artifact@v4
