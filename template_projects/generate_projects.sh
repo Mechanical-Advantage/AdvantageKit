@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Constants
-WPILIB_VERSION="2025.2.1"
+WPILIB_VERSION="2025.3.1"
 PROJECTS=(kitbot_2025 diff_drive spark_swerve talonfx_swerve vision skeleton)
 VENDORDEPS=(
     "Studica PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # kitbot_2025

@@ -1,7 +1,7 @@
 {
     "fileName": "URCL.json",
     "name": "URCL",
-    "version": "2025.0.0",
+    "version": "2025.0.1",
     "frcYear": "2025",
     "uuid": "84246d17-a797-4d1e-bd9f-c59cd8d2477c",
     "mavenUrls": [
@@ -12,14 +12,14 @@
         {
             "groupId": "org.littletonrobotics.urcl",
             "artifactId": "URCL-java",
-            "version": "2025.0.0"
+            "version": "2025.0.1"
         }
     ],
     "jniDependencies": [
         {
             "groupId": "org.littletonrobotics.urcl",
             "artifactId": "URCL-driver",
-            "version": "2025.0.0",
+            "version": "2025.0.1",
             "skipInvalidPlatforms": true,
             "isJar": false,
             "validPlatforms": [
@@ -34,7 +34,7 @@
         {
             "groupId": "org.littletonrobotics.urcl",
             "artifactId": "URCL-cpp",
-            "version": "2025.0.0",
+            "version": "2025.0.1",
             "libName": "URCL",
             "headerClassifier": "headers",
             "sharedLibrary": false,
@@ -49,7 +49,7 @@
         {
             "groupId": "org.littletonrobotics.urcl",
             "artifactId": "URCL-driver",
-            "version": "2025.0.0",
+            "version": "2025.0.1",
             "libName": "URCLDriver",
             "headerClassifier": "headers",
             "sharedLibrary": false,
