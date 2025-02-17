@@ -33,6 +33,9 @@ public class RLOGServer implements LogDataReceiver {
   private ServerThread thread;
   private RLOGEncoder encoder = new RLOGEncoder();
 
+  private static Object encoderLock = new Object();
+  private static Object socketsLock = new Object();
+
   public RLOGServer() {
     this(5800);
   }
@@ -58,7 +61,7 @@ public class RLOGServer implements LogDataReceiver {
     if (thread != null && thread.broadcastQueue.remainingCapacity() > 0) {
       // If broadcast is behind, drop this cycle and encode changes in the next cycle
       byte[] data;
-      synchronized (thread) {
+      synchronized (encoderLock) {
         encoder.encodeTable(table, false);
         data = encodeData(encoder.getOutput().array());
       }
@@ -111,12 +114,14 @@ public class RLOGServer implements LogDataReceiver {
         try {
           Socket socket = server.accept();
           byte[] data;
-          synchronized (this) {
+          synchronized (encoderLock) {
             data = encodeData(encoder.getNewcomerData().array());
           }
           socket.getOutputStream().write(data);
-          sockets.add(socket);
-          lastHeartbeats.add(RobotController.getFPGATime() / 1000000.0);
+          synchronized (socketsLock) {
+            sockets.add(socket);
+            lastHeartbeats.add(RobotController.getFPGATime() / 1000000.0);
+          }
           System.out.println("[AdvantageKit] Connected to RLOG client - " + socket.getInetAddress().getHostAddress());
         } catch (IOException e) {
           e.printStackTrace();
@@ -137,41 +142,43 @@ public class RLOGServer implements LogDataReceiver {
         broadcastQueue.drainTo(broadcastData);
 
         // Broadcast to each client
-        for (int i = 0; i < sockets.size(); i++) {
-          Socket socket = sockets.get(i);
-          if (socket.isClosed()) {
-            continue;
-          }
-
-          try {
-            // Read heartbeat
-            InputStream inputStream = socket.getInputStream();
-            if (inputStream.available() > 0) {
-              inputStream.skip(inputStream.available());
-              lastHeartbeats.set(i, RobotController.getFPGATime() / 1000000.0);
-            }
-
-            // Close connection if socket timed out
-            if (RobotController.getFPGATime() / 1000000.0 - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
-              socket.close();
-              printDisconnectMessage(socket, "timeout");
+        synchronized (socketsLock) {
+          for (int i = 0; i < sockets.size(); i++) {
+            Socket socket = sockets.get(i);
+            if (socket.isClosed()) {
               continue;
             }
 
-            // Send message to stay alive
-            var outputStream = socket.getOutputStream();
-            outputStream.write(new byte[4]);
-
-            // Send broadcast data
-            for (byte[] data : broadcastData) {
-              outputStream.write(data);
-            }
-          } catch (IOException e) {
             try {
-              socket.close();
-              printDisconnectMessage(socket, "IOException");
-            } catch (IOException a) {
-              a.printStackTrace();
+              // Read heartbeat
+              InputStream inputStream = socket.getInputStream();
+              if (inputStream.available() > 0) {
+                inputStream.skip(inputStream.available());
+                lastHeartbeats.set(i, RobotController.getFPGATime() / 1000000.0);
+              }
+
+              // Close connection if socket timed out
+              if (RobotController.getFPGATime() / 1000000.0 - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
+                socket.close();
+                printDisconnectMessage(socket, "timeout");
+                continue;
+              }
+
+              // Send message to stay alive
+              var outputStream = socket.getOutputStream();
+              outputStream.write(new byte[4]);
+
+              // Send broadcast data
+              for (byte[] data : broadcastData) {
+                outputStream.write(data);
+              }
+            } catch (IOException e) {
+              try {
+                socket.close();
+                printDisconnectMessage(socket, "IOException");
+              } catch (IOException a) {
+                a.printStackTrace();
+              }
             }
           }
         }
