@@ -461,7 +461,7 @@ public class LogTable {
   public <U extends Unit> void put(String key, Measure<U> value) {
     if (value == null)
       return;
-    put(key, new LogValue(value.baseUnitMagnitude(), null));
+    put(key, new MeasureRecord(value.baseUnitMagnitude(), value.baseUnit().name()));
   }
 
   /**
@@ -1017,25 +1017,19 @@ public class LogTable {
   /** Reads a Measure value from the table. */
   @SuppressWarnings("unchecked")
   public <U extends Unit, M extends Measure<U>> M get(String key, M defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      double value = get(key).getDouble(defaultValue.baseUnitMagnitude());
-      return (M) defaultValue.unit().ofBaseUnits(value);
-    } else {
-      return defaultValue;
-    }
+    MeasureRecord record = get(key, new MeasureRecord(defaultValue.baseUnitMagnitude(), defaultValue.unit().name()));
+
+    return (M) defaultValue.unit().ofBaseUnits(record.value());
   }
 
   /** Reads a MutableMeasure value from the table. */
   @SuppressWarnings("unchecked")
   public <U extends Unit, Base extends Measure<U>, M extends MutableMeasure<U, Base, M>> M get(
       String key, M defaultValue) {
-    if (data.containsKey(prefix + key)) {
-      double baseValue = get(key).getDouble(defaultValue.baseUnitMagnitude());
-      double relativeValue = defaultValue.unit().fromBaseUnits(baseValue);
-      return (M) new GenericMutableMeasureImpl<>(relativeValue, baseValue, defaultValue.unit());
-    } else {
-      return defaultValue;
-    }
+    MeasureRecord record = get(key, new MeasureRecord(defaultValue.baseUnitMagnitude(), defaultValue.unit().name()));
+    double relativeValue = defaultValue.unit().fromBaseUnits(record.value());
+
+    return (M) new GenericMutableMeasureImpl<>(relativeValue, record.value(), defaultValue.unit());
   }
 
   /** Reads a LoggableInput subtable from the table. */
