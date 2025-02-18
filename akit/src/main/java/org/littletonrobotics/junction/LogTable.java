@@ -159,23 +159,34 @@ public class LogTable {
    * exist or is already the correct type). Sends a warning to the Driver Station
    * if the existing type is different.
    */
-  private boolean writeAllowed(String key, LoggableType type) {
+  private boolean writeAllowed(String key, LoggableType type, String customTypeStr) {
     LogValue currentValue = data.get(prefix + key);
     if (currentValue == null) {
       return true;
     }
-    if (currentValue.type.equals(type)) {
-      return true;
+    if (!currentValue.type.equals(type)) {
+      DriverStation.reportWarning(
+          "[AdvantageKit] Failed to write to field \""
+              + prefix + key
+              + "\" - attempted to write "
+              + type
+              + " value but expected "
+              + currentValue.type,
+          true);
+      return false;
     }
-    DriverStation.reportWarning(
-        "[AdvantageKit] Failed to write to field \""
-            + prefix + key
-            + "\" - attempted to write "
-            + type
-            + " value but expected "
-            + currentValue.type,
-        true);
-    return false;
+    if (currentValue.customTypeStr != customTypeStr && !currentValue.customTypeStr.equals(customTypeStr)) {
+      DriverStation.reportWarning(
+          "[AdvantageKit] Failed to write to field \""
+              + prefix + key
+              + "\" - attempted to write "
+              + customTypeStr
+              + " value but expected "
+              + currentValue.customTypeStr,
+          true);
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -185,7 +196,7 @@ public class LogTable {
   public void put(String key, LogValue value) {
     if (value == null)
       return;
-    if (writeAllowed(key, value.type)) {
+    if (writeAllowed(key, value.type, value.customTypeStr)) {
       data.put(prefix + key, value);
     }
   }
@@ -510,18 +521,16 @@ public class LogTable {
   public <T> void put(String key, Struct<T> struct, T value) {
     if (value == null)
       return;
-    if (writeAllowed(key, LoggableType.Raw)) {
-      addStructSchema(struct, new HashSet<>());
-      if (!structBuffers.containsKey(struct.getTypeString())) {
-        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
-      }
-      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
-      ByteBuffer bb = buffer.write(value);
-      byte[] array = new byte[bb.position()];
-      bb.position(0);
-      bb.get(array);
-      put(key, new LogValue(array, struct.getTypeString()));
+    addStructSchema(struct, new HashSet<>());
+    if (!structBuffers.containsKey(struct.getTypeString())) {
+      structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
     }
+    StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+    ByteBuffer bb = buffer.write(value);
+    byte[] array = new byte[bb.position()];
+    bb.position(0);
+    bb.get(array);
+    put(key, new LogValue(array, struct.getTypeString()));
   }
 
   /**
@@ -532,18 +541,16 @@ public class LogTable {
   public <T> void put(String key, Struct<T> struct, T... value) {
     if (value == null)
       return;
-    if (writeAllowed(key, LoggableType.Raw)) {
-      addStructSchema(struct, new HashSet<>());
-      if (!structBuffers.containsKey(struct.getTypeString())) {
-        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
-      }
-      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
-      ByteBuffer bb = buffer.writeArray(value);
-      byte[] array = new byte[bb.position()];
-      bb.position(0);
-      bb.get(array);
-      put(key, new LogValue(array, struct.getTypeString() + "[]"));
+    addStructSchema(struct, new HashSet<>());
+    if (!structBuffers.containsKey(struct.getTypeString())) {
+      structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
     }
+    StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+    ByteBuffer bb = buffer.writeArray(value);
+    byte[] array = new byte[bb.position()];
+    bb.position(0);
+    bb.get(array);
+    put(key, new LogValue(array, struct.getTypeString() + "[]"));
   }
 
   /**
@@ -567,31 +574,29 @@ public class LogTable {
   public <T, MessageType extends ProtoMessage<?>> void put(String key, Protobuf<T, MessageType> proto, T value) {
     if (value == null)
       return;
-    if (writeAllowed(key, LoggableType.Raw)) {
-      proto.forEachDescriptor((name) -> data.containsKey("/.schema/" + name), (typeString, schema) -> data
-          .put("/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto")));
-      if (!protoBuffers.containsKey(proto.getTypeString())) {
-        protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
+    proto.forEachDescriptor((name) -> data.containsKey("/.schema/" + name), (typeString, schema) -> data
+        .put("/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto")));
+    if (!protoBuffers.containsKey(proto.getTypeString())) {
+      protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
 
-        // Warn about protobuf logging when enabled
-        if (DriverStation.isEnabled()) {
-          DriverStation.reportWarning(
-              "[AdvantageKit] Logging protobuf value with type \"" + proto.getTypeString()
-                  + "\" for the first time. Logging a protobuf type for the first time when the robot is enabled is likely to cause high loop overruns. Protobuf types should be always logged for the first time when the robot is disabled.",
-              false);
-        }
+      // Warn about protobuf logging when enabled
+      if (DriverStation.isEnabled()) {
+        DriverStation.reportWarning(
+            "[AdvantageKit] Logging protobuf value with type \"" + proto.getTypeString()
+                + "\" for the first time. Logging a protobuf type for the first time when the robot is enabled is likely to cause high loop overruns. Protobuf types should be always logged for the first time when the robot is disabled.",
+            false);
       }
-      ProtobufBuffer<T, MessageType> buffer = (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
-      ByteBuffer bb;
-      try {
-        bb = buffer.write(value);
-        byte[] array = new byte[bb.position()];
-        bb.position(0);
-        bb.get(array);
-        put(key, new LogValue(array, proto.getTypeString()));
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+    }
+    ProtobufBuffer<T, MessageType> buffer = (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
+    ByteBuffer bb;
+    try {
+      bb = buffer.write(value);
+      byte[] array = new byte[bb.position()];
+      bb.position(0);
+      bb.get(array);
+      put(key, new LogValue(array, proto.getTypeString()));
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
