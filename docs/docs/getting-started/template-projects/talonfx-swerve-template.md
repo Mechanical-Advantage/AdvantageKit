@@ -341,3 +341,9 @@ public void runVelocity(ChassisSpeeds speeds) {
 ### Advanced Physics Simulation
 
 The project can be easily adapted to utilize Team 5516's [maple-sim](https://github.com/Shenzhen-Robotics-Alliance/Maple-Sim) library for simulation, which provides a full rigid-body simulation of the swerve drive and its interactions with the field. Check the documentation for more details on how to install and use the library.
+
+### Real-Time Thread Priority
+
+Optionally, the main thread can be configured to use [real-time](https://blogs.oracle.com/linux/post/task-priority) priority when running the command scheduler by removing the comments [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/a86d21b27034a36d051798e3eaef167076cd302b/template_projects/sources/talonfx_swerve/src/main/java/frc/robot/Robot.java#L110) and [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/a86d21b27034a36d051798e3eaef167076cd302b/template_projects/sources/talonfx_swerve/src/main/java/frc/robot/Robot.java#L120) (**IMPORTANT:** You must uncomment _both_ lines). This may improve the consistency of loop cycle timing in some cases, but should be used with caution as it will prevent other threads from running during the user code loop cycle (including internal threads required by NetworkTables, vendors, etc).
+
+This customization **should only be used if the loop cycle time is significantly less than 20ms**, which allows other threads to continue running between user code cycles. We always recommend **thoroughly testing this change** to ensure that it does not cause unintended side effects (examples include NetworkTables lag, CAN timeouts, etc). In general, **this customization is only recommended for advanced users** who understand the potential side-effects.

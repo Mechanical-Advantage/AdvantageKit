@@ -66,3 +66,9 @@ This project is compatible with all variants of Limelight by default (in additio
 :::info
 Users can configure the IMU mode by importing [LimelightLib](https://docs.limelightvision.io/docs/docs-limelight/apis/limelight-lib) or by publishing an integer to the `imumode_set` key in NetworkTables.
 :::
+
+### Real-Time Thread Priority
+
+Optionally, the main thread can be configured to use [real-time](https://blogs.oracle.com/linux/post/task-priority) priority when running the command scheduler by removing the comments [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/a86d21b27034a36d051798e3eaef167076cd302b/template_projects/sources/vision/src/main/java/frc/robot/Robot.java#L90) and [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/a86d21b27034a36d051798e3eaef167076cd302b/template_projects/sources/vision/src/main/java/frc/robot/Robot.java#L100) (**IMPORTANT:** You must uncomment _both_ lines). This may improve the consistency of loop cycle timing in some cases, but should be used with caution as it will prevent other threads from running during the user code loop cycle (including internal threads required by NetworkTables, vendors, etc).
+
+This customization **should only be used if the loop cycle time is significantly less than 20ms**, which allows other threads to continue running between user code cycles. We always recommend **thoroughly testing this change** to ensure that it does not cause unintended side effects (examples include NetworkTables lag, CAN timeouts, etc). In general, **this customization is only recommended for advanced users** who understand the potential side-effects.
