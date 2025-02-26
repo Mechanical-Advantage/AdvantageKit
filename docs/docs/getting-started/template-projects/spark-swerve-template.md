@@ -248,7 +248,7 @@ public static final double turnEncoderPositionFactor = 2 * Math.PI / turnMotorRe
 public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0 / turnMotorReduction; // Rotor RPM -> Wheel Rad/Sec
 ```
 
-4. Reset the relative encoder position at startup:
+6. Reset the relative encoder position at startup:
 
 ```java
 tryUntilOk(turnSpark, 5, () -> turnEncoder.setPosition(customEncoder.getPositionRadians()));
