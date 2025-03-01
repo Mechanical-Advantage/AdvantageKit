@@ -65,7 +65,7 @@ public class Logger {
 
   private static LogReplaySource replaySource;
   private static final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
-  private static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
+  private static ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
   private static boolean receiverQueueFault = false;
 
   private Logger() {
@@ -231,6 +231,21 @@ public class Logger {
       }
       RobotController.setTimeSource(RobotController::getFPGATime);
     }
+  }
+
+  /**
+   * Resets the logging system, clearing all data and stopping any receivers.
+   * This method should only be called during tests to reset the robot state.
+   */
+  public void reset() {
+    end();
+    receiverQueue.clear();
+    receiverThread = new ReceiverThread(receiverQueue);
+    dashboardInputs.clear();
+    metadata.clear();
+    cycleCount = 0;
+    urclSupplier = null;
+    receiverQueueFault = false;
   }
 
   /**
