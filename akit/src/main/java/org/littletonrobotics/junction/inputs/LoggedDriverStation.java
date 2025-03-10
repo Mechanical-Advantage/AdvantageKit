@@ -89,7 +89,13 @@ public class LoggedDriverStation {
     DriverStationSim.setGameSpecificMessage(table.get("GameSpecificMessage", ""));
     DriverStationSim.setMatchNumber(table.get("MatchNumber", 0));
     DriverStationSim.setReplayNumber(table.get("ReplayNumber", 0));
-    DriverStationSim.setMatchType(MatchType.values()[table.get("MatchType", 0)]);
+    DriverStationSim.setMatchType(
+        switch (table.get("MatchType", 0)) {
+          case 1 -> MatchType.Practice;
+          case 2 -> MatchType.Qualification;
+          case 3 -> MatchType.Elimination;
+          default -> MatchType.None;
+        });
     DriverStationSim.setMatchTime(table.get("MatchTime", -1.0));
 
     boolean dsAttached = table.get("DSAttached", false);
