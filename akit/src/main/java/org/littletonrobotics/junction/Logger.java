@@ -985,6 +985,25 @@ public class Logger {
    * main thread. See the "Common Issues" page in the documentation for more
    * details.
    * 
+   * @param key   The name of the field to record. It will be stored under
+   *              "/RealOutputs" or "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public static <U extends Unit> void recordOutput(String key, Measure<U> value, U unit) {
+    if (running) {
+      outputTable.put(key, value.in(unit));
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the
+   * simulator, use this method to record extra data based on the original inputs.
+   * 
+   * <p>
+   * This method is <b>not thread-safe</b> and should only be called from the
+   * main thread. See the "Common Issues" page in the documentation for more
+   * details.
+   * 
    * <p>
    * This method serializes a single object as a struct. Example usage:
    * {@code recordOutput("MyPose", Pose2d.struct, new Pose2d())}
