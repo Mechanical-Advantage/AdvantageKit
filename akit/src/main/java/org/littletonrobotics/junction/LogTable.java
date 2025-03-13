@@ -39,6 +39,7 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.util.WPISerializable;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.util.Color;
 import us.hebi.quickbuf.ProtoMessage;
 
 /**
@@ -473,6 +474,16 @@ public class LogTable {
     if (value == null)
       return;
     put(key, new LogValue(value.baseUnitMagnitude(), null));
+  }
+
+  /**
+   * Writes a new Color value to the table. Skipped if the key already exists as
+   * a different type.
+   */
+  public void put(String key, Color value) {
+    if (value == null)
+      return;
+    put(key, value.toHexString());
   }
 
   /**
@@ -1038,6 +1049,15 @@ public class LogTable {
       double baseValue = get(key).getDouble(defaultValue.baseUnitMagnitude());
       double relativeValue = defaultValue.unit().fromBaseUnits(baseValue);
       return (M) new GenericMutableMeasureImpl<>(relativeValue, baseValue, defaultValue.unit());
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /** Reads a Color value from the table. */
+  public Color get(String key, Color defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      return new Color(get(key).getString(defaultValue.toHexString()));
     } else {
       return defaultValue;
     }
