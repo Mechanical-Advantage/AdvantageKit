@@ -13,7 +13,9 @@
 
 package org.littletonrobotics.junction;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -51,8 +53,12 @@ public class ReplayWatch {
       System.exit(1);
     }
 
+    // Check for spotless
+    System.out.print("[AdvantageKit] Starting...\r");
+    boolean hasSpotless = isSpotlessInstalled();
+
     // Run initial replay
-    launchReplay(inputLog);
+    launchReplay(inputLog, hasSpotless);
 
     // Create directory watcher
     watcher = FileSystems.getDefault().newWatchService();
@@ -114,26 +120,33 @@ public class ReplayWatch {
 
       // New update, run replay
       if (isNewUpdate && System.currentTimeMillis() - lastReplay > 250) {
-        launchReplay(inputLog);
+        launchReplay(inputLog, hasSpotless);
         lastReplay = System.currentTimeMillis();
       }
     }
   }
 
-  private static void launchReplay(String inputLog) throws IOException, InterruptedException {
+  private static void launchReplay(String inputLog, boolean hasSpotless) throws IOException, InterruptedException {
     System.out.print("[AdvantageKit] Replay active... (0.0s)\r");
 
     // Launch Gradle
     boolean isWindows = System.getProperty("os.name").startsWith("Windows");
     var gradleBuilder = new ProcessBuilder(
-        isWindows ? "gradlew.bat" : "./gradlew",
-        "simulateJava",
-        "-x",
-        "test",
-        "-x",
-        "spotlessApply",
-        "-x",
-        "spotlessCheck");
+        hasSpotless
+            ? new String[] {
+                isWindows ? "gradlew.bat" : "./gradlew",
+                "simulateJava",
+                "-x",
+                "test",
+                "-x",
+                "spotlessApply",
+                "-x",
+                "spotlessCheck" }
+            : new String[] {
+                isWindows ? "gradlew.bat" : "./gradlew",
+                "simulateJava",
+                "-x",
+                "test" });
     gradleBuilder.environment().put(LogFileUtil.environmentVariable, inputLog);
     var gradle = gradleBuilder.start();
 
@@ -152,6 +165,26 @@ public class ReplayWatch {
     } else {
       System.out.print("[AdvantageKit] Replay failed             \r");
     }
+  }
+
+  private static boolean isSpotlessInstalled() throws IOException, InterruptedException {
+    // Launch Gradle
+    boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+    var gradleBuilder = new ProcessBuilder(
+        isWindows ? "gradlew.bat" : "./gradlew",
+        "tasks");
+    var gradle = gradleBuilder.start();
+
+    // Read Gradle output
+    BufferedReader reader = new BufferedReader(new InputStreamReader(gradle.getInputStream()));
+    StringBuilder builder = new StringBuilder();
+    String line = null;
+    while ((line = reader.readLine()) != null) {
+      builder.append(line);
+      builder.append(System.getProperty("line.separator"));
+    }
+    String result = builder.toString();
+    return result.contains("spotless");
   }
 
   /**
