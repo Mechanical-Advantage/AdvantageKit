@@ -13,21 +13,20 @@
 
 package org.littletonrobotics.junction.networktables;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
-
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Manages a chooser value published to the "SmartDashboard" table of NT.
  */
 public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
+
   private final String key;
   private String selectedValue = null;
   private SendableChooser<String> sendableChooser = new SendableChooser<>();
@@ -70,30 +69,34 @@ public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
   @SuppressWarnings("unchecked")
   public LoggedDashboardChooser(String key, SendableChooser<V> chooser) {
     this(key);
-
     // Get options map
     Map<String, V> options = new HashMap<>();
     try {
       Field mapField = SendableChooser.class.getDeclaredField("m_map");
       mapField.setAccessible(true);
       options = (Map<String, V>) mapField.get(chooser);
-    } catch (NoSuchFieldException
-        | SecurityException
-        | IllegalArgumentException
-        | IllegalAccessException e) {
+    } catch (
+      NoSuchFieldException
+      | SecurityException
+      | IllegalArgumentException
+      | IllegalAccessException e
+    ) {
       e.printStackTrace();
     }
 
     // Get default option
     String defaultString = "";
     try {
-      Field defaultField = SendableChooser.class.getDeclaredField("m_defaultChoice");
+      Field defaultField =
+        SendableChooser.class.getDeclaredField("m_defaultChoice");
       defaultField.setAccessible(true);
       defaultString = (String) defaultField.get(chooser);
-    } catch (NoSuchFieldException
-        | SecurityException
-        | IllegalArgumentException
-        | IllegalAccessException e) {
+    } catch (
+      NoSuchFieldException
+      | SecurityException
+      | IllegalArgumentException
+      | IllegalAccessException e
+    ) {
       e.printStackTrace();
     }
 

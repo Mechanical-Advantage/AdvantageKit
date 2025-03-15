@@ -14,16 +14,21 @@
 package org.littletonrobotics.junction.networktables;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StringEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 /** Manages a String value published to the root table of NT. */
-public class LoggedNetworkString extends LoggedNetworkInput {
+public class LoggedNetworkString extends ObservableLoggedNetworkInput<String> {
+
+  private static final String DEFAULT_VALUE = "";
+
   private final String key;
   private final StringEntry entry;
-  private String defaultValue = "";
+  private String defaultValue = DEFAULT_VALUE;
   private String value;
 
   /**
@@ -34,8 +39,15 @@ public class LoggedNetworkString extends LoggedNetworkInput {
    *            "/DashboardInputs/{key}" when logged.
    */
   public LoggedNetworkString(String key) {
+    super(DEFAULT_VALUE);
     this.key = key;
-    this.entry = NetworkTableInstance.getDefault().getStringTopic(key).getEntry("");
+    this.entry = NetworkTableInstance.getDefault()
+      .getStringTopic(key)
+      .getEntry(
+        DEFAULT_VALUE,
+        PubSubOption.keepDuplicates(false),
+        PubSubOption.pollStorage(1)
+      );
     this.value = defaultValue;
     Logger.registerDashboardInput(this);
   }
@@ -86,6 +98,14 @@ public class LoggedNetworkString extends LoggedNetworkInput {
   public void periodic() {
     if (!Logger.hasReplaySource()) {
       value = entry.get(defaultValue);
+
+      // Only do tunables when not in a match
+      if (DriverStation.getMatchType() == DriverStation.MatchType.None) {
+        var changes = entry.readQueueValues();
+        if (changes.length == 1) {
+          notifyListeners();
+        }
+      }
     }
     Logger.processInputs(prefix, inputs);
   }
