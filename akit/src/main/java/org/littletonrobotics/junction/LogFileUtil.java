@@ -33,15 +33,21 @@ public class LogFileUtil {
    * instead.
    */
   public static String addPathSuffix(String path, String suffix) {
-    String[] tokens = path.split("\\.");
-    if (tokens[0].endsWith(suffix)) {
-      return tokens[0] + "_2." + tokens[1];
-    } else if (tokens[0].matches(".+" + suffix + "_[0-9]+$")) {
-      int splitIndex = tokens[0].lastIndexOf("_");
-      int index = Integer.parseInt(tokens[0].substring(splitIndex + 1));
-      return tokens[0].substring(0, splitIndex) + "_" + Integer.toString(index + 1) + "." + tokens[1];
+    int dotIndex = path.lastIndexOf(".");
+    if (dotIndex == -1) {
+      return path;
+    }
+    String basename = path.substring(0, dotIndex);
+    String extension = path.substring(dotIndex);
+    if (basename.endsWith(suffix)) {
+      return basename + "_2" + extension;
+    } else if (basename.matches(".+" + suffix + "_[0-9]+$")) {
+      int splitIndex = basename.lastIndexOf("_");
+      int index = Integer.parseInt(basename.substring(splitIndex + 1));
+      return basename.substring(0, splitIndex) + "_" + Integer.toString(index + 1)
+          + extension;
     } else {
-      return tokens[0] + suffix + "." + tokens[1];
+      return basename + suffix + extension;
     }
   }
 
