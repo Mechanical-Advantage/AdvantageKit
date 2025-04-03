@@ -15,15 +15,21 @@ package org.littletonrobotics.junction.networktables;
 
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 /** Manages a boolean value published to the root table of NT. */
-public class LoggedNetworkBoolean extends LoggedNetworkInput {
+public class LoggedNetworkBoolean
+  extends ObservableLoggedNetworkInput<Boolean> {
+
+  private static final boolean DEFAULT_VALUE = false;
+
   private final String key;
   private final BooleanEntry entry;
-  private boolean defaultValue = false;
+  private boolean defaultValue = DEFAULT_VALUE;
   private boolean value;
 
   /**
@@ -34,8 +40,15 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput {
    *            "/DashboardInputs/{key}" when logged.
    */
   public LoggedNetworkBoolean(String key) {
+    super(DEFAULT_VALUE);
     this.key = key;
-    this.entry = NetworkTableInstance.getDefault().getBooleanTopic(key).getEntry(false);
+    this.entry = NetworkTableInstance.getDefault()
+      .getBooleanTopic(key)
+      .getEntry(
+        DEFAULT_VALUE,
+        PubSubOption.keepDuplicates(false),
+        PubSubOption.pollStorage(1)
+      );
     this.value = defaultValue;
     Logger.registerDashboardInput(this);
   }
@@ -69,7 +82,7 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput {
   }
 
   /** Returns the current value. */
-  public boolean get() {
+  public Boolean get() {
     return value;
   }
 
@@ -86,6 +99,14 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput {
   public void periodic() {
     if (!Logger.hasReplaySource()) {
       value = entry.get(defaultValue);
+
+      // Only do tunables when not in a match
+      if (DriverStation.getMatchType() == DriverStation.MatchType.None) {
+        var changes = entry.readQueueValues();
+        if (changes.length == 1) {
+          notifyListeners();
+        }
+      }
     }
     Logger.processInputs(prefix, inputs);
   }
