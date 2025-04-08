@@ -103,7 +103,12 @@ public class AutoLogOutputManager {
    * @param root The object to scan recursively.
    */
   public static void addObject(Object root) {
-    allowedPackages.add(root.getClass().getPackageName());
+    String packageName = root.getClass().getPackageName();
+    if (!allowedPackages.contains(packageName)) {
+        addKotlinPackage(root);
+        allowedPackages.add(packageName);
+    }
+
     addObjectImpl(root, root.getClass());
   }
 
