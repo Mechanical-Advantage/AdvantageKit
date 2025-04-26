@@ -75,50 +75,57 @@ public class LoggedRobot extends IterativeRobotBase {
   @Override
   @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
-    // Robot init methods
-    robotInit();
-    if (isSimulation()) {
-      simulationInit();
-    }
-    long initEnd = RobotController.getFPGATime(); // Includes Robot constructor and robotInit
-
-    // Register auto logged outputs
-    AutoLogOutputManager.addObject(this);
-
-    // Save data from init cycle
-    Logger.periodicAfterUser(initEnd, 0);
-
-    // Tell the DS that the robot is ready to be enabled
-    System.out.println("********** Robot program startup complete **********");
-    DriverStationJNI.observeUserProgramStarting();
-
-    // Loop forever, calling the appropriate mode-dependent function
-    while (true) {
-      if (useTiming) {
-        long currentTimeUs = RobotController.getFPGATime();
-        if (nextCycleUs < currentTimeUs) {
-          // Loop overrun, start next cycle immediately
-          nextCycleUs = currentTimeUs;
-        } else {
-          // Wait before next cycle
-          NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
-          if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
-            // Break the loop if the notifier was stopped
-            Logger.end();
-            break;
-          }
-        }
-        nextCycleUs += periodUs;
+    try {
+      // Robot init methods
+      robotInit();
+      if (isSimulation()) {
+        simulationInit();
       }
+      long initEnd = RobotController.getFPGATime(); // Includes Robot constructor and robotInit
 
-      long periodicBeforeStart = RobotController.getFPGATime();
-      Logger.periodicBeforeUser();
-      long userCodeStart = RobotController.getFPGATime();
-      loopFunc();
-      long userCodeEnd = RobotController.getFPGATime();
+      // Register auto logged outputs
+      AutoLogOutputManager.addObject(this);
 
-      gcStatsCollector.update();
-      Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
+      // Save data from init cycle
+      Logger.periodicAfterUser(initEnd, 0);
+
+      // Tell the DS that the robot is ready to be enabled
+      System.out.println("********** Robot program startup complete **********");
+      DriverStationJNI.observeUserProgramStarting();
+
+      // Loop forever, calling the appropriate mode-dependent function
+      while (true) {
+        if (useTiming) {
+          long currentTimeUs = RobotController.getFPGATime();
+          if (nextCycleUs < currentTimeUs) {
+            // Loop overrun, start next cycle immediately
+            nextCycleUs = currentTimeUs;
+          } else {
+            // Wait before next cycle
+            NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
+            if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
+              // Break the loop if the notifier was stopped
+              Logger.end();
+              break;
+            }
+          }
+          nextCycleUs += periodUs;
+        }
+
+        long periodicBeforeStart = RobotController.getFPGATime();
+        Logger.periodicBeforeUser();
+        long userCodeStart = RobotController.getFPGATime();
+        loopFunc();
+        long userCodeEnd = RobotController.getFPGATime();
+
+        gcStatsCollector.update();
+        Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
+      }
+    } catch(Exception e) {
+      // Exception thrown, log crash information last minute
+      e.printStackTrace();
+      Logger.periodicAfterUser(0, 0);
+      throw e;
     }
   }
 
