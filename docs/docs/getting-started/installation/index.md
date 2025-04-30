@@ -17,7 +17,7 @@ Users wishing to install AdvantageKit in an existing project should check the do
 
 ## Offline Installation
 
-Maven artifacts for AdvantageKit can be downloaded and installed for offline use. This allows AdvantageKit to be accessed even if GitHub Packages is blocked on school networks.
+Maven artifacts for AdvantageKit can be downloaded and installed for offline use. This allows AdvantageKit to be accessed even if the Maven repository is blocked on school networks.
 
 1. Download the "maven_offline.zip" asset attached to the latest [GitHub release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest).
 2. Unzip the file into "C:\Users\Public\wpilib\YEAR\maven" on Windows or "~/wpilib/YEAR/maven" on macOS/Linux.
