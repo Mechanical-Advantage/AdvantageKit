@@ -6,6 +6,7 @@ plugins {
     id("edu.wpi.first.NativeUtils") version "2025.9.0"
     id("edu.wpi.first.GradleJni") version "1.1.0"
     id("edu.wpi.first.GradleVsCode") version "2.1.0"
+    id("com.diffplug.spotless") version "6.25.0"
 }
 
 sourceSets["main"].java {
@@ -44,6 +45,27 @@ tasks.withType<Javadoc> {
 java {
     withSourcesJar()
     withJavadocJar()
+}
+
+// Spotless formatting
+spotless {
+    java {
+        target("src/main/java/**/*.java", "autolog/src/main/java/**/*.java")
+        toggleOffOn()
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+        licenseHeader("// Copyright (c) 2021-2025 Littleton Robotics\n// http://github.com/Mechanical-Advantage\n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n\n")
+    }
+    cpp {
+        target("src/main/native/**/*.cc", "src/main/native/**/*.h", "src/test/native/**/*.cc", "src/test/native/**/*.h")
+        toggleOffOn()
+        eclipseCdt()
+        trimTrailingWhitespace()
+        endWithNewline()
+        licenseHeader("// Copyright (c) 2021-2025 Littleton Robotics\n// http://github.com/Mechanical-Advantage\n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n\n")
+    }
 }
 
 apply(from = "native.gradle")

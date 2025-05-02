@@ -12,3 +12,4 @@ plugins {
 
 rootProject.name = "AdvantageKit"
 includeBuild("akit")
+includeBuild("template_projects")
