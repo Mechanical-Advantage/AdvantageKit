@@ -1,26 +1,18 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction.networktables;
 
+import edu.wpi.first.networktables.*;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
-
-import edu.wpi.first.networktables.*;
 
 /** Publishes log data using NT4. */
 public class NT4Publisher implements LogDataReceiver {
@@ -31,7 +23,8 @@ public class NT4Publisher implements LogDataReceiver {
 
   public NT4Publisher() {
     akitTable = NetworkTableInstance.getDefault().getTable("/AdvantageKit");
-    timestampPublisher = akitTable.getIntegerTopic(timestampKey.substring(1)).publish(PubSubOption.sendAll(true));
+    timestampPublisher =
+        akitTable.getIntegerTopic(timestampKey.substring(1)).publish(PubSubOption.sendAll(true));
   }
 
   public void putTable(LogTable table) {
@@ -54,7 +47,10 @@ public class NT4Publisher implements LogDataReceiver {
       String key = field.getKey().substring(1);
       GenericPublisher publisher = publishers.get(key);
       if (publisher == null) {
-        publisher = akitTable.getTopic(key).genericPublish(field.getValue().getNT4Type(), PubSubOption.sendAll(true));
+        publisher =
+            akitTable
+                .getTopic(key)
+                .genericPublish(field.getValue().getNT4Type(), PubSubOption.sendAll(true));
         publishers.put(key, publisher);
       }
 

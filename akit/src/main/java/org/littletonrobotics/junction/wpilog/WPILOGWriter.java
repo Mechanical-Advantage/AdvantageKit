@@ -1,15 +1,9 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction.wpilog;
 
@@ -18,7 +12,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -38,11 +31,13 @@ import org.littletonrobotics.junction.Logger;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
-  private static final double timestampUpdateDelay = 5.0; // Wait several seconds after DS attached to ensure
-                                                          // timestamp/timezone is updated
+  private static final double timestampUpdateDelay =
+      5.0; // Wait several seconds after DS attached to ensure
+  // timestamp/timezone is updated
   private static final String defaultPathRio = "/U/logs";
   private static final String defaultPathSim = "logs";
-  private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
+  private static final DateTimeFormatter timeFormatter =
+      DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
   private static final String advantageScopeFileName = "ascope-log-path.txt";
 
   private String folder;
@@ -65,11 +60,9 @@ public class WPILOGWriter implements LogDataReceiver {
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
-   * @param path         Path to log file or folder. If only a folder is provided,
-   *                     the filename will be generated based on the current time
-   *                     and match number (if applicable).
-   * @param openBehavior Whether to automatically open the log file in
-   *                     AdvantageScope.
+   * @param path Path to log file or folder. If only a folder is provided, the filename will be
+   *     generated based on the current time and match number (if applicable).
+   * @param openBehavior Whether to automatically open the log file in AdvantageScope.
    */
   public WPILOGWriter(String path, AdvantageScopeOpenBehavior openBehavior) {
     this.openBehavior = openBehavior;
@@ -98,9 +91,8 @@ public class WPILOGWriter implements LogDataReceiver {
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
-   * @param path Path to log file or folder. If only a folder is provided, the
-   *             filename will be generated based on the current time and match
-   *             number (if applicable).
+   * @param path Path to log file or folder. If only a folder is provided, the filename will be
+   *     generated based on the current time and match number (if applicable).
    */
   public WPILOGWriter(String path) {
     this(path, AdvantageScopeOpenBehavior.AUTO);
@@ -109,13 +101,10 @@ public class WPILOGWriter implements LogDataReceiver {
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
-   * <p>
-   * The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The
-   * filename will be generated based on the current time and match number (if
-   * applicable).
-   * 
-   * @param openBehavior Whether to automatically open the log file in
-   *                     AdvantageScope.
+   * <p>The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The filename will be
+   * generated based on the current time and match number (if applicable).
+   *
+   * @param openBehavior Whether to automatically open the log file in AdvantageScope.
    */
   public WPILOGWriter(AdvantageScopeOpenBehavior openBehavior) {
     this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRio, openBehavior);
@@ -124,13 +113,13 @@ public class WPILOGWriter implements LogDataReceiver {
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
-   * <p>
-   * The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The
-   * filename will be generated based on the current time and match number (if
-   * applicable).
+   * <p>The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The filename will be
+   * generated based on the current time and match number (if applicable).
    */
   public WPILOGWriter() {
-    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRio, AdvantageScopeOpenBehavior.AUTO);
+    this(
+        RobotBase.isSimulation() ? defaultPathSim : defaultPathRio,
+        AdvantageScopeOpenBehavior.AUTO);
   }
 
   public void start() {
@@ -156,8 +145,9 @@ public class WPILOGWriter implements LogDataReceiver {
       return;
     }
     isOpen = true;
-    timestampID = log.start(
-        timestampKey, LoggableType.Integer.getWPILOGType(), WPILOGConstants.entryMetadata, 0);
+    timestampID =
+        log.start(
+            timestampKey, LoggableType.Integer.getWPILOGType(), WPILOGConstants.entryMetadata, 0);
     lastTable = new LogTable(0);
 
     // Reset data
@@ -171,16 +161,22 @@ public class WPILOGWriter implements LogDataReceiver {
     log.close();
 
     // Send log path to AdvantageScope
-    boolean shouldOpen = switch (openBehavior) {
-      case ALWAYS -> RobotBase.isSimulation();
-      case AUTO -> RobotBase.isSimulation() && Logger.hasReplaySource();
-      case NEVER -> false;
-    };
+    boolean shouldOpen =
+        switch (openBehavior) {
+          case ALWAYS -> RobotBase.isSimulation();
+          case AUTO -> RobotBase.isSimulation() && Logger.hasReplaySource();
+          case NEVER -> false;
+        };
     if (shouldOpen) {
       try {
-        String fullLogPath = FileSystems.getDefault().getPath(folder, filename).normalize().toAbsolutePath()
-            .toString();
-        Path advantageScopeTempPath = Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
+        String fullLogPath =
+            FileSystems.getDefault()
+                .getPath(folder, filename)
+                .normalize()
+                .toAbsolutePath()
+                .toString();
+        Path advantageScopeTempPath =
+            Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
         PrintWriter writer = new PrintWriter(advantageScopeTempPath.toString(), "UTF-8");
         writer.println(fullLogPath);
         writer.close();
@@ -193,8 +189,7 @@ public class WPILOGWriter implements LogDataReceiver {
 
   public void putTable(LogTable table) {
     // Exit if log not open
-    if (!isOpen)
-      return;
+    if (!isOpen) return;
 
     // Auto rename
     if (autoRename) {
@@ -202,11 +197,12 @@ public class WPILOGWriter implements LogDataReceiver {
       // Update timestamp
       if (logDate == null) {
         if ((table.get("DriverStation/DSAttached", false)
-            && table.get("SystemStats/SystemTimeValid", false))
+                && table.get("SystemStats/SystemTimeValid", false))
             || RobotBase.isSimulation()) {
           if (dsAttachedTime == null) {
             dsAttachedTime = RobotController.getFPGATime() / 1000000.0;
-          } else if (RobotController.getFPGATime() / 1000000.0 - dsAttachedTime > timestampUpdateDelay
+          } else if (RobotController.getFPGATime() / 1000000.0 - dsAttachedTime
+                  > timestampUpdateDelay
               || RobotBase.isSimulation()) {
             logDate = LocalDateTime.now();
           }
