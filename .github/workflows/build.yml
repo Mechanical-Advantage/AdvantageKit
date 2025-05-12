@@ -21,6 +21,8 @@ jobs:
           java-version: "17"
       - name: "Install RoboRIO toolchain"
         run: ./gradlew :akit:installRoboRioToolchain
+      - name: "Check formatting"
+        run: ./gradlew spotlessCheck
       - name: "Build and test"
         run: ./gradlew :akit:build -Ponlylinuxathena
       - name: "Development: Publish local"

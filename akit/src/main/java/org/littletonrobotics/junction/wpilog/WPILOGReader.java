@@ -1,32 +1,24 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction.wpilog;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.littletonrobotics.junction.LogTable;
-import org.littletonrobotics.junction.LogTable.LogValue;
-import org.littletonrobotics.junction.LogTable.LoggableType;
-import org.littletonrobotics.junction.LogDataReceiver;
-import org.littletonrobotics.junction.LogReplaySource;
 
 import edu.wpi.first.util.datalog.DataLogIterator;
 import edu.wpi.first.util.datalog.DataLogReader;
 import edu.wpi.first.util.datalog.DataLogRecord;
 import edu.wpi.first.wpilibj.DriverStation;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import org.littletonrobotics.junction.LogDataReceiver;
+import org.littletonrobotics.junction.LogReplaySource;
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.LogTable.LogValue;
+import org.littletonrobotics.junction.LogTable.LoggableType;
 
 /** Replays log values from a WPILOG file. */
 public class WPILOGReader implements LogReplaySource {
@@ -58,7 +50,8 @@ public class WPILOGReader implements LogReplaySource {
       DriverStation.reportError("[AdvantageKit] The replay log is not a valid WPILOG file.", false);
       isValid = false;
     } else if (!reader.getExtraHeader().equals(WPILOGConstants.extraHeader)) {
-      DriverStation.reportError("[AdvantageKit] The replay log was not produced by AdvantageKit.", true);
+      DriverStation.reportError(
+          "[AdvantageKit] The replay log was not produced by AdvantageKit.", true);
       isValid = false;
     } else {
       isValid = true;
@@ -99,7 +92,9 @@ public class WPILOGReader implements LogReplaySource {
             entryIDs.put(record.getStartData().entry, record.getStartData().name);
             String typeStr = record.getStartData().type;
             entryTypes.put(record.getStartData().entry, LoggableType.fromWPILOGType(typeStr));
-            if (typeStr.startsWith("proto:") || typeStr.startsWith("struct:") || typeStr.equals("structschema")) {
+            if (typeStr.startsWith("proto:")
+                || typeStr.startsWith("struct:")
+                || typeStr.equals("structschema")) {
               entryCustomTypes.put(record.getStartData().entry, typeStr);
             }
           }

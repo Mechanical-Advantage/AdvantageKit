@@ -1,18 +1,13 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction.rlog;
 
+import edu.wpi.first.wpilibj.RobotController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -21,11 +16,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
-
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
-
-import edu.wpi.first.wpilibj.RobotController;
 
 /** Sends log data over a socket connection using the RLOG format. */
 public class RLOGServer implements LogDataReceiver {
@@ -78,8 +70,9 @@ public class RLOGServer implements LogDataReceiver {
   }
 
   private class ServerThread extends Thread {
-    private static final double heartbeatTimeoutSecs = 3.0; // Close connection if heartbeat not received for this
-                                                            // length
+    private static final double heartbeatTimeoutSecs =
+        3.0; // Close connection if heartbeat not received for this
+    // length
 
     ServerSocket server;
     Thread broadcastThread;
@@ -122,7 +115,9 @@ public class RLOGServer implements LogDataReceiver {
             sockets.add(socket);
             lastHeartbeats.add(RobotController.getFPGATime() / 1000000.0);
           }
-          System.out.println("[AdvantageKit] Connected to RLOG client - " + socket.getInetAddress().getHostAddress());
+          System.out.println(
+              "[AdvantageKit] Connected to RLOG client - "
+                  + socket.getInetAddress().getHostAddress());
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -158,7 +153,8 @@ public class RLOGServer implements LogDataReceiver {
               }
 
               // Close connection if socket timed out
-              if (RobotController.getFPGATime() / 1000000.0 - lastHeartbeats.get(i) > heartbeatTimeoutSecs) {
+              if (RobotController.getFPGATime() / 1000000.0 - lastHeartbeats.get(i)
+                  > heartbeatTimeoutSecs) {
                 socket.close();
                 printDisconnectMessage(socket, "timeout");
                 continue;
@@ -186,8 +182,11 @@ public class RLOGServer implements LogDataReceiver {
     }
 
     private void printDisconnectMessage(Socket socket, String reason) {
-      System.out
-          .println("Disconnected from RLOG client (" + reason + ") - " + socket.getInetAddress().getHostAddress());
+      System.out.println(
+          "Disconnected from RLOG client ("
+              + reason
+              + ") - "
+              + socket.getInetAddress().getHostAddress());
     }
 
     public void close() {

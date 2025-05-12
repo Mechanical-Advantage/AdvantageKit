@@ -1,18 +1,13 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction.console;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -24,11 +19,9 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import edu.wpi.first.wpilibj.DriverStation;
-
 /**
- * Reads console data on the RIO. Saves stdout and sterr from both Java and
- * native code, including lines logged before this class was instantiated.
+ * Reads console data on the RIO. Saves stdout and sterr from both Java and native code, including
+ * lines logged before this class was instantiated.
  */
 public class RIOConsoleSource implements ConsoleSource {
   private static final String filePath = "/home/lvuser/FRC_UserProgram.log";
@@ -60,7 +53,10 @@ public class RIOConsoleSource implements ConsoleSource {
       reader = new BufferedReader(new FileReader(filePath));
     } catch (FileNotFoundException e) {
       DriverStation.reportError(
-          "[AdvantageKit] Failed to open console file \"" + filePath + "\", disabling console capture.", true);
+          "[AdvantageKit] Failed to open console file \""
+              + filePath
+              + "\", disabling console capture.",
+          true);
       return;
     }
 
@@ -72,7 +68,10 @@ public class RIOConsoleSource implements ConsoleSource {
           nextChar = reader.read();
         } catch (IOException e) {
           DriverStation.reportError(
-              "[AdvantageKit] Failed to read console file \"" + filePath + "\", disabling console capture.", true);
+              "[AdvantageKit] Failed to read console file \""
+                  + filePath
+                  + "\", disabling console capture.",
+              true);
           try {
             reader.close();
           } catch (IOException io) {

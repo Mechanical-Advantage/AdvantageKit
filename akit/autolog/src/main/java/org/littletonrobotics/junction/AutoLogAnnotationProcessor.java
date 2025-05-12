@@ -1,20 +1,18 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction;
 
 import com.squareup.javapoet.*;
-
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -23,11 +21,6 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 public class AutoLogAnnotationProcessor extends AbstractProcessor {
   private static String getPackageName(Element e) {
@@ -41,9 +34,10 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
     return null;
   }
 
-  private static final TypeName LOG_TABLE_TYPE = ClassName.get("org.littletonrobotics.junction", "LogTable");
-  private static final TypeName LOGGABLE_INPUTS_TYPE = ClassName.get("org.littletonrobotics.junction.inputs",
-      "LoggableInputs");
+  private static final TypeName LOG_TABLE_TYPE =
+      ClassName.get("org.littletonrobotics.junction", "LogTable");
+  private static final TypeName LOGGABLE_INPUTS_TYPE =
+      ClassName.get("org.littletonrobotics.junction.inputs", "LoggableInputs");
   private static final Map<String, String> UNLOGGABLE_TYPES_SUGGESTIONS = new HashMap<>();
 
   static {
@@ -62,106 +56,131 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    Optional<? extends TypeElement> annotationOptional = annotations.stream()
-        .filter((te) -> te.getSimpleName().toString().equals("AutoLog")).findFirst();
+    Optional<? extends TypeElement> annotationOptional =
+        annotations.stream()
+            .filter((te) -> te.getSimpleName().toString().equals("AutoLog"))
+            .findFirst();
     if (!annotationOptional.isPresent()) {
       return false;
     }
 
     TypeElement annotation = annotationOptional.get();
-    roundEnv.getElementsAnnotatedWith(annotation).forEach(classElement -> {
-      String autologgedClassName = classElement.getSimpleName() + "AutoLogged";
-      String autologgedPackage = getPackageName(classElement);
+    roundEnv
+        .getElementsAnnotatedWith(annotation)
+        .forEach(
+            classElement -> {
+              String autologgedClassName = classElement.getSimpleName() + "AutoLogged";
+              String autologgedPackage = getPackageName(classElement);
 
-      MethodSpec.Builder toLogBuilder = MethodSpec.methodBuilder("toLog")
-          .addAnnotation(Override.class)
-          .addModifiers(Modifier.PUBLIC)
-          .addParameter(LOG_TABLE_TYPE, "table");
-      MethodSpec.Builder fromLogBuilder = MethodSpec.methodBuilder("fromLog")
-          .addAnnotation(Override.class)
-          .addModifiers(Modifier.PUBLIC)
-          .addParameter(LOG_TABLE_TYPE, "table");
-      MethodSpec.Builder cloneBuilder = MethodSpec.methodBuilder("clone")
-          .addModifiers(Modifier.PUBLIC)
-          .addCode("$L copy = new $L();\n", autologgedClassName, autologgedClassName)
-          .returns(ClassName.get(autologgedPackage, autologgedClassName));
+              MethodSpec.Builder toLogBuilder =
+                  MethodSpec.methodBuilder("toLog")
+                      .addAnnotation(Override.class)
+                      .addModifiers(Modifier.PUBLIC)
+                      .addParameter(LOG_TABLE_TYPE, "table");
+              MethodSpec.Builder fromLogBuilder =
+                  MethodSpec.methodBuilder("fromLog")
+                      .addAnnotation(Override.class)
+                      .addModifiers(Modifier.PUBLIC)
+                      .addParameter(LOG_TABLE_TYPE, "table");
+              MethodSpec.Builder cloneBuilder =
+                  MethodSpec.methodBuilder("clone")
+                      .addModifiers(Modifier.PUBLIC)
+                      .addCode("$L copy = new $L();\n", autologgedClassName, autologgedClassName)
+                      .returns(ClassName.get(autologgedPackage, autologgedClassName));
 
-      Types util = processingEnv.getTypeUtils();
-      TypeElement typeElement = (TypeElement) classElement;
-      boolean isSuperclass = false;
-      while (typeElement != null) {
-        final TypeElement finalTypeElement = typeElement;
-        final boolean finalIsSuperclass = isSuperclass;
-        typeElement.getEnclosedElements().stream().filter(f -> f.getKind().equals(ElementKind.FIELD))
-            .forEach(fieldElement -> {
-              if (finalIsSuperclass && fieldElement.getModifiers().contains(Modifier.PRIVATE)) {
-                return;
-              }
+              Types util = processingEnv.getTypeUtils();
+              TypeElement typeElement = (TypeElement) classElement;
+              boolean isSuperclass = false;
+              while (typeElement != null) {
+                final TypeElement finalTypeElement = typeElement;
+                final boolean finalIsSuperclass = isSuperclass;
+                typeElement.getEnclosedElements().stream()
+                    .filter(f -> f.getKind().equals(ElementKind.FIELD))
+                    .forEach(
+                        fieldElement -> {
+                          if (finalIsSuperclass
+                              && fieldElement.getModifiers().contains(Modifier.PRIVATE)) {
+                            return;
+                          }
 
-              String simpleName = fieldElement.getSimpleName().toString();
-              String logName = simpleName.substring(0, 1).toUpperCase() + simpleName.substring(1);
+                          String simpleName = fieldElement.getSimpleName().toString();
+                          String logName =
+                              simpleName.substring(0, 1).toUpperCase() + simpleName.substring(1);
 
-              String fieldType = fieldElement.asType().toString();
-              String typeSuggestion = UNLOGGABLE_TYPES_SUGGESTIONS.get(fieldType);
+                          String fieldType = fieldElement.asType().toString();
+                          String typeSuggestion = UNLOGGABLE_TYPES_SUGGESTIONS.get(fieldType);
 
-              // Check for unloggable types
-              if (typeSuggestion != null
-                  || (fieldType.startsWith("java") && !fieldType.startsWith("java.lang.String"))) {
-                String extraText = "";
-                if (typeSuggestion != null) {
-                  extraText = "Did you mean to use \"" + typeSuggestion + "\" instead?";
+                          // Check for unloggable types
+                          if (typeSuggestion != null
+                              || (fieldType.startsWith("java")
+                                  && !fieldType.startsWith("java.lang.String"))) {
+                            String extraText = "";
+                            if (typeSuggestion != null) {
+                              extraText = "Did you mean to use \"" + typeSuggestion + "\" instead?";
+                            } else {
+                              extraText = "\"" + fieldType + "\" is not supported";
+                            }
+                            throw new RuntimeException(
+                                "[AutoLog] Unkonwn type for \""
+                                    + simpleName
+                                    + "\" from \""
+                                    + finalTypeElement.getSimpleName()
+                                    + "\" ("
+                                    + extraText
+                                    + ")");
+                          }
+
+                          // Log data (might be serialized)
+                          toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
+                          fromLogBuilder.addCode(
+                              "$L = table.get($S, $L);\n", simpleName, logName, simpleName);
+                          if (fieldElement.asType().getKind().equals(TypeKind.ARRAY)) {
+                            // Need to deep copy arrays
+                            cloneBuilder.addCode(
+                                "copy.$L = this.$L.clone();\n", simpleName, simpleName);
+                          } else if (fieldElement
+                              .asType()
+                              .toString()
+                              .startsWith("edu.wpi.first.units.MutableMeasure")) {
+                            // Need to clone mutable measure
+                            cloneBuilder.addCode(
+                                "copy.$L = this.$L.mutableCopy();\n", simpleName, simpleName);
+                          } else {
+                            cloneBuilder.addCode("copy.$L = this.$L;\n", simpleName, simpleName);
+                          }
+                        });
+                TypeMirror mirror = (typeElement).getSuperclass();
+                if (mirror.getKind() == TypeKind.DECLARED) {
+                  typeElement = (TypeElement) util.asElement(mirror);
+                  isSuperclass = true;
                 } else {
-                  extraText = "\"" + fieldType + "\" is not supported";
+                  typeElement = null;
                 }
-                throw new RuntimeException(
-                    "[AutoLog] Unkonwn type for \"" + simpleName + "\" from \"" +
-                        finalTypeElement.getSimpleName()
-                        + "\" (" + extraText + ")");
               }
 
-              // Log data (might be serialized)
-              toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
-              fromLogBuilder.addCode("$L = table.get($S, $L);\n", simpleName, logName, simpleName);
-              if (fieldElement.asType().getKind().equals(TypeKind.ARRAY)) {
-                // Need to deep copy arrays
-                cloneBuilder.addCode("copy.$L = this.$L.clone();\n", simpleName, simpleName);
-              } else if (fieldElement.asType().toString().startsWith("edu.wpi.first.units.MutableMeasure")) {
-                // Need to clone mutable measure
-                cloneBuilder.addCode("copy.$L = this.$L.mutableCopy();\n", simpleName, simpleName);
-              } else {
-                cloneBuilder.addCode("copy.$L = this.$L;\n", simpleName, simpleName);
+              cloneBuilder.addCode("return copy;\n");
+
+              TypeSpec type =
+                  TypeSpec.classBuilder(autologgedClassName)
+                      .addModifiers(Modifier.PUBLIC)
+                      .addSuperinterface(LOGGABLE_INPUTS_TYPE)
+                      .addSuperinterface(ClassName.get("java.lang", "Cloneable"))
+                      .superclass(classElement.asType())
+                      .addMethod(toLogBuilder.build())
+                      .addMethod(fromLogBuilder.build())
+                      .addMethod(cloneBuilder.build())
+                      .build();
+
+              JavaFile file = JavaFile.builder(autologgedPackage, type).build();
+              try {
+                file.writeTo(processingEnv.getFiler());
+              } catch (IOException e) {
+                processingEnv
+                    .getMessager()
+                    .printMessage(Diagnostic.Kind.ERROR, "Failed to write class", classElement);
+                e.printStackTrace();
               }
             });
-        TypeMirror mirror = (typeElement).getSuperclass();
-        if (mirror.getKind() == TypeKind.DECLARED) {
-          typeElement = (TypeElement) util.asElement(mirror);
-          isSuperclass = true;
-        } else {
-          typeElement = null;
-        }
-      }
-
-      cloneBuilder.addCode("return copy;\n");
-
-      TypeSpec type = TypeSpec
-          .classBuilder(autologgedClassName)
-          .addModifiers(Modifier.PUBLIC)
-          .addSuperinterface(LOGGABLE_INPUTS_TYPE)
-          .addSuperinterface(ClassName.get("java.lang", "Cloneable"))
-          .superclass(classElement.asType())
-          .addMethod(toLogBuilder.build())
-          .addMethod(fromLogBuilder.build())
-          .addMethod(cloneBuilder.build())
-          .build();
-
-      JavaFile file = JavaFile.builder(autologgedPackage, type).build();
-      try {
-        file.writeTo(processingEnv.getFiler());
-      } catch (IOException e) {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Failed to write class", classElement);
-        e.printStackTrace();
-      }
-    });
     return true;
   }
 
