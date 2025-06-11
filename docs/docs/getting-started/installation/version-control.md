@@ -67,9 +67,7 @@ The metadata values can be viewed using AdvantageScope's 🔍 [Metadata](https:/
 
 ## Event Deploy
 
-Code often changes repeatedly during competition, which would normally mean running code with uncommitted change. This is a problem for log replay, since the version of code running in a particular match may be impossible to recreate afterwards.
-
-This can be addressed by including a Gradle task to automatically commit working changes to a temporary branch before every deploy.
+Code often changes repeatedly during competition, which would normally mean running code with uncommitted changes. This is a problem for log replay, since the version of code running in a particular match may be impossible to recreate afterwards. This can be addressed by including a Gradle task to automatically commit working changes to a temporary branch before every deploy.
 
 ### Installation
 
