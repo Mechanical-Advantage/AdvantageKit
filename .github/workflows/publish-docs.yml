@@ -46,3 +46,17 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  algolia-crawl:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Algolia Crawler
+        uses: algolia/algoliasearch-crawler-github-action@v1
+        with:
+          crawler-user-id: ${{ secrets.ALGOLIA_CRAWLER_USER_ID }}
+          crawler-api-key: ${{ secrets.ALGOLIA_CRAWLER_API_KEY }}
+          algolia-app-id: ${{ secrets.ALGOLIA_APPLICATION_ID }}
+          algolia-api-key: ${{ secrets.ALGOLIA_API_KEY }}
+          site-url: "https://docs.advantagekit.org"
+          crawler-name: "advantagekit"
