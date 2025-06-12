@@ -33,10 +33,6 @@ public:
 			schema::PDPData *pdp_buf);
 
 private:
-	void update_ctre_pdp_data(schema::PDPData *pdp_buf);
-	void update_rev_pdh_data(schema::PDPData *pdp_buf);
-	void update_sim_data(schema::PDPData *pdp_buf);
-
 	HAL_PowerDistributionHandle pd_handle;
 	HAL_CANHandle pd_can_handle;
 	HAL_PowerDistributionType pd_type;
