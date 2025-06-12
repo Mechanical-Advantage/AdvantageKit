@@ -21,7 +21,7 @@
 #include <mutex>
 
 #include "conduit/HALUtil.h"
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
 #include "conduit/pdh_util.h"
 #include "conduit/pdp_util.h"
 #endif
@@ -31,7 +31,7 @@ using namespace std::chrono_literals;
 #define MAX_CHANNEL_COUNT 24
 
 void PDPReader::read(schema::PDPData *pdp_buf) {
-#ifdef AKIT_ATHENA
+#ifdef __FRC_SYSTEMCORE__
   if (pd_type == HAL_PowerDistributionType_kCTRE) {
     update_ctre_pdp_data(pdp_buf);
   } else if (pd_type == HAL_PowerDistributionType_kRev) {
@@ -49,18 +49,18 @@ void PDPReader::configure(JNIEnv *env, jint bus, jint module, jint type,
 	pd_handle = HAL_InitializePowerDistribution(bus, module,
 			static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
 			&status);
-#ifdef AKIT_ATHENA
+#ifdef __FRC_SYSTEMCORE__
   hal::CheckStatus(env, status, false);
 #endif
 
 	int32_t pd_module_id = HAL_GetPowerDistributionModuleNumber(pd_handle,
 			&status);
-#ifdef AKIT_ATHENA
+#ifdef __FRC_SYSTEMCORE__
   hal::CheckStatus(env, status, false);
 #endif
 
 	pd_type = HAL_GetPowerDistributionType(pd_handle, &status);
-#ifdef AKIT_ATHENA
+#ifdef __FRC_SYSTEMCORE__
   hal::CheckStatus(env, status, false);
 #endif
 
@@ -88,7 +88,7 @@ void PDPReader::configure(JNIEnv *env, jint bus, jint module, jint type,
 	}
 }
 
-#ifdef AKIT_ATHENA
+#ifdef __FRC_SYSTEMCORE__
 
 void PDPReader::update_ctre_pdp_data(schema::PDPData* pdp_buf) {
   int32_t status;
