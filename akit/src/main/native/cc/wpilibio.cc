@@ -60,8 +60,8 @@ void capture_data(void) {
 	sys_reader.read(sys_view);
 }
 
-void configurePDP(JNIEnv *env, jint moduleNumber, jint type) {
-	pdp_reader.configure(env, moduleNumber, type, pdp_view);
+void configurePDP(JNIEnv *env, jint busId, jint moduleNumber, jint type) {
+	pdp_reader.configure(env, busId, moduleNumber, type, pdp_view);
 }
 
 }  // namespace wpilibio

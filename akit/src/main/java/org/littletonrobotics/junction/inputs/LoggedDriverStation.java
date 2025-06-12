@@ -9,7 +9,6 @@ package org.littletonrobotics.junction.inputs;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import org.littletonrobotics.conduit.ConduitApi;
@@ -39,11 +38,11 @@ public class LoggedDriverStation {
     table.put("FMSAttached", (controlWord & 16) != 0);
     table.put("DSAttached", (controlWord & 32) != 0);
 
-    for (int id = 0; id < DriverStation.kJoystickPorts; id++) {
+    for (int id = 0; id < ConduitApi.NUM_JOYSTICKS; id++) {
       LogTable joystickTable = table.getSubtable("Joystick" + Integer.toString(id));
       joystickTable.put("Name", conduit.getJoystickName(id).trim());
       joystickTable.put("Type", conduit.getJoystickType(id));
-      joystickTable.put("Xbox", conduit.isXbox(id));
+      joystickTable.put("IsGamepad", conduit.isGamepad(id));
       joystickTable.put("ButtonCount", conduit.getButtonCount(id));
       joystickTable.put("ButtonValues", conduit.getButtonValues(id));
 
@@ -95,11 +94,11 @@ public class LoggedDriverStation {
     DriverStationSim.setFmsAttached(table.get("FMSAttached", false));
     DriverStationSim.setDsAttached(dsAttached);
 
-    for (int id = 0; id < DriverStation.kJoystickPorts; id++) {
+    for (int id = 0; id < ConduitApi.NUM_JOYSTICKS; id++) {
       LogTable joystickTable = table.getSubtable("Joystick" + Integer.toString(id));
       DriverStationSim.setJoystickName(id, joystickTable.get("Name", ""));
       DriverStationSim.setJoystickType(id, joystickTable.get("Type", 0));
-      DriverStationSim.setJoystickIsXbox(id, joystickTable.get("Xbox", false));
+      DriverStationSim.setJoystickIsGamepad(id, joystickTable.get("IsGamepad", false));
       DriverStationSim.setJoystickButtonCount(id, joystickTable.get("ButtonCount", 0));
       DriverStationSim.setJoystickButtons(id, joystickTable.get("ButtonValues", 0));
 

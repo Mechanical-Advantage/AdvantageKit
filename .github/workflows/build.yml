@@ -8,8 +8,8 @@ on:
     types: [published]
 
 jobs:
-  build-athena:
-    name: "Build for Athena"
+  build-systemcore:
+    name: "Build for SystemCore"
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout repository"
@@ -19,15 +19,15 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
-      - name: "Install RoboRIO toolchain"
-        run: ./gradlew :akit:installRoboRioToolchain
+      - name: "Install SystemCore toolchain"
+        run: ./gradlew :akit:installSystemCoreToolchain
       - name: "Check formatting"
         run: ./gradlew spotlessCheck
       - name: "Build and test"
-        run: ./gradlew :akit:build -Ponlylinuxathena
+        run: ./gradlew :akit:build -Ponlylinuxsystemcore
       - name: "Development: Publish local"
         if: github.event_name != 'release'
-        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponlylinuxathena
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponlylinuxsystemcore
       - name: "Release: Get version number"
         id: get_version
         if: github.event_name == 'release'
@@ -40,7 +40,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
       - name: "Release: Publish remote"
         if: github.event_name == 'release'
-        run: ./gradlew :akit:publish -Ponlylinuxathena "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
+        run: ./gradlew :akit:publish -Ponlylinuxsystemcore "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
         env:
           ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
@@ -57,7 +57,7 @@ jobs:
       - name: "Upload local repo"
         uses: actions/upload-artifact@v4
         with:
-          name: maven_linuxathena
+          name: maven_linuxsystemcore
           path: akit/build/repos/releases
       - name: "Generate template projects"
         working-directory: template_projects
@@ -195,13 +195,13 @@ jobs:
   combine:
     name: "Combine Maven Offline"
     runs-on: ubuntu-latest
-    needs: [build-athena, build-desktop]
+    needs: [build-systemcore, build-desktop]
     steps:
-      - name: "Download Athena"
+      - name: "Download SystemCore"
         uses: actions/download-artifact@v4
         with:
-          name: maven_linuxathena
-          path: maven_linuxathena
+          name: maven_linuxsystemcore
+          path: maven_linuxsystemcore
       - name: "Download Linux (x64)"
         uses: actions/download-artifact@v4
         with:
@@ -224,7 +224,7 @@ jobs:
           path: maven_windowsx86-64
       - name: "Combine"
         run: |
-          rsync -a maven_linuxathena/* maven_offline
+          rsync -a maven_linuxsystemcore/* maven_offline
           rsync -a maven_linuxx86-64/* maven_offline
           rsync -a maven_linuxarm64/* maven_offline
           rsync -a maven_osxuniversal/* maven_offline

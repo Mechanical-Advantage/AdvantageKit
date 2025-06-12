@@ -7,7 +7,7 @@
 
 package org.littletonrobotics.junction.wpilog;
 
-import edu.wpi.first.util.datalog.DataLogWriter;
+import edu.wpi.first.datalog.DataLogWriter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -31,10 +31,9 @@ import org.littletonrobotics.junction.Logger;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
-  private static final double timestampUpdateDelay =
-      5.0; // Wait several seconds after DS attached to ensure
-  // timestamp/timezone is updated
-  private static final String defaultPathRio = "/U/logs";
+  // Wait several seconds after DS attached to ensure time is updated
+  private static final double timestampUpdateDelay = 5.0;
+  private static final String defaultPathRobot = "/U/logs";
   private static final String defaultPathSim = "logs";
   private static final DateTimeFormatter timeFormatter =
       DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
@@ -101,24 +100,24 @@ public class WPILOGWriter implements LogDataReceiver {
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
-   * <p>The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The filename will be
+   * <p>The logs will be saved to "/U/logs" on the robot and "logs" in sim. The filename will be
    * generated based on the current time and match number (if applicable).
    *
    * @param openBehavior Whether to automatically open the log file in AdvantageScope.
    */
   public WPILOGWriter(AdvantageScopeOpenBehavior openBehavior) {
-    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRio, openBehavior);
+    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRobot, openBehavior);
   }
 
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
-   * <p>The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The filename will be
+   * <p>The logs will be saved to "/U/logs" on the robot and "logs" in sim. The filename will be
    * generated based on the current time and match number (if applicable).
    */
   public WPILOGWriter() {
     this(
-        RobotBase.isSimulation() ? defaultPathSim : defaultPathRio,
+        RobotBase.isSimulation() ? defaultPathSim : defaultPathRobot,
         AdvantageScopeOpenBehavior.AUTO);
   }
 

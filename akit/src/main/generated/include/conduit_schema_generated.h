@@ -54,8 +54,8 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
   int8_t padding1__;  int16_t padding2__;
   int32_t buttons_;
   int16_t pov_count_;
-  int16_t pov_values_[12];
-  uint8_t is_xbox_;
+  uint8_t pov_values_[8];
+  uint8_t is_gamepad_;
   int8_t padding3__;
 
  public:
@@ -75,14 +75,14 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
         buttons_(0),
         pov_count_(0),
         pov_values_(),
-        is_xbox_(0),
+        is_gamepad_(0),
         padding3__(0) {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
     (void)padding3__;
   }
-  Joystick(uint8_t _type, int16_t _axis_count, uint8_t _button_count, int32_t _buttons, int16_t _pov_count, bool _is_xbox)
+  Joystick(uint8_t _type, int16_t _axis_count, uint8_t _button_count, int32_t _buttons, int16_t _pov_count, bool _is_gamepad)
       : name_(),
         type_(::flatbuffers::EndianScalar(_type)),
         padding0__(0),
@@ -95,14 +95,14 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
         buttons_(::flatbuffers::EndianScalar(_buttons)),
         pov_count_(::flatbuffers::EndianScalar(_pov_count)),
         pov_values_(),
-        is_xbox_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_xbox))),
+        is_gamepad_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_gamepad))),
         padding3__(0) {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
     (void)padding3__;
   }
-  Joystick(::flatbuffers::span<const uint8_t, 256> _name, uint8_t _type, int16_t _axis_count, ::flatbuffers::span<const uint8_t, 12> _axis_types, ::flatbuffers::span<const float, 12> _axis_values, uint8_t _button_count, int32_t _buttons, int16_t _pov_count, ::flatbuffers::span<const int16_t, 12> _pov_values, bool _is_xbox)
+  Joystick(::flatbuffers::span<const uint8_t, 256> _name, uint8_t _type, int16_t _axis_count, ::flatbuffers::span<const uint8_t, 12> _axis_types, ::flatbuffers::span<const float, 12> _axis_values, uint8_t _button_count, int32_t _buttons, int16_t _pov_count, ::flatbuffers::span<const uint8_t, 8> _pov_values, bool _is_gamepad)
       : type_(::flatbuffers::EndianScalar(_type)),
         padding0__(0),
         axis_count_(::flatbuffers::EndianScalar(_axis_count)),
@@ -111,7 +111,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
         padding2__(0),
         buttons_(::flatbuffers::EndianScalar(_buttons)),
         pov_count_(::flatbuffers::EndianScalar(_pov_count)),
-        is_xbox_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_xbox))),
+        is_gamepad_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_gamepad))),
         padding3__(0) {
     ::flatbuffers::CastToArray(name_).CopyFromSpan(_name);
     (void)padding0__;
@@ -170,20 +170,20 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
   void mutate_pov_count(int16_t _pov_count) {
     ::flatbuffers::WriteScalar(&pov_count_, _pov_count);
   }
-  const ::flatbuffers::Array<int16_t, 12> *pov_values() const {
+  const ::flatbuffers::Array<uint8_t, 8> *pov_values() const {
     return &::flatbuffers::CastToArray(pov_values_);
   }
-  ::flatbuffers::Array<int16_t, 12> *mutable_pov_values() {
+  ::flatbuffers::Array<uint8_t, 8> *mutable_pov_values() {
     return &::flatbuffers::CastToArray(pov_values_);
   }
-  bool is_xbox() const {
-    return ::flatbuffers::EndianScalar(is_xbox_) != 0;
+  bool is_gamepad() const {
+    return ::flatbuffers::EndianScalar(is_gamepad_) != 0;
   }
-  void mutate_is_xbox(bool _is_xbox) {
-    ::flatbuffers::WriteScalar(&is_xbox_, static_cast<uint8_t>(_is_xbox));
+  void mutate_is_gamepad(bool _is_gamepad) {
+    ::flatbuffers::WriteScalar(&is_gamepad_, static_cast<uint8_t>(_is_gamepad));
   }
 };
-FLATBUFFERS_STRUCT_END(Joystick, 356);
+FLATBUFFERS_STRUCT_END(Joystick, 340);
 
 inline bool operator==(const Joystick &lhs, const Joystick &rhs) {
   return
@@ -196,7 +196,7 @@ inline bool operator==(const Joystick &lhs, const Joystick &rhs) {
       (lhs.buttons() == rhs.buttons()) &&
       (lhs.pov_count() == rhs.pov_count()) &&
       (*lhs.pov_values() == *rhs.pov_values()) &&
-      (lhs.is_xbox() == rhs.is_xbox());
+      (lhs.is_gamepad() == rhs.is_gamepad());
 }
 
 inline bool operator!=(const Joystick &lhs, const Joystick &rhs) {
@@ -338,7 +338,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
     return &::flatbuffers::CastToArray(joysticks_);
   }
 };
-FLATBUFFERS_STRUCT_END(DSData, 2296);
+FLATBUFFERS_STRUCT_END(DSData, 2200);
 
 inline bool operator==(const DSData &lhs, const DSData &rhs) {
   return
@@ -598,31 +598,22 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   uint16_t comments_size_;
   uint8_t comments_[64];
   int32_t team_number_;
-  int32_t fpga_button_;
   int32_t system_active_;
   int32_t browned_out_;
   int32_t comms_disable_count_;
   int32_t rsl_state_;
   int32_t system_time_valid_;
+  int32_t padding0__;
   double voltage_vin_;
-  double current_vin_;
   double user_voltage_3v3_;
   double user_current_3v3_;
   int32_t user_active_3v3_;
   int32_t user_current_faults_3v3_;
-  double user_voltage_5v_;
-  double user_current_5v_;
-  int32_t user_active_5v_;
-  int32_t user_current_faults_5v_;
-  double user_voltage_6v_;
-  double user_current_6v_;
-  int32_t user_active_6v_;
-  int32_t user_current_faults_6v_;
   double brownout_voltage_;
   double cpu_temp_;
-  org::littletonrobotics::conduit::schema::CANStatus can_status_;
-  int32_t padding0__;
   uint64_t epoch_time_;
+  org::littletonrobotics::conduit::schema::CANStatus can_status_[5];
+  int32_t padding1__;
 
  public:
   static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
@@ -636,34 +627,26 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         comments_size_(0),
         comments_(),
         team_number_(0),
-        fpga_button_(0),
         system_active_(0),
         browned_out_(0),
         comms_disable_count_(0),
         rsl_state_(0),
         system_time_valid_(0),
+        padding0__(0),
         voltage_vin_(0),
-        current_vin_(0),
         user_voltage_3v3_(0),
         user_current_3v3_(0),
         user_active_3v3_(0),
         user_current_faults_3v3_(0),
-        user_voltage_5v_(0),
-        user_current_5v_(0),
-        user_active_5v_(0),
-        user_current_faults_5v_(0),
-        user_voltage_6v_(0),
-        user_current_6v_(0),
-        user_active_6v_(0),
-        user_current_faults_6v_(0),
         brownout_voltage_(0),
         cpu_temp_(0),
+        epoch_time_(0),
         can_status_(),
-        padding0__(0),
-        epoch_time_(0) {
+        padding1__(0) {
     (void)padding0__;
+    (void)padding1__;
   }
-  SystemData(int32_t _fpga_version, int32_t _fpga_revision, uint16_t _serial_number_size, uint16_t _comments_size, int32_t _team_number, int32_t _fpga_button, int32_t _system_active, int32_t _browned_out, int32_t _comms_disable_count, int32_t _rsl_state, int32_t _system_time_valid, double _voltage_vin, double _current_vin, double _user_voltage_3v3, double _user_current_3v3, int32_t _user_active_3v3, int32_t _user_current_faults_3v3, double _user_voltage_5v, double _user_current_5v, int32_t _user_active_5v, int32_t _user_current_faults_5v, double _user_voltage_6v, double _user_current_6v, int32_t _user_active_6v, int32_t _user_current_faults_6v, double _brownout_voltage, double _cpu_temp, const org::littletonrobotics::conduit::schema::CANStatus &_can_status, uint64_t _epoch_time)
+  SystemData(int32_t _fpga_version, int32_t _fpga_revision, uint16_t _serial_number_size, uint16_t _comments_size, int32_t _team_number, int32_t _system_active, int32_t _browned_out, int32_t _comms_disable_count, int32_t _rsl_state, int32_t _system_time_valid, double _voltage_vin, double _user_voltage_3v3, double _user_current_3v3, int32_t _user_active_3v3, int32_t _user_current_faults_3v3, double _brownout_voltage, double _cpu_temp, uint64_t _epoch_time)
       : fpga_version_(::flatbuffers::EndianScalar(_fpga_version)),
         fpga_revision_(::flatbuffers::EndianScalar(_fpga_revision)),
         serial_number_size_(::flatbuffers::EndianScalar(_serial_number_size)),
@@ -671,67 +654,51 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         comments_size_(::flatbuffers::EndianScalar(_comments_size)),
         comments_(),
         team_number_(::flatbuffers::EndianScalar(_team_number)),
-        fpga_button_(::flatbuffers::EndianScalar(_fpga_button)),
         system_active_(::flatbuffers::EndianScalar(_system_active)),
         browned_out_(::flatbuffers::EndianScalar(_browned_out)),
         comms_disable_count_(::flatbuffers::EndianScalar(_comms_disable_count)),
         rsl_state_(::flatbuffers::EndianScalar(_rsl_state)),
         system_time_valid_(::flatbuffers::EndianScalar(_system_time_valid)),
+        padding0__(0),
         voltage_vin_(::flatbuffers::EndianScalar(_voltage_vin)),
-        current_vin_(::flatbuffers::EndianScalar(_current_vin)),
         user_voltage_3v3_(::flatbuffers::EndianScalar(_user_voltage_3v3)),
         user_current_3v3_(::flatbuffers::EndianScalar(_user_current_3v3)),
         user_active_3v3_(::flatbuffers::EndianScalar(_user_active_3v3)),
         user_current_faults_3v3_(::flatbuffers::EndianScalar(_user_current_faults_3v3)),
-        user_voltage_5v_(::flatbuffers::EndianScalar(_user_voltage_5v)),
-        user_current_5v_(::flatbuffers::EndianScalar(_user_current_5v)),
-        user_active_5v_(::flatbuffers::EndianScalar(_user_active_5v)),
-        user_current_faults_5v_(::flatbuffers::EndianScalar(_user_current_faults_5v)),
-        user_voltage_6v_(::flatbuffers::EndianScalar(_user_voltage_6v)),
-        user_current_6v_(::flatbuffers::EndianScalar(_user_current_6v)),
-        user_active_6v_(::flatbuffers::EndianScalar(_user_active_6v)),
-        user_current_faults_6v_(::flatbuffers::EndianScalar(_user_current_faults_6v)),
         brownout_voltage_(::flatbuffers::EndianScalar(_brownout_voltage)),
         cpu_temp_(::flatbuffers::EndianScalar(_cpu_temp)),
-        can_status_(_can_status),
-        padding0__(0),
-        epoch_time_(::flatbuffers::EndianScalar(_epoch_time)) {
+        epoch_time_(::flatbuffers::EndianScalar(_epoch_time)),
+        can_status_(),
+        padding1__(0) {
     (void)padding0__;
+    (void)padding1__;
   }
-  SystemData(int32_t _fpga_version, int32_t _fpga_revision, uint16_t _serial_number_size, ::flatbuffers::span<const uint8_t, 8> _serial_number, uint16_t _comments_size, ::flatbuffers::span<const uint8_t, 64> _comments, int32_t _team_number, int32_t _fpga_button, int32_t _system_active, int32_t _browned_out, int32_t _comms_disable_count, int32_t _rsl_state, int32_t _system_time_valid, double _voltage_vin, double _current_vin, double _user_voltage_3v3, double _user_current_3v3, int32_t _user_active_3v3, int32_t _user_current_faults_3v3, double _user_voltage_5v, double _user_current_5v, int32_t _user_active_5v, int32_t _user_current_faults_5v, double _user_voltage_6v, double _user_current_6v, int32_t _user_active_6v, int32_t _user_current_faults_6v, double _brownout_voltage, double _cpu_temp, const org::littletonrobotics::conduit::schema::CANStatus &_can_status, uint64_t _epoch_time)
+  SystemData(int32_t _fpga_version, int32_t _fpga_revision, uint16_t _serial_number_size, ::flatbuffers::span<const uint8_t, 8> _serial_number, uint16_t _comments_size, ::flatbuffers::span<const uint8_t, 64> _comments, int32_t _team_number, int32_t _system_active, int32_t _browned_out, int32_t _comms_disable_count, int32_t _rsl_state, int32_t _system_time_valid, double _voltage_vin, double _user_voltage_3v3, double _user_current_3v3, int32_t _user_active_3v3, int32_t _user_current_faults_3v3, double _brownout_voltage, double _cpu_temp, uint64_t _epoch_time, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::CANStatus, 5> _can_status)
       : fpga_version_(::flatbuffers::EndianScalar(_fpga_version)),
         fpga_revision_(::flatbuffers::EndianScalar(_fpga_revision)),
         serial_number_size_(::flatbuffers::EndianScalar(_serial_number_size)),
         comments_size_(::flatbuffers::EndianScalar(_comments_size)),
         team_number_(::flatbuffers::EndianScalar(_team_number)),
-        fpga_button_(::flatbuffers::EndianScalar(_fpga_button)),
         system_active_(::flatbuffers::EndianScalar(_system_active)),
         browned_out_(::flatbuffers::EndianScalar(_browned_out)),
         comms_disable_count_(::flatbuffers::EndianScalar(_comms_disable_count)),
         rsl_state_(::flatbuffers::EndianScalar(_rsl_state)),
         system_time_valid_(::flatbuffers::EndianScalar(_system_time_valid)),
+        padding0__(0),
         voltage_vin_(::flatbuffers::EndianScalar(_voltage_vin)),
-        current_vin_(::flatbuffers::EndianScalar(_current_vin)),
         user_voltage_3v3_(::flatbuffers::EndianScalar(_user_voltage_3v3)),
         user_current_3v3_(::flatbuffers::EndianScalar(_user_current_3v3)),
         user_active_3v3_(::flatbuffers::EndianScalar(_user_active_3v3)),
         user_current_faults_3v3_(::flatbuffers::EndianScalar(_user_current_faults_3v3)),
-        user_voltage_5v_(::flatbuffers::EndianScalar(_user_voltage_5v)),
-        user_current_5v_(::flatbuffers::EndianScalar(_user_current_5v)),
-        user_active_5v_(::flatbuffers::EndianScalar(_user_active_5v)),
-        user_current_faults_5v_(::flatbuffers::EndianScalar(_user_current_faults_5v)),
-        user_voltage_6v_(::flatbuffers::EndianScalar(_user_voltage_6v)),
-        user_current_6v_(::flatbuffers::EndianScalar(_user_current_6v)),
-        user_active_6v_(::flatbuffers::EndianScalar(_user_active_6v)),
-        user_current_faults_6v_(::flatbuffers::EndianScalar(_user_current_faults_6v)),
         brownout_voltage_(::flatbuffers::EndianScalar(_brownout_voltage)),
         cpu_temp_(::flatbuffers::EndianScalar(_cpu_temp)),
-        can_status_(_can_status),
-        padding0__(0),
-        epoch_time_(::flatbuffers::EndianScalar(_epoch_time)) {
+        epoch_time_(::flatbuffers::EndianScalar(_epoch_time)),
+        padding1__(0) {
     ::flatbuffers::CastToArray(serial_number_).CopyFromSpan(_serial_number);
     ::flatbuffers::CastToArray(comments_).CopyFromSpan(_comments);
     (void)padding0__;
+    ::flatbuffers::CastToArray(can_status_).CopyFromSpan(_can_status);
+    (void)padding1__;
   }
   int32_t fpga_version() const {
     return ::flatbuffers::EndianScalar(fpga_version_);
@@ -775,12 +742,6 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   void mutate_team_number(int32_t _team_number) {
     ::flatbuffers::WriteScalar(&team_number_, _team_number);
   }
-  int32_t fpga_button() const {
-    return ::flatbuffers::EndianScalar(fpga_button_);
-  }
-  void mutate_fpga_button(int32_t _fpga_button) {
-    ::flatbuffers::WriteScalar(&fpga_button_, _fpga_button);
-  }
   int32_t system_active() const {
     return ::flatbuffers::EndianScalar(system_active_);
   }
@@ -817,12 +778,6 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   void mutate_voltage_vin(double _voltage_vin) {
     ::flatbuffers::WriteScalar(&voltage_vin_, _voltage_vin);
   }
-  double current_vin() const {
-    return ::flatbuffers::EndianScalar(current_vin_);
-  }
-  void mutate_current_vin(double _current_vin) {
-    ::flatbuffers::WriteScalar(&current_vin_, _current_vin);
-  }
   double user_voltage_3v3() const {
     return ::flatbuffers::EndianScalar(user_voltage_3v3_);
   }
@@ -847,54 +802,6 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   void mutate_user_current_faults_3v3(int32_t _user_current_faults_3v3) {
     ::flatbuffers::WriteScalar(&user_current_faults_3v3_, _user_current_faults_3v3);
   }
-  double user_voltage_5v() const {
-    return ::flatbuffers::EndianScalar(user_voltage_5v_);
-  }
-  void mutate_user_voltage_5v(double _user_voltage_5v) {
-    ::flatbuffers::WriteScalar(&user_voltage_5v_, _user_voltage_5v);
-  }
-  double user_current_5v() const {
-    return ::flatbuffers::EndianScalar(user_current_5v_);
-  }
-  void mutate_user_current_5v(double _user_current_5v) {
-    ::flatbuffers::WriteScalar(&user_current_5v_, _user_current_5v);
-  }
-  int32_t user_active_5v() const {
-    return ::flatbuffers::EndianScalar(user_active_5v_);
-  }
-  void mutate_user_active_5v(int32_t _user_active_5v) {
-    ::flatbuffers::WriteScalar(&user_active_5v_, _user_active_5v);
-  }
-  int32_t user_current_faults_5v() const {
-    return ::flatbuffers::EndianScalar(user_current_faults_5v_);
-  }
-  void mutate_user_current_faults_5v(int32_t _user_current_faults_5v) {
-    ::flatbuffers::WriteScalar(&user_current_faults_5v_, _user_current_faults_5v);
-  }
-  double user_voltage_6v() const {
-    return ::flatbuffers::EndianScalar(user_voltage_6v_);
-  }
-  void mutate_user_voltage_6v(double _user_voltage_6v) {
-    ::flatbuffers::WriteScalar(&user_voltage_6v_, _user_voltage_6v);
-  }
-  double user_current_6v() const {
-    return ::flatbuffers::EndianScalar(user_current_6v_);
-  }
-  void mutate_user_current_6v(double _user_current_6v) {
-    ::flatbuffers::WriteScalar(&user_current_6v_, _user_current_6v);
-  }
-  int32_t user_active_6v() const {
-    return ::flatbuffers::EndianScalar(user_active_6v_);
-  }
-  void mutate_user_active_6v(int32_t _user_active_6v) {
-    ::flatbuffers::WriteScalar(&user_active_6v_, _user_active_6v);
-  }
-  int32_t user_current_faults_6v() const {
-    return ::flatbuffers::EndianScalar(user_current_faults_6v_);
-  }
-  void mutate_user_current_faults_6v(int32_t _user_current_faults_6v) {
-    ::flatbuffers::WriteScalar(&user_current_faults_6v_, _user_current_faults_6v);
-  }
   double brownout_voltage() const {
     return ::flatbuffers::EndianScalar(brownout_voltage_);
   }
@@ -907,20 +814,20 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   void mutate_cpu_temp(double _cpu_temp) {
     ::flatbuffers::WriteScalar(&cpu_temp_, _cpu_temp);
   }
-  const org::littletonrobotics::conduit::schema::CANStatus &can_status() const {
-    return can_status_;
-  }
-  org::littletonrobotics::conduit::schema::CANStatus &mutable_can_status() {
-    return can_status_;
-  }
   uint64_t epoch_time() const {
     return ::flatbuffers::EndianScalar(epoch_time_);
   }
   void mutate_epoch_time(uint64_t _epoch_time) {
     ::flatbuffers::WriteScalar(&epoch_time_, _epoch_time);
   }
+  const ::flatbuffers::Array<org::littletonrobotics::conduit::schema::CANStatus, 5> *can_status() const {
+    return &::flatbuffers::CastToArray(can_status_);
+  }
+  ::flatbuffers::Array<org::littletonrobotics::conduit::schema::CANStatus, 5> *mutable_can_status() {
+    return &::flatbuffers::CastToArray(can_status_);
+  }
 };
-FLATBUFFERS_STRUCT_END(SystemData, 248);
+FLATBUFFERS_STRUCT_END(SystemData, 272);
 
 inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
   return
@@ -931,30 +838,20 @@ inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
       (lhs.comments_size() == rhs.comments_size()) &&
       (*lhs.comments() == *rhs.comments()) &&
       (lhs.team_number() == rhs.team_number()) &&
-      (lhs.fpga_button() == rhs.fpga_button()) &&
       (lhs.system_active() == rhs.system_active()) &&
       (lhs.browned_out() == rhs.browned_out()) &&
       (lhs.comms_disable_count() == rhs.comms_disable_count()) &&
       (lhs.rsl_state() == rhs.rsl_state()) &&
       (lhs.system_time_valid() == rhs.system_time_valid()) &&
       (lhs.voltage_vin() == rhs.voltage_vin()) &&
-      (lhs.current_vin() == rhs.current_vin()) &&
       (lhs.user_voltage_3v3() == rhs.user_voltage_3v3()) &&
       (lhs.user_current_3v3() == rhs.user_current_3v3()) &&
       (lhs.user_active_3v3() == rhs.user_active_3v3()) &&
       (lhs.user_current_faults_3v3() == rhs.user_current_faults_3v3()) &&
-      (lhs.user_voltage_5v() == rhs.user_voltage_5v()) &&
-      (lhs.user_current_5v() == rhs.user_current_5v()) &&
-      (lhs.user_active_5v() == rhs.user_active_5v()) &&
-      (lhs.user_current_faults_5v() == rhs.user_current_faults_5v()) &&
-      (lhs.user_voltage_6v() == rhs.user_voltage_6v()) &&
-      (lhs.user_current_6v() == rhs.user_current_6v()) &&
-      (lhs.user_active_6v() == rhs.user_active_6v()) &&
-      (lhs.user_current_faults_6v() == rhs.user_current_faults_6v()) &&
       (lhs.brownout_voltage() == rhs.brownout_voltage()) &&
       (lhs.cpu_temp() == rhs.cpu_temp()) &&
-      (lhs.can_status() == rhs.can_status()) &&
-      (lhs.epoch_time() == rhs.epoch_time());
+      (lhs.epoch_time() == rhs.epoch_time()) &&
+      (*lhs.can_status() == *rhs.can_status());
 }
 
 inline bool operator!=(const SystemData &lhs, const SystemData &rhs) {
@@ -1010,7 +907,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CoreInputs FLATBUFFERS_FINAL_CLASS {
     return sys_;
   }
 };
-FLATBUFFERS_STRUCT_END(CoreInputs, 2808);
+FLATBUFFERS_STRUCT_END(CoreInputs, 2736);
 
 inline bool operator==(const CoreInputs &lhs, const CoreInputs &rhs) {
   return
@@ -1035,11 +932,11 @@ inline const ::flatbuffers::TypeTable *JoystickTypeTable() {
     { ::flatbuffers::ET_UCHAR, 0, -1 },
     { ::flatbuffers::ET_INT, 0, -1 },
     { ::flatbuffers::ET_SHORT, 0, -1 },
-    { ::flatbuffers::ET_SHORT, 1, -1 },
+    { ::flatbuffers::ET_UCHAR, 1, -1 },
     { ::flatbuffers::ET_BOOL, 0, -1 }
   };
-  static const int16_t array_sizes[] = { 256, 12, 12, 12,  };
-  static const int64_t values[] = { 0, 256, 258, 260, 272, 320, 324, 328, 330, 354, 356 };
+  static const int16_t array_sizes[] = { 256, 12, 12, 8,  };
+  static const int64_t values[] = { 0, 256, 258, 260, 272, 320, 324, 328, 330, 338, 340 };
   static const char * const names[] = {
     "name",
     "type",
@@ -1050,7 +947,7 @@ inline const ::flatbuffers::TypeTable *JoystickTypeTable() {
     "buttons",
     "pov_count",
     "pov_values",
-    "is_xbox"
+    "is_gamepad"
   };
   static const ::flatbuffers::TypeTable tt = {
     ::flatbuffers::ST_STRUCT, 10, type_codes, nullptr, array_sizes, values, names
@@ -1075,7 +972,7 @@ inline const ::flatbuffers::TypeTable *DSDataTypeTable() {
     org::littletonrobotics::conduit::schema::JoystickTypeTable
   };
   static const int16_t array_sizes[] = { 64, 64, 6,  };
-  static const int64_t values[] = { 0, 4, 68, 70, 134, 136, 140, 144, 152, 160, 2296 };
+  static const int64_t values[] = { 0, 4, 68, 70, 134, 136, 140, 144, 152, 160, 2200 };
   static const char * const names[] = {
     "alliance_station",
     "event_name",
@@ -1167,8 +1064,6 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     { ::flatbuffers::ET_INT, 0, -1 },
     { ::flatbuffers::ET_INT, 0, -1 },
     { ::flatbuffers::ET_INT, 0, -1 },
-    { ::flatbuffers::ET_INT, 0, -1 },
-    { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
@@ -1176,22 +1071,14 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     { ::flatbuffers::ET_INT, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
-    { ::flatbuffers::ET_INT, 0, -1 },
-    { ::flatbuffers::ET_INT, 0, -1 },
-    { ::flatbuffers::ET_DOUBLE, 0, -1 },
-    { ::flatbuffers::ET_DOUBLE, 0, -1 },
-    { ::flatbuffers::ET_INT, 0, -1 },
-    { ::flatbuffers::ET_INT, 0, -1 },
-    { ::flatbuffers::ET_DOUBLE, 0, -1 },
-    { ::flatbuffers::ET_DOUBLE, 0, -1 },
-    { ::flatbuffers::ET_SEQUENCE, 0, 0 },
-    { ::flatbuffers::ET_ULONG, 0, -1 }
+    { ::flatbuffers::ET_ULONG, 0, -1 },
+    { ::flatbuffers::ET_SEQUENCE, 1, 0 }
   };
   static const ::flatbuffers::TypeFunction type_refs[] = {
     org::littletonrobotics::conduit::schema::CANStatusTypeTable
   };
-  static const int16_t array_sizes[] = { 8, 64,  };
-  static const int64_t values[] = { 0, 4, 8, 10, 18, 20, 84, 88, 92, 96, 100, 104, 108, 112, 120, 128, 136, 144, 148, 152, 160, 168, 172, 176, 184, 192, 196, 200, 208, 216, 240, 248 };
+  static const int16_t array_sizes[] = { 8, 64, 5,  };
+  static const int64_t values[] = { 0, 4, 8, 10, 18, 20, 84, 88, 92, 96, 100, 104, 112, 120, 128, 136, 140, 144, 152, 160, 168, 272 };
   static const char * const names[] = {
     "fpga_version",
     "fpga_revision",
@@ -1200,33 +1087,23 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     "comments_size",
     "comments",
     "team_number",
-    "fpga_button",
     "system_active",
     "browned_out",
     "comms_disable_count",
     "rsl_state",
     "system_time_valid",
     "voltage_vin",
-    "current_vin",
     "user_voltage_3v3",
     "user_current_3v3",
     "user_active_3v3",
     "user_current_faults_3v3",
-    "user_voltage_5v",
-    "user_current_5v",
-    "user_active_5v",
-    "user_current_faults_5v",
-    "user_voltage_6v",
-    "user_current_6v",
-    "user_active_6v",
-    "user_current_faults_6v",
     "brownout_voltage",
     "cpu_temp",
-    "can_status",
-    "epoch_time"
+    "epoch_time",
+    "can_status"
   };
   static const ::flatbuffers::TypeTable tt = {
-    ::flatbuffers::ST_STRUCT, 31, type_codes, type_refs, array_sizes, values, names
+    ::flatbuffers::ST_STRUCT, 21, type_codes, type_refs, array_sizes, values, names
   };
   return &tt;
 }
@@ -1243,7 +1120,7 @@ inline const ::flatbuffers::TypeTable *CoreInputsTypeTable() {
     org::littletonrobotics::conduit::schema::PDPDataTypeTable,
     org::littletonrobotics::conduit::schema::SystemDataTypeTable
   };
-  static const int64_t values[] = { 0, 8, 2304, 2560, 2808 };
+  static const int64_t values[] = { 0, 8, 2208, 2464, 2736 };
   static const char * const names[] = {
     "timestamp",
     "ds",

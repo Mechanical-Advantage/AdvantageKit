@@ -10,6 +10,7 @@ package org.littletonrobotics.conduit;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import org.littletonrobotics.conduit.schema.CANStatus;
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.Joystick;
@@ -18,9 +19,10 @@ import org.littletonrobotics.conduit.schema.SystemData;
 
 public class ConduitApi {
   // Length constants
-  private static final int NUM_JOYSTICKS = 6;
-  private static final int NUM_JOYSTICK_AXES = 12;
-  private static final int NUM_JOYSTICK_POVS = 12;
+  public static final int NUM_JOYSTICKS = 6;
+  public static final int NUM_JOYSTICK_AXES = 12;
+  public static final int NUM_JOYSTICK_POVS = 12;
+  public static final int NUM_CAN_BUSES = 5;
 
   private static final byte[] eventNameBytes = new byte[64];
   private static final byte[] gameSpecificMessageBytes = new byte[64];
@@ -44,6 +46,7 @@ public class ConduitApi {
   private final PDPData pdp;
   private final SystemData sys;
   private final Joystick[] joysticks = new Joystick[NUM_JOYSTICKS];
+  private final CANStatus[] canStatus = new CANStatus[NUM_CAN_BUSES];
 
   private ConduitApi() {
     ConduitJni.start();
@@ -56,6 +59,9 @@ public class ConduitApi {
     sys = inputs.sys();
     for (int i = 0; i < NUM_JOYSTICKS; i++) {
       joysticks[i] = ds.joysticks(new Joystick(), i);
+    }
+    for (int i = 0; i < NUM_CAN_BUSES; i++) {
+      canStatus[i] = sys.canStatus(new CANStatus(), i);
     }
   }
 
@@ -167,8 +173,8 @@ public class ConduitApi {
     return ret;
   }
 
-  public boolean isXbox(int joystickId) {
-    return joysticks[joystickId].isXbox();
+  public boolean isGamepad(int joystickId) {
+    return joysticks[joystickId].isGamepad();
   }
 
   public double getPDPTemperature() {
@@ -223,10 +229,6 @@ public class ConduitApi {
     return sys.teamNumber();
   }
 
-  public boolean getFPGAButton() {
-    return sys.fpgaButton() != 0;
-  }
-
   public boolean getSystemActive() {
     return sys.systemActive() != 0;
   }
@@ -251,10 +253,6 @@ public class ConduitApi {
     return sys.voltageVin();
   }
 
-  public double getCurrentVin() {
-    return sys.currentVin();
-  }
-
   public double getUserVoltage3v3() {
     return sys.userVoltage3v3();
   }
@@ -271,38 +269,6 @@ public class ConduitApi {
     return sys.userCurrentFaults3v3();
   }
 
-  public double getUserVoltage5v() {
-    return sys.userVoltage5v();
-  }
-
-  public double getUserCurrent5v() {
-    return sys.userCurrent5v();
-  }
-
-  public boolean getUserActive5v() {
-    return sys.userActive5v() != 0;
-  }
-
-  public int getUserCurrentFaults5v() {
-    return sys.userCurrentFaults5v();
-  }
-
-  public double getUserVoltage6v() {
-    return sys.userVoltage6v();
-  }
-
-  public double getUserCurrent6v() {
-    return sys.userCurrent6v();
-  }
-
-  public boolean getUserActive6v() {
-    return sys.userActive6v() != 0;
-  }
-
-  public int getUserCurrentFaults6v() {
-    return sys.userCurrentFaults6v();
-  }
-
   public double getBrownoutVoltage() {
     return sys.brownoutVoltage();
   }
@@ -311,32 +277,32 @@ public class ConduitApi {
     return sys.cpuTemp();
   }
 
-  public float getCANBusUtilization() {
-    return sys.canStatus().percentBusUtilization();
-  }
-
-  public long getBusOffCount() {
-    return sys.canStatus().busOffCount();
-  }
-
-  public long getTxFullCount() {
-    return sys.canStatus().txFullCount();
-  }
-
-  public long getReceiveErrorCount() {
-    return sys.canStatus().receiveErrorCount();
-  }
-
-  public long getTransmitErrorCount() {
-    return sys.canStatus().transmitErrorCount();
-  }
-
   public long getEpochTime() {
     return sys.epochTime();
   }
 
-  public void configurePowerDistribution(int moduleID, int type) {
-    ConduitJni.configurePowerDistribution(moduleID, type);
+  public float getCANBusUtilization(int busId) {
+    return canStatus[busId].percentBusUtilization();
+  }
+
+  public long getBusOffCount(int busId) {
+    return canStatus[busId].busOffCount();
+  }
+
+  public long getTxFullCount(int busId) {
+    return canStatus[busId].txFullCount();
+  }
+
+  public long getReceiveErrorCount(int busId) {
+    return canStatus[busId].receiveErrorCount();
+  }
+
+  public long getTransmitErrorCount(int busId) {
+    return canStatus[busId].transmitErrorCount();
+  }
+
+  public void configurePowerDistribution(int busID, int moduleID, int type) {
+    ConduitJni.configurePowerDistribution(busID, moduleID, type);
   }
 
   public int getPDPChannelCount() {

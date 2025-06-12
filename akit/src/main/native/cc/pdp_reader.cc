@@ -42,11 +42,11 @@ void PDPReader::read(schema::PDPData *pdp_buf) {
 #endif
 }
 
-void PDPReader::configure(JNIEnv *env, jint module, jint type,
+void PDPReader::configure(JNIEnv *env, jint bus, jint module, jint type,
 		schema::PDPData *pdp_buf) {
 	int32_t status = 0;
 	auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-	pd_handle = HAL_InitializePowerDistribution(module,
+	pd_handle = HAL_InitializePowerDistribution(bus, module,
 			static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
 			&status);
 #ifdef AKIT_ATHENA
@@ -67,11 +67,11 @@ void PDPReader::configure(JNIEnv *env, jint module, jint type,
 	runtime = HAL_GetRuntimeType();
 	if (runtime != HAL_Runtime_Simulation) {
 		if (pd_type == HAL_PowerDistributionType_kCTRE) {
-			pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kCTRE, pd_module_id,
-					HAL_CAN_Dev_kPowerDistribution, &status);
+			pd_can_handle = HAL_InitializeCAN(bus, HAL_CAN_Man_kCTRE,
+					pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
 		} else if (pd_type == HAL_PowerDistributionType_kRev) {
-			pd_can_handle = HAL_InitializeCAN(HAL_CAN_Man_kREV, pd_module_id,
-					HAL_CAN_Dev_kPowerDistribution, &status);
+			pd_can_handle = HAL_InitializeCAN(bus, HAL_CAN_Man_kREV,
+					pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
 		}
 	}
 

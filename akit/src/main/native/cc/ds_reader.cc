@@ -47,7 +47,7 @@ void DsReader::read(schema::DSData *ds_buf) {
 
 		std::memcpy(stick_buf->mutable_axis_types()->Data(), jd.axisTypes,
 				stick_buf->mutable_axis_types()->size() * sizeof(uint8_t));
-		stick_buf->mutate_is_xbox(jd.isXbox);
+		stick_buf->mutate_is_gamepad(jd.isGamepad);
 
 		// Read joystick values
 		HAL_JoystickAxes axes;
@@ -59,7 +59,7 @@ void DsReader::read(schema::DSData *ds_buf) {
 		HAL_JoystickPOVs povs;
 		HAL_GetJoystickPOVs(joystickNum, &povs);
 		std::memcpy(stick_buf->mutable_pov_values()->Data(), povs.povs,
-				stick_buf->pov_values()->size() * sizeof(int16_t));
+				stick_buf->pov_values()->size() * sizeof(uint8_t));
 		stick_buf->mutate_pov_count(povs.count);
 
 		HAL_JoystickButtons buttons;

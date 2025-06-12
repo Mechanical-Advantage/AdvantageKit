@@ -8,8 +8,6 @@
 package org.littletonrobotics.junction;
 
 import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
@@ -50,9 +48,8 @@ public class LoggedRobot extends IterativeRobotBase {
     this.periodUs = (long) (period * 1000000);
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_AdvantageKit);
-    HAL.report(
-        tResourceType.kResourceType_LoggingFramework, tInstances.kLoggingFramework_AdvantageKit);
+    HAL.reportUsage("Framework", "AdvantageKit");
+    HAL.reportUsage("LoggingFramework", "AdvantageKit");
   }
 
   @Override

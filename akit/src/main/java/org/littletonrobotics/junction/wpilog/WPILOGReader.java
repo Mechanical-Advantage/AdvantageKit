@@ -7,9 +7,9 @@
 
 package org.littletonrobotics.junction.wpilog;
 
-import edu.wpi.first.util.datalog.DataLogIterator;
-import edu.wpi.first.util.datalog.DataLogReader;
-import edu.wpi.first.util.datalog.DataLogRecord;
+import edu.wpi.first.datalog.DataLogIterator;
+import edu.wpi.first.datalog.DataLogReader;
+import edu.wpi.first.datalog.DataLogRecord;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.io.IOException;
 import java.util.HashMap;

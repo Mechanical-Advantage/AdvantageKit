@@ -29,43 +29,36 @@ public final class CoreInputs extends Struct {
   public org.littletonrobotics.conduit.schema.DSData ds() { return ds(new org.littletonrobotics.conduit.schema.DSData()); }
   public org.littletonrobotics.conduit.schema.DSData ds(org.littletonrobotics.conduit.schema.DSData obj) { return obj.__assign(bb_pos + 8, bb); }
   public org.littletonrobotics.conduit.schema.PDPData pdp() { return pdp(new org.littletonrobotics.conduit.schema.PDPData()); }
-  public org.littletonrobotics.conduit.schema.PDPData pdp(org.littletonrobotics.conduit.schema.PDPData obj) { return obj.__assign(bb_pos + 2304, bb); }
+  public org.littletonrobotics.conduit.schema.PDPData pdp(org.littletonrobotics.conduit.schema.PDPData obj) { return obj.__assign(bb_pos + 2208, bb); }
   public org.littletonrobotics.conduit.schema.SystemData sys() { return sys(new org.littletonrobotics.conduit.schema.SystemData()); }
-  public org.littletonrobotics.conduit.schema.SystemData sys(org.littletonrobotics.conduit.schema.SystemData obj) { return obj.__assign(bb_pos + 2560, bb); }
+  public org.littletonrobotics.conduit.schema.SystemData sys(org.littletonrobotics.conduit.schema.SystemData obj) { return obj.__assign(bb_pos + 2464, bb); }
 
-  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, short[][] ds_joysticks_povValues, boolean[] ds_joysticks_isXbox, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, int sys_fpgaVersion, int sys_fpgaRevision, int sys_serialNumberSize, int[] sys_serialNumber, int sys_commentsSize, int[] sys_comments, int sys_teamNumber, int sys_fpgaButton, int sys_systemActive, int sys_brownedOut, int sys_commsDisableCount, int sys_rslState, int sys_systemTimeValid, double sys_voltageVin, double sys_currentVin, double sys_userVoltage3v3, double sys_userCurrent3v3, int sys_userActive3v3, int sys_userCurrentFaults3v3, double sys_userVoltage5v, double sys_userCurrent5v, int sys_userActive5v, int sys_userCurrentFaults5v, double sys_userVoltage6v, double sys_userCurrent6v, int sys_userActive6v, int sys_userCurrentFaults6v, double sys_brownoutVoltage, double sys_cpuTemp, float sys_can_status_percentBusUtilization, long sys_can_status_busOffCount, long sys_can_status_txFullCount, long sys_can_status_receiveErrorCount, long sys_can_status_transmitErrorCount, long sys_epochTime) {
-    builder.prep(8, 2808);
-    builder.prep(8, 248);
-    builder.putLong(sys_epochTime);
+  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, int sys_fpgaVersion, int sys_fpgaRevision, int sys_serialNumberSize, int[] sys_serialNumber, int sys_commentsSize, int[] sys_comments, int sys_teamNumber, int sys_systemActive, int sys_brownedOut, int sys_commsDisableCount, int sys_rslState, int sys_systemTimeValid, double sys_voltageVin, double sys_userVoltage3v3, double sys_userCurrent3v3, int sys_userActive3v3, int sys_userCurrentFaults3v3, double sys_brownoutVoltage, double sys_cpuTemp, long sys_epochTime, float[] sys_can_status_percentBusUtilization, long[] sys_can_status_busOffCount, long[] sys_can_status_txFullCount, long[] sys_can_status_receiveErrorCount, long[] sys_can_status_transmitErrorCount) {
+    builder.prep(8, 2736);
+    builder.prep(8, 272);
     builder.pad(4);
-    builder.prep(4, 20);
-    builder.putInt((int) sys_can_status_transmitErrorCount);
-    builder.putInt((int) sys_can_status_receiveErrorCount);
-    builder.putInt((int) sys_can_status_txFullCount);
-    builder.putInt((int) sys_can_status_busOffCount);
-    builder.putFloat(sys_can_status_percentBusUtilization);
+    for (int _idx0 = 5; _idx0 > 0; _idx0--) {
+      builder.prep(4, 20);
+      builder.putInt((int) sys_can_status_transmitErrorCount[_idx0-1]);
+      builder.putInt((int) sys_can_status_receiveErrorCount[_idx0-1]);
+      builder.putInt((int) sys_can_status_txFullCount[_idx0-1]);
+      builder.putInt((int) sys_can_status_busOffCount[_idx0-1]);
+      builder.putFloat(sys_can_status_percentBusUtilization[_idx0-1]);
+    }
+    builder.putLong(sys_epochTime);
     builder.putDouble(sys_cpuTemp);
     builder.putDouble(sys_brownoutVoltage);
-    builder.putInt(sys_userCurrentFaults6v);
-    builder.putInt(sys_userActive6v);
-    builder.putDouble(sys_userCurrent6v);
-    builder.putDouble(sys_userVoltage6v);
-    builder.putInt(sys_userCurrentFaults5v);
-    builder.putInt(sys_userActive5v);
-    builder.putDouble(sys_userCurrent5v);
-    builder.putDouble(sys_userVoltage5v);
     builder.putInt(sys_userCurrentFaults3v3);
     builder.putInt(sys_userActive3v3);
     builder.putDouble(sys_userCurrent3v3);
     builder.putDouble(sys_userVoltage3v3);
-    builder.putDouble(sys_currentVin);
     builder.putDouble(sys_voltageVin);
+    builder.pad(4);
     builder.putInt(sys_systemTimeValid);
     builder.putInt(sys_rslState);
     builder.putInt(sys_commsDisableCount);
     builder.putInt(sys_brownedOut);
     builder.putInt(sys_systemActive);
-    builder.putInt(sys_fpgaButton);
     builder.putInt(sys_teamNumber);
     for (int _idx0 = 64; _idx0 > 0; _idx0--) {
       builder.putByte((byte) sys_comments[_idx0-1]);
@@ -92,13 +85,13 @@ public final class CoreInputs extends Struct {
     builder.putInt(pdp_type);
     builder.putInt(pdp_channelCount);
     builder.putInt(pdp_handle);
-    builder.prep(8, 2296);
+    builder.prep(8, 2200);
     for (int _idx0 = 6; _idx0 > 0; _idx0--) {
-      builder.prep(4, 356);
+      builder.prep(4, 340);
       builder.pad(1);
-      builder.putBoolean(ds_joysticks_isXbox[_idx0-1]);
-      for (int _idx1 = 12; _idx1 > 0; _idx1--) {
-        builder.putShort(ds_joysticks_povValues[_idx0-1][_idx1-1]);
+      builder.putBoolean(ds_joysticks_isGamepad[_idx0-1]);
+      for (int _idx1 = 8; _idx1 > 0; _idx1--) {
+        builder.putByte((byte) ds_joysticks_povValues[_idx0-1][_idx1-1]);
       }
       builder.putShort(ds_joysticks_povCount[_idx0-1]);
       builder.putInt(ds_joysticks_buttons[_idx0-1]);

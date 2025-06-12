@@ -29,7 +29,7 @@ using namespace org::littletonrobotics::conduit;
 class PDPReader {
 public:
 	void read(schema::PDPData *pdp_buf);
-	void configure(JNIEnv *env, jint module, jint type,
+	void configure(JNIEnv *env, jint bus, jint module, jint type,
 			schema::PDPData *pdp_buf);
 
 private:

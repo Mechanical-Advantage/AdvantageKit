@@ -22,6 +22,8 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Reads console data on the RIO. Saves stdout and sterr from both Java and native code, including
  * lines logged before this class was instantiated.
+ *
+ * <p>TODO: Update this class to support SystemCore
  */
 public class RIOConsoleSource implements ConsoleSource {
   private static final String filePath = "/home/lvuser/FRC_UserProgram.log";
