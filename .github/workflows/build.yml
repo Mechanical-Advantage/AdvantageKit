@@ -135,13 +135,13 @@ jobs:
       matrix:
         include:
           - name: "Linux (x64)"
-            runner-image: ubuntu-22.04
+            runner-image: ubuntu-24.04
             classifier: "linuxx86-64"
             container: ""
           - name: "Linux (arm64)"
-            runner-image: ubuntu-22.04
+            runner-image: ubuntu-24.04
             classifier: "linuxarm64"
-            container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
+            container: wpilib/aarch64-cross-ubuntu:bookworm-24.04
           - name: "macOS"
             runner-image: macos-latest
             classifier: "osxuniversal"
