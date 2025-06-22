@@ -9,9 +9,8 @@ package org.littletonrobotics.junction.console;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
@@ -20,19 +19,18 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Reads console data on the RIO. Saves stdout and sterr from both Java and native code, including
- * lines logged before this class was instantiated.
- *
- * <p>TODO: Update this class to support SystemCore
+ * Reads console data on SystemCore. Saves stdout and sterr from both Java and native code,
+ * including lines logged before this class was instantiated.
  */
-public class RIOConsoleSource implements ConsoleSource {
-  private static final String filePath = "/home/lvuser/FRC_UserProgram.log";
+public class SystemCoreConsoleSource implements ConsoleSource {
+  private static final String command =
+      "sudo journalctl -f -u robot.service -n all -o cat _SYSTEMD_INVOCATION_ID=$(systemctl show -p InvocationID --value robot.service) 2>&1";
   private final Thread thread;
   private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(100);
   private final List<String> lines = new ArrayList<>();
 
-  public RIOConsoleSource() {
-    thread = new Thread(this::run, "AdvantageKit_RIOConsoleSource");
+  public SystemCoreConsoleSource() {
+    thread = new Thread(this::run, "AdvantageKit_SystemCoreConsoleSource");
     thread.setDaemon(true);
     thread.start();
   }
@@ -50,15 +48,14 @@ public class RIOConsoleSource implements ConsoleSource {
   private void run() {
     // Initialize reader
     CharBuffer buffer = CharBuffer.allocate(10240);
+    Process process;
     BufferedReader reader;
     try {
-      reader = new BufferedReader(new FileReader(filePath));
-    } catch (FileNotFoundException e) {
+      process = Runtime.getRuntime().exec(command);
+      reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    } catch (IOException e) {
       DriverStation.reportError(
-          "[AdvantageKit] Failed to open console file \""
-              + filePath
-              + "\", disabling console capture.",
-          true);
+          "[AdvantageKit] Failed to launch console capture process, disabling.", true);
       return;
     }
 
@@ -70,11 +67,9 @@ public class RIOConsoleSource implements ConsoleSource {
           nextChar = reader.read();
         } catch (IOException e) {
           DriverStation.reportError(
-              "[AdvantageKit] Failed to read console file \""
-                  + filePath
-                  + "\", disabling console capture.",
-              true);
+              "[AdvantageKit] Failed to read from console capture process, disabling.", true);
           try {
+            process.destroy();
             reader.close();
           } catch (IOException io) {
           }
@@ -108,6 +103,7 @@ public class RIOConsoleSource implements ConsoleSource {
           queue.put(output);
         } catch (InterruptedException e) {
           try {
+            process.destroy();
             reader.close();
           } catch (IOException io) {
           }
@@ -120,6 +116,7 @@ public class RIOConsoleSource implements ConsoleSource {
         Thread.sleep(20);
       } catch (InterruptedException e) {
         try {
+          process.destroy();
           reader.close();
         } catch (IOException io) {
         }
