@@ -9,7 +9,6 @@ package org.littletonrobotics.junction;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -30,9 +29,9 @@ class RadioLogger {
   private static boolean isConnected = false;
   private static String statusJson = "";
 
-  public static void periodic(LogTable table) {
-    if (notifier == null && RobotBase.isReal()) {
-      start();
+  public static void periodic(LogTable table, int teamNumber) {
+    if (notifier == null && RobotBase.isReal() && teamNumber >= 0) {
+      start(teamNumber);
     }
 
     synchronized (lock) {
@@ -41,9 +40,8 @@ class RadioLogger {
     }
   }
 
-  private static void start() {
+  private static void start(int teamNumber) {
     // Get status URL
-    int teamNumber = RobotController.getTeamNumber();
     StringBuilder statusURLBuilder = new StringBuilder();
     statusURLBuilder.append("http://10.");
     statusURLBuilder.append(teamNumber / 100);

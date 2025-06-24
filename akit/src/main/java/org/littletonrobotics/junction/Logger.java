@@ -314,7 +314,8 @@ public class Logger {
       AlertLogger.periodic();
       long radioLogStart = RobotController.getFPGATime();
       if (!hasReplaySource()) {
-        RadioLogger.periodic(entry.getSubtable("RadioStatus"));
+        RadioLogger.periodic(
+            entry.getSubtable("RadioStatus"), entry.get("SystemStats/TeamNumber", -1));
       }
       long consoleCaptureStart = RobotController.getFPGATime();
       if (enableConsole) {
