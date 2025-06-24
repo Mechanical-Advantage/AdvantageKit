@@ -204,7 +204,7 @@ model {
                 }
             }
 
-            nativeUtils.useRequiredLibrary(it, "driver_shared")
+            nativeUtils.useRequiredLibrary(it, "driver_shared", "ntcore_shared")
         }
     }
     testSuites {

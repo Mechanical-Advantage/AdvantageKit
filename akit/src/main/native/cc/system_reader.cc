@@ -13,6 +13,8 @@
 #include <hal/Ports.h>
 #include <hal/Power.h>
 #include <hal/PowerDistribution.h>
+#include <hal/SystemServer.h>
+#include <networktables/NetworkTableInstance.h>
 #include <wpi/StackTrace.h>
 #include <wpi/timestamp.h>
 
@@ -24,74 +26,78 @@
 
 using namespace std::chrono_literals;
 
-static const int NUM_CAN_BUSES = 5;
+static constexpr int NUM_CAN_BUSES = 5;
+
+void SystemReader::start() {
+	const auto inst = nt::NetworkTableInstance { HAL_GetSystemServerHandle() };
+	const auto sys_table = inst.GetTable("sys");
+	const auto imu_table = inst.GetTable("imu");
+	const auto diagnostics_table = inst.GetTable("diagnostics");
+
+	watchdog_active_sub = inst.GetBooleanTopic(
+			"/Netcomm/Control/WatchdogActive").Subscribe(false);
+	can_bandwidth_sub =
+			diagnostics_table->GetDoubleArrayTopic("llsccanban2").Subscribe(
+					std::vector<double>(NUM_CAN_BUSES, 0.0));
+	io_frequency_sub = sys_table->GetIntegerTopic("iofreq").Subscribe(0);
+	team_number_sub = sys_table->GetIntegerTopic("teamnum").Subscribe(-1);
+
+	cpu_percent_sub = sys_table->GetDoubleTopic("cpu").Subscribe(0.0);
+	cpu_temp_sub = sys_table->GetDoubleTopic("temp").Subscribe(0.0);
+
+	memory_usage_bytes_sub = sys_table->GetIntegerTopic("ram").Subscribe(0);
+	memory_total_bytes_sub = sys_table->GetIntegerTopic("ramtotal").Subscribe(
+			0);
+	memory_percent_sub = sys_table->GetDoubleTopic("ramutil").Subscribe(0);
+
+	storage_usage_bytes_sub = sys_table->GetIntegerTopic("storage").Subscribe(
+			0);
+	storage_total_bytes_sub =
+			sys_table->GetIntegerTopic("storagetotal").Subscribe(0);
+	storage_percent_sub = sys_table->GetDoubleTopic("storageutil").Subscribe(0);
+
+	imu_raw_accel_sub = imu_table->GetDoubleArrayTopic("rawaccel").Subscribe(
+			std::vector { 0.0, 0.0, 0.0 });
+	imu_raw_gyro_sub = imu_table->GetDoubleArrayTopic("rawgyro").Subscribe(
+			std::vector { 0.0, 0.0, 0.0 });
+	imu_quaternion_sub = imu_table->GetDoubleArrayTopic("quat").Subscribe(
+			std::vector { 1.0, 0.0, 0.0, 0.0 });
+	imu_yaw_flat_sub = imu_table->GetDoubleTopic("yaw_flat").Subscribe(0.0);
+	imu_yaw_landscape_sub =
+			imu_table->GetDoubleTopic("yaw_landscape").Subscribe(0.0);
+	imu_yaw_portrait_sub = imu_table->GetDoubleTopic("yaw_portrait").Subscribe(
+			0.0);
+}
 
 void SystemReader::read(schema::SystemData *system_buf) {
 	std::int32_t status;
 
-	// Update values that shouldn't change after initial cycle
-	if (cycleCount == 0) {
-		system_buf->mutate_fpga_version(HAL_GetFPGAVersion(&status));
-		system_buf->mutate_fpga_revision(HAL_GetFPGARevision(&status));
-
-		WPI_String serialNum;
-		HAL_GetSerialNumber(&serialNum);
-		system_buf->mutate_serial_number_size(serialNum.len);
-		std::memcpy(system_buf->mutable_serial_number()->Data(), serialNum.str,
-				serialNum.len);
-
-		WPI_String comments;
-		HAL_GetComments(&comments);
-		system_buf->mutate_comments_size(comments.len);
-		std::memcpy(system_buf->mutable_comments()->Data(), comments.str,
-				comments.len);
-
-		system_buf->mutate_team_number(HAL_GetTeamNumber());
-	}
-
-	system_buf->mutate_system_active(HAL_GetSystemActive(&status));
-	system_buf->mutate_browned_out(HAL_GetBrownedOut(&status));
-	system_buf->mutate_comms_disable_count(HAL_GetCommsDisableCount(&status));
-	system_buf->mutate_rsl_state(HAL_GetRSLState(&status));
-	if (cycleCount % 50 == 0) {
-		// This read takes longer
-		system_buf->mutate_system_time_valid(HAL_GetSystemTimeValid(&status));
-	}
-
-	system_buf->mutate_voltage_vin(HAL_GetVinVoltage(&status));
-
-	system_buf->mutate_user_voltage_3v3(HAL_GetUserVoltage3V3(&status));
-	system_buf->mutate_user_current_3v3(HAL_GetUserCurrent3V3(&status));
-	system_buf->mutate_user_active_3v3(HAL_GetUserActive3V3(&status));
-	system_buf->mutate_user_current_faults_3v3(
-			HAL_GetUserCurrentFaults3V3(&status));
-
-	system_buf->mutate_brownout_voltage(HAL_GetBrownoutVoltage(&status));
-	system_buf->mutate_cpu_temp(HAL_GetCPUTemp(&status));
+	system_buf->mutate_battery_voltage(HAL_GetVinVoltage(&status));
+	system_buf->mutate_watchdog_active(watchdog_active_sub.Get());
+	std::memcpy(system_buf->mutable_can_bandwidth()->Data(),
+			can_bandwidth_sub.Get().data(), NUM_CAN_BUSES * sizeof(double));
+	system_buf->mutate_io_frequency(io_frequency_sub.Get());
+	system_buf->mutate_team_number(team_number_sub.Get());
 	system_buf->mutate_epoch_time(wpi::GetSystemTime());
 
-	schema::CANStatus can_status_bufs[NUM_CAN_BUSES];
+	system_buf->mutate_cpu_percent(cpu_percent_sub.Get());
+	system_buf->mutate_cpu_temp(cpu_temp_sub.Get());
 
-	for (int bus_id = 0; bus_id < NUM_CAN_BUSES; bus_id++) {
-		float percent_bus_utilization = 0;
-		uint32_t bus_off_count = 0;
-		uint32_t tx_full_count = 0;
-		uint32_t receive_error_count = 0;
-		uint32_t transmit_error_count = 0;
-		HAL_CAN_GetCANStatus(bus_id, &percent_bus_utilization, &bus_off_count,
-				&tx_full_count, &receive_error_count, &transmit_error_count,
-				&status);
+	system_buf->mutate_memory_usage_bytes(memory_usage_bytes_sub.Get());
+	system_buf->mutate_memory_total_bytes(memory_total_bytes_sub.Get());
+	system_buf->mutate_memory_percent(memory_percent_sub.Get());
 
-		schema::CANStatus *can_status_buf = &can_status_bufs[bus_id];
-		can_status_buf->mutate_percent_bus_utilization(percent_bus_utilization);
-		can_status_buf->mutate_bus_off_count(bus_off_count);
-		can_status_buf->mutate_tx_full_count(tx_full_count);
-		can_status_buf->mutate_receive_error_count(receive_error_count);
-		can_status_buf->mutate_transmit_error_count(transmit_error_count);
-	}
+	system_buf->mutate_storage_usage_bytes(storage_usage_bytes_sub.Get());
+	system_buf->mutate_storage_total_bytes(storage_total_bytes_sub.Get());
+	system_buf->mutate_storage_percent(storage_percent_sub.Get());
 
-	std::memcpy(system_buf->mutable_can_status()->Data(), can_status_bufs,
-			system_buf->can_status()->size() * sizeof(schema::CANStatus));
-
-	cycleCount++;
+	std::memcpy(system_buf->mutable_imu_raw_accel()->Data(),
+			imu_raw_accel_sub.Get().data(), 3 * sizeof(double));
+	std::memcpy(system_buf->mutable_imu_raw_gyro()->Data(),
+			imu_raw_gyro_sub.Get().data(), 3 * sizeof(double));
+	std::memcpy(system_buf->mutable_imu_quaternion()->Data(),
+			imu_quaternion_sub.Get().data(), 4 * sizeof(double));
+	system_buf->mutate_imu_yaw_flat(imu_yaw_flat_sub.Get());
+	system_buf->mutate_imu_yaw_landscape(imu_yaw_landscape_sub.Get());
+	system_buf->mutate_imu_yaw_portrait(imu_yaw_portrait_sub.Get());
 }

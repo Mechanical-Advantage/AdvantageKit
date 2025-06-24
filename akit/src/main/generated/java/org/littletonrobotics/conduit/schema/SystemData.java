@@ -24,85 +24,78 @@ public final class SystemData extends Struct {
   public void __init(int _i, ByteBuffer _bb) { __reset(_i, _bb); }
   public SystemData __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
-  public int fpgaVersion() { return bb.getInt(bb_pos + 0); }
-  public void mutateFpgaVersion(int fpga_version) { bb.putInt(bb_pos + 0, fpga_version); }
-  public int fpgaRevision() { return bb.getInt(bb_pos + 4); }
-  public void mutateFpgaRevision(int fpga_revision) { bb.putInt(bb_pos + 4, fpga_revision); }
-  public int serialNumberSize() { return bb.getShort(bb_pos + 8) & 0xFFFF; }
-  public void mutateSerialNumberSize(int serial_number_size) { bb.putShort(bb_pos + 8, (short) serial_number_size); }
-  public int serialNumber(int j) { return bb.get(bb_pos + 10 + j * 1); }
-  public void mutateSerialNumber(int j, int serial_number) { bb.put(bb_pos + 10 + j * 1, (byte) serial_number); }
-  public int commentsSize() { return bb.getShort(bb_pos + 18) & 0xFFFF; }
-  public void mutateCommentsSize(int comments_size) { bb.putShort(bb_pos + 18, (short) comments_size); }
-  public int comments(int j) { return bb.get(bb_pos + 20 + j * 1); }
-  public void mutateComments(int j, int comments) { bb.put(bb_pos + 20 + j * 1, (byte) comments); }
-  public int teamNumber() { return bb.getInt(bb_pos + 84); }
-  public void mutateTeamNumber(int team_number) { bb.putInt(bb_pos + 84, team_number); }
-  public int systemActive() { return bb.getInt(bb_pos + 88); }
-  public void mutateSystemActive(int system_active) { bb.putInt(bb_pos + 88, system_active); }
-  public int brownedOut() { return bb.getInt(bb_pos + 92); }
-  public void mutateBrownedOut(int browned_out) { bb.putInt(bb_pos + 92, browned_out); }
-  public int commsDisableCount() { return bb.getInt(bb_pos + 96); }
-  public void mutateCommsDisableCount(int comms_disable_count) { bb.putInt(bb_pos + 96, comms_disable_count); }
-  public int rslState() { return bb.getInt(bb_pos + 100); }
-  public void mutateRslState(int rsl_state) { bb.putInt(bb_pos + 100, rsl_state); }
-  public int systemTimeValid() { return bb.getInt(bb_pos + 104); }
-  public void mutateSystemTimeValid(int system_time_valid) { bb.putInt(bb_pos + 104, system_time_valid); }
-  public double voltageVin() { return bb.getDouble(bb_pos + 112); }
-  public void mutateVoltageVin(double voltage_vin) { bb.putDouble(bb_pos + 112, voltage_vin); }
-  public double userVoltage3v3() { return bb.getDouble(bb_pos + 120); }
-  public void mutateUserVoltage3v3(double user_voltage_3v3) { bb.putDouble(bb_pos + 120, user_voltage_3v3); }
-  public double userCurrent3v3() { return bb.getDouble(bb_pos + 128); }
-  public void mutateUserCurrent3v3(double user_current_3v3) { bb.putDouble(bb_pos + 128, user_current_3v3); }
-  public int userActive3v3() { return bb.getInt(bb_pos + 136); }
-  public void mutateUserActive3v3(int user_active_3v3) { bb.putInt(bb_pos + 136, user_active_3v3); }
-  public int userCurrentFaults3v3() { return bb.getInt(bb_pos + 140); }
-  public void mutateUserCurrentFaults3v3(int user_current_faults_3v3) { bb.putInt(bb_pos + 140, user_current_faults_3v3); }
-  public double brownoutVoltage() { return bb.getDouble(bb_pos + 144); }
-  public void mutateBrownoutVoltage(double brownout_voltage) { bb.putDouble(bb_pos + 144, brownout_voltage); }
-  public double cpuTemp() { return bb.getDouble(bb_pos + 152); }
-  public void mutateCpuTemp(double cpu_temp) { bb.putDouble(bb_pos + 152, cpu_temp); }
-  public long epochTime() { return bb.getLong(bb_pos + 160); }
-  public void mutateEpochTime(long epoch_time) { bb.putLong(bb_pos + 160, epoch_time); }
-  public org.littletonrobotics.conduit.schema.CANStatus canStatus(int j) { return canStatus(new org.littletonrobotics.conduit.schema.CANStatus(), j); }
-  public org.littletonrobotics.conduit.schema.CANStatus canStatus(org.littletonrobotics.conduit.schema.CANStatus obj, int j) { return obj.__assign(bb_pos + 168 + j * 20, bb); }
+  public double batteryVoltage() { return bb.getDouble(bb_pos + 0); }
+  public void mutateBatteryVoltage(double battery_voltage) { bb.putDouble(bb_pos + 0, battery_voltage); }
+  public boolean watchdogActive() { return 0!=bb.get(bb_pos + 8); }
+  public void mutateWatchdogActive(boolean watchdog_active) { bb.put(bb_pos + 8, (byte)(watchdog_active ? 1 : 0)); }
+  public double canBandwidth(int j) { return bb.getDouble(bb_pos + 16 + j * 8); }
+  public void mutateCanBandwidth(int j, double can_bandwidth) { bb.putDouble(bb_pos + 16 + j * 8, can_bandwidth); }
+  public long ioFrequency() { return bb.getLong(bb_pos + 56); }
+  public void mutateIoFrequency(long io_frequency) { bb.putLong(bb_pos + 56, io_frequency); }
+  public long teamNumber() { return bb.getLong(bb_pos + 64); }
+  public void mutateTeamNumber(long team_number) { bb.putLong(bb_pos + 64, team_number); }
+  public long epochTime() { return bb.getLong(bb_pos + 72); }
+  public void mutateEpochTime(long epoch_time) { bb.putLong(bb_pos + 72, epoch_time); }
+  public double cpuPercent() { return bb.getDouble(bb_pos + 80); }
+  public void mutateCpuPercent(double cpu_percent) { bb.putDouble(bb_pos + 80, cpu_percent); }
+  public double cpuTemp() { return bb.getDouble(bb_pos + 88); }
+  public void mutateCpuTemp(double cpu_temp) { bb.putDouble(bb_pos + 88, cpu_temp); }
+  public long memoryUsageBytes() { return bb.getLong(bb_pos + 96); }
+  public void mutateMemoryUsageBytes(long memory_usage_bytes) { bb.putLong(bb_pos + 96, memory_usage_bytes); }
+  public long memoryTotalBytes() { return bb.getLong(bb_pos + 104); }
+  public void mutateMemoryTotalBytes(long memory_total_bytes) { bb.putLong(bb_pos + 104, memory_total_bytes); }
+  public double memoryPercent() { return bb.getDouble(bb_pos + 112); }
+  public void mutateMemoryPercent(double memory_percent) { bb.putDouble(bb_pos + 112, memory_percent); }
+  public long storageUsageBytes() { return bb.getLong(bb_pos + 120); }
+  public void mutateStorageUsageBytes(long storage_usage_bytes) { bb.putLong(bb_pos + 120, storage_usage_bytes); }
+  public long storageTotalBytes() { return bb.getLong(bb_pos + 128); }
+  public void mutateStorageTotalBytes(long storage_total_bytes) { bb.putLong(bb_pos + 128, storage_total_bytes); }
+  public double storagePercent() { return bb.getDouble(bb_pos + 136); }
+  public void mutateStoragePercent(double storage_percent) { bb.putDouble(bb_pos + 136, storage_percent); }
+  public double imuRawAccel(int j) { return bb.getDouble(bb_pos + 144 + j * 8); }
+  public void mutateImuRawAccel(int j, double imu_raw_accel) { bb.putDouble(bb_pos + 144 + j * 8, imu_raw_accel); }
+  public double imuRawGyro(int j) { return bb.getDouble(bb_pos + 168 + j * 8); }
+  public void mutateImuRawGyro(int j, double imu_raw_gyro) { bb.putDouble(bb_pos + 168 + j * 8, imu_raw_gyro); }
+  public double imuQuaternion(int j) { return bb.getDouble(bb_pos + 192 + j * 8); }
+  public void mutateImuQuaternion(int j, double imu_quaternion) { bb.putDouble(bb_pos + 192 + j * 8, imu_quaternion); }
+  public double imuYawFlat() { return bb.getDouble(bb_pos + 224); }
+  public void mutateImuYawFlat(double imu_yaw_flat) { bb.putDouble(bb_pos + 224, imu_yaw_flat); }
+  public double imuYawLandscape() { return bb.getDouble(bb_pos + 232); }
+  public void mutateImuYawLandscape(double imu_yaw_landscape) { bb.putDouble(bb_pos + 232, imu_yaw_landscape); }
+  public double imuYawPortrait() { return bb.getDouble(bb_pos + 240); }
+  public void mutateImuYawPortrait(double imu_yaw_portrait) { bb.putDouble(bb_pos + 240, imu_yaw_portrait); }
 
-  public static int createSystemData(FlatBufferBuilder builder, int fpgaVersion, int fpgaRevision, int serialNumberSize, int[] serialNumber, int commentsSize, int[] comments, int teamNumber, int systemActive, int brownedOut, int commsDisableCount, int rslState, int systemTimeValid, double voltageVin, double userVoltage3v3, double userCurrent3v3, int userActive3v3, int userCurrentFaults3v3, double brownoutVoltage, double cpuTemp, long epochTime, float[] can_status_percentBusUtilization, long[] can_status_busOffCount, long[] can_status_txFullCount, long[] can_status_receiveErrorCount, long[] can_status_transmitErrorCount) {
-    builder.prep(8, 272);
-    builder.pad(4);
-    for (int _idx0 = 5; _idx0 > 0; _idx0--) {
-      builder.prep(4, 20);
-      builder.putInt((int) can_status_transmitErrorCount[_idx0-1]);
-      builder.putInt((int) can_status_receiveErrorCount[_idx0-1]);
-      builder.putInt((int) can_status_txFullCount[_idx0-1]);
-      builder.putInt((int) can_status_busOffCount[_idx0-1]);
-      builder.putFloat(can_status_percentBusUtilization[_idx0-1]);
+  public static int createSystemData(FlatBufferBuilder builder, double batteryVoltage, boolean watchdogActive, double[] canBandwidth, long ioFrequency, long teamNumber, long epochTime, double cpuPercent, double cpuTemp, long memoryUsageBytes, long memoryTotalBytes, double memoryPercent, long storageUsageBytes, long storageTotalBytes, double storagePercent, double[] imuRawAccel, double[] imuRawGyro, double[] imuQuaternion, double imuYawFlat, double imuYawLandscape, double imuYawPortrait) {
+    builder.prep(8, 248);
+    builder.putDouble(imuYawPortrait);
+    builder.putDouble(imuYawLandscape);
+    builder.putDouble(imuYawFlat);
+    for (int _idx0 = 4; _idx0 > 0; _idx0--) {
+      builder.putDouble(imuQuaternion[_idx0-1]);
     }
-    builder.putLong(epochTime);
+    for (int _idx0 = 3; _idx0 > 0; _idx0--) {
+      builder.putDouble(imuRawGyro[_idx0-1]);
+    }
+    for (int _idx0 = 3; _idx0 > 0; _idx0--) {
+      builder.putDouble(imuRawAccel[_idx0-1]);
+    }
+    builder.putDouble(storagePercent);
+    builder.putLong(storageTotalBytes);
+    builder.putLong(storageUsageBytes);
+    builder.putDouble(memoryPercent);
+    builder.putLong(memoryTotalBytes);
+    builder.putLong(memoryUsageBytes);
     builder.putDouble(cpuTemp);
-    builder.putDouble(brownoutVoltage);
-    builder.putInt(userCurrentFaults3v3);
-    builder.putInt(userActive3v3);
-    builder.putDouble(userCurrent3v3);
-    builder.putDouble(userVoltage3v3);
-    builder.putDouble(voltageVin);
-    builder.pad(4);
-    builder.putInt(systemTimeValid);
-    builder.putInt(rslState);
-    builder.putInt(commsDisableCount);
-    builder.putInt(brownedOut);
-    builder.putInt(systemActive);
-    builder.putInt(teamNumber);
-    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) comments[_idx0-1]);
+    builder.putDouble(cpuPercent);
+    builder.putLong(epochTime);
+    builder.putLong(teamNumber);
+    builder.putLong(ioFrequency);
+    for (int _idx0 = 5; _idx0 > 0; _idx0--) {
+      builder.putDouble(canBandwidth[_idx0-1]);
     }
-    builder.putShort((short) commentsSize);
-    for (int _idx0 = 8; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) serialNumber[_idx0-1]);
-    }
-    builder.putShort((short) serialNumberSize);
-    builder.putInt(fpgaRevision);
-    builder.putInt(fpgaVersion);
+    builder.pad(7);
+    builder.putBoolean(watchdogActive);
+    builder.putDouble(batteryVoltage);
     return builder.offset();
   }
 

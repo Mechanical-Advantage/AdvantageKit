@@ -7,21 +7,42 @@
 
 #pragma once
 
+#include <networktables/BooleanTopic.h>
+#include <networktables/DoubleArrayTopic.h>
+#include <networktables/DoubleTopic.h>
+#include <networktables/IntegerTopic.h>
+
 #include "conduit_schema_generated.h"
 using namespace org::littletonrobotics::conduit;
-
-#include <hal/PowerDistribution.h>
-
-#include <atomic>
-#include <mutex>
-#include <thread>
 
 // Reads system stats data from the RIO. The data is read synchronously as
 // there are no periodic updates (unlike DS and PD data).
 class SystemReader {
 public:
+	void start();
 	void read(schema::SystemData *system_buf);
 
 private:
-	uint64_t cycleCount = 0;
+	nt::BooleanSubscriber watchdog_active_sub;
+	nt::DoubleArraySubscriber can_bandwidth_sub;
+	nt::IntegerSubscriber io_frequency_sub;
+	nt::IntegerSubscriber team_number_sub;
+
+	nt::DoubleSubscriber cpu_percent_sub;
+	nt::DoubleSubscriber cpu_temp_sub;
+
+	nt::IntegerSubscriber memory_usage_bytes_sub;
+	nt::IntegerSubscriber memory_total_bytes_sub;
+	nt::DoubleSubscriber memory_percent_sub;
+
+	nt::IntegerSubscriber storage_usage_bytes_sub;
+	nt::IntegerSubscriber storage_total_bytes_sub;
+	nt::DoubleSubscriber storage_percent_sub;
+
+	nt::DoubleArraySubscriber imu_raw_accel_sub;
+	nt::DoubleArraySubscriber imu_raw_gyro_sub;
+	nt::DoubleArraySubscriber imu_quaternion_sub;
+	nt::DoubleSubscriber imu_yaw_flat_sub;
+	nt::DoubleSubscriber imu_yaw_landscape_sub;
+	nt::DoubleSubscriber imu_yaw_portrait_sub;
 };

@@ -136,27 +136,7 @@ TEST(SizeTests, SysDataSizes) {
 	schema::SystemData sys;
 
 	ASSERT_EQ(sizeof(decltype(HAL_GetVinVoltage(0))),
-			sizeof(decltype(sys.voltage_vin())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserVoltage3V3(0))),
-			sizeof(decltype(sys.user_voltage_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrent3V3(0))),
-			sizeof(decltype(sys.user_current_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserActive3V3(0))),
-			sizeof(decltype(sys.user_active_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrentFaults3V3(0))),
-			sizeof(decltype(sys.user_current_faults_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetBrownedOut(0))),
-			sizeof(decltype(sys.browned_out())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetSystemActive(0))),
-			sizeof(decltype(sys.system_active())));
-
-	// Not sure how to test size for HAL_CAN_GetCANStatus
+			sizeof(decltype(sys.battery_voltage())));
 
 	ASSERT_EQ(sizeof(decltype(wpi::GetSystemTime())),
 			sizeof(decltype(sys.epoch_time())));

@@ -33,43 +33,38 @@ public final class CoreInputs extends Struct {
   public org.littletonrobotics.conduit.schema.SystemData sys() { return sys(new org.littletonrobotics.conduit.schema.SystemData()); }
   public org.littletonrobotics.conduit.schema.SystemData sys(org.littletonrobotics.conduit.schema.SystemData obj) { return obj.__assign(bb_pos + 2464, bb); }
 
-  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, int sys_fpgaVersion, int sys_fpgaRevision, int sys_serialNumberSize, int[] sys_serialNumber, int sys_commentsSize, int[] sys_comments, int sys_teamNumber, int sys_systemActive, int sys_brownedOut, int sys_commsDisableCount, int sys_rslState, int sys_systemTimeValid, double sys_voltageVin, double sys_userVoltage3v3, double sys_userCurrent3v3, int sys_userActive3v3, int sys_userCurrentFaults3v3, double sys_brownoutVoltage, double sys_cpuTemp, long sys_epochTime, float[] sys_can_status_percentBusUtilization, long[] sys_can_status_busOffCount, long[] sys_can_status_txFullCount, long[] sys_can_status_receiveErrorCount, long[] sys_can_status_transmitErrorCount) {
-    builder.prep(8, 2736);
-    builder.prep(8, 272);
-    builder.pad(4);
-    for (int _idx0 = 5; _idx0 > 0; _idx0--) {
-      builder.prep(4, 20);
-      builder.putInt((int) sys_can_status_transmitErrorCount[_idx0-1]);
-      builder.putInt((int) sys_can_status_receiveErrorCount[_idx0-1]);
-      builder.putInt((int) sys_can_status_txFullCount[_idx0-1]);
-      builder.putInt((int) sys_can_status_busOffCount[_idx0-1]);
-      builder.putFloat(sys_can_status_percentBusUtilization[_idx0-1]);
+  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, double sys_batteryVoltage, boolean sys_watchdogActive, double[] sys_canBandwidth, long sys_ioFrequency, long sys_teamNumber, long sys_epochTime, double sys_cpuPercent, double sys_cpuTemp, long sys_memoryUsageBytes, long sys_memoryTotalBytes, double sys_memoryPercent, long sys_storageUsageBytes, long sys_storageTotalBytes, double sys_storagePercent, double[] sys_imuRawAccel, double[] sys_imuRawGyro, double[] sys_imuQuaternion, double sys_imuYawFlat, double sys_imuYawLandscape, double sys_imuYawPortrait) {
+    builder.prep(8, 2712);
+    builder.prep(8, 248);
+    builder.putDouble(sys_imuYawPortrait);
+    builder.putDouble(sys_imuYawLandscape);
+    builder.putDouble(sys_imuYawFlat);
+    for (int _idx0 = 4; _idx0 > 0; _idx0--) {
+      builder.putDouble(sys_imuQuaternion[_idx0-1]);
     }
-    builder.putLong(sys_epochTime);
+    for (int _idx0 = 3; _idx0 > 0; _idx0--) {
+      builder.putDouble(sys_imuRawGyro[_idx0-1]);
+    }
+    for (int _idx0 = 3; _idx0 > 0; _idx0--) {
+      builder.putDouble(sys_imuRawAccel[_idx0-1]);
+    }
+    builder.putDouble(sys_storagePercent);
+    builder.putLong(sys_storageTotalBytes);
+    builder.putLong(sys_storageUsageBytes);
+    builder.putDouble(sys_memoryPercent);
+    builder.putLong(sys_memoryTotalBytes);
+    builder.putLong(sys_memoryUsageBytes);
     builder.putDouble(sys_cpuTemp);
-    builder.putDouble(sys_brownoutVoltage);
-    builder.putInt(sys_userCurrentFaults3v3);
-    builder.putInt(sys_userActive3v3);
-    builder.putDouble(sys_userCurrent3v3);
-    builder.putDouble(sys_userVoltage3v3);
-    builder.putDouble(sys_voltageVin);
-    builder.pad(4);
-    builder.putInt(sys_systemTimeValid);
-    builder.putInt(sys_rslState);
-    builder.putInt(sys_commsDisableCount);
-    builder.putInt(sys_brownedOut);
-    builder.putInt(sys_systemActive);
-    builder.putInt(sys_teamNumber);
-    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) sys_comments[_idx0-1]);
+    builder.putDouble(sys_cpuPercent);
+    builder.putLong(sys_epochTime);
+    builder.putLong(sys_teamNumber);
+    builder.putLong(sys_ioFrequency);
+    for (int _idx0 = 5; _idx0 > 0; _idx0--) {
+      builder.putDouble(sys_canBandwidth[_idx0-1]);
     }
-    builder.putShort((short) sys_commentsSize);
-    for (int _idx0 = 8; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) sys_serialNumber[_idx0-1]);
-    }
-    builder.putShort((short) sys_serialNumberSize);
-    builder.putInt(sys_fpgaRevision);
-    builder.putInt(sys_fpgaVersion);
+    builder.pad(7);
+    builder.putBoolean(sys_watchdogActive);
+    builder.putDouble(sys_batteryVoltage);
     builder.prep(8, 256);
     builder.putDouble(pdp_totalEnergy);
     builder.putDouble(pdp_totalPower);

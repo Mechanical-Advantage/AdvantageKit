@@ -18,34 +18,29 @@ public class LoggedSystemStats {
     // Update inputs from conduit
     ConduitApi conduit = ConduitApi.getInstance();
 
-    table.put("FPGAVersion", conduit.getFPGAVersion());
-    table.put("FPGARevision", conduit.getFPGARevision());
-    table.put("SerialNumber", conduit.getSerialNumber());
-    table.put("Comments", conduit.getComments());
+    table.put("BatteryVoltage", conduit.getBatteryVoltage());
+    table.put("WatchdogActive", conduit.getWatchdogActive());
+    table.put("CANBandwidth", conduit.getCANBandwidth());
+    table.put("IOFrequency", conduit.getIOFrequency());
     table.put("TeamNumber", conduit.getTeamNumber());
-    table.put("SystemActive", conduit.getSystemActive());
-    table.put("BrownedOut", conduit.getBrownedOut());
-    table.put("CommsDisableCount", conduit.getCommsDisableCount());
-    table.put("RSLState", conduit.getRSLState());
-    table.put("SystemTimeValid", conduit.getSystemTimeValid());
-
-    table.put("BatteryVoltage", conduit.getVoltageVin());
-
-    table.put("3v3Rail/Voltage", conduit.getUserVoltage3v3());
-    table.put("3v3Rail/Current", conduit.getUserCurrent3v3());
-    table.put("3v3Rail/Active", conduit.getUserActive3v3());
-    table.put("3v3Rail/CurrentFaults", conduit.getUserCurrentFaults3v3());
-
-    table.put("BrownoutVoltage", conduit.getBrownoutVoltage());
-    table.put("CPUTempCelsius", conduit.getCPUTemp());
     table.put("EpochTimeMicros", conduit.getEpochTime());
 
-    for (int busId = 0; busId < ConduitApi.NUM_CAN_BUSES; busId++) {
-      table.put("CANBus/" + busId + "/Utilization", conduit.getCANBusUtilization(busId));
-      table.put("CANBus/" + busId + "/OffCount", conduit.getBusOffCount(busId));
-      table.put("CANBus/" + busId + "/TxFullCount", conduit.getTxFullCount(busId));
-      table.put("CANBus/" + busId + "/ReceiveErrorCount", conduit.getReceiveErrorCount(busId));
-      table.put("CANBus/" + busId + "/TransmitErrorCount", conduit.getTransmitErrorCount(busId));
-    }
+    table.put("CPU/Percent", conduit.getCPUPercent());
+    table.put("CPU/TempCelsius", conduit.getCPUTempCelcius());
+
+    table.put("Memory/UsageBytes", conduit.getMemoryUsageBytes());
+    table.put("Memory/TotalBytes", conduit.getMemoryTotalBytes());
+    table.put("Memory/Percent", conduit.getMemoryPercent());
+
+    table.put("Storage/UsageBytes", conduit.getStorageUsageBytes());
+    table.put("Storage/TotalBytes", conduit.getStorageTotalBytes());
+    table.put("Storage/Percent", conduit.getStoragePercent());
+
+    table.put("IMU/RawAccel", conduit.getIMURawAccel());
+    table.put("IMU/RawGyro", conduit.getIMURawGyro());
+    table.put("IMU/Gyro3d", conduit.getIMURotation3d());
+    table.put("IMU/YawFlat", conduit.getIMUYawFlat());
+    table.put("IMU/YawLandscape", conduit.getIMUYawFlat());
+    table.put("IMU/YawPortrait", conduit.getIMUYawFlat());
   }
 }

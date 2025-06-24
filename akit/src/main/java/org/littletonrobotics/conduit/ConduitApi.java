@@ -7,10 +7,13 @@
 
 package org.littletonrobotics.conduit;
 
+import edu.wpi.first.math.geometry.Quaternion;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.units.Units;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import org.littletonrobotics.conduit.schema.CANStatus;
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.Joystick;
@@ -28,7 +31,6 @@ public class ConduitApi {
   private static final byte[] gameSpecificMessageBytes = new byte[64];
   private static final byte[] joystickNameBytes = new byte[256];
   private static final byte[] serialNumberBytes = new byte[8];
-  private static final byte[] commentsBytes = new byte[64];
 
   private static ConduitApi instance = null;
 
@@ -46,7 +48,6 @@ public class ConduitApi {
   private final PDPData pdp;
   private final SystemData sys;
   private final Joystick[] joysticks = new Joystick[NUM_JOYSTICKS];
-  private final CANStatus[] canStatus = new CANStatus[NUM_CAN_BUSES];
 
   private ConduitApi() {
     ConduitJni.start();
@@ -59,9 +60,6 @@ public class ConduitApi {
     sys = inputs.sys();
     for (int i = 0; i < NUM_JOYSTICKS; i++) {
       joysticks[i] = ds.joysticks(new Joystick(), i);
-    }
-    for (int i = 0; i < NUM_CAN_BUSES; i++) {
-      canStatus[i] = sys.canStatus(new CANStatus(), i);
     }
   }
 
@@ -177,130 +175,6 @@ public class ConduitApi {
     return joysticks[joystickId].isGamepad();
   }
 
-  public double getPDPTemperature() {
-    return pdp.temperature();
-  }
-
-  public double getPDPVoltage() {
-    return pdp.voltage();
-  }
-
-  public double getPDPChannelCurrent(int channel) {
-    return pdp.channelCurrent(channel);
-  }
-
-  public double getPDPTotalCurrent() {
-    return pdp.totalCurrent();
-  }
-
-  public double getPDPTotalPower() {
-    return pdp.totalPower();
-  }
-
-  public double getPDPTotalEnergy() {
-    return pdp.totalEnergy();
-  }
-
-  public int getFPGAVersion() {
-    return sys.fpgaVersion();
-  }
-
-  public int getFPGARevision() {
-    return sys.fpgaRevision();
-  }
-
-  public String getSerialNumber() {
-    int i;
-    for (i = 0; i < Math.min(serialNumberBytes.length, sys.serialNumberSize()); i++) {
-      serialNumberBytes[i] = (byte) sys.serialNumber(i);
-    }
-    return new String(serialNumberBytes, 0, i, utf8Charset);
-  }
-
-  public String getComments() {
-    int i;
-    for (i = 0; i < Math.min(commentsBytes.length, sys.commentsSize()); i++) {
-      commentsBytes[i] = (byte) sys.comments(i);
-    }
-    return new String(commentsBytes, 0, i, utf8Charset);
-  }
-
-  public int getTeamNumber() {
-    return sys.teamNumber();
-  }
-
-  public boolean getSystemActive() {
-    return sys.systemActive() != 0;
-  }
-
-  public boolean getBrownedOut() {
-    return sys.brownedOut() != 0;
-  }
-
-  public int getCommsDisableCount() {
-    return sys.commsDisableCount();
-  }
-
-  public boolean getRSLState() {
-    return sys.rslState() != 0;
-  }
-
-  public boolean getSystemTimeValid() {
-    return sys.systemTimeValid() != 0;
-  }
-
-  public double getVoltageVin() {
-    return sys.voltageVin();
-  }
-
-  public double getUserVoltage3v3() {
-    return sys.userVoltage3v3();
-  }
-
-  public double getUserCurrent3v3() {
-    return sys.userCurrent3v3();
-  }
-
-  public boolean getUserActive3v3() {
-    return sys.userActive3v3() != 0;
-  }
-
-  public int getUserCurrentFaults3v3() {
-    return sys.userCurrentFaults3v3();
-  }
-
-  public double getBrownoutVoltage() {
-    return sys.brownoutVoltage();
-  }
-
-  public double getCPUTemp() {
-    return sys.cpuTemp();
-  }
-
-  public long getEpochTime() {
-    return sys.epochTime();
-  }
-
-  public float getCANBusUtilization(int busId) {
-    return canStatus[busId].percentBusUtilization();
-  }
-
-  public long getBusOffCount(int busId) {
-    return canStatus[busId].busOffCount();
-  }
-
-  public long getTxFullCount(int busId) {
-    return canStatus[busId].txFullCount();
-  }
-
-  public long getReceiveErrorCount(int busId) {
-    return canStatus[busId].receiveErrorCount();
-  }
-
-  public long getTransmitErrorCount(int busId) {
-    return canStatus[busId].transmitErrorCount();
-  }
-
   public void configurePowerDistribution(int busID, int moduleID, int type) {
     ConduitJni.configurePowerDistribution(busID, moduleID, type);
   }
@@ -327,5 +201,126 @@ public class ConduitApi {
 
   public long getPDPStickyFaults() {
     return pdp.stickyFaults();
+  }
+
+  public double getPDPTemperature() {
+    return pdp.temperature();
+  }
+
+  public double getPDPVoltage() {
+    return pdp.voltage();
+  }
+
+  public double getPDPChannelCurrent(int channel) {
+    return pdp.channelCurrent(channel);
+  }
+
+  public double getPDPTotalCurrent() {
+    return pdp.totalCurrent();
+  }
+
+  public double getPDPTotalPower() {
+    return pdp.totalPower();
+  }
+
+  public double getPDPTotalEnergy() {
+    return pdp.totalEnergy();
+  }
+
+  public double getBatteryVoltage() {
+    return sys.batteryVoltage();
+  }
+
+  public boolean getWatchdogActive() {
+    return sys.watchdogActive();
+  }
+
+  public double[] getCANBandwidth() {
+    double[] result = new double[NUM_CAN_BUSES];
+    for (int i = 0; i < NUM_CAN_BUSES; i++) {
+      result[i] = sys.canBandwidth(i);
+    }
+    return result;
+  }
+
+  public long getIOFrequency() {
+    return sys.ioFrequency();
+  }
+
+  public long getTeamNumber() {
+    return sys.teamNumber();
+  }
+
+  public long getEpochTime() {
+    return sys.epochTime();
+  }
+
+  public double getCPUPercent() {
+    return sys.cpuPercent();
+  }
+
+  public double getCPUTempCelcius() {
+    return sys.cpuTemp();
+  }
+
+  public long getMemoryUsageBytes() {
+    return sys.memoryUsageBytes();
+  }
+
+  public long getMemoryTotalBytes() {
+    return sys.memoryTotalBytes();
+  }
+
+  public double getMemoryPercent() {
+    return sys.memoryPercent();
+  }
+
+  public long getStorageUsageBytes() {
+    return sys.storageUsageBytes();
+  }
+
+  public long getStorageTotalBytes() {
+    return sys.storageTotalBytes();
+  }
+
+  public double getStoragePercent() {
+    return sys.storagePercent();
+  }
+
+  public double[] getIMURawAccel() {
+    return new double[] {
+      Units.Gs.of(sys.imuRawAccel(0)).in(Units.MetersPerSecondPerSecond),
+      Units.Gs.of(sys.imuRawAccel(1)).in(Units.MetersPerSecondPerSecond),
+      Units.Gs.of(sys.imuRawAccel(2)).in(Units.MetersPerSecondPerSecond)
+    };
+  }
+
+  public double[] getIMURawGyro() {
+    return new double[] {
+      Units.Degrees.of(sys.imuRawGyro(0)).in(Units.Radians),
+      Units.Degrees.of(sys.imuRawGyro(1)).in(Units.Radians),
+      Units.Degrees.of(sys.imuRawGyro(2)).in(Units.Radians)
+    };
+  }
+
+  public Rotation3d getIMURotation3d() {
+    return new Rotation3d(
+        new Quaternion(
+            sys.imuQuaternion(0),
+            sys.imuQuaternion(1),
+            sys.imuQuaternion(2),
+            sys.imuQuaternion(3)));
+  }
+
+  public Rotation2d getIMUYawFlat() {
+    return Rotation2d.fromDegrees(sys.imuYawFlat());
+  }
+
+  public Rotation2d getIMUYawLandscape() {
+    return Rotation2d.fromDegrees(sys.imuYawLandscape());
+  }
+
+  public Rotation2d getIMUYawPortrait() {
+    return Rotation2d.fromDegrees(sys.imuYawPortrait());
   }
 }

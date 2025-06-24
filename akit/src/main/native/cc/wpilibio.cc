@@ -38,6 +38,7 @@ PDPReader pdp_reader;
 SystemReader sys_reader;
 
 void start() {
+	sys_reader.start();
 }
 
 void make_buffer() {

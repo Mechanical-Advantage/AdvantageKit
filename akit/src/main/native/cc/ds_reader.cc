@@ -17,7 +17,7 @@
 #include <mutex>
 #include <thread>
 
-static const int NUM_JOYSTICKS = 6;
+static constexpr int NUM_JOYSTICKS = 6;
 
 void DsReader::read(schema::DSData *ds_buf) {
 	std::int32_t status;
