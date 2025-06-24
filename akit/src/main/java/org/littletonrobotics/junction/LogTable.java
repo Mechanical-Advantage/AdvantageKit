@@ -548,15 +548,6 @@ public class LogTable {
             data.put("/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto")));
     if (!protoBuffers.containsKey(proto.getTypeString())) {
       protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
-
-      // Warn about protobuf logging when enabled
-      if (DriverStation.isEnabled()) {
-        DriverStation.reportWarning(
-            "[AdvantageKit] Logging protobuf value with type \""
-                + proto.getTypeString()
-                + "\" for the first time. Logging a protobuf type for the first time when the robot is enabled is likely to cause high loop overruns. Protobuf types should be always logged for the first time when the robot is disabled.",
-            false);
-      }
     }
     ProtobufBuffer<T, MessageType> buffer =
         (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
@@ -667,15 +658,6 @@ public class LogTable {
   private Struct<?> findRecordStructType(Class<?> classObj) {
     if (!structTypeCache.containsKey(classObj.getName())) {
       structTypeCache.put(classObj.getName(), new RecordStruct(classObj));
-
-      // Warn about record logging when enabled
-      if (DriverStation.isEnabled()) {
-        DriverStation.reportWarning(
-            "[AdvantageKit] Logging record value with type \""
-                + classObj.getName()
-                + "\" for the first time. Logging a record type for the first time when the robot is enabled is likely to cause high loop overruns. Record types should be always logged for the first time when the robot is disabled.",
-            false);
-      }
     }
     return structTypeCache.get(classObj.getName());
   }
