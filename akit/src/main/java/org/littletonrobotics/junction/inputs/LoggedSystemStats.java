@@ -40,7 +40,7 @@ public class LoggedSystemStats {
     table.put("IMU/RawGyro", conduit.getIMURawGyro());
     table.put("IMU/Gyro3d", conduit.getIMURotation3d());
     table.put("IMU/YawFlat", conduit.getIMUYawFlat());
-    table.put("IMU/YawLandscape", conduit.getIMUYawFlat());
-    table.put("IMU/YawPortrait", conduit.getIMUYawFlat());
+    table.put("IMU/YawLandscape", conduit.getIMUYawLandscape());
+    table.put("IMU/YawPortrait", conduit.getIMUYawPortrait());
   }
 }
