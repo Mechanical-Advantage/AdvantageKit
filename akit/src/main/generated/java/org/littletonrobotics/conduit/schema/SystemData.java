@@ -52,33 +52,43 @@ public final class SystemData extends Struct {
   public void mutateStorageTotalBytes(long storage_total_bytes) { bb.putLong(bb_pos + 128, storage_total_bytes); }
   public double storagePercent() { return bb.getDouble(bb_pos + 136); }
   public void mutateStoragePercent(double storage_percent) { bb.putDouble(bb_pos + 136, storage_percent); }
-  public double imuRawAccel(int j) { return bb.getDouble(bb_pos + 144 + j * 8); }
-  public void mutateImuRawAccel(int j, double imu_raw_accel) { bb.putDouble(bb_pos + 144 + j * 8, imu_raw_accel); }
-  public double imuRawGyro(int j) { return bb.getDouble(bb_pos + 168 + j * 8); }
-  public void mutateImuRawGyro(int j, double imu_raw_gyro) { bb.putDouble(bb_pos + 168 + j * 8, imu_raw_gyro); }
-  public double imuQuaternion(int j) { return bb.getDouble(bb_pos + 192 + j * 8); }
-  public void mutateImuQuaternion(int j, double imu_quaternion) { bb.putDouble(bb_pos + 192 + j * 8, imu_quaternion); }
-  public double imuYawFlat() { return bb.getDouble(bb_pos + 224); }
-  public void mutateImuYawFlat(double imu_yaw_flat) { bb.putDouble(bb_pos + 224, imu_yaw_flat); }
-  public double imuYawLandscape() { return bb.getDouble(bb_pos + 232); }
-  public void mutateImuYawLandscape(double imu_yaw_landscape) { bb.putDouble(bb_pos + 232, imu_yaw_landscape); }
-  public double imuYawPortrait() { return bb.getDouble(bb_pos + 240); }
-  public void mutateImuYawPortrait(double imu_yaw_portrait) { bb.putDouble(bb_pos + 240, imu_yaw_portrait); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuAccelRaw() { return imuAccelRaw(new org.littletonrobotics.conduit.schema.Vector3()); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuAccelRaw(org.littletonrobotics.conduit.schema.Vector3 obj) { return obj.__assign(bb_pos + 144, bb); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroRates() { return imuGyroRates(new org.littletonrobotics.conduit.schema.Vector3()); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroRates(org.littletonrobotics.conduit.schema.Vector3 obj) { return obj.__assign(bb_pos + 168, bb); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEuler() { return imuGyroEuler(new org.littletonrobotics.conduit.schema.Vector3()); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEuler(org.littletonrobotics.conduit.schema.Vector3 obj) { return obj.__assign(bb_pos + 192, bb); }
+  public org.littletonrobotics.conduit.schema.Vector4 imuGyroQuaternion() { return imuGyroQuaternion(new org.littletonrobotics.conduit.schema.Vector4()); }
+  public org.littletonrobotics.conduit.schema.Vector4 imuGyroQuaternion(org.littletonrobotics.conduit.schema.Vector4 obj) { return obj.__assign(bb_pos + 216, bb); }
+  public double imuGyroYawFlat() { return bb.getDouble(bb_pos + 248); }
+  public void mutateImuGyroYawFlat(double imu_gyro_yaw_flat) { bb.putDouble(bb_pos + 248, imu_gyro_yaw_flat); }
+  public double imuGyroYawLandscape() { return bb.getDouble(bb_pos + 256); }
+  public void mutateImuGyroYawLandscape(double imu_gyro_yaw_landscape) { bb.putDouble(bb_pos + 256, imu_gyro_yaw_landscape); }
+  public double imuGyroYawPortrait() { return bb.getDouble(bb_pos + 264); }
+  public void mutateImuGyroYawPortrait(double imu_gyro_yaw_portrait) { bb.putDouble(bb_pos + 264, imu_gyro_yaw_portrait); }
 
-  public static int createSystemData(FlatBufferBuilder builder, double batteryVoltage, boolean watchdogActive, double[] canBandwidth, long ioFrequency, long teamNumber, long epochTime, double cpuPercent, double cpuTemp, long memoryUsageBytes, long memoryTotalBytes, double memoryPercent, long storageUsageBytes, long storageTotalBytes, double storagePercent, double[] imuRawAccel, double[] imuRawGyro, double[] imuQuaternion, double imuYawFlat, double imuYawLandscape, double imuYawPortrait) {
-    builder.prep(8, 248);
-    builder.putDouble(imuYawPortrait);
-    builder.putDouble(imuYawLandscape);
-    builder.putDouble(imuYawFlat);
-    for (int _idx0 = 4; _idx0 > 0; _idx0--) {
-      builder.putDouble(imuQuaternion[_idx0-1]);
-    }
-    for (int _idx0 = 3; _idx0 > 0; _idx0--) {
-      builder.putDouble(imuRawGyro[_idx0-1]);
-    }
-    for (int _idx0 = 3; _idx0 > 0; _idx0--) {
-      builder.putDouble(imuRawAccel[_idx0-1]);
-    }
+  public static int createSystemData(FlatBufferBuilder builder, double batteryVoltage, boolean watchdogActive, double[] canBandwidth, long ioFrequency, long teamNumber, long epochTime, double cpuPercent, double cpuTemp, long memoryUsageBytes, long memoryTotalBytes, double memoryPercent, long storageUsageBytes, long storageTotalBytes, double storagePercent, double imu_accel_raw_x, double imu_accel_raw_y, double imu_accel_raw_z, double imu_gyro_rates_x, double imu_gyro_rates_y, double imu_gyro_rates_z, double imu_gyro_euler_x, double imu_gyro_euler_y, double imu_gyro_euler_z, double imu_gyro_quaternion_w, double imu_gyro_quaternion_x, double imu_gyro_quaternion_y, double imu_gyro_quaternion_z, double imuGyroYawFlat, double imuGyroYawLandscape, double imuGyroYawPortrait) {
+    builder.prep(8, 272);
+    builder.putDouble(imuGyroYawPortrait);
+    builder.putDouble(imuGyroYawLandscape);
+    builder.putDouble(imuGyroYawFlat);
+    builder.prep(8, 32);
+    builder.putDouble(imu_gyro_quaternion_z);
+    builder.putDouble(imu_gyro_quaternion_y);
+    builder.putDouble(imu_gyro_quaternion_x);
+    builder.putDouble(imu_gyro_quaternion_w);
+    builder.prep(8, 24);
+    builder.putDouble(imu_gyro_euler_z);
+    builder.putDouble(imu_gyro_euler_y);
+    builder.putDouble(imu_gyro_euler_x);
+    builder.prep(8, 24);
+    builder.putDouble(imu_gyro_rates_z);
+    builder.putDouble(imu_gyro_rates_y);
+    builder.putDouble(imu_gyro_rates_x);
+    builder.prep(8, 24);
+    builder.putDouble(imu_accel_raw_z);
+    builder.putDouble(imu_accel_raw_y);
+    builder.putDouble(imu_accel_raw_x);
     builder.putDouble(storagePercent);
     builder.putLong(storageTotalBytes);
     builder.putLong(storageUsageBytes);

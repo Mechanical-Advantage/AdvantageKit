@@ -10,6 +10,8 @@
 #include <hal/CAN.h>
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
+#include <hal/IMU.h>
+#include <hal/IMUTypes.h>
 #include <hal/Ports.h>
 #include <hal/Power.h>
 #include <hal/PowerDistribution.h>
@@ -71,6 +73,7 @@ void SystemReader::start() {
 
 void SystemReader::read(schema::SystemData *system_buf) {
 	std::int32_t status;
+	int64_t timestamp;
 
 	system_buf->mutate_battery_voltage(HAL_GetVinVoltage(&status));
 	system_buf->mutate_watchdog_active(watchdog_active_sub.Get());
@@ -91,13 +94,33 @@ void SystemReader::read(schema::SystemData *system_buf) {
 	system_buf->mutate_storage_total_bytes(storage_total_bytes_sub.Get());
 	system_buf->mutate_storage_percent(storage_percent_sub.Get());
 
-	std::memcpy(system_buf->mutable_imu_raw_accel()->Data(),
-			imu_raw_accel_sub.Get().data(), 3 * sizeof(double));
-	std::memcpy(system_buf->mutable_imu_raw_gyro()->Data(),
-			imu_raw_gyro_sub.Get().data(), 3 * sizeof(double));
-	std::memcpy(system_buf->mutable_imu_quaternion()->Data(),
-			imu_quaternion_sub.Get().data(), 4 * sizeof(double));
-	system_buf->mutate_imu_yaw_flat(imu_yaw_flat_sub.Get());
-	system_buf->mutate_imu_yaw_landscape(imu_yaw_landscape_sub.Get());
-	system_buf->mutate_imu_yaw_portrait(imu_yaw_portrait_sub.Get());
+	HAL_Acceleration3d accel;
+	HAL_GetIMUAcceleration(&accel, &status);
+	system_buf->mutable_imu_accel_raw().mutate_x(accel.x);
+	system_buf->mutable_imu_accel_raw().mutate_y(accel.y);
+	system_buf->mutable_imu_accel_raw().mutate_z(accel.z);
+
+	HAL_GyroRate3d gyro_rates;
+	HAL_GetIMUGyroRates(&gyro_rates, &status);
+	system_buf->mutable_imu_gyro_rates().mutate_x(gyro_rates.x);
+	system_buf->mutable_imu_gyro_rates().mutate_y(gyro_rates.y);
+	system_buf->mutable_imu_gyro_rates().mutate_z(gyro_rates.z);
+
+	HAL_EulerAngles3d gyro_euler;
+	HAL_GetIMUEulerAngles(&gyro_euler, &status);
+	system_buf->mutable_imu_gyro_euler().mutate_x(gyro_euler.x);
+	system_buf->mutable_imu_gyro_euler().mutate_y(gyro_euler.y);
+	system_buf->mutable_imu_gyro_euler().mutate_z(gyro_euler.z);
+
+	HAL_Quaternion gyro_quaternion;
+	HAL_GetIMUQuaternion(&gyro_quaternion, &status);
+	system_buf->mutable_imu_gyro_quaternion().mutate_w(gyro_quaternion.w);
+	system_buf->mutable_imu_gyro_quaternion().mutate_x(gyro_quaternion.x);
+	system_buf->mutable_imu_gyro_quaternion().mutate_y(gyro_quaternion.y);
+	system_buf->mutable_imu_gyro_quaternion().mutate_z(gyro_quaternion.z);
+
+	system_buf->mutate_imu_gyro_yaw_flat(HAL_GetIMUYawFlat(&timestamp));
+	system_buf->mutate_imu_gyro_yaw_landscape(
+			HAL_GetIMUYawLandscape(&timestamp));
+	system_buf->mutate_imu_gyro_yaw_portrait(HAL_GetIMUYawPortrait(&timestamp));
 }

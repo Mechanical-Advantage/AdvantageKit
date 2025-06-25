@@ -10,7 +10,6 @@ package org.littletonrobotics.conduit;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.units.Units;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -19,6 +18,7 @@ import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.Joystick;
 import org.littletonrobotics.conduit.schema.PDPData;
 import org.littletonrobotics.conduit.schema.SystemData;
+import org.littletonrobotics.conduit.schema.Vector3;
 
 public class ConduitApi {
   // Length constants
@@ -30,7 +30,6 @@ public class ConduitApi {
   private static final byte[] eventNameBytes = new byte[64];
   private static final byte[] gameSpecificMessageBytes = new byte[64];
   private static final byte[] joystickNameBytes = new byte[256];
-  private static final byte[] serialNumberBytes = new byte[8];
 
   private static ConduitApi instance = null;
 
@@ -287,40 +286,36 @@ public class ConduitApi {
     return sys.storagePercent();
   }
 
-  public double[] getIMURawAccel() {
-    return new double[] {
-      Units.Gs.of(sys.imuRawAccel(0)).in(Units.MetersPerSecondPerSecond),
-      Units.Gs.of(sys.imuRawAccel(1)).in(Units.MetersPerSecondPerSecond),
-      Units.Gs.of(sys.imuRawAccel(2)).in(Units.MetersPerSecondPerSecond)
-    };
+  public Vector3 getIMUAccelRaw() {
+    return sys.imuAccelRaw();
   }
 
-  public double[] getIMURawGyro() {
-    return new double[] {
-      Units.Degrees.of(sys.imuRawGyro(0)).in(Units.Radians),
-      Units.Degrees.of(sys.imuRawGyro(1)).in(Units.Radians),
-      Units.Degrees.of(sys.imuRawGyro(2)).in(Units.Radians)
-    };
+  public Vector3 getIMUGyroRates() {
+    return sys.imuGyroRates();
   }
 
-  public Rotation3d getIMURotation3d() {
+  public Vector3 getIMUGyroEuler() {
+    return sys.imuGyroEuler();
+  }
+
+  public Rotation3d getIMUGyroRotation3d() {
     return new Rotation3d(
         new Quaternion(
-            sys.imuQuaternion(0),
-            sys.imuQuaternion(1),
-            sys.imuQuaternion(2),
-            sys.imuQuaternion(3)));
+            sys.imuGyroQuaternion().w(),
+            sys.imuGyroQuaternion().x(),
+            sys.imuGyroQuaternion().y(),
+            sys.imuGyroQuaternion().z()));
   }
 
-  public Rotation2d getIMUYawFlat() {
-    return Rotation2d.fromDegrees(sys.imuYawFlat());
+  public Rotation2d getIMUGyroYawFlat() {
+    return new Rotation2d(sys.imuGyroYawFlat());
   }
 
-  public Rotation2d getIMUYawLandscape() {
-    return Rotation2d.fromDegrees(sys.imuYawLandscape());
+  public Rotation2d getIMUGyroYawLandscape() {
+    return new Rotation2d(sys.imuGyroYawLandscape());
   }
 
-  public Rotation2d getIMUYawPortrait() {
-    return Rotation2d.fromDegrees(sys.imuYawPortrait());
+  public Rotation2d getIMUGyroYawPortrait() {
+    return new Rotation2d(sys.imuGyroYawPortrait());
   }
 }

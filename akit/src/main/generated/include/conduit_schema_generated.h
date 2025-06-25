@@ -24,6 +24,10 @@ struct DSData;
 
 struct PDPData;
 
+struct Vector3;
+
+struct Vector4;
+
 struct SystemData;
 
 struct CoreInputs;
@@ -33,6 +37,10 @@ inline const ::flatbuffers::TypeTable *JoystickTypeTable();
 inline const ::flatbuffers::TypeTable *DSDataTypeTable();
 
 inline const ::flatbuffers::TypeTable *PDPDataTypeTable();
+
+inline const ::flatbuffers::TypeTable *Vector3TypeTable();
+
+inline const ::flatbuffers::TypeTable *Vector4TypeTable();
 
 inline const ::flatbuffers::TypeTable *SystemDataTypeTable();
 
@@ -512,6 +520,122 @@ inline bool operator!=(const PDPData &lhs, const PDPData &rhs) {
 }
 
 
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Vector3 FLATBUFFERS_FINAL_CLASS {
+ private:
+  double x_;
+  double y_;
+  double z_;
+
+ public:
+  static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
+    return Vector3TypeTable();
+  }
+  Vector3()
+      : x_(0),
+        y_(0),
+        z_(0) {
+  }
+  Vector3(double _x, double _y, double _z)
+      : x_(::flatbuffers::EndianScalar(_x)),
+        y_(::flatbuffers::EndianScalar(_y)),
+        z_(::flatbuffers::EndianScalar(_z)) {
+  }
+  double x() const {
+    return ::flatbuffers::EndianScalar(x_);
+  }
+  void mutate_x(double _x) {
+    ::flatbuffers::WriteScalar(&x_, _x);
+  }
+  double y() const {
+    return ::flatbuffers::EndianScalar(y_);
+  }
+  void mutate_y(double _y) {
+    ::flatbuffers::WriteScalar(&y_, _y);
+  }
+  double z() const {
+    return ::flatbuffers::EndianScalar(z_);
+  }
+  void mutate_z(double _z) {
+    ::flatbuffers::WriteScalar(&z_, _z);
+  }
+};
+FLATBUFFERS_STRUCT_END(Vector3, 24);
+
+inline bool operator==(const Vector3 &lhs, const Vector3 &rhs) {
+  return
+      (lhs.x() == rhs.x()) &&
+      (lhs.y() == rhs.y()) &&
+      (lhs.z() == rhs.z());
+}
+
+inline bool operator!=(const Vector3 &lhs, const Vector3 &rhs) {
+    return !(lhs == rhs);
+}
+
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Vector4 FLATBUFFERS_FINAL_CLASS {
+ private:
+  double w_;
+  double x_;
+  double y_;
+  double z_;
+
+ public:
+  static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
+    return Vector4TypeTable();
+  }
+  Vector4()
+      : w_(0),
+        x_(0),
+        y_(0),
+        z_(0) {
+  }
+  Vector4(double _w, double _x, double _y, double _z)
+      : w_(::flatbuffers::EndianScalar(_w)),
+        x_(::flatbuffers::EndianScalar(_x)),
+        y_(::flatbuffers::EndianScalar(_y)),
+        z_(::flatbuffers::EndianScalar(_z)) {
+  }
+  double w() const {
+    return ::flatbuffers::EndianScalar(w_);
+  }
+  void mutate_w(double _w) {
+    ::flatbuffers::WriteScalar(&w_, _w);
+  }
+  double x() const {
+    return ::flatbuffers::EndianScalar(x_);
+  }
+  void mutate_x(double _x) {
+    ::flatbuffers::WriteScalar(&x_, _x);
+  }
+  double y() const {
+    return ::flatbuffers::EndianScalar(y_);
+  }
+  void mutate_y(double _y) {
+    ::flatbuffers::WriteScalar(&y_, _y);
+  }
+  double z() const {
+    return ::flatbuffers::EndianScalar(z_);
+  }
+  void mutate_z(double _z) {
+    ::flatbuffers::WriteScalar(&z_, _z);
+  }
+};
+FLATBUFFERS_STRUCT_END(Vector4, 32);
+
+inline bool operator==(const Vector4 &lhs, const Vector4 &rhs) {
+  return
+      (lhs.w() == rhs.w()) &&
+      (lhs.x() == rhs.x()) &&
+      (lhs.y() == rhs.y()) &&
+      (lhs.z() == rhs.z());
+}
+
+inline bool operator!=(const Vector4 &lhs, const Vector4 &rhs) {
+    return !(lhs == rhs);
+}
+
+
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
  private:
   double battery_voltage_;
@@ -529,12 +653,13 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   int64_t storage_usage_bytes_;
   int64_t storage_total_bytes_;
   double storage_percent_;
-  double imu_raw_accel_[3];
-  double imu_raw_gyro_[3];
-  double imu_quaternion_[4];
-  double imu_yaw_flat_;
-  double imu_yaw_landscape_;
-  double imu_yaw_portrait_;
+  org::littletonrobotics::conduit::schema::Vector3 imu_accel_raw_;
+  org::littletonrobotics::conduit::schema::Vector3 imu_gyro_rates_;
+  org::littletonrobotics::conduit::schema::Vector3 imu_gyro_euler_;
+  org::littletonrobotics::conduit::schema::Vector4 imu_gyro_quaternion_;
+  double imu_gyro_yaw_flat_;
+  double imu_gyro_yaw_landscape_;
+  double imu_gyro_yaw_portrait_;
 
  public:
   static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
@@ -558,17 +683,18 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         storage_usage_bytes_(0),
         storage_total_bytes_(0),
         storage_percent_(0),
-        imu_raw_accel_(),
-        imu_raw_gyro_(),
-        imu_quaternion_(),
-        imu_yaw_flat_(0),
-        imu_yaw_landscape_(0),
-        imu_yaw_portrait_(0) {
+        imu_accel_raw_(),
+        imu_gyro_rates_(),
+        imu_gyro_euler_(),
+        imu_gyro_quaternion_(),
+        imu_gyro_yaw_flat_(0),
+        imu_gyro_yaw_landscape_(0),
+        imu_gyro_yaw_portrait_(0) {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
   }
-  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, double _imu_yaw_flat, double _imu_yaw_landscape, double _imu_yaw_portrait)
+  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
       : battery_voltage_(::flatbuffers::EndianScalar(_battery_voltage)),
         watchdog_active_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_watchdog_active))),
         padding0__(0),
@@ -586,17 +712,18 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         storage_usage_bytes_(::flatbuffers::EndianScalar(_storage_usage_bytes)),
         storage_total_bytes_(::flatbuffers::EndianScalar(_storage_total_bytes)),
         storage_percent_(::flatbuffers::EndianScalar(_storage_percent)),
-        imu_raw_accel_(),
-        imu_raw_gyro_(),
-        imu_quaternion_(),
-        imu_yaw_flat_(::flatbuffers::EndianScalar(_imu_yaw_flat)),
-        imu_yaw_landscape_(::flatbuffers::EndianScalar(_imu_yaw_landscape)),
-        imu_yaw_portrait_(::flatbuffers::EndianScalar(_imu_yaw_portrait)) {
+        imu_accel_raw_(_imu_accel_raw),
+        imu_gyro_rates_(_imu_gyro_rates),
+        imu_gyro_euler_(_imu_gyro_euler),
+        imu_gyro_quaternion_(_imu_gyro_quaternion),
+        imu_gyro_yaw_flat_(::flatbuffers::EndianScalar(_imu_gyro_yaw_flat)),
+        imu_gyro_yaw_landscape_(::flatbuffers::EndianScalar(_imu_gyro_yaw_landscape)),
+        imu_gyro_yaw_portrait_(::flatbuffers::EndianScalar(_imu_gyro_yaw_portrait)) {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
   }
-  SystemData(double _battery_voltage, bool _watchdog_active, ::flatbuffers::span<const double, 5> _can_bandwidth, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, ::flatbuffers::span<const double, 3> _imu_raw_accel, ::flatbuffers::span<const double, 3> _imu_raw_gyro, ::flatbuffers::span<const double, 4> _imu_quaternion, double _imu_yaw_flat, double _imu_yaw_landscape, double _imu_yaw_portrait)
+  SystemData(double _battery_voltage, bool _watchdog_active, ::flatbuffers::span<const double, 5> _can_bandwidth, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
       : battery_voltage_(::flatbuffers::EndianScalar(_battery_voltage)),
         watchdog_active_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_watchdog_active))),
         padding0__(0),
@@ -613,16 +740,17 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         storage_usage_bytes_(::flatbuffers::EndianScalar(_storage_usage_bytes)),
         storage_total_bytes_(::flatbuffers::EndianScalar(_storage_total_bytes)),
         storage_percent_(::flatbuffers::EndianScalar(_storage_percent)),
-        imu_yaw_flat_(::flatbuffers::EndianScalar(_imu_yaw_flat)),
-        imu_yaw_landscape_(::flatbuffers::EndianScalar(_imu_yaw_landscape)),
-        imu_yaw_portrait_(::flatbuffers::EndianScalar(_imu_yaw_portrait)) {
+        imu_accel_raw_(_imu_accel_raw),
+        imu_gyro_rates_(_imu_gyro_rates),
+        imu_gyro_euler_(_imu_gyro_euler),
+        imu_gyro_quaternion_(_imu_gyro_quaternion),
+        imu_gyro_yaw_flat_(::flatbuffers::EndianScalar(_imu_gyro_yaw_flat)),
+        imu_gyro_yaw_landscape_(::flatbuffers::EndianScalar(_imu_gyro_yaw_landscape)),
+        imu_gyro_yaw_portrait_(::flatbuffers::EndianScalar(_imu_gyro_yaw_portrait)) {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
     ::flatbuffers::CastToArray(can_bandwidth_).CopyFromSpan(_can_bandwidth);
-    ::flatbuffers::CastToArray(imu_raw_accel_).CopyFromSpan(_imu_raw_accel);
-    ::flatbuffers::CastToArray(imu_raw_gyro_).CopyFromSpan(_imu_raw_gyro);
-    ::flatbuffers::CastToArray(imu_quaternion_).CopyFromSpan(_imu_quaternion);
   }
   double battery_voltage() const {
     return ::flatbuffers::EndianScalar(battery_voltage_);
@@ -708,44 +836,50 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   void mutate_storage_percent(double _storage_percent) {
     ::flatbuffers::WriteScalar(&storage_percent_, _storage_percent);
   }
-  const ::flatbuffers::Array<double, 3> *imu_raw_accel() const {
-    return &::flatbuffers::CastToArray(imu_raw_accel_);
+  const org::littletonrobotics::conduit::schema::Vector3 &imu_accel_raw() const {
+    return imu_accel_raw_;
   }
-  ::flatbuffers::Array<double, 3> *mutable_imu_raw_accel() {
-    return &::flatbuffers::CastToArray(imu_raw_accel_);
+  org::littletonrobotics::conduit::schema::Vector3 &mutable_imu_accel_raw() {
+    return imu_accel_raw_;
   }
-  const ::flatbuffers::Array<double, 3> *imu_raw_gyro() const {
-    return &::flatbuffers::CastToArray(imu_raw_gyro_);
+  const org::littletonrobotics::conduit::schema::Vector3 &imu_gyro_rates() const {
+    return imu_gyro_rates_;
   }
-  ::flatbuffers::Array<double, 3> *mutable_imu_raw_gyro() {
-    return &::flatbuffers::CastToArray(imu_raw_gyro_);
+  org::littletonrobotics::conduit::schema::Vector3 &mutable_imu_gyro_rates() {
+    return imu_gyro_rates_;
   }
-  const ::flatbuffers::Array<double, 4> *imu_quaternion() const {
-    return &::flatbuffers::CastToArray(imu_quaternion_);
+  const org::littletonrobotics::conduit::schema::Vector3 &imu_gyro_euler() const {
+    return imu_gyro_euler_;
   }
-  ::flatbuffers::Array<double, 4> *mutable_imu_quaternion() {
-    return &::flatbuffers::CastToArray(imu_quaternion_);
+  org::littletonrobotics::conduit::schema::Vector3 &mutable_imu_gyro_euler() {
+    return imu_gyro_euler_;
   }
-  double imu_yaw_flat() const {
-    return ::flatbuffers::EndianScalar(imu_yaw_flat_);
+  const org::littletonrobotics::conduit::schema::Vector4 &imu_gyro_quaternion() const {
+    return imu_gyro_quaternion_;
   }
-  void mutate_imu_yaw_flat(double _imu_yaw_flat) {
-    ::flatbuffers::WriteScalar(&imu_yaw_flat_, _imu_yaw_flat);
+  org::littletonrobotics::conduit::schema::Vector4 &mutable_imu_gyro_quaternion() {
+    return imu_gyro_quaternion_;
   }
-  double imu_yaw_landscape() const {
-    return ::flatbuffers::EndianScalar(imu_yaw_landscape_);
+  double imu_gyro_yaw_flat() const {
+    return ::flatbuffers::EndianScalar(imu_gyro_yaw_flat_);
   }
-  void mutate_imu_yaw_landscape(double _imu_yaw_landscape) {
-    ::flatbuffers::WriteScalar(&imu_yaw_landscape_, _imu_yaw_landscape);
+  void mutate_imu_gyro_yaw_flat(double _imu_gyro_yaw_flat) {
+    ::flatbuffers::WriteScalar(&imu_gyro_yaw_flat_, _imu_gyro_yaw_flat);
   }
-  double imu_yaw_portrait() const {
-    return ::flatbuffers::EndianScalar(imu_yaw_portrait_);
+  double imu_gyro_yaw_landscape() const {
+    return ::flatbuffers::EndianScalar(imu_gyro_yaw_landscape_);
   }
-  void mutate_imu_yaw_portrait(double _imu_yaw_portrait) {
-    ::flatbuffers::WriteScalar(&imu_yaw_portrait_, _imu_yaw_portrait);
+  void mutate_imu_gyro_yaw_landscape(double _imu_gyro_yaw_landscape) {
+    ::flatbuffers::WriteScalar(&imu_gyro_yaw_landscape_, _imu_gyro_yaw_landscape);
+  }
+  double imu_gyro_yaw_portrait() const {
+    return ::flatbuffers::EndianScalar(imu_gyro_yaw_portrait_);
+  }
+  void mutate_imu_gyro_yaw_portrait(double _imu_gyro_yaw_portrait) {
+    ::flatbuffers::WriteScalar(&imu_gyro_yaw_portrait_, _imu_gyro_yaw_portrait);
   }
 };
-FLATBUFFERS_STRUCT_END(SystemData, 248);
+FLATBUFFERS_STRUCT_END(SystemData, 272);
 
 inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
   return
@@ -763,12 +897,13 @@ inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
       (lhs.storage_usage_bytes() == rhs.storage_usage_bytes()) &&
       (lhs.storage_total_bytes() == rhs.storage_total_bytes()) &&
       (lhs.storage_percent() == rhs.storage_percent()) &&
-      (*lhs.imu_raw_accel() == *rhs.imu_raw_accel()) &&
-      (*lhs.imu_raw_gyro() == *rhs.imu_raw_gyro()) &&
-      (*lhs.imu_quaternion() == *rhs.imu_quaternion()) &&
-      (lhs.imu_yaw_flat() == rhs.imu_yaw_flat()) &&
-      (lhs.imu_yaw_landscape() == rhs.imu_yaw_landscape()) &&
-      (lhs.imu_yaw_portrait() == rhs.imu_yaw_portrait());
+      (lhs.imu_accel_raw() == rhs.imu_accel_raw()) &&
+      (lhs.imu_gyro_rates() == rhs.imu_gyro_rates()) &&
+      (lhs.imu_gyro_euler() == rhs.imu_gyro_euler()) &&
+      (lhs.imu_gyro_quaternion() == rhs.imu_gyro_quaternion()) &&
+      (lhs.imu_gyro_yaw_flat() == rhs.imu_gyro_yaw_flat()) &&
+      (lhs.imu_gyro_yaw_landscape() == rhs.imu_gyro_yaw_landscape()) &&
+      (lhs.imu_gyro_yaw_portrait() == rhs.imu_gyro_yaw_portrait());
 }
 
 inline bool operator!=(const SystemData &lhs, const SystemData &rhs) {
@@ -824,7 +959,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CoreInputs FLATBUFFERS_FINAL_CLASS {
     return sys_;
   }
 };
-FLATBUFFERS_STRUCT_END(CoreInputs, 2712);
+FLATBUFFERS_STRUCT_END(CoreInputs, 2736);
 
 inline bool operator==(const CoreInputs &lhs, const CoreInputs &rhs) {
   return
@@ -945,6 +1080,44 @@ inline const ::flatbuffers::TypeTable *PDPDataTypeTable() {
   return &tt;
 }
 
+inline const ::flatbuffers::TypeTable *Vector3TypeTable() {
+  static const ::flatbuffers::TypeCode type_codes[] = {
+    { ::flatbuffers::ET_DOUBLE, 0, -1 },
+    { ::flatbuffers::ET_DOUBLE, 0, -1 },
+    { ::flatbuffers::ET_DOUBLE, 0, -1 }
+  };
+  static const int64_t values[] = { 0, 8, 16, 24 };
+  static const char * const names[] = {
+    "x",
+    "y",
+    "z"
+  };
+  static const ::flatbuffers::TypeTable tt = {
+    ::flatbuffers::ST_STRUCT, 3, type_codes, nullptr, nullptr, values, names
+  };
+  return &tt;
+}
+
+inline const ::flatbuffers::TypeTable *Vector4TypeTable() {
+  static const ::flatbuffers::TypeCode type_codes[] = {
+    { ::flatbuffers::ET_DOUBLE, 0, -1 },
+    { ::flatbuffers::ET_DOUBLE, 0, -1 },
+    { ::flatbuffers::ET_DOUBLE, 0, -1 },
+    { ::flatbuffers::ET_DOUBLE, 0, -1 }
+  };
+  static const int64_t values[] = { 0, 8, 16, 24, 32 };
+  static const char * const names[] = {
+    "w",
+    "x",
+    "y",
+    "z"
+  };
+  static const ::flatbuffers::TypeTable tt = {
+    ::flatbuffers::ST_STRUCT, 4, type_codes, nullptr, nullptr, values, names
+  };
+  return &tt;
+}
+
 inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
   static const ::flatbuffers::TypeCode type_codes[] = {
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
@@ -961,15 +1134,20 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     { ::flatbuffers::ET_LONG, 0, -1 },
     { ::flatbuffers::ET_LONG, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
-    { ::flatbuffers::ET_DOUBLE, 1, -1 },
-    { ::flatbuffers::ET_DOUBLE, 1, -1 },
-    { ::flatbuffers::ET_DOUBLE, 1, -1 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 0 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 0 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 0 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 }
   };
-  static const int16_t array_sizes[] = { 5, 3, 3, 4,  };
-  static const int64_t values[] = { 0, 8, 16, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 168, 192, 224, 232, 240, 248 };
+  static const ::flatbuffers::TypeFunction type_refs[] = {
+    org::littletonrobotics::conduit::schema::Vector3TypeTable,
+    org::littletonrobotics::conduit::schema::Vector4TypeTable
+  };
+  static const int16_t array_sizes[] = { 5,  };
+  static const int64_t values[] = { 0, 8, 16, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 168, 192, 216, 248, 256, 264, 272 };
   static const char * const names[] = {
     "battery_voltage",
     "watchdog_active",
@@ -985,15 +1163,16 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     "storage_usage_bytes",
     "storage_total_bytes",
     "storage_percent",
-    "imu_raw_accel",
-    "imu_raw_gyro",
-    "imu_quaternion",
-    "imu_yaw_flat",
-    "imu_yaw_landscape",
-    "imu_yaw_portrait"
+    "imu_accel_raw",
+    "imu_gyro_rates",
+    "imu_gyro_euler",
+    "imu_gyro_quaternion",
+    "imu_gyro_yaw_flat",
+    "imu_gyro_yaw_landscape",
+    "imu_gyro_yaw_portrait"
   };
   static const ::flatbuffers::TypeTable tt = {
-    ::flatbuffers::ST_STRUCT, 20, type_codes, nullptr, array_sizes, values, names
+    ::flatbuffers::ST_STRUCT, 21, type_codes, type_refs, array_sizes, values, names
   };
   return &tt;
 }
@@ -1010,7 +1189,7 @@ inline const ::flatbuffers::TypeTable *CoreInputsTypeTable() {
     org::littletonrobotics::conduit::schema::PDPDataTypeTable,
     org::littletonrobotics::conduit::schema::SystemDataTypeTable
   };
-  static const int64_t values[] = { 0, 8, 2208, 2464, 2712 };
+  static const int64_t values[] = { 0, 8, 2208, 2464, 2736 };
   static const char * const names[] = {
     "timestamp",
     "ds",

@@ -51,6 +51,19 @@ struct PDPData {
     total_energy:float64;
 }
 
+struct Vector3 {
+    x:float64;
+    y:float64;
+    z:float64;
+}
+
+struct Vector4 {
+    w:float64;
+    x:float64;
+    y:float64;
+    z:float64;
+}
+
 struct SystemData {
     battery_voltage:float64;
     watchdog_active:bool;
@@ -70,12 +83,13 @@ struct SystemData {
     storage_total_bytes:int64;
     storage_percent:float64;
 
-    imu_raw_accel:[float64:3];
-    imu_raw_gyro:[float64:3];
-    imu_quaternion:[float64:4];
-    imu_yaw_flat:float64;
-    imu_yaw_landscape:float64;
-    imu_yaw_portrait:float64;
+    imu_accel_raw:Vector3;
+    imu_gyro_rates:Vector3;
+    imu_gyro_euler:Vector3;
+    imu_gyro_quaternion:Vector4;
+    imu_gyro_yaw_flat:float64;
+    imu_gyro_yaw_landscape:float64;
+    imu_gyro_yaw_portrait:float64;
 }
 
 struct CoreInputs {

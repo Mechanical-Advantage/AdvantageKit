@@ -28,19 +28,32 @@ public class LoggedSystemStats {
     table.put("CPU/Percent", conduit.getCPUPercent());
     table.put("CPU/TempCelsius", conduit.getCPUTempCelcius());
 
-    table.put("Memory/UsageBytes", conduit.getMemoryUsageBytes());
-    table.put("Memory/TotalBytes", conduit.getMemoryTotalBytes());
+    table.put("Memory/UsageMB", conduit.getMemoryUsageBytes() * 1.0e-6);
+    table.put("Memory/TotalMB", conduit.getMemoryTotalBytes() * 1.0e-6);
     table.put("Memory/Percent", conduit.getMemoryPercent());
 
-    table.put("Storage/UsageBytes", conduit.getStorageUsageBytes());
-    table.put("Storage/TotalBytes", conduit.getStorageTotalBytes());
+    table.put("Storage/UsageMB", conduit.getStorageUsageBytes() * 1.0e-6);
+    table.put("Storage/TotalMB", conduit.getStorageTotalBytes() * 1.0e-6);
     table.put("Storage/Percent", conduit.getStoragePercent());
 
-    table.put("IMU/RawAccel", conduit.getIMURawAccel());
-    table.put("IMU/RawGyro", conduit.getIMURawGyro());
-    table.put("IMU/Gyro3d", conduit.getIMURotation3d());
-    table.put("IMU/YawFlat", conduit.getIMUYawFlat());
-    table.put("IMU/YawLandscape", conduit.getIMUYawLandscape());
-    table.put("IMU/YawPortrait", conduit.getIMUYawPortrait());
+    final var accelRaw = conduit.getIMUAccelRaw();
+    table.put("IMU/AccelRaw/X", accelRaw.x());
+    table.put("IMU/AccelRaw/Y", accelRaw.y());
+    table.put("IMU/AccelRaw/Z", accelRaw.z());
+
+    final var gyroRates = conduit.getIMUGyroRates();
+    table.put("IMU/GyroRates/X", gyroRates.x());
+    table.put("IMU/GyroRates/Y", gyroRates.y());
+    table.put("IMU/GyroRates/Z", gyroRates.z());
+
+    final var gyroEuler = conduit.getIMUGyroEuler();
+    table.put("IMU/GyroEuler/X", gyroEuler.x());
+    table.put("IMU/GyroEuler/Y", gyroEuler.y());
+    table.put("IMU/GyroEuler/Z", gyroEuler.z());
+
+    table.put("IMU/Gyro3d", conduit.getIMUGyroRotation3d());
+    table.put("IMU/GyroYawFlat", conduit.getIMUGyroYawFlat());
+    table.put("IMU/GyroYawLandscape", conduit.getIMUGyroYawLandscape());
+    table.put("IMU/GyroYawPortrait", conduit.getIMUGyroYawPortrait());
   }
 }

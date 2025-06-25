@@ -33,21 +33,29 @@ public final class CoreInputs extends Struct {
   public org.littletonrobotics.conduit.schema.SystemData sys() { return sys(new org.littletonrobotics.conduit.schema.SystemData()); }
   public org.littletonrobotics.conduit.schema.SystemData sys(org.littletonrobotics.conduit.schema.SystemData obj) { return obj.__assign(bb_pos + 2464, bb); }
 
-  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, double sys_batteryVoltage, boolean sys_watchdogActive, double[] sys_canBandwidth, long sys_ioFrequency, long sys_teamNumber, long sys_epochTime, double sys_cpuPercent, double sys_cpuTemp, long sys_memoryUsageBytes, long sys_memoryTotalBytes, double sys_memoryPercent, long sys_storageUsageBytes, long sys_storageTotalBytes, double sys_storagePercent, double[] sys_imuRawAccel, double[] sys_imuRawGyro, double[] sys_imuQuaternion, double sys_imuYawFlat, double sys_imuYawLandscape, double sys_imuYawPortrait) {
-    builder.prep(8, 2712);
-    builder.prep(8, 248);
-    builder.putDouble(sys_imuYawPortrait);
-    builder.putDouble(sys_imuYawLandscape);
-    builder.putDouble(sys_imuYawFlat);
-    for (int _idx0 = 4; _idx0 > 0; _idx0--) {
-      builder.putDouble(sys_imuQuaternion[_idx0-1]);
-    }
-    for (int _idx0 = 3; _idx0 > 0; _idx0--) {
-      builder.putDouble(sys_imuRawGyro[_idx0-1]);
-    }
-    for (int _idx0 = 3; _idx0 > 0; _idx0--) {
-      builder.putDouble(sys_imuRawAccel[_idx0-1]);
-    }
+  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, double sys_batteryVoltage, boolean sys_watchdogActive, double[] sys_canBandwidth, long sys_ioFrequency, long sys_teamNumber, long sys_epochTime, double sys_cpuPercent, double sys_cpuTemp, long sys_memoryUsageBytes, long sys_memoryTotalBytes, double sys_memoryPercent, long sys_storageUsageBytes, long sys_storageTotalBytes, double sys_storagePercent, double sys_imu_accel_raw_x, double sys_imu_accel_raw_y, double sys_imu_accel_raw_z, double sys_imu_gyro_rates_x, double sys_imu_gyro_rates_y, double sys_imu_gyro_rates_z, double sys_imu_gyro_euler_x, double sys_imu_gyro_euler_y, double sys_imu_gyro_euler_z, double sys_imu_gyro_quaternion_w, double sys_imu_gyro_quaternion_x, double sys_imu_gyro_quaternion_y, double sys_imu_gyro_quaternion_z, double sys_imuGyroYawFlat, double sys_imuGyroYawLandscape, double sys_imuGyroYawPortrait) {
+    builder.prep(8, 2736);
+    builder.prep(8, 272);
+    builder.putDouble(sys_imuGyroYawPortrait);
+    builder.putDouble(sys_imuGyroYawLandscape);
+    builder.putDouble(sys_imuGyroYawFlat);
+    builder.prep(8, 32);
+    builder.putDouble(sys_imu_gyro_quaternion_z);
+    builder.putDouble(sys_imu_gyro_quaternion_y);
+    builder.putDouble(sys_imu_gyro_quaternion_x);
+    builder.putDouble(sys_imu_gyro_quaternion_w);
+    builder.prep(8, 24);
+    builder.putDouble(sys_imu_gyro_euler_z);
+    builder.putDouble(sys_imu_gyro_euler_y);
+    builder.putDouble(sys_imu_gyro_euler_x);
+    builder.prep(8, 24);
+    builder.putDouble(sys_imu_gyro_rates_z);
+    builder.putDouble(sys_imu_gyro_rates_y);
+    builder.putDouble(sys_imu_gyro_rates_x);
+    builder.prep(8, 24);
+    builder.putDouble(sys_imu_accel_raw_z);
+    builder.putDouble(sys_imu_accel_raw_y);
+    builder.putDouble(sys_imu_accel_raw_x);
     builder.putDouble(sys_storagePercent);
     builder.putLong(sys_storageTotalBytes);
     builder.putLong(sys_storageUsageBytes);
