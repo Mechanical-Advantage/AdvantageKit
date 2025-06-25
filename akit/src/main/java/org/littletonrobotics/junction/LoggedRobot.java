@@ -64,17 +64,18 @@ public class LoggedRobot extends IterativeRobotBase {
   @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
     // Robot init methods
+    long initStat = RobotController.getFPGATime();
     robotInit();
     if (isSimulation()) {
       simulationInit();
     }
-    long initEnd = RobotController.getFPGATime(); // Includes Robot constructor and robotInit
+    long initEnd = RobotController.getFPGATime();
 
     // Register auto logged outputs
     AutoLogOutputManager.addObject(this);
 
     // Save data from init cycle
-    Logger.periodicAfterUser(initEnd, 0);
+    Logger.periodicAfterUser(initEnd - initStat, 0);
 
     // Tell the DS that the robot is ready to be enabled
     System.out.println("********** Robot program startup complete **********");
