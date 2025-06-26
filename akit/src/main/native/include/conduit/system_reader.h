@@ -23,10 +23,21 @@ public:
 	void read(schema::SystemData *system_buf);
 
 private:
+	static constexpr int NUM_CAN_BUSES = 5;
+
+	void update_network_status(
+			org::littletonrobotics::conduit::schema::NetworkStatus &status,
+			std::vector<double> values);
+
 	nt::BooleanSubscriber watchdog_active_sub;
-	nt::DoubleArraySubscriber can_bandwidth_sub;
 	nt::IntegerSubscriber io_frequency_sub;
 	nt::IntegerSubscriber team_number_sub;
+
+	nt::DoubleArraySubscriber network_ethernet_sub;
+	nt::DoubleArraySubscriber network_wifi_sub;
+	nt::DoubleArraySubscriber network_usb0_sub;
+	nt::DoubleArraySubscriber network_usb1_sub;
+	nt::DoubleArraySubscriber network_can_subs[NUM_CAN_BUSES];
 
 	nt::DoubleSubscriber cpu_percent_sub;
 	nt::DoubleSubscriber cpu_temp_sub;

@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.Joystick;
+import org.littletonrobotics.conduit.schema.NetworkStatus;
 import org.littletonrobotics.conduit.schema.PDPData;
 import org.littletonrobotics.conduit.schema.SystemData;
 import org.littletonrobotics.conduit.schema.Vector3;
@@ -234,14 +235,6 @@ public class ConduitApi {
     return sys.watchdogActive();
   }
 
-  public double[] getCANBandwidth() {
-    double[] result = new double[NUM_CAN_BUSES];
-    for (int i = 0; i < NUM_CAN_BUSES; i++) {
-      result[i] = sys.canBandwidth(i);
-    }
-    return result;
-  }
-
   public long getIOFrequency() {
     return sys.ioFrequency();
   }
@@ -252,6 +245,22 @@ public class ConduitApi {
 
   public long getEpochTime() {
     return sys.epochTime();
+  }
+
+  public NetworkStatus getNetworkEthernet() {
+    return sys.networkEthernet();
+  }
+
+  public NetworkStatus getNetworkWiFi() {
+    return sys.networkWifi();
+  }
+
+  public NetworkStatus getNetworkUSBTether() {
+    return sys.networkUsbTether();
+  }
+
+  public NetworkStatus getNetworkCAN(int bus) {
+    return sys.networkCan(bus);
   }
 
   public double getCPUPercent() {

@@ -8,6 +8,8 @@
 package org.littletonrobotics.junction.inputs;
 
 import org.littletonrobotics.conduit.ConduitApi;
+import org.littletonrobotics.conduit.schema.NetworkDirStatus;
+import org.littletonrobotics.conduit.schema.NetworkStatus;
 import org.littletonrobotics.junction.LogTable;
 
 /** Manages logging general system data. */
@@ -20,10 +22,16 @@ public class LoggedSystemStats {
 
     table.put("BatteryVoltage", conduit.getBatteryVoltage());
     table.put("WatchdogActive", conduit.getWatchdogActive());
-    table.put("CANBandwidth", conduit.getCANBandwidth());
     table.put("IOFrequency", conduit.getIOFrequency());
     table.put("TeamNumber", conduit.getTeamNumber());
     table.put("EpochTimeMicros", conduit.getEpochTime());
+
+    logNetworkStatus(table.getSubtable("Network/Ethernet"), conduit.getNetworkEthernet());
+    logNetworkStatus(table.getSubtable("Network/WiFi"), conduit.getNetworkWiFi());
+    logNetworkStatus(table.getSubtable("Network/USBTether"), conduit.getNetworkUSBTether());
+    for (int bus = 0; bus < ConduitApi.NUM_CAN_BUSES; bus++) {
+      logNetworkStatus(table.getSubtable("Network/CAN" + bus), conduit.getNetworkCAN(bus));
+    }
 
     table.put("CPU/Percent", conduit.getCPUPercent());
     table.put("CPU/TempCelsius", conduit.getCPUTempCelcius());
@@ -55,5 +63,18 @@ public class LoggedSystemStats {
     table.put("IMU/GyroYawFlat", conduit.getIMUGyroYawFlat());
     table.put("IMU/GyroYawLandscape", conduit.getIMUGyroYawLandscape());
     table.put("IMU/GyroYawPortrait", conduit.getIMUGyroYawPortrait());
+  }
+
+  private static void logNetworkStatus(LogTable table, NetworkStatus status) {
+    logNetworkDirectionStatus(table.getSubtable("RX"), status.rx());
+    logNetworkDirectionStatus(table.getSubtable("TX"), status.tx());
+  }
+
+  private static void logNetworkDirectionStatus(LogTable table, NetworkDirStatus status) {
+    table.put("BandwidthMbps", status.bandwidthKbps() * 1.0e-3);
+    table.put("Bytes", status.bytes());
+    table.put("Dropped", status.dropped());
+    table.put("Errors", status.errors());
+    table.put("Packets", status.packets());
   }
 }

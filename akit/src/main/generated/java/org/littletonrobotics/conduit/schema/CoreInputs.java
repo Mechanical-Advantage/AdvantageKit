@@ -33,9 +33,9 @@ public final class CoreInputs extends Struct {
   public org.littletonrobotics.conduit.schema.SystemData sys() { return sys(new org.littletonrobotics.conduit.schema.SystemData()); }
   public org.littletonrobotics.conduit.schema.SystemData sys(org.littletonrobotics.conduit.schema.SystemData obj) { return obj.__assign(bb_pos + 2464, bb); }
 
-  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, double sys_batteryVoltage, boolean sys_watchdogActive, double[] sys_canBandwidth, long sys_ioFrequency, long sys_teamNumber, long sys_epochTime, double sys_cpuPercent, double sys_cpuTemp, long sys_memoryUsageBytes, long sys_memoryTotalBytes, double sys_memoryPercent, long sys_storageUsageBytes, long sys_storageTotalBytes, double sys_storagePercent, double sys_imu_accel_raw_x, double sys_imu_accel_raw_y, double sys_imu_accel_raw_z, double sys_imu_gyro_rates_x, double sys_imu_gyro_rates_y, double sys_imu_gyro_rates_z, double sys_imu_gyro_euler_x, double sys_imu_gyro_euler_y, double sys_imu_gyro_euler_z, double sys_imu_gyro_quaternion_w, double sys_imu_gyro_quaternion_x, double sys_imu_gyro_quaternion_y, double sys_imu_gyro_quaternion_z, double sys_imuGyroYawFlat, double sys_imuGyroYawLandscape, double sys_imuGyroYawPortrait) {
-    builder.prep(8, 2736);
-    builder.prep(8, 272);
+  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, double sys_batteryVoltage, boolean sys_watchdogActive, long sys_ioFrequency, long sys_teamNumber, long sys_epochTime, long sys_network_ethernet_rx_bandwidthKbps, long sys_network_ethernet_rx_bytes, long sys_network_ethernet_rx_dropped, long sys_network_ethernet_rx_errors, long sys_network_ethernet_rx_packets, long sys_network_ethernet_tx_bandwidthKbps, long sys_network_ethernet_tx_bytes, long sys_network_ethernet_tx_dropped, long sys_network_ethernet_tx_errors, long sys_network_ethernet_tx_packets, long sys_network_wifi_rx_bandwidthKbps, long sys_network_wifi_rx_bytes, long sys_network_wifi_rx_dropped, long sys_network_wifi_rx_errors, long sys_network_wifi_rx_packets, long sys_network_wifi_tx_bandwidthKbps, long sys_network_wifi_tx_bytes, long sys_network_wifi_tx_dropped, long sys_network_wifi_tx_errors, long sys_network_wifi_tx_packets, long sys_network_usb_tether_rx_bandwidthKbps, long sys_network_usb_tether_rx_bytes, long sys_network_usb_tether_rx_dropped, long sys_network_usb_tether_rx_errors, long sys_network_usb_tether_rx_packets, long sys_network_usb_tether_tx_bandwidthKbps, long sys_network_usb_tether_tx_bytes, long sys_network_usb_tether_tx_dropped, long sys_network_usb_tether_tx_errors, long sys_network_usb_tether_tx_packets, long[] sys_network_can_rx_bandwidthKbps, long[] sys_network_can_rx_bytes, long[] sys_network_can_rx_dropped, long[] sys_network_can_rx_errors, long[] sys_network_can_rx_packets, long[] sys_network_can_tx_bandwidthKbps, long[] sys_network_can_tx_bytes, long[] sys_network_can_tx_dropped, long[] sys_network_can_tx_errors, long[] sys_network_can_tx_packets, double sys_cpuPercent, double sys_cpuTemp, long sys_memoryUsageBytes, long sys_memoryTotalBytes, double sys_memoryPercent, long sys_storageUsageBytes, long sys_storageTotalBytes, double sys_storagePercent, double sys_imu_accel_raw_x, double sys_imu_accel_raw_y, double sys_imu_accel_raw_z, double sys_imu_gyro_rates_x, double sys_imu_gyro_rates_y, double sys_imu_gyro_rates_z, double sys_imu_gyro_euler_x, double sys_imu_gyro_euler_y, double sys_imu_gyro_euler_z, double sys_imu_gyro_quaternion_w, double sys_imu_gyro_quaternion_x, double sys_imu_gyro_quaternion_y, double sys_imu_gyro_quaternion_z, double sys_imuGyroYawFlat, double sys_imuGyroYawLandscape, double sys_imuGyroYawPortrait) {
+    builder.prep(8, 3336);
+    builder.prep(8, 872);
     builder.putDouble(sys_imuGyroYawPortrait);
     builder.putDouble(sys_imuGyroYawLandscape);
     builder.putDouble(sys_imuGyroYawFlat);
@@ -64,12 +64,63 @@ public final class CoreInputs extends Struct {
     builder.putLong(sys_memoryUsageBytes);
     builder.putDouble(sys_cpuTemp);
     builder.putDouble(sys_cpuPercent);
+    for (int _idx0 = 5; _idx0 > 0; _idx0--) {
+      builder.prep(8, 80);
+      builder.prep(8, 40);
+      builder.putLong(sys_network_can_tx_packets[_idx0-1]);
+      builder.putLong(sys_network_can_tx_errors[_idx0-1]);
+      builder.putLong(sys_network_can_tx_dropped[_idx0-1]);
+      builder.putLong(sys_network_can_tx_bytes[_idx0-1]);
+      builder.putLong(sys_network_can_tx_bandwidthKbps[_idx0-1]);
+      builder.prep(8, 40);
+      builder.putLong(sys_network_can_rx_packets[_idx0-1]);
+      builder.putLong(sys_network_can_rx_errors[_idx0-1]);
+      builder.putLong(sys_network_can_rx_dropped[_idx0-1]);
+      builder.putLong(sys_network_can_rx_bytes[_idx0-1]);
+      builder.putLong(sys_network_can_rx_bandwidthKbps[_idx0-1]);
+    }
+    builder.prep(8, 80);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_usb_tether_tx_packets);
+    builder.putLong(sys_network_usb_tether_tx_errors);
+    builder.putLong(sys_network_usb_tether_tx_dropped);
+    builder.putLong(sys_network_usb_tether_tx_bytes);
+    builder.putLong(sys_network_usb_tether_tx_bandwidthKbps);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_usb_tether_rx_packets);
+    builder.putLong(sys_network_usb_tether_rx_errors);
+    builder.putLong(sys_network_usb_tether_rx_dropped);
+    builder.putLong(sys_network_usb_tether_rx_bytes);
+    builder.putLong(sys_network_usb_tether_rx_bandwidthKbps);
+    builder.prep(8, 80);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_wifi_tx_packets);
+    builder.putLong(sys_network_wifi_tx_errors);
+    builder.putLong(sys_network_wifi_tx_dropped);
+    builder.putLong(sys_network_wifi_tx_bytes);
+    builder.putLong(sys_network_wifi_tx_bandwidthKbps);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_wifi_rx_packets);
+    builder.putLong(sys_network_wifi_rx_errors);
+    builder.putLong(sys_network_wifi_rx_dropped);
+    builder.putLong(sys_network_wifi_rx_bytes);
+    builder.putLong(sys_network_wifi_rx_bandwidthKbps);
+    builder.prep(8, 80);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_ethernet_tx_packets);
+    builder.putLong(sys_network_ethernet_tx_errors);
+    builder.putLong(sys_network_ethernet_tx_dropped);
+    builder.putLong(sys_network_ethernet_tx_bytes);
+    builder.putLong(sys_network_ethernet_tx_bandwidthKbps);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_ethernet_rx_packets);
+    builder.putLong(sys_network_ethernet_rx_errors);
+    builder.putLong(sys_network_ethernet_rx_dropped);
+    builder.putLong(sys_network_ethernet_rx_bytes);
+    builder.putLong(sys_network_ethernet_rx_bandwidthKbps);
     builder.putLong(sys_epochTime);
     builder.putLong(sys_teamNumber);
     builder.putLong(sys_ioFrequency);
-    for (int _idx0 = 5; _idx0 > 0; _idx0--) {
-      builder.putDouble(sys_canBandwidth[_idx0-1]);
-    }
     builder.pad(7);
     builder.putBoolean(sys_watchdogActive);
     builder.putDouble(sys_batteryVoltage);

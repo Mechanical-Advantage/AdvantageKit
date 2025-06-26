@@ -51,6 +51,19 @@ struct PDPData {
     total_energy:float64;
 }
 
+struct NetworkDirStatus {
+    bandwidth_kbps:int64;
+    bytes:int64;
+    dropped:int64;
+    errors:int64;
+    packets:int64;
+}
+
+struct NetworkStatus {
+    rx:NetworkDirStatus;
+    tx:NetworkDirStatus;    
+}
+
 struct Vector3 {
     x:float64;
     y:float64;
@@ -67,10 +80,14 @@ struct Vector4 {
 struct SystemData {
     battery_voltage:float64;
     watchdog_active:bool;
-    can_bandwidth:[float64:5];
     io_frequency:int64;
     team_number:int64;
     epoch_time:int64;
+
+    network_ethernet:NetworkStatus;
+    network_wifi:NetworkStatus;
+    network_usb_tether:NetworkStatus;
+    network_can:[NetworkStatus:5];
 
     cpu_percent:float64;
     cpu_temp:float64;

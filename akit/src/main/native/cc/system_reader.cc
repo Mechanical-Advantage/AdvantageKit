@@ -28,8 +28,6 @@
 
 using namespace std::chrono_literals;
 
-static constexpr int NUM_CAN_BUSES = 5;
-
 void SystemReader::start() {
 	const auto inst = nt::NetworkTableInstance { HAL_GetSystemServerHandle() };
 	const auto sys_table = inst.GetTable("sys");
@@ -38,11 +36,24 @@ void SystemReader::start() {
 
 	watchdog_active_sub = inst.GetBooleanTopic(
 			"/Netcomm/Control/WatchdogActive").Subscribe(false);
-	can_bandwidth_sub =
-			diagnostics_table->GetDoubleArrayTopic("llsccanban2").Subscribe(
-					std::vector<double>(NUM_CAN_BUSES, 0.0));
 	io_frequency_sub = sys_table->GetIntegerTopic("iofreq").Subscribe(0);
 	team_number_sub = sys_table->GetIntegerTopic("teamnum").Subscribe(-1);
+
+	const auto network_default = std::vector<double>(10, 0.0);
+	network_ethernet_sub =
+			diagnostics_table->GetDoubleArrayTopic("eth0").Subscribe(
+					network_default);
+	network_wifi_sub =
+			diagnostics_table->GetDoubleArrayTopic("wlan0").Subscribe(
+					network_default);
+	network_usb0_sub = diagnostics_table->GetDoubleArrayTopic("usb0").Subscribe(
+			network_default);
+	network_usb1_sub = diagnostics_table->GetDoubleArrayTopic("usb1").Subscribe(
+			network_default);
+	for (int i = 0; i < NUM_CAN_BUSES; i++) {
+		network_can_subs[i] = diagnostics_table->GetDoubleArrayTopic(
+				"can_s" + std::to_string(i)).Subscribe(network_default);
+	}
 
 	cpu_percent_sub = sys_table->GetDoubleTopic("cpu").Subscribe(0.0);
 	cpu_temp_sub = sys_table->GetDoubleTopic("temp").Subscribe(0.0);
@@ -71,17 +82,47 @@ void SystemReader::start() {
 			0.0);
 }
 
+void SystemReader::update_network_status(
+		org::littletonrobotics::conduit::schema::NetworkStatus &status,
+		std::vector<double> values) {
+	status.mutable_rx().mutate_bytes(values[0]);
+	status.mutable_tx().mutate_bytes(values[1]);
+	status.mutable_rx().mutate_packets(values[2]);
+	status.mutable_tx().mutate_packets(values[3]);
+	status.mutable_rx().mutate_errors(values[4]);
+	status.mutable_tx().mutate_errors(values[5]);
+	status.mutable_rx().mutate_dropped(values[6]);
+	status.mutable_tx().mutate_dropped(values[7]);
+	status.mutable_rx().mutate_bandwidth_kbps(values[8]);
+	status.mutable_tx().mutate_bandwidth_kbps(values[9]);
+}
+
 void SystemReader::read(schema::SystemData *system_buf) {
 	std::int32_t status;
 	int64_t timestamp;
 
 	system_buf->mutate_battery_voltage(HAL_GetVinVoltage(&status));
 	system_buf->mutate_watchdog_active(watchdog_active_sub.Get());
-	std::memcpy(system_buf->mutable_can_bandwidth()->Data(),
-			can_bandwidth_sub.Get().data(), NUM_CAN_BUSES * sizeof(double));
 	system_buf->mutate_io_frequency(io_frequency_sub.Get());
 	system_buf->mutate_team_number(team_number_sub.Get());
 	system_buf->mutate_epoch_time(wpi::GetSystemTime());
+
+	update_network_status(system_buf->mutable_network_ethernet(),
+			network_ethernet_sub.Get());
+	update_network_status(system_buf->mutable_network_wifi(),
+			network_wifi_sub.Get());
+	auto usb0_status = network_usb0_sub.Get();
+	auto usb1_status = network_usb1_sub.Get();
+	auto usb_status = std::vector<double>(10, 0.0);
+	for (size_t i = 0; i < std::min(usb0_status.size(), usb1_status.size());
+			i++) {
+		usb_status[i] = usb0_status[i] + usb1_status[i];
+	}
+	update_network_status(system_buf->mutable_network_usb_tether(), usb_status);
+	for (int i = 0; i < NUM_CAN_BUSES; i++) {
+		update_network_status(system_buf->mutable_network_can()->data()[i],
+				network_can_subs[i].Get());
+	}
 
 	system_buf->mutate_cpu_percent(cpu_percent_sub.Get());
 	system_buf->mutate_cpu_temp(cpu_temp_sub.Get());
