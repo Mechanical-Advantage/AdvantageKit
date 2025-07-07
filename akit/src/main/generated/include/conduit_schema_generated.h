@@ -782,7 +782,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   double storage_percent_;
   org::littletonrobotics::conduit::schema::Vector3 imu_accel_raw_;
   org::littletonrobotics::conduit::schema::Vector3 imu_gyro_rates_;
-  org::littletonrobotics::conduit::schema::Vector3 imu_gyro_euler_;
+  org::littletonrobotics::conduit::schema::Vector3 imu_gyro_euler_flat_;
+  org::littletonrobotics::conduit::schema::Vector3 imu_gyro_euler_landscape_;
+  org::littletonrobotics::conduit::schema::Vector3 imu_gyro_euler_portrait_;
   org::littletonrobotics::conduit::schema::Vector4 imu_gyro_quaternion_;
   double imu_gyro_yaw_flat_;
   double imu_gyro_yaw_landscape_;
@@ -815,7 +817,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         storage_percent_(0),
         imu_accel_raw_(),
         imu_gyro_rates_(),
-        imu_gyro_euler_(),
+        imu_gyro_euler_flat_(),
+        imu_gyro_euler_landscape_(),
+        imu_gyro_euler_portrait_(),
         imu_gyro_quaternion_(),
         imu_gyro_yaw_flat_(0),
         imu_gyro_yaw_landscape_(0),
@@ -824,7 +828,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     (void)padding1__;
     (void)padding2__;
   }
-  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
+  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_flat, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_landscape, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_portrait, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
       : battery_voltage_(::flatbuffers::EndianScalar(_battery_voltage)),
         watchdog_active_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_watchdog_active))),
         padding0__(0),
@@ -847,7 +851,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         storage_percent_(::flatbuffers::EndianScalar(_storage_percent)),
         imu_accel_raw_(_imu_accel_raw),
         imu_gyro_rates_(_imu_gyro_rates),
-        imu_gyro_euler_(_imu_gyro_euler),
+        imu_gyro_euler_flat_(_imu_gyro_euler_flat),
+        imu_gyro_euler_landscape_(_imu_gyro_euler_landscape),
+        imu_gyro_euler_portrait_(_imu_gyro_euler_portrait),
         imu_gyro_quaternion_(_imu_gyro_quaternion),
         imu_gyro_yaw_flat_(::flatbuffers::EndianScalar(_imu_gyro_yaw_flat)),
         imu_gyro_yaw_landscape_(::flatbuffers::EndianScalar(_imu_gyro_yaw_landscape)),
@@ -856,7 +862,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     (void)padding1__;
     (void)padding2__;
   }
-  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::NetworkStatus, 5> _network_can, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
+  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::NetworkStatus, 5> _network_can, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_flat, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_landscape, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_portrait, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
       : battery_voltage_(::flatbuffers::EndianScalar(_battery_voltage)),
         watchdog_active_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_watchdog_active))),
         padding0__(0),
@@ -878,7 +884,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         storage_percent_(::flatbuffers::EndianScalar(_storage_percent)),
         imu_accel_raw_(_imu_accel_raw),
         imu_gyro_rates_(_imu_gyro_rates),
-        imu_gyro_euler_(_imu_gyro_euler),
+        imu_gyro_euler_flat_(_imu_gyro_euler_flat),
+        imu_gyro_euler_landscape_(_imu_gyro_euler_landscape),
+        imu_gyro_euler_portrait_(_imu_gyro_euler_portrait),
         imu_gyro_quaternion_(_imu_gyro_quaternion),
         imu_gyro_yaw_flat_(::flatbuffers::EndianScalar(_imu_gyro_yaw_flat)),
         imu_gyro_yaw_landscape_(::flatbuffers::EndianScalar(_imu_gyro_yaw_landscape)),
@@ -1002,11 +1010,23 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   org::littletonrobotics::conduit::schema::Vector3 &mutable_imu_gyro_rates() {
     return imu_gyro_rates_;
   }
-  const org::littletonrobotics::conduit::schema::Vector3 &imu_gyro_euler() const {
-    return imu_gyro_euler_;
+  const org::littletonrobotics::conduit::schema::Vector3 &imu_gyro_euler_flat() const {
+    return imu_gyro_euler_flat_;
   }
-  org::littletonrobotics::conduit::schema::Vector3 &mutable_imu_gyro_euler() {
-    return imu_gyro_euler_;
+  org::littletonrobotics::conduit::schema::Vector3 &mutable_imu_gyro_euler_flat() {
+    return imu_gyro_euler_flat_;
+  }
+  const org::littletonrobotics::conduit::schema::Vector3 &imu_gyro_euler_landscape() const {
+    return imu_gyro_euler_landscape_;
+  }
+  org::littletonrobotics::conduit::schema::Vector3 &mutable_imu_gyro_euler_landscape() {
+    return imu_gyro_euler_landscape_;
+  }
+  const org::littletonrobotics::conduit::schema::Vector3 &imu_gyro_euler_portrait() const {
+    return imu_gyro_euler_portrait_;
+  }
+  org::littletonrobotics::conduit::schema::Vector3 &mutable_imu_gyro_euler_portrait() {
+    return imu_gyro_euler_portrait_;
   }
   const org::littletonrobotics::conduit::schema::Vector4 &imu_gyro_quaternion() const {
     return imu_gyro_quaternion_;
@@ -1033,7 +1053,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     ::flatbuffers::WriteScalar(&imu_gyro_yaw_portrait_, _imu_gyro_yaw_portrait);
   }
 };
-FLATBUFFERS_STRUCT_END(SystemData, 872);
+FLATBUFFERS_STRUCT_END(SystemData, 920);
 
 inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
   return
@@ -1056,7 +1076,9 @@ inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
       (lhs.storage_percent() == rhs.storage_percent()) &&
       (lhs.imu_accel_raw() == rhs.imu_accel_raw()) &&
       (lhs.imu_gyro_rates() == rhs.imu_gyro_rates()) &&
-      (lhs.imu_gyro_euler() == rhs.imu_gyro_euler()) &&
+      (lhs.imu_gyro_euler_flat() == rhs.imu_gyro_euler_flat()) &&
+      (lhs.imu_gyro_euler_landscape() == rhs.imu_gyro_euler_landscape()) &&
+      (lhs.imu_gyro_euler_portrait() == rhs.imu_gyro_euler_portrait()) &&
       (lhs.imu_gyro_quaternion() == rhs.imu_gyro_quaternion()) &&
       (lhs.imu_gyro_yaw_flat() == rhs.imu_gyro_yaw_flat()) &&
       (lhs.imu_gyro_yaw_landscape() == rhs.imu_gyro_yaw_landscape()) &&
@@ -1116,7 +1138,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CoreInputs FLATBUFFERS_FINAL_CLASS {
     return sys_;
   }
 };
-FLATBUFFERS_STRUCT_END(CoreInputs, 3336);
+FLATBUFFERS_STRUCT_END(CoreInputs, 3384);
 
 inline bool operator==(const CoreInputs &lhs, const CoreInputs &rhs) {
   return
@@ -1338,6 +1360,8 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     { ::flatbuffers::ET_SEQUENCE, 0, 1 },
     { ::flatbuffers::ET_SEQUENCE, 0, 1 },
     { ::flatbuffers::ET_SEQUENCE, 0, 1 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 1 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 1 },
     { ::flatbuffers::ET_SEQUENCE, 0, 2 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
@@ -1349,7 +1373,7 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     org::littletonrobotics::conduit::schema::Vector4TypeTable
   };
   static const int16_t array_sizes[] = { 5,  };
-  static const int64_t values[] = { 0, 8, 16, 24, 32, 40, 120, 200, 280, 680, 688, 696, 704, 712, 720, 728, 736, 744, 768, 792, 816, 848, 856, 864, 872 };
+  static const int64_t values[] = { 0, 8, 16, 24, 32, 40, 120, 200, 280, 680, 688, 696, 704, 712, 720, 728, 736, 744, 768, 792, 816, 840, 864, 896, 904, 912, 920 };
   static const char * const names[] = {
     "battery_voltage",
     "watchdog_active",
@@ -1370,14 +1394,16 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     "storage_percent",
     "imu_accel_raw",
     "imu_gyro_rates",
-    "imu_gyro_euler",
+    "imu_gyro_euler_flat",
+    "imu_gyro_euler_landscape",
+    "imu_gyro_euler_portrait",
     "imu_gyro_quaternion",
     "imu_gyro_yaw_flat",
     "imu_gyro_yaw_landscape",
     "imu_gyro_yaw_portrait"
   };
   static const ::flatbuffers::TypeTable tt = {
-    ::flatbuffers::ST_STRUCT, 24, type_codes, type_refs, array_sizes, values, names
+    ::flatbuffers::ST_STRUCT, 26, type_codes, type_refs, array_sizes, values, names
   };
   return &tt;
 }
@@ -1394,7 +1420,7 @@ inline const ::flatbuffers::TypeTable *CoreInputsTypeTable() {
     org::littletonrobotics::conduit::schema::PDPDataTypeTable,
     org::littletonrobotics::conduit::schema::SystemDataTypeTable
   };
-  static const int64_t values[] = { 0, 8, 2208, 2464, 3336 };
+  static const int64_t values[] = { 0, 8, 2208, 2464, 3384 };
   static const char * const names[] = {
     "timestamp",
     "ds",

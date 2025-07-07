@@ -10,6 +10,7 @@ package org.littletonrobotics.junction.inputs;
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.conduit.schema.NetworkDirStatus;
 import org.littletonrobotics.conduit.schema.NetworkStatus;
+import org.littletonrobotics.conduit.schema.Vector3;
 import org.littletonrobotics.junction.LogTable;
 
 /** Manages logging general system data. */
@@ -44,25 +45,15 @@ public class LoggedSystemStats {
     table.put("Storage/TotalMB", conduit.getStorageTotalBytes() * 1.0e-6);
     table.put("Storage/Percent", conduit.getStoragePercent());
 
-    final var accelRaw = conduit.getIMUAccelRaw();
-    table.put("IMU/AccelRaw/X", accelRaw.x());
-    table.put("IMU/AccelRaw/Y", accelRaw.y());
-    table.put("IMU/AccelRaw/Z", accelRaw.z());
-
-    final var gyroRates = conduit.getIMUGyroRates();
-    table.put("IMU/GyroRates/X", gyroRates.x());
-    table.put("IMU/GyroRates/Y", gyroRates.y());
-    table.put("IMU/GyroRates/Z", gyroRates.z());
-
-    final var gyroEuler = conduit.getIMUGyroEuler();
-    table.put("IMU/GyroEuler/X", gyroEuler.x());
-    table.put("IMU/GyroEuler/Y", gyroEuler.y());
-    table.put("IMU/GyroEuler/Z", gyroEuler.z());
-
+    logVector3(table.getSubtable("IMU/AccelRaw"), conduit.getIMUAccelRaw());
+    logVector3(table.getSubtable("IMU/GyroRates"), conduit.getIMUGyroRates());
+    logVector3(table.getSubtable("IMU/GyroEuler/Flat"), conduit.getIMUGyroEulerFlat());
+    logVector3(table.getSubtable("IMU/GyroEuler/Landscape"), conduit.getIMUGyroEulerLandscape());
+    logVector3(table.getSubtable("IMU/GyroEuler/Portrait"), conduit.getIMUGyroEulerPortrait());
     table.put("IMU/Gyro3d", conduit.getIMUGyroRotation3d());
-    table.put("IMU/GyroYawFlat", conduit.getIMUGyroYawFlat());
-    table.put("IMU/GyroYawLandscape", conduit.getIMUGyroYawLandscape());
-    table.put("IMU/GyroYawPortrait", conduit.getIMUGyroYawPortrait());
+    table.put("IMU/GyroYaw/Flat", conduit.getIMUGyroYawFlat());
+    table.put("IMU/GyroYaw/Landscape", conduit.getIMUGyroYawLandscape());
+    table.put("IMU/GyroYaw/Portrait", conduit.getIMUGyroYawPortrait());
   }
 
   private static void logNetworkStatus(LogTable table, NetworkStatus status) {
@@ -76,5 +67,11 @@ public class LoggedSystemStats {
     table.put("Dropped", status.dropped());
     table.put("Errors", status.errors());
     table.put("Packets", status.packets());
+  }
+
+  private static void logVector3(LogTable table, Vector3 vector) {
+    table.put("X", vector.x());
+    table.put("Y", vector.y());
+    table.put("Z", vector.z());
   }
 }

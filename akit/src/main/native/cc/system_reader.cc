@@ -69,17 +69,14 @@ void SystemReader::start() {
 			sys_table->GetIntegerTopic("storagetotal").Subscribe(0);
 	storage_percent_sub = sys_table->GetDoubleTopic("storageutil").Subscribe(0);
 
-	imu_raw_accel_sub = imu_table->GetDoubleArrayTopic("rawaccel").Subscribe(
+	imu_euler_flat_sub = imu_table->GetDoubleArrayTopic("euler_flat").Subscribe(
 			std::vector { 0.0, 0.0, 0.0 });
-	imu_raw_gyro_sub = imu_table->GetDoubleArrayTopic("rawgyro").Subscribe(
-			std::vector { 0.0, 0.0, 0.0 });
-	imu_quaternion_sub = imu_table->GetDoubleArrayTopic("quat").Subscribe(
-			std::vector { 1.0, 0.0, 0.0, 0.0 });
-	imu_yaw_flat_sub = imu_table->GetDoubleTopic("yaw_flat").Subscribe(0.0);
-	imu_yaw_landscape_sub =
-			imu_table->GetDoubleTopic("yaw_landscape").Subscribe(0.0);
-	imu_yaw_portrait_sub = imu_table->GetDoubleTopic("yaw_portrait").Subscribe(
-			0.0);
+	imu_euler_landscape_sub =
+			imu_table->GetDoubleArrayTopic("euler_landscape").Subscribe(
+					std::vector { 0.0, 0.0, 0.0 });
+	imu_euler_portrait_sub =
+			imu_table->GetDoubleArrayTopic("euler_portrait").Subscribe(
+					std::vector { 0.0, 0.0, 0.0 });
 }
 
 void SystemReader::update_network_status(
@@ -147,11 +144,22 @@ void SystemReader::read(schema::SystemData *system_buf) {
 	system_buf->mutable_imu_gyro_rates().mutate_y(gyro_rates.y);
 	system_buf->mutable_imu_gyro_rates().mutate_z(gyro_rates.z);
 
-	HAL_EulerAngles3d gyro_euler;
-	HAL_GetIMUEulerAngles(&gyro_euler, &status);
-	system_buf->mutable_imu_gyro_euler().mutate_x(gyro_euler.x);
-	system_buf->mutable_imu_gyro_euler().mutate_y(gyro_euler.y);
-	system_buf->mutable_imu_gyro_euler().mutate_z(gyro_euler.z);
+	// TODO: Read Euler angles from HAL when API is available
+
+	const auto euler_flat = imu_euler_flat_sub.Get();
+	system_buf->mutable_imu_gyro_euler_flat().mutate_x(euler_flat[0]);
+	system_buf->mutable_imu_gyro_euler_flat().mutate_y(euler_flat[1]);
+	system_buf->mutable_imu_gyro_euler_flat().mutate_z(euler_flat[2]);
+
+	const auto euler_landscape = imu_euler_landscape_sub.Get();
+	system_buf->mutable_imu_gyro_euler_landscape().mutate_x(euler_landscape[0]);
+	system_buf->mutable_imu_gyro_euler_landscape().mutate_y(euler_landscape[1]);
+	system_buf->mutable_imu_gyro_euler_landscape().mutate_z(euler_landscape[2]);
+
+	const auto euler_portrait = imu_euler_portrait_sub.Get();
+	system_buf->mutable_imu_gyro_euler_portrait().mutate_x(euler_portrait[0]);
+	system_buf->mutable_imu_gyro_euler_portrait().mutate_y(euler_portrait[1]);
+	system_buf->mutable_imu_gyro_euler_portrait().mutate_z(euler_portrait[2]);
 
 	HAL_Quaternion gyro_quaternion;
 	HAL_GetIMUQuaternion(&gyro_quaternion, &status);

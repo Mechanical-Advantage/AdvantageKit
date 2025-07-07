@@ -303,8 +303,16 @@ public class ConduitApi {
     return sys.imuGyroRates();
   }
 
-  public Vector3 getIMUGyroEuler() {
-    return sys.imuGyroEuler();
+  public Vector3 getIMUGyroEulerFlat() {
+    return sys.imuGyroEulerFlat();
+  }
+
+  public Vector3 getIMUGyroEulerLandscape() {
+    return sys.imuGyroEulerLandscape();
+  }
+
+  public Vector3 getIMUGyroEulerPortrait() {
+    return sys.imuGyroEulerPortrait();
   }
 
   public Rotation3d getIMUGyroRotation3d() {

@@ -62,19 +62,23 @@ public final class SystemData extends Struct {
   public org.littletonrobotics.conduit.schema.Vector3 imuAccelRaw(org.littletonrobotics.conduit.schema.Vector3 obj) { return obj.__assign(bb_pos + 744, bb); }
   public org.littletonrobotics.conduit.schema.Vector3 imuGyroRates() { return imuGyroRates(new org.littletonrobotics.conduit.schema.Vector3()); }
   public org.littletonrobotics.conduit.schema.Vector3 imuGyroRates(org.littletonrobotics.conduit.schema.Vector3 obj) { return obj.__assign(bb_pos + 768, bb); }
-  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEuler() { return imuGyroEuler(new org.littletonrobotics.conduit.schema.Vector3()); }
-  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEuler(org.littletonrobotics.conduit.schema.Vector3 obj) { return obj.__assign(bb_pos + 792, bb); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEulerFlat() { return imuGyroEulerFlat(new org.littletonrobotics.conduit.schema.Vector3()); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEulerFlat(org.littletonrobotics.conduit.schema.Vector3 obj) { return obj.__assign(bb_pos + 792, bb); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEulerLandscape() { return imuGyroEulerLandscape(new org.littletonrobotics.conduit.schema.Vector3()); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEulerLandscape(org.littletonrobotics.conduit.schema.Vector3 obj) { return obj.__assign(bb_pos + 816, bb); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEulerPortrait() { return imuGyroEulerPortrait(new org.littletonrobotics.conduit.schema.Vector3()); }
+  public org.littletonrobotics.conduit.schema.Vector3 imuGyroEulerPortrait(org.littletonrobotics.conduit.schema.Vector3 obj) { return obj.__assign(bb_pos + 840, bb); }
   public org.littletonrobotics.conduit.schema.Vector4 imuGyroQuaternion() { return imuGyroQuaternion(new org.littletonrobotics.conduit.schema.Vector4()); }
-  public org.littletonrobotics.conduit.schema.Vector4 imuGyroQuaternion(org.littletonrobotics.conduit.schema.Vector4 obj) { return obj.__assign(bb_pos + 816, bb); }
-  public double imuGyroYawFlat() { return bb.getDouble(bb_pos + 848); }
-  public void mutateImuGyroYawFlat(double imu_gyro_yaw_flat) { bb.putDouble(bb_pos + 848, imu_gyro_yaw_flat); }
-  public double imuGyroYawLandscape() { return bb.getDouble(bb_pos + 856); }
-  public void mutateImuGyroYawLandscape(double imu_gyro_yaw_landscape) { bb.putDouble(bb_pos + 856, imu_gyro_yaw_landscape); }
-  public double imuGyroYawPortrait() { return bb.getDouble(bb_pos + 864); }
-  public void mutateImuGyroYawPortrait(double imu_gyro_yaw_portrait) { bb.putDouble(bb_pos + 864, imu_gyro_yaw_portrait); }
+  public org.littletonrobotics.conduit.schema.Vector4 imuGyroQuaternion(org.littletonrobotics.conduit.schema.Vector4 obj) { return obj.__assign(bb_pos + 864, bb); }
+  public double imuGyroYawFlat() { return bb.getDouble(bb_pos + 896); }
+  public void mutateImuGyroYawFlat(double imu_gyro_yaw_flat) { bb.putDouble(bb_pos + 896, imu_gyro_yaw_flat); }
+  public double imuGyroYawLandscape() { return bb.getDouble(bb_pos + 904); }
+  public void mutateImuGyroYawLandscape(double imu_gyro_yaw_landscape) { bb.putDouble(bb_pos + 904, imu_gyro_yaw_landscape); }
+  public double imuGyroYawPortrait() { return bb.getDouble(bb_pos + 912); }
+  public void mutateImuGyroYawPortrait(double imu_gyro_yaw_portrait) { bb.putDouble(bb_pos + 912, imu_gyro_yaw_portrait); }
 
-  public static int createSystemData(FlatBufferBuilder builder, double batteryVoltage, boolean watchdogActive, long ioFrequency, long teamNumber, long epochTime, long network_ethernet_rx_bandwidthKbps, long network_ethernet_rx_bytes, long network_ethernet_rx_dropped, long network_ethernet_rx_errors, long network_ethernet_rx_packets, long network_ethernet_tx_bandwidthKbps, long network_ethernet_tx_bytes, long network_ethernet_tx_dropped, long network_ethernet_tx_errors, long network_ethernet_tx_packets, long network_wifi_rx_bandwidthKbps, long network_wifi_rx_bytes, long network_wifi_rx_dropped, long network_wifi_rx_errors, long network_wifi_rx_packets, long network_wifi_tx_bandwidthKbps, long network_wifi_tx_bytes, long network_wifi_tx_dropped, long network_wifi_tx_errors, long network_wifi_tx_packets, long network_usb_tether_rx_bandwidthKbps, long network_usb_tether_rx_bytes, long network_usb_tether_rx_dropped, long network_usb_tether_rx_errors, long network_usb_tether_rx_packets, long network_usb_tether_tx_bandwidthKbps, long network_usb_tether_tx_bytes, long network_usb_tether_tx_dropped, long network_usb_tether_tx_errors, long network_usb_tether_tx_packets, long[] network_can_rx_bandwidthKbps, long[] network_can_rx_bytes, long[] network_can_rx_dropped, long[] network_can_rx_errors, long[] network_can_rx_packets, long[] network_can_tx_bandwidthKbps, long[] network_can_tx_bytes, long[] network_can_tx_dropped, long[] network_can_tx_errors, long[] network_can_tx_packets, double cpuPercent, double cpuTemp, long memoryUsageBytes, long memoryTotalBytes, double memoryPercent, long storageUsageBytes, long storageTotalBytes, double storagePercent, double imu_accel_raw_x, double imu_accel_raw_y, double imu_accel_raw_z, double imu_gyro_rates_x, double imu_gyro_rates_y, double imu_gyro_rates_z, double imu_gyro_euler_x, double imu_gyro_euler_y, double imu_gyro_euler_z, double imu_gyro_quaternion_w, double imu_gyro_quaternion_x, double imu_gyro_quaternion_y, double imu_gyro_quaternion_z, double imuGyroYawFlat, double imuGyroYawLandscape, double imuGyroYawPortrait) {
-    builder.prep(8, 872);
+  public static int createSystemData(FlatBufferBuilder builder, double batteryVoltage, boolean watchdogActive, long ioFrequency, long teamNumber, long epochTime, long network_ethernet_rx_bandwidthKbps, long network_ethernet_rx_bytes, long network_ethernet_rx_dropped, long network_ethernet_rx_errors, long network_ethernet_rx_packets, long network_ethernet_tx_bandwidthKbps, long network_ethernet_tx_bytes, long network_ethernet_tx_dropped, long network_ethernet_tx_errors, long network_ethernet_tx_packets, long network_wifi_rx_bandwidthKbps, long network_wifi_rx_bytes, long network_wifi_rx_dropped, long network_wifi_rx_errors, long network_wifi_rx_packets, long network_wifi_tx_bandwidthKbps, long network_wifi_tx_bytes, long network_wifi_tx_dropped, long network_wifi_tx_errors, long network_wifi_tx_packets, long network_usb_tether_rx_bandwidthKbps, long network_usb_tether_rx_bytes, long network_usb_tether_rx_dropped, long network_usb_tether_rx_errors, long network_usb_tether_rx_packets, long network_usb_tether_tx_bandwidthKbps, long network_usb_tether_tx_bytes, long network_usb_tether_tx_dropped, long network_usb_tether_tx_errors, long network_usb_tether_tx_packets, long[] network_can_rx_bandwidthKbps, long[] network_can_rx_bytes, long[] network_can_rx_dropped, long[] network_can_rx_errors, long[] network_can_rx_packets, long[] network_can_tx_bandwidthKbps, long[] network_can_tx_bytes, long[] network_can_tx_dropped, long[] network_can_tx_errors, long[] network_can_tx_packets, double cpuPercent, double cpuTemp, long memoryUsageBytes, long memoryTotalBytes, double memoryPercent, long storageUsageBytes, long storageTotalBytes, double storagePercent, double imu_accel_raw_x, double imu_accel_raw_y, double imu_accel_raw_z, double imu_gyro_rates_x, double imu_gyro_rates_y, double imu_gyro_rates_z, double imu_gyro_euler_flat_x, double imu_gyro_euler_flat_y, double imu_gyro_euler_flat_z, double imu_gyro_euler_landscape_x, double imu_gyro_euler_landscape_y, double imu_gyro_euler_landscape_z, double imu_gyro_euler_portrait_x, double imu_gyro_euler_portrait_y, double imu_gyro_euler_portrait_z, double imu_gyro_quaternion_w, double imu_gyro_quaternion_x, double imu_gyro_quaternion_y, double imu_gyro_quaternion_z, double imuGyroYawFlat, double imuGyroYawLandscape, double imuGyroYawPortrait) {
+    builder.prep(8, 920);
     builder.putDouble(imuGyroYawPortrait);
     builder.putDouble(imuGyroYawLandscape);
     builder.putDouble(imuGyroYawFlat);
@@ -84,9 +88,17 @@ public final class SystemData extends Struct {
     builder.putDouble(imu_gyro_quaternion_x);
     builder.putDouble(imu_gyro_quaternion_w);
     builder.prep(8, 24);
-    builder.putDouble(imu_gyro_euler_z);
-    builder.putDouble(imu_gyro_euler_y);
-    builder.putDouble(imu_gyro_euler_x);
+    builder.putDouble(imu_gyro_euler_portrait_z);
+    builder.putDouble(imu_gyro_euler_portrait_y);
+    builder.putDouble(imu_gyro_euler_portrait_x);
+    builder.prep(8, 24);
+    builder.putDouble(imu_gyro_euler_landscape_z);
+    builder.putDouble(imu_gyro_euler_landscape_y);
+    builder.putDouble(imu_gyro_euler_landscape_x);
+    builder.prep(8, 24);
+    builder.putDouble(imu_gyro_euler_flat_z);
+    builder.putDouble(imu_gyro_euler_flat_y);
+    builder.putDouble(imu_gyro_euler_flat_x);
     builder.prep(8, 24);
     builder.putDouble(imu_gyro_rates_z);
     builder.putDouble(imu_gyro_rates_y);

@@ -50,10 +50,7 @@ private:
 	nt::IntegerSubscriber storage_total_bytes_sub;
 	nt::DoubleSubscriber storage_percent_sub;
 
-	nt::DoubleArraySubscriber imu_raw_accel_sub;
-	nt::DoubleArraySubscriber imu_raw_gyro_sub;
-	nt::DoubleArraySubscriber imu_quaternion_sub;
-	nt::DoubleSubscriber imu_yaw_flat_sub;
-	nt::DoubleSubscriber imu_yaw_landscape_sub;
-	nt::DoubleSubscriber imu_yaw_portrait_sub;
+	nt::DoubleArraySubscriber imu_euler_flat_sub;
+	nt::DoubleArraySubscriber imu_euler_landscape_sub;
+	nt::DoubleArraySubscriber imu_euler_portrait_sub;
 };

@@ -102,7 +102,9 @@ struct SystemData {
 
     imu_accel_raw:Vector3;
     imu_gyro_rates:Vector3;
-    imu_gyro_euler:Vector3;
+    imu_gyro_euler_flat:Vector3;
+    imu_gyro_euler_landscape:Vector3;
+    imu_gyro_euler_portrait:Vector3;
     imu_gyro_quaternion:Vector4;
     imu_gyro_yaw_flat:float64;
     imu_gyro_yaw_landscape:float64;
