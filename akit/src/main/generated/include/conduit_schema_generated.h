@@ -768,6 +768,8 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   int64_t io_frequency_;
   int64_t team_number_;
   int64_t epoch_time_;
+  uint8_t epoch_time_valid_;
+  int8_t padding3__;  int16_t padding4__;  int32_t padding5__;
   org::littletonrobotics::conduit::schema::NetworkStatus network_ethernet_;
   org::littletonrobotics::conduit::schema::NetworkStatus network_wifi_;
   org::littletonrobotics::conduit::schema::NetworkStatus network_usb_tether_;
@@ -803,6 +805,10 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         io_frequency_(0),
         team_number_(0),
         epoch_time_(0),
+        epoch_time_valid_(0),
+        padding3__(0),
+        padding4__(0),
+        padding5__(0),
         network_ethernet_(),
         network_wifi_(),
         network_usb_tether_(),
@@ -827,8 +833,11 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
+    (void)padding3__;
+    (void)padding4__;
+    (void)padding5__;
   }
-  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_flat, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_landscape, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_portrait, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
+  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, bool _epoch_time_valid, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_flat, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_landscape, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_portrait, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
       : battery_voltage_(::flatbuffers::EndianScalar(_battery_voltage)),
         watchdog_active_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_watchdog_active))),
         padding0__(0),
@@ -837,6 +846,10 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         io_frequency_(::flatbuffers::EndianScalar(_io_frequency)),
         team_number_(::flatbuffers::EndianScalar(_team_number)),
         epoch_time_(::flatbuffers::EndianScalar(_epoch_time)),
+        epoch_time_valid_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_epoch_time_valid))),
+        padding3__(0),
+        padding4__(0),
+        padding5__(0),
         network_ethernet_(_network_ethernet),
         network_wifi_(_network_wifi),
         network_usb_tether_(_network_usb_tether),
@@ -861,8 +874,11 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
+    (void)padding3__;
+    (void)padding4__;
+    (void)padding5__;
   }
-  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::NetworkStatus, 5> _network_can, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_flat, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_landscape, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_portrait, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
+  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, bool _epoch_time_valid, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::NetworkStatus, 5> _network_can, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_flat, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_landscape, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_portrait, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
       : battery_voltage_(::flatbuffers::EndianScalar(_battery_voltage)),
         watchdog_active_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_watchdog_active))),
         padding0__(0),
@@ -871,6 +887,10 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         io_frequency_(::flatbuffers::EndianScalar(_io_frequency)),
         team_number_(::flatbuffers::EndianScalar(_team_number)),
         epoch_time_(::flatbuffers::EndianScalar(_epoch_time)),
+        epoch_time_valid_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_epoch_time_valid))),
+        padding3__(0),
+        padding4__(0),
+        padding5__(0),
         network_ethernet_(_network_ethernet),
         network_wifi_(_network_wifi),
         network_usb_tether_(_network_usb_tether),
@@ -894,6 +914,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
+    (void)padding3__;
+    (void)padding4__;
+    (void)padding5__;
     ::flatbuffers::CastToArray(network_can_).CopyFromSpan(_network_can);
   }
   double battery_voltage() const {
@@ -925,6 +948,12 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   }
   void mutate_epoch_time(int64_t _epoch_time) {
     ::flatbuffers::WriteScalar(&epoch_time_, _epoch_time);
+  }
+  bool epoch_time_valid() const {
+    return ::flatbuffers::EndianScalar(epoch_time_valid_) != 0;
+  }
+  void mutate_epoch_time_valid(bool _epoch_time_valid) {
+    ::flatbuffers::WriteScalar(&epoch_time_valid_, static_cast<uint8_t>(_epoch_time_valid));
   }
   const org::littletonrobotics::conduit::schema::NetworkStatus &network_ethernet() const {
     return network_ethernet_;
@@ -1053,7 +1082,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     ::flatbuffers::WriteScalar(&imu_gyro_yaw_portrait_, _imu_gyro_yaw_portrait);
   }
 };
-FLATBUFFERS_STRUCT_END(SystemData, 920);
+FLATBUFFERS_STRUCT_END(SystemData, 928);
 
 inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
   return
@@ -1062,6 +1091,7 @@ inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
       (lhs.io_frequency() == rhs.io_frequency()) &&
       (lhs.team_number() == rhs.team_number()) &&
       (lhs.epoch_time() == rhs.epoch_time()) &&
+      (lhs.epoch_time_valid() == rhs.epoch_time_valid()) &&
       (lhs.network_ethernet() == rhs.network_ethernet()) &&
       (lhs.network_wifi() == rhs.network_wifi()) &&
       (lhs.network_usb_tether() == rhs.network_usb_tether()) &&
@@ -1138,7 +1168,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CoreInputs FLATBUFFERS_FINAL_CLASS {
     return sys_;
   }
 };
-FLATBUFFERS_STRUCT_END(CoreInputs, 3384);
+FLATBUFFERS_STRUCT_END(CoreInputs, 3392);
 
 inline bool operator==(const CoreInputs &lhs, const CoreInputs &rhs) {
   return
@@ -1345,6 +1375,7 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     { ::flatbuffers::ET_LONG, 0, -1 },
     { ::flatbuffers::ET_LONG, 0, -1 },
     { ::flatbuffers::ET_LONG, 0, -1 },
+    { ::flatbuffers::ET_BOOL, 0, -1 },
     { ::flatbuffers::ET_SEQUENCE, 0, 0 },
     { ::flatbuffers::ET_SEQUENCE, 0, 0 },
     { ::flatbuffers::ET_SEQUENCE, 0, 0 },
@@ -1373,13 +1404,14 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     org::littletonrobotics::conduit::schema::Vector4TypeTable
   };
   static const int16_t array_sizes[] = { 5,  };
-  static const int64_t values[] = { 0, 8, 16, 24, 32, 40, 120, 200, 280, 680, 688, 696, 704, 712, 720, 728, 736, 744, 768, 792, 816, 840, 864, 896, 904, 912, 920 };
+  static const int64_t values[] = { 0, 8, 16, 24, 32, 40, 48, 128, 208, 288, 688, 696, 704, 712, 720, 728, 736, 744, 752, 776, 800, 824, 848, 872, 904, 912, 920, 928 };
   static const char * const names[] = {
     "battery_voltage",
     "watchdog_active",
     "io_frequency",
     "team_number",
     "epoch_time",
+    "epoch_time_valid",
     "network_ethernet",
     "network_wifi",
     "network_usb_tether",
@@ -1403,7 +1435,7 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     "imu_gyro_yaw_portrait"
   };
   static const ::flatbuffers::TypeTable tt = {
-    ::flatbuffers::ST_STRUCT, 26, type_codes, type_refs, array_sizes, values, names
+    ::flatbuffers::ST_STRUCT, 27, type_codes, type_refs, array_sizes, values, names
   };
   return &tt;
 }
@@ -1420,7 +1452,7 @@ inline const ::flatbuffers::TypeTable *CoreInputsTypeTable() {
     org::littletonrobotics::conduit::schema::PDPDataTypeTable,
     org::littletonrobotics::conduit::schema::SystemDataTypeTable
   };
-  static const int64_t values[] = { 0, 8, 2208, 2464, 3384 };
+  static const int64_t values[] = { 0, 8, 2208, 2464, 3392 };
   static const char * const names[] = {
     "timestamp",
     "ds",

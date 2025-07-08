@@ -195,16 +195,15 @@ public class WPILOGWriter implements LogDataReceiver {
 
       // Update timestamp
       if (logDate == null) {
-        final var now = LocalDateTime.now();
         if ((table.get("DriverStation/DSAttached", false)
-                && now.getYear() >= 2025) // Default time on SystemCore is January 2024
+                && table.get("SystemStats/EpochTimeValid", false))
             || RobotBase.isSimulation()) {
           if (dsAttachedTime == null) {
             dsAttachedTime = RobotController.getFPGATime() / 1000000.0;
           } else if (RobotController.getFPGATime() / 1000000.0 - dsAttachedTime
                   > timestampUpdateDelay
               || RobotBase.isSimulation()) {
-            logDate = now;
+            logDate = LocalDateTime.now();
           }
         } else {
           dsAttachedTime = null;

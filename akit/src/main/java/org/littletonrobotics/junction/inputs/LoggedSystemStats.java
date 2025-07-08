@@ -26,6 +26,7 @@ public class LoggedSystemStats {
     table.put("IOFrequency", conduit.getIOFrequency());
     table.put("TeamNumber", conduit.getTeamNumber());
     table.put("EpochTimeMicros", conduit.getEpochTime());
+    table.put("EpochTimeValid", conduit.getEpochTimeValid());
 
     logNetworkStatus(table.getSubtable("Network/Ethernet"), conduit.getNetworkEthernet());
     logNetworkStatus(table.getSubtable("Network/WiFi"), conduit.getNetworkWiFi());

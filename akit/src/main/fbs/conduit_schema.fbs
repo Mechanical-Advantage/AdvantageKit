@@ -83,6 +83,7 @@ struct SystemData {
     io_frequency:int64;
     team_number:int64;
     epoch_time:int64;
+    epoch_time_valid:bool;
 
     network_ethernet:NetworkStatus;
     network_wifi:NetworkStatus;

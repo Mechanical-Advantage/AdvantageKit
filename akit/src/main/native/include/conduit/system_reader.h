@@ -32,6 +32,7 @@ private:
 	nt::BooleanSubscriber watchdog_active_sub;
 	nt::IntegerSubscriber io_frequency_sub;
 	nt::IntegerSubscriber team_number_sub;
+	nt::BooleanSubscriber epoch_time_valid_sub;
 
 	nt::DoubleArraySubscriber network_ethernet_sub;
 	nt::DoubleArraySubscriber network_wifi_sub;

@@ -30,6 +30,7 @@ using namespace std::chrono_literals;
 
 void SystemReader::start() {
 	const auto inst = nt::NetworkTableInstance { HAL_GetSystemServerHandle() };
+	const auto netcomm_table = inst.GetTable("Netcomm");
 	const auto sys_table = inst.GetTable("sys");
 	const auto imu_table = inst.GetTable("imu");
 	const auto diagnostics_table = inst.GetTable("diagnostics");
@@ -38,6 +39,8 @@ void SystemReader::start() {
 			"/Netcomm/Control/WatchdogActive").Subscribe(false);
 	io_frequency_sub = sys_table->GetIntegerTopic("iofreq").Subscribe(0);
 	team_number_sub = sys_table->GetIntegerTopic("teamnum").Subscribe(-1);
+	epoch_time_valid_sub = netcomm_table->GetBooleanTopic(
+			"Control/HasSetWallClock").Subscribe(false);
 
 	const auto network_default = std::vector<double>(10, 0.0);
 	network_ethernet_sub =
@@ -103,6 +106,7 @@ void SystemReader::read(schema::SystemData *system_buf) {
 	system_buf->mutate_io_frequency(io_frequency_sub.Get());
 	system_buf->mutate_team_number(team_number_sub.Get());
 	system_buf->mutate_epoch_time(wpi::GetSystemTime());
+	system_buf->mutate_epoch_time_valid(epoch_time_valid_sub.Get());
 
 	update_network_status(system_buf->mutable_network_ethernet(),
 			network_ethernet_sub.Get());

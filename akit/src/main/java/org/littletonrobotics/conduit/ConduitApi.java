@@ -247,6 +247,10 @@ public class ConduitApi {
     return sys.epochTime();
   }
 
+  public boolean getEpochTimeValid() {
+    return sys.epochTimeValid();
+  }
+
   public NetworkStatus getNetworkEthernet() {
     return sys.networkEthernet();
   }
