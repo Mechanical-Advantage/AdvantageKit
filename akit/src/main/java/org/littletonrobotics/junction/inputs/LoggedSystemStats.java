@@ -8,6 +8,7 @@
 package org.littletonrobotics.junction.inputs;
 
 import org.littletonrobotics.conduit.ConduitApi;
+import org.littletonrobotics.conduit.schema.CANInfo;
 import org.littletonrobotics.conduit.schema.NetworkDirStatus;
 import org.littletonrobotics.conduit.schema.NetworkStatus;
 import org.littletonrobotics.conduit.schema.Vector3;
@@ -33,6 +34,7 @@ public class LoggedSystemStats {
     logNetworkStatus(table.getSubtable("Network/USBTether"), conduit.getNetworkUSBTether());
     for (int bus = 0; bus < ConduitApi.NUM_CAN_BUSES; bus++) {
       logNetworkStatus(table.getSubtable("Network/CAN" + bus), conduit.getNetworkCAN(bus));
+      logCANInfo(table.getSubtable("Network/CAN" + bus), conduit.getNetworkCANInfo(bus));
     }
 
     table.put("CPU/Percent", conduit.getCPUPercent());
@@ -68,6 +70,13 @@ public class LoggedSystemStats {
     table.put("Dropped", status.dropped());
     table.put("Errors", status.errors());
     table.put("Packets", status.packets());
+  }
+
+  private static void logCANInfo(LogTable table, CANInfo info) {
+    table.put("MaxBandwidthMbps", info.maxBandwidthMbps());
+    table.put("FD", info.isFd());
+    table.put("Available", info.isAvailable());
+    table.put("InterfaceUp", info.isUp());
   }
 
   private static void logVector3(LogTable table, Vector3 vector) {

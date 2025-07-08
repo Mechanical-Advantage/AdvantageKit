@@ -28,6 +28,8 @@ struct NetworkDirStatus;
 
 struct NetworkStatus;
 
+struct CANInfo;
+
 struct Vector3;
 
 struct Vector4;
@@ -45,6 +47,8 @@ inline const ::flatbuffers::TypeTable *PDPDataTypeTable();
 inline const ::flatbuffers::TypeTable *NetworkDirStatusTypeTable();
 
 inline const ::flatbuffers::TypeTable *NetworkStatusTypeTable();
+
+inline const ::flatbuffers::TypeTable *CANInfoTypeTable();
 
 inline const ::flatbuffers::TypeTable *Vector3TypeTable();
 
@@ -644,6 +648,78 @@ inline bool operator!=(const NetworkStatus &lhs, const NetworkStatus &rhs) {
 }
 
 
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CANInfo FLATBUFFERS_FINAL_CLASS {
+ private:
+  double max_bandwidth_mbps_;
+  uint8_t is_fd_;
+  uint8_t is_available_;
+  uint8_t is_up_;
+  int8_t padding0__;  int32_t padding1__;
+
+ public:
+  static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
+    return CANInfoTypeTable();
+  }
+  CANInfo()
+      : max_bandwidth_mbps_(0),
+        is_fd_(0),
+        is_available_(0),
+        is_up_(0),
+        padding0__(0),
+        padding1__(0) {
+    (void)padding0__;
+    (void)padding1__;
+  }
+  CANInfo(double _max_bandwidth_mbps, bool _is_fd, bool _is_available, bool _is_up)
+      : max_bandwidth_mbps_(::flatbuffers::EndianScalar(_max_bandwidth_mbps)),
+        is_fd_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_fd))),
+        is_available_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_available))),
+        is_up_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_up))),
+        padding0__(0),
+        padding1__(0) {
+    (void)padding0__;
+    (void)padding1__;
+  }
+  double max_bandwidth_mbps() const {
+    return ::flatbuffers::EndianScalar(max_bandwidth_mbps_);
+  }
+  void mutate_max_bandwidth_mbps(double _max_bandwidth_mbps) {
+    ::flatbuffers::WriteScalar(&max_bandwidth_mbps_, _max_bandwidth_mbps);
+  }
+  bool is_fd() const {
+    return ::flatbuffers::EndianScalar(is_fd_) != 0;
+  }
+  void mutate_is_fd(bool _is_fd) {
+    ::flatbuffers::WriteScalar(&is_fd_, static_cast<uint8_t>(_is_fd));
+  }
+  bool is_available() const {
+    return ::flatbuffers::EndianScalar(is_available_) != 0;
+  }
+  void mutate_is_available(bool _is_available) {
+    ::flatbuffers::WriteScalar(&is_available_, static_cast<uint8_t>(_is_available));
+  }
+  bool is_up() const {
+    return ::flatbuffers::EndianScalar(is_up_) != 0;
+  }
+  void mutate_is_up(bool _is_up) {
+    ::flatbuffers::WriteScalar(&is_up_, static_cast<uint8_t>(_is_up));
+  }
+};
+FLATBUFFERS_STRUCT_END(CANInfo, 16);
+
+inline bool operator==(const CANInfo &lhs, const CANInfo &rhs) {
+  return
+      (lhs.max_bandwidth_mbps() == rhs.max_bandwidth_mbps()) &&
+      (lhs.is_fd() == rhs.is_fd()) &&
+      (lhs.is_available() == rhs.is_available()) &&
+      (lhs.is_up() == rhs.is_up());
+}
+
+inline bool operator!=(const CANInfo &lhs, const CANInfo &rhs) {
+    return !(lhs == rhs);
+}
+
+
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Vector3 FLATBUFFERS_FINAL_CLASS {
  private:
   double x_;
@@ -774,6 +850,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   org::littletonrobotics::conduit::schema::NetworkStatus network_wifi_;
   org::littletonrobotics::conduit::schema::NetworkStatus network_usb_tether_;
   org::littletonrobotics::conduit::schema::NetworkStatus network_can_[5];
+  org::littletonrobotics::conduit::schema::CANInfo network_can_info_[5];
   double cpu_percent_;
   double cpu_temp_;
   int64_t memory_usage_bytes_;
@@ -813,6 +890,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         network_wifi_(),
         network_usb_tether_(),
         network_can_(),
+        network_can_info_(),
         cpu_percent_(0),
         cpu_temp_(0),
         memory_usage_bytes_(0),
@@ -854,6 +932,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
         network_wifi_(_network_wifi),
         network_usb_tether_(_network_usb_tether),
         network_can_(),
+        network_can_info_(),
         cpu_percent_(::flatbuffers::EndianScalar(_cpu_percent)),
         cpu_temp_(::flatbuffers::EndianScalar(_cpu_temp)),
         memory_usage_bytes_(::flatbuffers::EndianScalar(_memory_usage_bytes)),
@@ -878,7 +957,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     (void)padding4__;
     (void)padding5__;
   }
-  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, bool _epoch_time_valid, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::NetworkStatus, 5> _network_can, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_flat, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_landscape, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_portrait, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
+  SystemData(double _battery_voltage, bool _watchdog_active, int64_t _io_frequency, int64_t _team_number, int64_t _epoch_time, bool _epoch_time_valid, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_ethernet, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_wifi, const org::littletonrobotics::conduit::schema::NetworkStatus &_network_usb_tether, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::NetworkStatus, 5> _network_can, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::CANInfo, 5> _network_can_info, double _cpu_percent, double _cpu_temp, int64_t _memory_usage_bytes, int64_t _memory_total_bytes, double _memory_percent, int64_t _storage_usage_bytes, int64_t _storage_total_bytes, double _storage_percent, const org::littletonrobotics::conduit::schema::Vector3 &_imu_accel_raw, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_rates, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_flat, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_landscape, const org::littletonrobotics::conduit::schema::Vector3 &_imu_gyro_euler_portrait, const org::littletonrobotics::conduit::schema::Vector4 &_imu_gyro_quaternion, double _imu_gyro_yaw_flat, double _imu_gyro_yaw_landscape, double _imu_gyro_yaw_portrait)
       : battery_voltage_(::flatbuffers::EndianScalar(_battery_voltage)),
         watchdog_active_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_watchdog_active))),
         padding0__(0),
@@ -918,6 +997,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     (void)padding4__;
     (void)padding5__;
     ::flatbuffers::CastToArray(network_can_).CopyFromSpan(_network_can);
+    ::flatbuffers::CastToArray(network_can_info_).CopyFromSpan(_network_can_info);
   }
   double battery_voltage() const {
     return ::flatbuffers::EndianScalar(battery_voltage_);
@@ -978,6 +1058,12 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
   }
   ::flatbuffers::Array<org::littletonrobotics::conduit::schema::NetworkStatus, 5> *mutable_network_can() {
     return &::flatbuffers::CastToArray(network_can_);
+  }
+  const ::flatbuffers::Array<org::littletonrobotics::conduit::schema::CANInfo, 5> *network_can_info() const {
+    return &::flatbuffers::CastToArray(network_can_info_);
+  }
+  ::flatbuffers::Array<org::littletonrobotics::conduit::schema::CANInfo, 5> *mutable_network_can_info() {
+    return &::flatbuffers::CastToArray(network_can_info_);
   }
   double cpu_percent() const {
     return ::flatbuffers::EndianScalar(cpu_percent_);
@@ -1082,7 +1168,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     ::flatbuffers::WriteScalar(&imu_gyro_yaw_portrait_, _imu_gyro_yaw_portrait);
   }
 };
-FLATBUFFERS_STRUCT_END(SystemData, 928);
+FLATBUFFERS_STRUCT_END(SystemData, 1008);
 
 inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
   return
@@ -1096,6 +1182,7 @@ inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
       (lhs.network_wifi() == rhs.network_wifi()) &&
       (lhs.network_usb_tether() == rhs.network_usb_tether()) &&
       (*lhs.network_can() == *rhs.network_can()) &&
+      (*lhs.network_can_info() == *rhs.network_can_info()) &&
       (lhs.cpu_percent() == rhs.cpu_percent()) &&
       (lhs.cpu_temp() == rhs.cpu_temp()) &&
       (lhs.memory_usage_bytes() == rhs.memory_usage_bytes()) &&
@@ -1168,7 +1255,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CoreInputs FLATBUFFERS_FINAL_CLASS {
     return sys_;
   }
 };
-FLATBUFFERS_STRUCT_END(CoreInputs, 3392);
+FLATBUFFERS_STRUCT_END(CoreInputs, 3472);
 
 inline bool operator==(const CoreInputs &lhs, const CoreInputs &rhs) {
   return
@@ -1330,6 +1417,26 @@ inline const ::flatbuffers::TypeTable *NetworkStatusTypeTable() {
   return &tt;
 }
 
+inline const ::flatbuffers::TypeTable *CANInfoTypeTable() {
+  static const ::flatbuffers::TypeCode type_codes[] = {
+    { ::flatbuffers::ET_DOUBLE, 0, -1 },
+    { ::flatbuffers::ET_BOOL, 0, -1 },
+    { ::flatbuffers::ET_BOOL, 0, -1 },
+    { ::flatbuffers::ET_BOOL, 0, -1 }
+  };
+  static const int64_t values[] = { 0, 8, 9, 10, 16 };
+  static const char * const names[] = {
+    "max_bandwidth_mbps",
+    "is_fd",
+    "is_available",
+    "is_up"
+  };
+  static const ::flatbuffers::TypeTable tt = {
+    ::flatbuffers::ST_STRUCT, 4, type_codes, nullptr, nullptr, values, names
+  };
+  return &tt;
+}
+
 inline const ::flatbuffers::TypeTable *Vector3TypeTable() {
   static const ::flatbuffers::TypeCode type_codes[] = {
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
@@ -1380,6 +1487,7 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     { ::flatbuffers::ET_SEQUENCE, 0, 0 },
     { ::flatbuffers::ET_SEQUENCE, 0, 0 },
     { ::flatbuffers::ET_SEQUENCE, 1, 0 },
+    { ::flatbuffers::ET_SEQUENCE, 1, 1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_LONG, 0, -1 },
@@ -1388,23 +1496,24 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     { ::flatbuffers::ET_LONG, 0, -1 },
     { ::flatbuffers::ET_LONG, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
-    { ::flatbuffers::ET_SEQUENCE, 0, 1 },
-    { ::flatbuffers::ET_SEQUENCE, 0, 1 },
-    { ::flatbuffers::ET_SEQUENCE, 0, 1 },
-    { ::flatbuffers::ET_SEQUENCE, 0, 1 },
-    { ::flatbuffers::ET_SEQUENCE, 0, 1 },
     { ::flatbuffers::ET_SEQUENCE, 0, 2 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 2 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 2 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 2 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 2 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 3 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 }
   };
   static const ::flatbuffers::TypeFunction type_refs[] = {
     org::littletonrobotics::conduit::schema::NetworkStatusTypeTable,
+    org::littletonrobotics::conduit::schema::CANInfoTypeTable,
     org::littletonrobotics::conduit::schema::Vector3TypeTable,
     org::littletonrobotics::conduit::schema::Vector4TypeTable
   };
-  static const int16_t array_sizes[] = { 5,  };
-  static const int64_t values[] = { 0, 8, 16, 24, 32, 40, 48, 128, 208, 288, 688, 696, 704, 712, 720, 728, 736, 744, 752, 776, 800, 824, 848, 872, 904, 912, 920, 928 };
+  static const int16_t array_sizes[] = { 5, 5,  };
+  static const int64_t values[] = { 0, 8, 16, 24, 32, 40, 48, 128, 208, 288, 688, 768, 776, 784, 792, 800, 808, 816, 824, 832, 856, 880, 904, 928, 952, 984, 992, 1000, 1008 };
   static const char * const names[] = {
     "battery_voltage",
     "watchdog_active",
@@ -1416,6 +1525,7 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     "network_wifi",
     "network_usb_tether",
     "network_can",
+    "network_can_info",
     "cpu_percent",
     "cpu_temp",
     "memory_usage_bytes",
@@ -1435,7 +1545,7 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     "imu_gyro_yaw_portrait"
   };
   static const ::flatbuffers::TypeTable tt = {
-    ::flatbuffers::ST_STRUCT, 27, type_codes, type_refs, array_sizes, values, names
+    ::flatbuffers::ST_STRUCT, 28, type_codes, type_refs, array_sizes, values, names
   };
   return &tt;
 }
@@ -1452,7 +1562,7 @@ inline const ::flatbuffers::TypeTable *CoreInputsTypeTable() {
     org::littletonrobotics::conduit::schema::PDPDataTypeTable,
     org::littletonrobotics::conduit::schema::SystemDataTypeTable
   };
-  static const int64_t values[] = { 0, 8, 2208, 2464, 3392 };
+  static const int64_t values[] = { 0, 8, 2208, 2464, 3472 };
   static const char * const names[] = {
     "timestamp",
     "ds",

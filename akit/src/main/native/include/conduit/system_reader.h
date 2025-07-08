@@ -39,6 +39,7 @@ private:
 	nt::DoubleArraySubscriber network_usb0_sub;
 	nt::DoubleArraySubscriber network_usb1_sub;
 	nt::DoubleArraySubscriber network_can_subs[NUM_CAN_BUSES];
+	nt::DoubleArraySubscriber network_can_info_sub;
 
 	nt::DoubleSubscriber cpu_percent_sub;
 	nt::DoubleSubscriber cpu_temp_sub;

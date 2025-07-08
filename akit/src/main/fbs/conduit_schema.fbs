@@ -64,6 +64,13 @@ struct NetworkStatus {
     tx:NetworkDirStatus;    
 }
 
+struct CANInfo {
+    max_bandwidth_mbps:float64;
+    is_fd:bool;
+    is_available:bool;
+    is_up:bool;
+}
+
 struct Vector3 {
     x:float64;
     y:float64;
@@ -89,6 +96,7 @@ struct SystemData {
     network_wifi:NetworkStatus;
     network_usb_tether:NetworkStatus;
     network_can:[NetworkStatus:5];
+    network_can_info:[CANInfo:5];
 
     cpu_percent:float64;
     cpu_temp:float64;

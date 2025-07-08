@@ -57,6 +57,9 @@ void SystemReader::start() {
 		network_can_subs[i] = diagnostics_table->GetDoubleArrayTopic(
 				"can_s" + std::to_string(i)).Subscribe(network_default);
 	}
+	network_can_info_sub =
+			diagnostics_table->GetDoubleArrayTopic("canbusinfo").Subscribe(
+					std::vector<double>(5 * NUM_CAN_BUSES, 0.0));
 
 	cpu_percent_sub = sys_table->GetDoubleTopic("cpu").Subscribe(0.0);
 	cpu_temp_sub = sys_table->GetDoubleTopic("temp").Subscribe(0.0);
@@ -123,6 +126,14 @@ void SystemReader::read(schema::SystemData *system_buf) {
 	for (int i = 0; i < NUM_CAN_BUSES; i++) {
 		update_network_status(system_buf->mutable_network_can()->data()[i],
 				network_can_subs[i].Get());
+	}
+	auto can_info = network_can_info_sub.Get();
+	for (int i = 0; i < NUM_CAN_BUSES; i++) {
+		auto &can_info_buf = system_buf->mutable_network_can_info()->data()[i];
+		can_info_buf.mutate_max_bandwidth_mbps(can_info[i * 5 + 1]);
+		can_info_buf.mutate_is_fd(can_info[i * 5 + 2] > 0);
+		can_info_buf.mutate_is_available(can_info[i * 5 + 3] > 0);
+		can_info_buf.mutate_is_up(can_info[i * 5 + 4] > 0);
 	}
 
 	system_buf->mutate_cpu_percent(cpu_percent_sub.Get());

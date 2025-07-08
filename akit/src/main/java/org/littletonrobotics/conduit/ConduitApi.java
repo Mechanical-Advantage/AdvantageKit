@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import org.littletonrobotics.conduit.schema.CANInfo;
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.Joystick;
@@ -265,6 +266,10 @@ public class ConduitApi {
 
   public NetworkStatus getNetworkCAN(int bus) {
     return sys.networkCan(bus);
+  }
+
+  public CANInfo getNetworkCANInfo(int bus) {
+    return sys.networkCanInfo(bus);
   }
 
   public double getCPUPercent() {
