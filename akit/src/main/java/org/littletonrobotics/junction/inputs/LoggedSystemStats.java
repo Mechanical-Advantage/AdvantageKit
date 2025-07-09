@@ -7,11 +7,19 @@
 
 package org.littletonrobotics.junction.inputs;
 
+import edu.wpi.first.networktables.ConnectionInfo;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import java.nio.ByteBuffer;
+import java.util.HashSet;
+import java.util.Set;
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable;
 
 /** Manages logging general system data. */
 public class LoggedSystemStats {
+  private static Set<String> lastNTRemoteIds = new HashSet<>();
+  private static ByteBuffer ntIntBuffer = ByteBuffer.allocate(4);
+
   private LoggedSystemStats() {}
 
   public static void saveToLog(LogTable table) {
@@ -58,5 +66,28 @@ public class LoggedSystemStats {
     table.put("CANBus/TransmitErrorCount", conduit.getTransmitErrorCount());
 
     table.put("EpochTimeMicros", conduit.getEpochTime());
+
+    // Log NT client list
+    final var ntClientsTable = table.getSubtable("NTClients");
+    ConnectionInfo[] ntConnections = NetworkTableInstance.getDefault().getConnections();
+    Set<String> ntRemoteIds = new HashSet<>();
+
+    for (int i = 0; i < ntConnections.length; i++) {
+      lastNTRemoteIds.remove(ntConnections[i].remote_id);
+      ntRemoteIds.add(ntConnections[i].remote_id);
+      final var ntClientTable = ntClientsTable.getSubtable(ntConnections[i].remote_id);
+
+      ntClientTable.put("Connected", true);
+      ntClientTable.put("IPAddress", ntConnections[i].remote_ip);
+      ntClientTable.put("RemotePort", ntConnections[i].remote_port);
+      ntIntBuffer.rewind();
+      ntClientTable.put(
+          "ProtocolVersion", ntIntBuffer.putInt(ntConnections[i].protocol_version).array());
+    }
+
+    for (var remoteId : lastNTRemoteIds) {
+      ntClientsTable.put(remoteId + "/Connected", false);
+    }
+    lastNTRemoteIds = ntRemoteIds;
   }
 }

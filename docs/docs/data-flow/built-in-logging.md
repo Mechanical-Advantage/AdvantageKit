@@ -68,7 +68,7 @@ LoggedPowerDistribution.getInstance(50, ModuleType.kRev); // Example: PDH on CAN
 
 ### System Stats
 
-Important status information from the roboRIO is automatically recorded, such as the battery voltage, rail status, CAN status, and system time. These fields are available under the `SystemStats` table.
+Important status information from the roboRIO is automatically recorded, such as the battery voltage, rail status, CAN status, system time, and NT client connections. These fields are available under the `SystemStats` table.
 
 ### Performance Data
 
