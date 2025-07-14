@@ -380,18 +380,6 @@ public class Logger {
   }
 
   /**
-   * Returns the true FPGA timestamp in microseconds, regardless of the timestamp used for logging.
-   * Useful for analyzing performance. DO NOT USE this method for any logic which might need to be
-   * replayed.
-   *
-   * @deprecated Use {@code RobotController.getFPGATime()} instead.
-   */
-  @Deprecated
-  public static long getRealTimestamp() {
-    return RobotController.getFPGATime();
-  }
-
-  /**
    * Runs the provided callback function every N loop cycles. This method can be used to update
    * inputs or log outputs at a lower rate than the standard loop cycle.
    *
