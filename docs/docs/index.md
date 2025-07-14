@@ -19,42 +19,42 @@ AdvantageKit is a logging, telemetry, and replay framework developed by [Team 63
 items={[
 {
 type: "category",
-label: "What is AdvantageKit?",
+label: "👋 What is AdvantageKit?",
 href: "/getting-started/what-is-advantagekit"
 },
 {
 type: "category",
-label: "Installation",
+label: "📒 API Documentation",
+href: "pathname:///javadoc"
+},
+{
+type: "category",
+label: "📦 Installation",
 href: "/getting-started/installation"
 },
 {
 type: "category",
-label: "Template Projects",
+label: "🏠 Template Projects",
 href: "/category/template-projects"
 },
 {
 type: "category",
-label: "Supported Types",
-href: "/data-flow/supported-types"
-},
-{
-type: "category",
-label: "Recording Inputs",
+label: "🔽 Recording Inputs",
 href: "/category/recording-inputs"
 },
 {
 type: "category",
-label: "Recording Outputs",
+label: "🔼 Recording Outputs",
 href: "/data-flow/recording-outputs/"
 },
 {
 type: "category",
-label: "Common Issues",
+label: "⚠️ Common Issues",
 href: "/category/common-issues"
 },
 {
 type: "category",
-label: "SysId Compatibility",
+label: "⚙️ SysId Compatibility",
 href: "/data-flow/sysid-compatibility"
 }
 ]}
