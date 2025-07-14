@@ -22,14 +22,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./docs
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -37,9 +39,11 @@ jobs:
           cache: "npm"
           cache-dependency-path: docs/package-lock.json
       - name: Install Node.js dependencies
-        run: npm ci
+        run: cd docs && npm ci
+      - name: Build Javadoc
+        run: ./gradlew :akit:javadoc
       - name: Build docs
-        run: npm run build
+        run: cd docs && npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
