@@ -92,9 +92,10 @@ public class Logger {
   }
 
   /**
-   * Registers a log supplier for <a href= "https://github.com/Mechanical-Advantage/URCL">URCL</a>
-   * (Unofficial REV-Compatible Logger). This method should be called during setup before starting
-   * to log. Example usage shown below.
+   * Registers a log supplier for <a
+   * href="https://docs.advantagescope.org/more-features/urcl">URCL</a> (Unofficial REV-Compatible
+   * Logger). This method should be called during setup before starting to log. Example usage shown
+   * below.
    *
    * <pre>
    * <code>Logger.registerURCL(URCL.startExternal());</code>

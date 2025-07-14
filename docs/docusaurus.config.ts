@@ -23,6 +23,9 @@ const config: Config = {
     locales: ["en"]
   },
 
+  // Copy built Javadoc files
+  staticDirectories: ["static", "../akit/build/docs"],
+
   presets: [
     [
       "classic",
