@@ -5,16 +5,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.littletonrobotics.junction.inputs;
+package org.littletonrobotics.junction;
 
 import edu.wpi.first.hal.PowerDistributionJNI;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import org.littletonrobotics.conduit.ConduitApi;
-import org.littletonrobotics.junction.LogTable;
 
 /** Manages logging power distribution data. */
-public class LoggedPowerDistribution {
-
+class LoggedPowerDistribution {
   private static LoggedPowerDistribution instance;
 
   private int moduleID;

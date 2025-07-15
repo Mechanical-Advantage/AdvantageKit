@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.littletonrobotics.junction.inputs;
+package org.littletonrobotics.junction;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.DriverStationJNI;
@@ -13,10 +13,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import org.littletonrobotics.conduit.ConduitApi;
-import org.littletonrobotics.junction.LogTable;
 
 /** Manages logging and replaying data from the driver station (robot state, joysticks, etc.) */
-public class LoggedDriverStation {
+class LoggedDriverStation {
   private LoggedDriverStation() {}
 
   /** Save the current DS state to the log table. */
