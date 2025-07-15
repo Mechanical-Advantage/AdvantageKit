@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# How To: Replay Watch
+# 👁️ How To: Replay Watch
 
 Some use cases of log replay benefit from rapid iteration, such as tuning pose estimation algorithms. **Replay watch** addresses this use case by automatically updating replayed outputs when the code is modified. An example is shown below, where the replayed output in AdvantageScope updates in real-time as the code is modified:
 

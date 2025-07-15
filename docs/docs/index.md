@@ -35,12 +35,12 @@ href: "/getting-started/installation"
 {
 type: "category",
 label: "🏠 Template Projects",
-href: "/category/template-projects"
+href: "/getting-started/template-projects"
 },
 {
 type: "category",
 label: "🔽 Recording Inputs",
-href: "/category/recording-inputs"
+href: "/data-flow/recording-inputs"
 },
 {
 type: "category",
@@ -50,7 +50,7 @@ href: "/data-flow/recording-outputs/"
 {
 type: "category",
 label: "⚠️ Common Issues",
-href: "/category/common-issues"
+href: "/getting-started/common-issues"
 },
 {
 type: "category",
