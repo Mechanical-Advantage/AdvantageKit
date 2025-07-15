@@ -11,7 +11,7 @@
 
 body {
     background-color:#ffffff;
-    color:#353833;
+    color:#383733;
     font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size:14px;
     margin:0;
@@ -621,6 +621,10 @@ ul.ui-autocomplete  li {
 }
 .ui-autocomplete .result-item {
     font-size: inherit;
+}
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
+    background: #FFD35B !important;
+    border: 1px solid #FFD35B !important;
 }
 #search-input {
     background-image:url('resources/glass.png');
