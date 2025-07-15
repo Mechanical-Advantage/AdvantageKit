@@ -2,7 +2,7 @@
 sidebar_position: 6
 ---
 
-# SysId Compatibility
+# ⚙️ SysId Compatibility
 
 WPILib provides tools to perform [system identification](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html) on robot mechanisms, enabling [feedforward and feedback](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/index.html) controller gains to be calculated based on real-world data. Starting in 2024, identification routines are defined in user code as described [here](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/creating-routine.html). Data is recorded to a WPILOG file for analysis in the SysId application.
 

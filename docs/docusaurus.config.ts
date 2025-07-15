@@ -42,6 +42,28 @@ const config: Config = {
     ]
   ],
 
+  plugins: [
+    [
+      "@docusaurus/plugin-client-redirects",
+      {
+        redirects: [
+          {
+            to: "/getting-started/template-projects",
+            from: "/category/template-projects"
+          },
+          {
+            to: "/getting-started/common-issues",
+            from: "/category/common-issues"
+          },
+          {
+            to: "/data-flow/recording-inputs",
+            from: "/category/recording-inputs"
+          }
+        ]
+      }
+    ]
+  ],
+
   themeConfig: {
     image: "img/social.png",
     navbar: {

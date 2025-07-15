@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Supported Types
+# 📊 Supported Types
 
 Data is stored using string keys where slashes are used to denote subtables (similar to NetworkTables). Like NetworkTables, **all logged values are persistent (they will continue to appear on subsequent cycles until updated**).
 

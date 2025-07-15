@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Built-In Logging
+# 🗒️ Built-In Logging
 
 AdvantageKit automatically logs many important fields as inputs or outputs. No configuration is required to use these features.
 
