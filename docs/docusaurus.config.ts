@@ -52,6 +52,11 @@ const config: Config = {
       },
       items: [
         {
+          href: "pathname:///javadoc",
+          label: "API Docs",
+          position: "right"
+        },
+        {
           href: "https://github.com/Mechanical-Advantage/AdvantageKit",
           label: "GitHub",
           position: "right"
