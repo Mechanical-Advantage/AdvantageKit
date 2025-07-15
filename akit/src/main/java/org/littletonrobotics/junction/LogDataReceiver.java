@@ -29,6 +29,7 @@ public interface LogDataReceiver {
    * queued for later.
    *
    * @param table A copy of the data to save.
+   * @throws InterruptedException If interrupted while processing.
    */
   public void putTable(LogTable table) throws InterruptedException;
 }

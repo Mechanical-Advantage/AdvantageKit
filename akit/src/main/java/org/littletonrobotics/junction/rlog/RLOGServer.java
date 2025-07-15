@@ -28,10 +28,16 @@ public class RLOGServer implements LogDataReceiver {
   private static Object encoderLock = new Object();
   private static Object socketsLock = new Object();
 
+  /** Creates a new RLOGServer on the default port (5800). */
   public RLOGServer() {
     this(5800);
   }
 
+  /**
+   * Creates a new RLOGServer.
+   *
+   * @param port The port number.
+   */
   public RLOGServer(int port) {
     this.port = port;
   }

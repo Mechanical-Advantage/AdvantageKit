@@ -27,7 +27,9 @@ import java.util.List;
  * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
  */
 public class LoggedRobot extends IterativeRobotBase {
+  /** Default loop period. */
   public static final double defaultPeriodSecs = 0.02;
+
   private final int notifier = NotifierJNI.initializeNotifier();
   private final long periodUs;
   private long nextCycleUs = 0;
@@ -119,7 +121,11 @@ public class LoggedRobot extends IterativeRobotBase {
     NotifierJNI.stopNotifier(notifier);
   }
 
-  /** Sets whether to use standard timing or run as fast as possible. */
+  /**
+   * Sets whether to use standard timing or run as fast as possible.
+   *
+   * @param useTiming If true, use standard timing. If false, run as fast as possible.
+   */
   public void setUseTiming(boolean useTiming) {
     this.useTiming = useTiming;
   }

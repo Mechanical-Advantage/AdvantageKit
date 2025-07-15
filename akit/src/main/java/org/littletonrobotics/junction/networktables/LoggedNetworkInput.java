@@ -7,16 +7,23 @@
 
 package org.littletonrobotics.junction.networktables;
 
+/** Base class for periodic dashboard inputs. */
 public abstract class LoggedNetworkInput {
-  public static final String prefix = "NetworkInputs";
+  /** The subtable prefix for input logging. */
+  protected static final String prefix = "NetworkInputs";
 
   /**
-   * Update the current value and save/replay the input. This function should not be called by the
-   * user.
+   * Update the current value and save/replay the input. <b>This function should never be called by
+   * user code.</b>
    */
   public abstract void periodic();
 
-  /** Removes the leading slash from a key. */
+  /**
+   * Removes the leading slash from a key.
+   *
+   * @param key The input key that may include a leading slash.
+   * @return The output key without a leading slash.
+   */
   protected static String removeSlash(String key) {
     if (key.startsWith("/")) {
       return key.substring(1);

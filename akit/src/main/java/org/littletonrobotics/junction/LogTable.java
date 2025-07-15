@@ -73,7 +73,11 @@ public class LogTable {
     this.protoTypeCache = protoTypeCache;
   }
 
-  /** Creates a new LogTable, to serve as the root table. */
+  /**
+   * Creates a new LogTable, to serve as the root table.
+   *
+   * @param timestamp The timestamp for the table.
+   */
   public LogTable(long timestamp) {
     this(
         "/",
@@ -86,7 +90,12 @@ public class LogTable {
         new HashMap<>());
   }
 
-  /** Creates a new LogTable, to reference a subtable. */
+  /**
+   * Creates a new LogTable, to reference a subtable.
+   *
+   * @param prefix The subtable prefix.
+   * @param parent The parent table.
+   */
   private LogTable(String prefix, LogTable parent) {
     this(
         prefix,
@@ -102,6 +111,9 @@ public class LogTable {
   /**
    * Creates a new LogTable, copying data from the given source. The original table can be safely
    * modified without affecting the copy.
+   *
+   * @param source The source table.
+   * @return The new table.
    */
   public static LogTable clone(LogTable source) {
     Map<String, LogValue> data = new HashMap<String, LogValue>();
@@ -117,12 +129,20 @@ public class LogTable {
         new HashMap<>());
   }
 
-  /** Updates the timestamp of the table. */
+  /**
+   * Updates the timestamp of the table.
+   *
+   * @param timestamp The new timestamp.
+   */
   public void setTimestamp(long timestamp) {
     this.timestamp.value = timestamp;
   }
 
-  /** Returns the timestamp of the table. */
+  /**
+   * Returns the timestamp of the table.
+   *
+   * @return The timestamp.
+   */
   public long getTimestamp() {
     return timestamp.value;
   }
@@ -199,6 +219,9 @@ public class LogTable {
 
   /**
    * Writes a new generic value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, LogValue value) {
     if (value == null) return;
@@ -207,7 +230,12 @@ public class LogTable {
     }
   }
 
-  /** Writes a new Raw value to the table. Skipped if the key already exists as a different type. */
+  /**
+   * Writes a new Raw value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
+   */
   public void put(String key, byte[] value) {
     if (value == null) return;
     byte[] valueClone = new byte[value.length];
@@ -217,6 +245,9 @@ public class LogTable {
 
   /**
    * Writes a new 2D Raw value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, byte[][] value) {
     if (value == null) return;
@@ -228,6 +259,9 @@ public class LogTable {
 
   /**
    * Writes a new Boolean value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, boolean value) {
     put(key, new LogValue(value, null));
@@ -236,6 +270,9 @@ public class LogTable {
   /**
    * Writes a new BooleanArray value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, boolean[] value) {
     if (value == null) return;
@@ -247,6 +284,9 @@ public class LogTable {
   /**
    * Writes a new 2D BooleanArray value to the table. Skipped if the key already exists as a
    * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, boolean[][] value) {
     if (value == null) return;
@@ -258,6 +298,9 @@ public class LogTable {
 
   /**
    * Writes a new Integer value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, int value) {
     put(key, (long) value);
@@ -266,6 +309,9 @@ public class LogTable {
   /**
    * Writes a new IntegerArray value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, int[] value) {
     if (value == null) return;
@@ -279,6 +325,9 @@ public class LogTable {
   /**
    * Writes a new 2D IntegerArray value to the table. Skipped if the key already exists as a
    * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, int[][] value) {
     if (value == null) return;
@@ -290,6 +339,9 @@ public class LogTable {
 
   /**
    * Writes a new Integer value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, long value) {
     put(key, new LogValue(value, null));
@@ -298,6 +350,9 @@ public class LogTable {
   /**
    * Writes a new IntegerArray value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, long[] value) {
     if (value == null) return;
@@ -309,6 +364,9 @@ public class LogTable {
   /**
    * Writes a new 2D IntegerArray value to the table. Skipped if the key already exists as a
    * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, long[][] value) {
     if (value == null) return;
@@ -320,6 +378,9 @@ public class LogTable {
 
   /**
    * Writes a new Float value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, float value) {
     put(key, new LogValue(value, null));
@@ -328,6 +389,9 @@ public class LogTable {
   /**
    * Writes a new FloatArray value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, float[] value) {
     if (value == null) return;
@@ -339,6 +403,9 @@ public class LogTable {
   /**
    * Writes a new 2D FloatArray value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, float[][] value) {
     if (value == null) return;
@@ -350,6 +417,9 @@ public class LogTable {
 
   /**
    * Writes a new Double value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, double value) {
     put(key, new LogValue(value, null));
@@ -358,6 +428,9 @@ public class LogTable {
   /**
    * Writes a new DoubleArray value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, double[] value) {
     if (value == null) return;
@@ -369,6 +442,9 @@ public class LogTable {
   /**
    * Writes a new 2D DoubleArray value to the table. Skipped if the key already exists as a
    * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, double[][] value) {
     if (value == null) return;
@@ -380,6 +456,9 @@ public class LogTable {
 
   /**
    * Writes a new String value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, String value) {
     if (value == null) return;
@@ -389,6 +468,9 @@ public class LogTable {
   /**
    * Writes a new StringArray value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, String[] value) {
     if (value == null) return;
@@ -400,6 +482,9 @@ public class LogTable {
   /**
    * Writes a new 2D StringArray value to the table. Skipped if the key already exists as a
    * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, String[][] value) {
     if (value == null) return;
@@ -411,6 +496,10 @@ public class LogTable {
 
   /**
    * Writes a new enum value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param <E> The enum type.
+   * @param key The field name.
+   * @param value The field value.
    */
   public <E extends Enum<E>> void put(String key, E value) {
     if (value == null) return;
@@ -420,6 +509,10 @@ public class LogTable {
   /**
    * Writes a new enum array value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param <E> The enum type.
+   * @param key The field name.
+   * @param value The field value.
    */
   public <E extends Enum<E>> void put(String key, E[] value) {
     if (value == null) return;
@@ -433,6 +526,10 @@ public class LogTable {
   /**
    * Writes a new 2D enum array value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param <E> The enum type.
+   * @param key The field name.
+   * @param value The field value.
    */
   public <E extends Enum<E>> void put(String key, E[][] value) {
     if (value == null) return;
@@ -444,13 +541,23 @@ public class LogTable {
 
   /**
    * Writes a new Measure value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param <U> The unit type.
+   * @param key The field name.
+   * @param value The field value.
    */
   public <U extends Unit> void put(String key, Measure<U> value) {
     if (value == null) return;
     put(key, new LogValue(value.baseUnitMagnitude(), null));
   }
 
-  /** Writes a new LoggableInput subtable to the table. */
+  /**
+   * Writes a new LoggableInput subtable to the table.
+   *
+   * @param <T> The input type.
+   * @param key The field name.
+   * @param value The field value.
+   */
   public <T extends LoggableInputs> void put(String key, T value) {
     if (value == null) return;
     if (this.depth > 100) {
@@ -487,6 +594,11 @@ public class LogTable {
 
   /**
    * Writes a new struct value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param <T> The struct type.
+   * @param key The field name.
+   * @param struct The struct serialization object.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T> void put(String key, Struct<T> struct, T value) {
@@ -506,6 +618,11 @@ public class LogTable {
   /**
    * Writes a new struct array value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param <T> The struct type.
+   * @param key The field name.
+   * @param struct The struct serialization object.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T> void put(String key, Struct<T> struct, T... value) {
@@ -525,6 +642,11 @@ public class LogTable {
   /**
    * Writes a new 2D struct array value to the table. Skipped if the key already exists as a
    * different type.
+   *
+   * @param <T> The struct type.
+   * @param key The field name.
+   * @param struct The struct serialization object.
+   * @param value The field value.
    */
   public <T> void put(String key, Struct<T> struct, T[][] value) {
     if (value == null) return;
@@ -537,6 +659,12 @@ public class LogTable {
   /**
    * Writes a new protobuf value to the table. Skipped if the key already exists as a different
    * type.
+   *
+   * @param <T> The value type.
+   * @param <MessageType> The protobuf message type.
+   * @param key The field name.
+   * @param proto The protobuf serialization object.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T, MessageType extends ProtoMessage<?>> void put(
@@ -611,6 +739,10 @@ public class LogTable {
   /**
    * Writes a new auto serialized value to the table. Skipped if the key already exists as a
    * different type.
+   *
+   * @param <T> The object type.
+   * @param key The field name.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T extends WPISerializable> void put(String key, T value) {
@@ -636,6 +768,10 @@ public class LogTable {
   /**
    * Writes a new auto serialized array value to the table. Skipped if the key already exists as a
    * different type.
+   *
+   * @param <T> The object type.
+   * @param key The field name.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T extends StructSerializable> void put(String key, T... value) {
@@ -655,6 +791,10 @@ public class LogTable {
   /**
    * Writes a new auto serialized 2D array value to the table. Skipped if the key already exists as
    * a different type.
+   *
+   * @param <T> The object type.
+   * @param key The field name.
+   * @param value The field value.
    */
   public <T extends StructSerializable> void put(String key, T[][] value) {
     if (value == null) return;
@@ -683,6 +823,10 @@ public class LogTable {
   /**
    * Writes a new auto serialized record value to the table. Skipped if the key already exists as a
    * different type.
+   *
+   * @param <R> The record type.
+   * @param key The field name.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> void put(String key, R value) {
@@ -696,6 +840,10 @@ public class LogTable {
   /**
    * Writes a new auto serialized record array value to the table. Skipped if the key already exists
    * as a different type.
+   *
+   * @param <R> The record type.
+   * @param key The field name.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> void put(String key, R... value) {
@@ -710,6 +858,10 @@ public class LogTable {
   /**
    * Writes a new auto serialized 2D record array value to the table. Skipped if the key already
    * exists as a different type.
+   *
+   * @param <R> The record type.
+   * @param key The field name.
+   * @param value The field value.
    */
   public <R extends Record> void put(String key, R[][] value) {
     if (value == null) return;
@@ -719,12 +871,23 @@ public class LogTable {
     }
   }
 
-  /** Reads a generic value from the table. */
+  /**
+   * Reads a generic value from the table.
+   *
+   * @param key The field name.
+   * @return The field value.
+   */
   public LogValue get(String key) {
     return data.get(prefix + key);
   }
 
-  /** Reads a Raw value from the table. */
+  /**
+   * Reads a Raw value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public byte[] get(String key, byte[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getRaw(defaultValue);
@@ -733,7 +896,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a 2D Raw value from the table. */
+  /**
+   * Reads a 2D Raw value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public byte[][] get(String key, byte[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
       byte[][] value = new byte[get(key + "/length", 0)][];
@@ -746,7 +915,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a Boolean value from the table. */
+  /**
+   * Reads a Boolean value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public boolean get(String key, boolean defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getBoolean(defaultValue);
@@ -755,7 +930,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a BooleanArray value from the table. */
+  /**
+   * Reads a BooleanArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public boolean[] get(String key, boolean[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getBooleanArray(defaultValue);
@@ -764,7 +945,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a 2D BooleanArray value from the table. */
+  /**
+   * Reads a 2D BooleanArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public boolean[][] get(String key, boolean[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
       boolean[][] value = new boolean[get(key + "/length", 0)][];
@@ -777,7 +964,13 @@ public class LogTable {
     }
   }
 
-  /** Reads an Integer value from the table. */
+  /**
+   * Reads an Integer value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public int get(String key, int defaultValue) {
     if (data.containsKey(prefix + key)) {
       return (int) get(key).getInteger(defaultValue);
@@ -786,7 +979,13 @@ public class LogTable {
     }
   }
 
-  /** Reads an IntegerArray value from the table. */
+  /**
+   * Reads an IntegerArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public int[] get(String key, int[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       long[] defaultValueLong = new long[defaultValue.length];
@@ -804,7 +1003,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a 2D IntegerArray value from the table. */
+  /**
+   * Reads a 2D IntegerArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public int[][] get(String key, int[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
       int[][] value = new int[get(key + "/length", 0)][];
@@ -817,7 +1022,13 @@ public class LogTable {
     }
   }
 
-  /** Reads an Integer value from the table. */
+  /**
+   * Reads an Integer value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public long get(String key, long defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getInteger(defaultValue);
@@ -826,7 +1037,13 @@ public class LogTable {
     }
   }
 
-  /** Reads an IntegerArray value from the table. */
+  /**
+   * Reads an IntegerArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public long[] get(String key, long[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getIntegerArray(defaultValue);
@@ -835,7 +1052,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a 2D IntegerArray value from the table. */
+  /**
+   * Reads a 2D IntegerArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public long[][] get(String key, long[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
       long[][] value = new long[get(key + "/length", 0)][];
@@ -848,7 +1071,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a Float value from the table. */
+  /**
+   * Reads a Float value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public float get(String key, float defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getFloat(defaultValue);
@@ -857,7 +1086,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a FloatArray value from the table. */
+  /**
+   * Reads a FloatArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public float[] get(String key, float[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getFloatArray(defaultValue);
@@ -866,7 +1101,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a 2D FloatArray value from the table. */
+  /**
+   * Reads a 2D FloatArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public float[][] get(String key, float[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
       float[][] value = new float[get(key + "/length", 0)][];
@@ -879,7 +1120,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a Double value from the table. */
+  /**
+   * Reads a Double value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public double get(String key, double defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getDouble(defaultValue);
@@ -888,7 +1135,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a DoubleArray value from the table. */
+  /**
+   * Reads a DoubleArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public double[] get(String key, double[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getDoubleArray(defaultValue);
@@ -897,7 +1150,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a 2D DoubleArray value from the table. */
+  /**
+   * Reads a 2D DoubleArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public double[][] get(String key, double[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
       double[][] value = new double[get(key + "/length", 0)][];
@@ -910,7 +1169,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a String value from the table. */
+  /**
+   * Reads a String value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public String get(String key, String defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getString(defaultValue);
@@ -919,7 +1184,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a StringArray value from the table. */
+  /**
+   * Reads a StringArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public String[] get(String key, String[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       return get(key).getStringArray(defaultValue);
@@ -928,7 +1199,13 @@ public class LogTable {
     }
   }
 
-  /** Reads a 2D StringArray value from the table. */
+  /**
+   * Reads a 2D StringArray value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public String[][] get(String key, String[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
       String[][] value = new String[get(key + "/length", 0)][];
@@ -941,7 +1218,14 @@ public class LogTable {
     }
   }
 
-  /** Reads an enum value from the table. */
+  /**
+   * Reads an enum value from the table.
+   *
+   * @param <E> The enum type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <E extends Enum<E>> E get(String key, E defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -952,7 +1236,14 @@ public class LogTable {
     }
   }
 
-  /** Reads an enum array value from the table. */
+  /**
+   * Reads an enum array value from the table.
+   *
+   * @param <E> The enum type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <E extends Enum<E>> E[] get(String key, E[] defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -970,7 +1261,14 @@ public class LogTable {
     }
   }
 
-  /** Reads a 2D enum array value from the table. */
+  /**
+   * Reads a 2D enum array value from the table.
+   *
+   * @param <E> The enum type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <E extends Enum<E>> E[][] get(String key, E[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
@@ -988,7 +1286,15 @@ public class LogTable {
     }
   }
 
-  /** Reads a Measure value from the table. */
+  /**
+   * Reads a Measure value from the table.
+   *
+   * @param <U> The unit type.
+   * @param <M> The measure type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <U extends Unit, M extends Measure<U>> M get(String key, M defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -999,7 +1305,16 @@ public class LogTable {
     }
   }
 
-  /** Reads a MutableMeasure value from the table. */
+  /**
+   * Reads a MutableMeasure value from the table.
+   *
+   * @param <U> The unit type.
+   * @param <Base> The base unit type
+   * @param <M> The measure type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <U extends Unit, Base extends Measure<U>, M extends MutableMeasure<U, Base, M>> M get(
       String key, M defaultValue) {
@@ -1012,14 +1327,29 @@ public class LogTable {
     }
   }
 
-  /** Reads a LoggableInput subtable from the table. */
+  /**
+   * Reads a LoggableInput subtable from the table.
+   *
+   * @param <T> The input type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   public <T extends LoggableInputs> T get(String key, T defaultValue) {
     if (defaultValue == null) return null;
     defaultValue.fromLog(getSubtable(key));
     return defaultValue;
   }
 
-  /** Reads a struct value from the table. */
+  /**
+   * Reads a struct value from the table.
+   *
+   * @param <T> The struct type.
+   * @param key The field name.
+   * @param struct The struct serialization object.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <T> T get(String key, Struct<T> struct, T defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -1033,7 +1363,15 @@ public class LogTable {
     }
   }
 
-  /** Reads a struct array value from the table. */
+  /**
+   * Reads a struct array value from the table.
+   *
+   * @param <T> The struct type.
+   * @param key The field name.
+   * @param struct The struct serialization object.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <T> T[] get(String key, Struct<T> struct, T... defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -1047,7 +1385,15 @@ public class LogTable {
     }
   }
 
-  /** Reads a 2D struct array value from the table. */
+  /**
+   * Reads a 2D struct array value from the table.
+   *
+   * @param <T> The struct type.
+   * @param key The field name.
+   * @param struct The struct serialization object.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <T> T[][] get(String key, Struct<T> struct, T[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
@@ -1065,7 +1411,16 @@ public class LogTable {
     }
   }
 
-  /** Reads a protobuf value from the table. */
+  /**
+   * Reads a protobuf value from the table.
+   *
+   * @param <T> The value type.
+   * @param <MessageType> The protobuf message type.
+   * @param key The field name.
+   * @param proto The protobuf serialization object.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <T, MessageType extends ProtoMessage<?>> T get(
       String key, Protobuf<T, MessageType> proto, T defaultValue) {
@@ -1086,7 +1441,14 @@ public class LogTable {
     }
   }
 
-  /** Reads a serialized (struct/protobuf) value from the table. */
+  /**
+   * Reads a serialized (struct/protobuf) value from the table.
+   *
+   * @param <T> The object type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <T extends WPISerializable> T get(String key, T defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -1107,7 +1469,14 @@ public class LogTable {
     return defaultValue;
   }
 
-  /** Reads a serialized (struct) array value from the table. */
+  /**
+   * Reads a serialized (struct) array value from the table.
+   *
+   * @param <T> The object type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <T extends StructSerializable> T[] get(String key, T... defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -1122,7 +1491,14 @@ public class LogTable {
     return defaultValue;
   }
 
-  /** Reads a serialized 2D (struct) array value from the table. */
+  /**
+   * Reads a serialized 2D (struct) array value from the table.
+   *
+   * @param <T> The object type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <T extends StructSerializable> T[][] get(String key, T[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
@@ -1140,7 +1516,14 @@ public class LogTable {
     }
   }
 
-  /** Reads a serialized record value from the table. */
+  /**
+   * Reads a serialized record value from the table.
+   *
+   * @param <R> The record type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <R extends Record> R get(String key, R defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -1155,7 +1538,14 @@ public class LogTable {
     return defaultValue;
   }
 
-  /** Reads a serialized record array value from the table. */
+  /**
+   * Reads a serialized record array value from the table.
+   *
+   * @param <R> The record type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <R extends Record> R[] get(String key, R... defaultValue) {
     if (data.containsKey(prefix + key)) {
@@ -1171,7 +1561,14 @@ public class LogTable {
     return defaultValue;
   }
 
-  /** Reads a serialized 2D record array value from the table. */
+  /**
+   * Reads a serialized 2D record array value from the table.
+   *
+   * @param <R> The record type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
   @SuppressWarnings("unchecked")
   public <R extends Record> R[][] get(String key, R[][] defaultValue) {
     if (data.containsKey(prefix + key + "/length")) {
@@ -1250,40 +1647,80 @@ public class LogTable {
 
   /** Represents a value stored in a LogTable, including type and value. */
   public static class LogValue {
-    public final LoggableType type;
-    public final String customTypeStr;
     private final Object value;
 
+    /** The log value type. */
+    public final LoggableType type;
+
+    /** The custom type string. */
+    public final String customTypeStr;
+
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(byte[] value, String typeStr) {
       type = LoggableType.Raw;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(boolean value, String typeStr) {
       type = LoggableType.Boolean;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(long value, String typeStr) {
       type = LoggableType.Integer;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(float value, String typeStr) {
       type = LoggableType.Float;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(double value, String typeStr) {
       type = LoggableType.Double;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(String value, String typeStr) {
       type = LoggableType.String;
       customTypeStr = typeStr;
@@ -1294,125 +1731,280 @@ public class LogTable {
       }
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(boolean[] value, String typeStr) {
       type = LoggableType.BooleanArray;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(long[] value, String typeStr) {
       type = LoggableType.IntegerArray;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(float[] value, String typeStr) {
       type = LoggableType.FloatArray;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(double[] value, String typeStr) {
       type = LoggableType.DoubleArray;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     */
     public LogValue(String[] value, String typeStr) {
       type = LoggableType.StringArray;
       customTypeStr = typeStr;
       this.value = value;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public byte[] getRaw() {
       return getRaw(new byte[] {});
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public boolean getBoolean() {
       return getBoolean(false);
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public long getInteger() {
       return getInteger(0);
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public float getFloat() {
       return getFloat(0.0f);
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public double getDouble() {
       return getDouble(0.0);
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public String getString() {
       return getString("");
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public boolean[] getBooleanArray() {
       return getBooleanArray(new boolean[] {});
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public long[] getIntegerArray() {
       return getIntegerArray(new long[] {});
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public float[] getFloatArray() {
       return getFloatArray(new float[] {});
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public double[] getDoubleArray() {
       return getDoubleArray(new double[] {});
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @return The value.
+     */
     public String[] getStringArray() {
       return getStringArray(new String[] {});
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public byte[] getRaw(byte[] defaultValue) {
       return type == LoggableType.Raw ? (byte[]) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public boolean getBoolean(boolean defaultValue) {
       return type == LoggableType.Boolean ? (boolean) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public long getInteger(long defaultValue) {
       return type == LoggableType.Integer ? (long) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public float getFloat(float defaultValue) {
       return type == LoggableType.Float ? (float) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public double getDouble(double defaultValue) {
       return type == LoggableType.Double ? (double) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public String getString(String defaultValue) {
       return type == LoggableType.String ? (String) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public boolean[] getBooleanArray(boolean[] defaultValue) {
       return type == LoggableType.BooleanArray ? (boolean[]) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public long[] getIntegerArray(long[] defaultValue) {
       return type == LoggableType.IntegerArray ? (long[]) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public float[] getFloatArray(float[] defaultValue) {
       return type == LoggableType.FloatArray ? (float[]) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public double[] getDoubleArray(double[] defaultValue) {
       return type == LoggableType.DoubleArray ? (double[]) value : defaultValue;
     }
 
+    /**
+     * Returns the value from the object.
+     *
+     * @param defaultValue The default value if the type doesn't match.
+     * @return The value.
+     */
     public String[] getStringArray(String[] defaultValue) {
       return type == LoggableType.StringArray ? (String[]) value : defaultValue;
     }
 
-    /** Returns the standard string type for WPILOGs. Returns the custom type string if not null. */
+    /**
+     * Returns the standard string type for WPILOGs. Returns the custom type string if not null.
+     *
+     * @return The type string.
+     */
     public String getWPILOGType() {
       if (customTypeStr == null) {
         return type.getWPILOGType();
@@ -1421,7 +2013,11 @@ public class LogTable {
       }
     }
 
-    /** Returns the standard string type for NT4. Returns the custom type string if not null. */
+    /**
+     * Returns the standard string type for NT4. Returns the custom type string if not null.
+     *
+     * @return The type string.
+     */
     public String getNT4Type() {
       if (customTypeStr == null) {
         return type.getNT4Type();
@@ -1468,16 +2064,27 @@ public class LogTable {
 
   /** Represents all possible data types that can be logged. */
   public enum LoggableType {
+    /** Raw value. */
     Raw,
+    /** Boolean value. */
     Boolean,
+    /** Integer (int64) value. */
     Integer,
+    /** Float value. */
     Float,
+    /** Double value. */
     Double,
+    /** String value. */
     String,
+    /** Boolean array value. */
     BooleanArray,
+    /** Integer (int64) array value. */
     IntegerArray,
+    /** Float array value. */
     FloatArray,
+    /** Double array value. */
     DoubleArray,
+    /** String array value. */
     StringArray;
 
     // https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc#data-types
@@ -1510,17 +2117,30 @@ public class LogTable {
             "double[]",
             "string[]");
 
-    /** Returns the standard string type for WPILOGs. */
+    /**
+     * Returns the standard string type for WPILOGs.
+     *
+     * @return The type string.
+     */
     public String getWPILOGType() {
       return wpilogTypes.get(this.ordinal());
     }
 
-    /** Returns the standard string type for NT4. */
+    /**
+     * Returns the standard string type for NT4.
+     *
+     * @return The type string.
+     */
     public String getNT4Type() {
       return nt4Types.get(this.ordinal());
     }
 
-    /** Returns the type based on a standard string type for WPILOGs. */
+    /**
+     * Returns the type based on a standard string type for WPILOGs.
+     *
+     * @param type The type string;
+     * @return The log type.
+     */
     public static LoggableType fromWPILOGType(String type) {
       if (wpilogTypes.contains(type)) {
         return LoggableType.values()[wpilogTypes.indexOf(type)];
@@ -1529,7 +2149,12 @@ public class LogTable {
       }
     }
 
-    /** Returns the type based on a standard string type for NT4. */
+    /**
+     * Returns the type based on a standard string type for NT4.
+     *
+     * @param type The type string;
+     * @return The log type.
+     */
     public static LoggableType fromNT4Type(String type) {
       if (nt4Types.contains(type)) {
         return LoggableType.values()[nt4Types.indexOf(type)];

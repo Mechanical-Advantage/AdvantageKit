@@ -139,6 +139,11 @@ public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
     }
   }
 
+  /**
+   * Record the current value to the log. <b>This function should never be called by user code.</b>
+   *
+   * @param table The table to which data should be written.
+   */
   public synchronized void logOutput(LogTable table) {
     table.put(".type", "Mechanism2d");
     table.put(".controllable", false);

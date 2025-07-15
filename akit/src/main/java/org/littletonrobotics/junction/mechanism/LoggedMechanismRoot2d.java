@@ -21,7 +21,7 @@ import org.littletonrobotics.junction.LogTable;
  * <p>Do not create objects of this class directly! Obtain instances from the {@link
  * edu.wpi.first.wpilibj.smartdashboard.Mechanism2d#getRoot(String, double, double)} factory method.
  *
- * <p>Append other nodes by using {@link #append(MechanismObject2d)}.
+ * <p>Append other nodes by using {@link #append(LoggedMechanismObject2d)}.
  */
 public final class LoggedMechanismRoot2d implements AutoCloseable {
   private final String m_name;
@@ -106,6 +106,11 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
     }
   }
 
+  /**
+   * Get the name of the root.
+   *
+   * @return The name of the root.
+   */
   public String getName() {
     return m_name;
   }

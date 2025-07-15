@@ -21,6 +21,7 @@ public class NT4Publisher implements LogDataReceiver {
   private final IntegerPublisher timestampPublisher;
   private final Map<String, GenericPublisher> publishers = new HashMap<>();
 
+  /** Creates a new NT4Publisher. */
   public NT4Publisher() {
     akitTable = NetworkTableInstance.getDefault().getTable("/AdvantageKit");
     timestampPublisher =
