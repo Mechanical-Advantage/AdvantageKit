@@ -30,13 +30,7 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable.LogValue;
-import org.littletonrobotics.junction.console.ConsoleSource;
-import org.littletonrobotics.junction.console.RIOConsoleSource;
-import org.littletonrobotics.junction.console.SimConsoleSource;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
-import org.littletonrobotics.junction.inputs.LoggedDriverStation;
-import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
-import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
 import us.hebi.quickbuf.ProtoMessage;
@@ -156,9 +150,9 @@ public class Logger {
       // Start console capture
       if (enableConsole) {
         if (RobotBase.isReal()) {
-          console = new RIOConsoleSource();
+          console = new ConsoleSource.RoboRIO();
         } else {
-          console = new SimConsoleSource();
+          console = new ConsoleSource.Simulator();
         }
       }
 
