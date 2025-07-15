@@ -12,8 +12,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Automatically record the field or method as an output. Check the <a href=
+ * "https://docs.advantagekit.org/data-flow/recording-outputs/annotation-logging">documentation</a>
+ * for details.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface AutoLogOutput {
+  /**
+   * The key to use when logging the field or method. Use {...} to reference constant fields for
+   * disambiguation.
+   *
+   * @return The value of the key parameter.
+   */
   public String key() default "";
 }

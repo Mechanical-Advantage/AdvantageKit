@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+/** Utility functions for managing log file paths. */
 public class LogFileUtil {
   static final String environmentVariable = "AKIT_LOG_PATH";
   private static final String advantageScopeFileName = "akit-log-path.txt";
@@ -19,9 +20,12 @@ public class LogFileUtil {
   private LogFileUtil() {}
 
   /**
-   * Adds a suffix to the given path (e.g. "test.wpilog" -> "test_sim.wpilog").
+   * Adds a suffix to the given path (e.g. "test.wpilog" -> "test_sim.wpilog"). If the input path
+   * already contains the suffix, an index will be added instead.
    *
-   * <p>If the input path already contains the suffix, an index will be added instead.
+   * @param path The base path, such as "test.wpilog".
+   * @param suffix The suffix to add, such as "_sim".
+   * @return The new path.
    */
   public static String addPathSuffix(String path, String suffix) {
     int dotIndex = path.lastIndexOf(".");
@@ -44,8 +48,13 @@ public class LogFileUtil {
   /**
    * Finds the path to a log file for replay, using the following priorities:
    *
-   * <p>1. The value of the "AKIT_LOG_PATH" environment variable, if set 2. The file currently open
-   * in AdvantageScope, if available 3. The result of the prompt displayed to the user
+   * <p>1. The value of the "AKIT_LOG_PATH" environment variable, if set
+   *
+   * <p>2. The file currently open in AdvantageScope, if available
+   *
+   * <p>3. The result of the prompt displayed to the user
+   *
+   * @return The path to the log file.
    */
   public static String findReplayLog() {
     // Read environment variables
