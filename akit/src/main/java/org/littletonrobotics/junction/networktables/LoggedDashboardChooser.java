@@ -54,6 +54,7 @@ public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
    *
    * @param key The key for the chooser, published to "/SmartDashboard/{key}" for NT or
    *     "/DashboardInputs/{key}" when logged.
+   * @param chooser The existing SendableChooser object.
    */
   @SuppressWarnings("unchecked")
   public LoggedDashboardChooser(String key, SendableChooser<V> chooser) {
@@ -95,13 +96,23 @@ public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
     }
   }
 
-  /** Adds a new option to the chooser. */
+  /**
+   * Adds a new option to the chooser.
+   *
+   * @param key The string key for the option.
+   * @param value The value of the option.
+   */
   public void addOption(String key, V value) {
     sendableChooser.addOption(key, key);
     options.put(key, value);
   }
 
-  /** Adds a new option to the chooser and sets it to the default. */
+  /**
+   * Adds a new option to the chooser and sets it to the default.
+   *
+   * @param key The string key for the option.
+   * @param value The value of the option.
+   */
   public void addDefaultOption(String key, V value) {
     sendableChooser.setDefaultOption(key, key);
     options.put(key, value);
@@ -110,14 +121,18 @@ public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
   /**
    * Returns the selected option. If there is none selected, it will return the default. If there is
    * none selected and no default, then it will return {@code null}.
+   *
+   * @return The value for the selected option.
    */
   public V get() {
     return options.get(selectedValue);
   }
 
   /**
-   * Returns the internal sendable chooser object, for use when setting up dashboard layouts. Do not
-   * read data from the sendable chooser directly.
+   * Returns the internal SendableChooser object, for use when setting up dashboard layouts. Do not
+   * read data from the SendableChooser directly.
+   *
+   * @return The internal SendableChooser object.
    */
   public SendableChooser<String> getSendableChooser() {
     return sendableChooser;

@@ -33,6 +33,11 @@ public class WPILOGReader implements LogReplaySource {
   private Map<Integer, LoggableType> entryTypes;
   private Map<Integer, String> entryCustomTypes;
 
+  /**
+   * Creates a new WPILOGReader.
+   *
+   * @param filename The log filename to read.
+   */
   public WPILOGReader(String filename) {
     this.filename = filename;
   }

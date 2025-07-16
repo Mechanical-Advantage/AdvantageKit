@@ -61,7 +61,9 @@ public class WPILOGWriter implements LogDataReceiver {
    *
    * @param path Path to log file or folder. If only a folder is provided, the filename will be
    *     generated based on the current time and match number (if applicable).
-   * @param openBehavior Whether to automatically open the log file in AdvantageScope.
+   * @param openBehavior Whether to automatically open the log file in AdvantageScope. See {@link
+   *     org.littletonrobotics.junction.wpilog.WPILOGWriter.AdvantageScopeOpenBehavior
+   *     AdvantageScopeOpenBehavior} for details.
    */
   public WPILOGWriter(String path, AdvantageScopeOpenBehavior openBehavior) {
     this.openBehavior = openBehavior;
@@ -103,7 +105,9 @@ public class WPILOGWriter implements LogDataReceiver {
    * <p>The logs will be saved to "/U/logs" on the robot and "logs" in sim. The filename will be
    * generated based on the current time and match number (if applicable).
    *
-   * @param openBehavior Whether to automatically open the log file in AdvantageScope.
+   * @param openBehavior Whether to automatically open the log file in AdvantageScope. See {@link
+   *     org.littletonrobotics.junction.wpilog.WPILOGWriter.AdvantageScopeOpenBehavior
+   *     AdvantageScopeOpenBehavior} for details.
    */
   public WPILOGWriter(AdvantageScopeOpenBehavior openBehavior) {
     this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRobot, openBehavior);
@@ -349,6 +353,10 @@ public class WPILOGWriter implements LogDataReceiver {
     lastTable = table;
   }
 
+  /**
+   * The behavior to use when sending the log file to AdvantageScope after the robot program exits
+   * in simulation.
+   */
   public static enum AdvantageScopeOpenBehavior {
     /** Always open the log file in AdvantageScope when running in sim. */
     ALWAYS,

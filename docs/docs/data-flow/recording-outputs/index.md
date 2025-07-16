@@ -1,4 +1,4 @@
-# Recording Outputs
+# 🔼 Recording Outputs
 
 Output data consists of any calculated values which could be recreated in the simulator, including...
 

@@ -1,7 +1,8 @@
 {
-  "label": "Template Projects",
+  "label": "🏠 Template Projects",
   "position": 3,
   "link": {
-    "type": "generated-index"
+    "type": "generated-index",
+    "slug": "getting-started/template-projects"
   }
 }

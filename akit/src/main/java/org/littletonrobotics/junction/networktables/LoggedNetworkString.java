@@ -46,7 +46,11 @@ public class LoggedNetworkString extends LoggedNetworkInput {
     this.value = defaultValue;
   }
 
-  /** Updates the default value, which is used if no value in NT is found. */
+  /**
+   * Updates the default value, which is used if no value in NT is found.
+   *
+   * @param defaultValue The new default value.
+   */
   public void setDefault(String defaultValue) {
     this.defaultValue = defaultValue;
     entry.set(entry.get(defaultValue));
@@ -55,12 +59,18 @@ public class LoggedNetworkString extends LoggedNetworkInput {
   /**
    * Publishes a new value. Note that the value will not be returned by {@link #get()} until the
    * next cycle.
+   *
+   * @param value The new value.
    */
   public void set(String value) {
     entry.set(value);
   }
 
-  /** Returns the current value. */
+  /**
+   * Returns the current value.
+   *
+   * @return The current value.
+   */
   public String get() {
     return value;
   }

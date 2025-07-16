@@ -79,6 +79,11 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
    */
   protected abstract void updateEntries(NetworkTable table);
 
+  /**
+   * Get the name of the object.
+   *
+   * @return The name of the object.
+   */
   public final String getName() {
     return m_name;
   }

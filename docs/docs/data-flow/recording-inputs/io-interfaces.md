@@ -19,7 +19,7 @@ Data logging of inputs should occur between the control logic and hardware inter
 ![Diagram of restructured subsystem](img/subsystem-2.png)
 
 :::tip
-Refer to the [AdvantageKit templates](/category/template-projects) for some reference IO interfaces and implementations.
+Refer to the [AdvantageKit templates](/getting-started/template-projects) for some reference IO interfaces and implementations.
 :::
 
 Outputs (setting voltage, setpoint, PID constants, etc.) make use of simple methods for each command. Input data is more controlled such that it can be logged and replayed. Each IO interface defines a class with public attributes for all input data, along with methods for saving and replaying that data from a log (`toLog` and `fromLog`). We recommend using the [`@AutoLog`](/data-flow/recording-inputs/annotation-logging) annotation to generate these methods automatically.

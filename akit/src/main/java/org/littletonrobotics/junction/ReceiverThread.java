@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class ReceiverThread extends Thread {
-
+class ReceiverThread extends Thread {
   private final BlockingQueue<LogTable> queue;
   private List<LogDataReceiver> dataReceivers = new ArrayList<>();
 

@@ -26,12 +26,24 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Entry-point for replay watch functionality. Check the <a href=
+ * "https://docs.advantagekit.org/getting-started/replay-watch">documentation</a> for details.
+ */
 public class ReplayWatch {
   private static WatchService watcher;
   private static Map<WatchKey, Path> keys;
 
   private ReplayWatch() {}
 
+  /**
+   * Launch replay watch. Check the <a href=
+   * "https://docs.advantagekit.org/getting-started/replay-watch">documentation</a> for details.
+   *
+   * @param args Command line arguments, unused.
+   * @throws IOException If an IO error occurs.
+   * @throws InterruptedException If the thread is interrupted.
+   */
   @SuppressWarnings({"rawtypes", "unchecked"})
   public static void main(String[] args) throws IOException, InterruptedException {
     // Find input log

@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.littletonrobotics.junction.inputs;
+package org.littletonrobotics.junction;
 
 import edu.wpi.first.networktables.ConnectionInfo;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -17,10 +17,9 @@ import org.littletonrobotics.conduit.schema.CANInfo;
 import org.littletonrobotics.conduit.schema.NetworkDirStatus;
 import org.littletonrobotics.conduit.schema.NetworkStatus;
 import org.littletonrobotics.conduit.schema.Vector3;
-import org.littletonrobotics.junction.LogTable;
 
 /** Manages logging general system data. */
-public class LoggedSystemStats {
+class LoggedSystemStats {
   private static Set<String> lastNTRemoteIds = new HashSet<>();
   private static ByteBuffer ntIntBuffer = ByteBuffer.allocate(4);
 

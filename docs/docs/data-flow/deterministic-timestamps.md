@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# Deterministic Timestamps
+# ⏰ Deterministic Timestamps
 
 ### The Problem
 

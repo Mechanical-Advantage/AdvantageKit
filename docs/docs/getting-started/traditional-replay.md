@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-# How To: Traditional Replay
+# ⏪ How To: Traditional Replay
 
 ## Setup
 

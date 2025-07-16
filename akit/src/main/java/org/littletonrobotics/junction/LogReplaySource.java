@@ -15,14 +15,12 @@ public interface LogReplaySource {
    * files, find network devices, start threads, etc.
    */
   public default void start() {}
-  ;
 
   /**
    * Called when the code shuts down cleanly. Note that this will NOT be called when the robot is
    * powered off.
    */
   public default void end() {}
-  ;
 
   /**
    * Called every loop cycle to get the next set of data.

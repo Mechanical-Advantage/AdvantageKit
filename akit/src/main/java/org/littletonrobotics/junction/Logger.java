@@ -30,13 +30,7 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable.LogValue;
-import org.littletonrobotics.junction.console.ConsoleSource;
-import org.littletonrobotics.junction.console.SimConsoleSource;
-import org.littletonrobotics.junction.console.SystemCoreConsoleSource;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
-import org.littletonrobotics.junction.inputs.LoggedDriverStation;
-import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
-import org.littletonrobotics.junction.inputs.LoggedSystemStats;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
 import us.hebi.quickbuf.ProtoMessage;
@@ -66,6 +60,8 @@ public class Logger {
   /**
    * Sets the source to use for replaying data. Use null to disable replay. This method only works
    * during setup before starting to log.
+   *
+   * @param replaySource The supplier for incoming replay data.
    */
   public static void setReplaySource(LogReplaySource replaySource) {
     if (!running) {
@@ -76,6 +72,8 @@ public class Logger {
   /**
    * Adds a new data receiver to process real or replayed data. This method only works during setup
    * before starting to log.
+   *
+   * @param dataReceiver The target for outgoing data.
    */
   public static void addDataReceiver(LogDataReceiver dataReceiver) {
     if (!running) {
@@ -86,19 +84,24 @@ public class Logger {
   /**
    * Registers a new dashboard input to be included in the periodic loop. This function should not
    * be called by the user.
+   *
+   * @param dashboardInput The input to register.
    */
   public static void registerDashboardInput(LoggedNetworkInput dashboardInput) {
     dashboardInputs.add(dashboardInput);
   }
 
   /**
-   * Registers a log supplier for <a href= "https://github.com/Mechanical-Advantage/URCL">URCL</a>
-   * (Unofficial REV-Compatible Logger). This method should be called during setup before starting
-   * to log. Example usage shown below.
+   * Registers a log supplier for <a
+   * href="https://docs.advantagescope.org/more-features/urcl">URCL</a> (Unofficial REV-Compatible
+   * Logger). This method should be called during setup before starting to log. Example usage shown
+   * below.
    *
    * <pre>
    * <code>Logger.registerURCL(URCL.startExternal());</code>
    * </pre>
+   *
+   * @param logSupplier The supplier returned from the {@code URCL.startExternal()} method.
    */
   public static void registerURCL(Supplier<ByteBuffer[]> logSupplier) {
     urclSupplier = logSupplier;
@@ -122,7 +125,11 @@ public class Logger {
     enableConsole = false;
   }
 
-  /** Returns whether a replay source is currently being used. */
+  /**
+   * Returns whether a replay source is currently being used.
+   *
+   * @return True if a replay source is being used, false otherwise.
+   */
   public static boolean hasReplaySource() {
     return replaySource != null;
   }
@@ -155,9 +162,9 @@ public class Logger {
       // Start console capture
       if (enableConsole) {
         if (RobotBase.isReal()) {
-          console = new SystemCoreConsoleSource();
+          console = new ConsoleSource.SystemCore();
         } else {
-          console = new SimConsoleSource();
+          console = new ConsoleSource.Simulator();
         }
       }
 
@@ -361,14 +368,17 @@ public class Logger {
   /**
    * Returns the state of the receiver queue fault. This is tripped when the receiver queue fills
    * up, meaning that data is no longer being saved.
+   *
+   * @return Whether the receiver queue is full.
    */
   public static boolean getReceiverQueueFault() {
     return receiverQueueFault;
   }
 
   /**
-   * Returns the current FPGA timestamp or replayed time based on the current log entry
-   * (microseconds).
+   * Returns the current timestamp or replayed time based on the current log entry (microseconds).
+   *
+   * @return The timestamp.
    */
   public static long getTimestamp() {
     synchronized (entry) {
@@ -381,23 +391,14 @@ public class Logger {
   }
 
   /**
-   * Returns the true FPGA timestamp in microseconds, regardless of the timestamp used for logging.
-   * Useful for analyzing performance. DO NOT USE this method for any logic which might need to be
-   * replayed.
-   *
-   * @deprecated Use {@code RobotController.getFPGATime()} instead.
-   */
-  @Deprecated
-  public static long getRealTimestamp() {
-    return RobotController.getFPGATime();
-  }
-
-  /**
    * Runs the provided callback function every N loop cycles. This method can be used to update
    * inputs or log outputs at a lower rate than the standard loop cycle.
    *
    * <p><b>Note that this method must be called periodically to continue running the callback
    * function</b>.
+   *
+   * @param n The number of loop cycles between runs.
+   * @param function The function to run.
    */
   public static void runEveryN(int n, Runnable function) {
     if (cycleCount % n == 0) {
@@ -410,8 +411,10 @@ public class Logger {
    * This should be called every loop cycle after updating the inputs from the hardware (if
    * applicable).
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name used to identify this set of inputs.
    * @param inputs The inputs to log or update.
@@ -430,8 +433,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -447,8 +452,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -464,8 +471,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -481,8 +490,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -498,8 +509,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -515,8 +528,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -532,8 +547,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -549,8 +566,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -566,8 +585,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -583,8 +604,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -600,8 +623,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -617,8 +642,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -634,8 +661,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -651,8 +680,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -668,8 +699,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -685,8 +718,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -702,8 +737,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -719,8 +756,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -736,8 +775,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -753,8 +794,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -770,8 +813,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -787,8 +832,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -804,8 +851,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -821,8 +870,10 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
@@ -838,9 +889,12 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
+   * @param <E> The enum type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -855,9 +909,12 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
+   * @param <E> The enum type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -872,9 +929,12 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
+   * @param <E> The enum type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -889,9 +949,12 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
+   * @param <U> The unit type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -906,14 +969,18 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * <p>This method serializes a single object as a struct. Example usage: {@code
    * recordOutput("MyPose", Pose2d.struct, new Pose2d())}
    *
+   * @param <T> The struct type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
+   * @param struct The struct serialization object.
    * @param value The value of the field.
    */
   public static <T> void recordOutput(String key, Struct<T> struct, T value) {
@@ -930,11 +997,15 @@ public class Logger {
    * recordOutput("MyPoses", Pose2d.struct, new Pose2d(), new Pose2d()); recordOutput("MyPoses",
    * Pose2d.struct, new Pose2d[] {new Pose2d(), new Pose2d()}); }
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
+   * @param <T> The struct type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
+   * @param struct The struct serialization object.
    * @param value The value of the field.
    */
   @SuppressWarnings("unchecked")
@@ -948,11 +1019,15 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
+   * @param <T> The struct type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
+   * @param struct The struct serialization object.
    * @param value The value of the field.
    */
   public static <T> void recordOutput(String key, Struct<T> struct, T[][] value) {
@@ -969,11 +1044,16 @@ public class Logger {
    * objects that do not support struct serialization. Example usage: {@code recordOutput("MyPose",
    * Pose2d.proto, new Pose2d())}
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
+   * @param <T> The value type.
+   * @param <MessageType> The protobuf message type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
+   * @param proto The protobuf serialization object.
    * @param value The value of the field.
    */
   public static <T, MessageType extends ProtoMessage<?>> void recordOutput(
@@ -990,10 +1070,12 @@ public class Logger {
    * <p>This method serializes a single object as a struct or protobuf automatically. Struct is
    * preferred if both methods are supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
-   * @param <T> The type
+   * @param <T> The object type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -1011,10 +1093,12 @@ public class Logger {
    * <p>This method serializes an array of objects as a struct automatically. Top-level protobuf
    * arrays are not supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
-   * @param <T> The type
+   * @param <T> The object type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -1033,10 +1117,12 @@ public class Logger {
    * <p>This method serializes an array of objects as a struct automatically. Top-level protobuf
    * arrays are not supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
-   * @param <T> The type
+   * @param <T> The object type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -1054,10 +1140,12 @@ public class Logger {
    * <p>This method serializes a single object as a struct or protobuf automatically. Struct is
    * preferred if both methods are supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
-   * @param <R> The type
+   * @param <R> The record type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -1075,10 +1163,12 @@ public class Logger {
    * <p>This method serializes an array of objects as a struct automatically. Top-level protobuf
    * arrays are not supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
-   * @param <R> The type
+   * @param <R> The record type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -1097,10 +1187,12 @@ public class Logger {
    * <p>This method serializes an array of objects as a struct automatically. Top-level protobuf
    * arrays are not supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
-   * @param <R> The type
+   * @param <R> The record type.
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -1118,8 +1210,10 @@ public class Logger {
    * <p>The current position of the Mechanism2d is logged once as a set of nested fields. If the
    * position is updated, this method must be called again.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. See
-   * the "Common Issues" page in the documentation for more details.
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
    *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
