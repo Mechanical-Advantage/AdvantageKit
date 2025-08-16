@@ -48,6 +48,7 @@ public class Logger {
   private static List<LoggedNetworkInput> dashboardInputs = new ArrayList<>();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean enableConsole = true;
+  private static boolean checkRobotBase = true;
 
   private static LogReplaySource replaySource;
   private static final BlockingQueue<LogTable> receiverQueue =
@@ -140,23 +141,25 @@ public class Logger {
       running = true;
 
       // Exit if LoggedRobot not present
-      var stackTrace = Thread.currentThread().getStackTrace();
-      boolean isValid = false;
-      for (var element : stackTrace) {
-        try {
-          Class<?> elementClass = Class.forName(element.getClassName());
-          if (LoggedRobot.class.isAssignableFrom(elementClass)) {
-            isValid = true;
-            break;
+      if (checkRobotBase) {
+        var stackTrace = Thread.currentThread().getStackTrace();
+        boolean isValid = false;
+        for (var element : stackTrace) {
+          try {
+            Class<?> elementClass = Class.forName(element.getClassName());
+            if (LoggedRobot.class.isAssignableFrom(elementClass)) {
+              isValid = true;
+              break;
+            }
+          } catch (ClassNotFoundException e) {
           }
-        } catch (ClassNotFoundException e) {
         }
-      }
-      if (!isValid) {
-        DriverStation.reportError(
-            "The main robot class must inherit from LoggedRobot when using AdvantageKit. For more details, check the AdvantageKit installation documentation: https://docs.advantagekit.org/getting-started/installation\n\n*** EXITING DUE TO INVALID ADVANTAGEKIT INSTALLATION, SEE ABOVE. ***",
-            false);
-        System.exit(1);
+        if (!isValid) {
+          DriverStation.reportError(
+              "The main robot class must inherit from LoggedRobot when using AdvantageKit. For more details, check the AdvantageKit installation documentation: https://docs.advantagekit.org/getting-started/installation\n\n*** EXITING DUE TO INVALID ADVANTAGEKIT INSTALLATION, SEE ABOVE. ***",
+              false);
+          System.exit(1);
+        }
       }
 
       // Start console capture
@@ -362,6 +365,34 @@ public class Logger {
             "[AdvantageKit] Capacity of receiver queue exceeded, data will NOT be logged.", false);
       }
     }
+  }
+
+  /**
+   * Advanced hooks for highly custom integration with the Logger class, including use of custom
+   * robot base classes. <b>The vast majority of users do not need to interact with this class.</b>
+   */
+  public static class AdvancedHooks {
+    /** Disable the robot base class check. */
+    public static void disableRobotBaseCheck() {
+      checkRobotBase = false;
+    }
+
+    /** Invoke the "before user" periodic method. */
+    public static void invokePeriodicBeforeUser() {
+      periodicBeforeUser();
+    }
+
+    /**
+     * Invoke the "after user" periodic method.
+     *
+     * @param userCodeLength Timestamp information for logging
+     * @param periodicBeforeLength Timestamp information for logging
+     */
+    public static void invokePeriodicAfterUser(long userCodeLength, long periodicBeforeLength) {
+      periodicAfterUser(userCodeLength, periodicBeforeLength);
+    }
+
+    private AdvancedHooks() {}
   }
 
   /**
