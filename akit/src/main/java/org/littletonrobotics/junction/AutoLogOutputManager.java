@@ -330,6 +330,7 @@ public class AutoLogOutputManager {
                     false);
               }
           });
+      return;
     }
 
     if (!type.isArray()) {
