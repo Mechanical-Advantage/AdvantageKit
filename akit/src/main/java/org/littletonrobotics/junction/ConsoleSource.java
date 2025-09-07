@@ -22,15 +22,20 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-interface ConsoleSource extends AutoCloseable {
-  /** Reads all console data that has been produced since the last call to this method. */
+/** Console logging source. Users should not interact with this class directly. */
+public interface ConsoleSource extends AutoCloseable {
+  /**
+   * Reads all console data that has been produced since the last call to this method.
+   *
+   * @return The console data
+   */
   public String getNewData();
 
   /**
    * Reads console data while running in the simulator. Saves stdout and sterr from Java only (not
    * native code), and only includes lines logged after this class was instantiated.
    */
-  class Simulator implements ConsoleSource {
+  public class Simulator implements ConsoleSource {
     private final PrintStream originalStdout;
     private final PrintStream originalStderr;
     private final ByteArrayOutputStream customStdout = new ByteArrayOutputStream();
@@ -38,6 +43,7 @@ interface ConsoleSource extends AutoCloseable {
     private int customStdoutPos = 0;
     private int customStderrPos = 0;
 
+    /** Create simulator console source. */
     public Simulator() {
       originalStdout = System.out;
       originalStderr = System.err;
@@ -84,12 +90,21 @@ interface ConsoleSource extends AutoCloseable {
    * Reads console data on the RIO. Saves stdout and sterr from both Java and native code, including
    * lines logged before this class was instantiated.
    */
-  class RoboRIO implements ConsoleSource {
-    private static final String filePath = "/home/lvuser/FRC_UserProgram.log";
+  public class RoboRIO implements ConsoleSource {
     private final Thread thread;
     private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(100);
     private final List<String> lines = new ArrayList<>();
 
+    /**
+     * Returns the file path to use for logging.
+     *
+     * @return The file path
+     */
+    protected String getFilePath() {
+      return "/home/lvuser/FRC_UserProgram.log";
+    }
+
+    /** Create roboRIO console source. */
     public RoboRIO() {
       thread = new Thread(this::run, "AdvantageKit_RIOConsoleSource");
       thread.setDaemon(true);
@@ -111,11 +126,11 @@ interface ConsoleSource extends AutoCloseable {
       CharBuffer buffer = CharBuffer.allocate(10240);
       BufferedReader reader;
       try {
-        reader = new BufferedReader(new FileReader(filePath));
+        reader = new BufferedReader(new FileReader(getFilePath()));
       } catch (FileNotFoundException e) {
         DriverStation.reportError(
             "[AdvantageKit] Failed to open console file \""
-                + filePath
+                + getFilePath()
                 + "\", disabling console capture.",
             true);
         return;
@@ -130,7 +145,7 @@ interface ConsoleSource extends AutoCloseable {
           } catch (IOException e) {
             DriverStation.reportError(
                 "[AdvantageKit] Failed to read console file \""
-                    + filePath
+                    + getFilePath()
                     + "\", disabling console capture.",
                 true);
             try {

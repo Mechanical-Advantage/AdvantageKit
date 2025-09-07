@@ -163,7 +163,7 @@ public class Logger {
       }
 
       // Start console capture
-      if (enableConsole) {
+      if (enableConsole && console == null) {
         if (RobotBase.isReal()) {
           console = new ConsoleSource.RoboRIO();
         } else {
@@ -390,6 +390,15 @@ public class Logger {
      */
     public static void invokePeriodicAfterUser(long userCodeLength, long periodicBeforeLength) {
       periodicAfterUser(userCodeLength, periodicBeforeLength);
+    }
+
+    /**
+     * Set a custom console source
+     *
+     * @param console The console source to use
+     */
+    public static void setConsoleSource(ConsoleSource console) {
+      Logger.console = console;
     }
 
     private AdvancedHooks() {}
