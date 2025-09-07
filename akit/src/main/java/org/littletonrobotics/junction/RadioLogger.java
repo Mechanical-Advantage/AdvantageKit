@@ -8,7 +8,6 @@
 package org.littletonrobotics.junction;
 
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
