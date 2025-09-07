@@ -31,7 +31,7 @@ class RadioLogger {
   private static String statusJson = "";
 
   public static void periodic(LogTable table) {
-    if (notifier == null && RobotBase.isReal()) {
+    if (notifier == null && RobotController.getTeamNumber() != 0) {
       start();
     }
 
