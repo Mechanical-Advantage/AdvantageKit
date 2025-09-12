@@ -118,6 +118,8 @@ public class AutoLogOutputManager {
                 // Get key
                 String keyParameter = method.getAnnotation(AutoLogOutput.class).key();
                 String key = makeKey(keyParameter, method.getName(), declaringClass, root);
+                boolean forceSerializable =
+                    method.getAnnotation(AutoLogOutput.class).forceSerializable();
 
                 // Register method
                 registerField(
@@ -132,7 +134,8 @@ public class AutoLogOutputManager {
                         e.printStackTrace();
                         return null;
                       }
-                    });
+                    },
+                    forceSerializable);
               }
             });
 
@@ -149,6 +152,8 @@ public class AutoLogOutputManager {
                 // Get key
                 String keyParameter = field.getAnnotation(AutoLogOutput.class).key();
                 String key = makeKey(keyParameter, field.getName(), declaringClass, root);
+                boolean forceSerializable =
+                    field.getAnnotation(AutoLogOutput.class).forceSerializable();
 
                 // Register field
                 registerField(
@@ -161,7 +166,8 @@ public class AutoLogOutputManager {
                         e.printStackTrace();
                         return null;
                       }
-                    });
+                    },
+                    forceSerializable);
                 return;
               }
 
@@ -308,7 +314,25 @@ public class AutoLogOutputManager {
    * @param type The type of object being logged.
    * @param supplier A supplier for the field values.
    */
-  private static void registerField(String key, Class<?> type, Supplier<?> supplier) {
+  private static void registerField(
+      String key, Class<?> type, Supplier<?> supplier, boolean forceSerializable) {
+    if (forceSerializable) {
+      callbacks.add(
+          () -> {
+            Object value = supplier.get();
+            if (value != null)
+              try {
+                Logger.recordOutput(key, (WPISerializable) value);
+              } catch (ClassCastException e) {
+                DriverStation.reportError(
+                    "[AdvantageKit] Auto serialization is not supported for type "
+                        + type.getSimpleName(),
+                    false);
+              }
+          });
+      return;
+    }
+
     if (!type.isArray()) {
       // Single types
       if (type.equals(boolean.class)) {
