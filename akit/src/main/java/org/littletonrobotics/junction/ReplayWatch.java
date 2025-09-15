@@ -140,20 +140,21 @@ public class ReplayWatch {
     boolean isWindows = System.getProperty("os.name").startsWith("Windows");
     var gradleBuilder =
         new ProcessBuilder(
-            hasSpotless
-                ? new String[] {
-                  isWindows ? "gradlew.bat" : "./gradlew",
-                  "simulateJava",
-                  "-x",
-                  "test",
-                  "-x",
-                  "spotlessApply",
-                  "-x",
-                  "spotlessCheck"
-                }
-                : new String[] {
-                  isWindows ? "gradlew.bat" : "./gradlew", "simulateJava", "-x", "test"
-                });
+                hasSpotless
+                    ? new String[] {
+                      isWindows ? "gradlew.bat" : "./gradlew",
+                      "simulateJava",
+                      "-x",
+                      "test",
+                      "-x",
+                      "spotlessApply",
+                      "-x",
+                      "spotlessCheck"
+                    }
+                    : new String[] {
+                      isWindows ? "gradlew.bat" : "./gradlew", "simulateJava", "-x", "test"
+                    })
+            .inheritIO();
     gradleBuilder.environment().put(LogFileUtil.environmentVariable, inputLog);
     var gradle = gradleBuilder.start();
 
