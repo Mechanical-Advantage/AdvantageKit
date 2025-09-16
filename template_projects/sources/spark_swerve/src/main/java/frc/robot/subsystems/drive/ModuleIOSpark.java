@@ -55,8 +55,10 @@ public class ModuleIOSpark implements ModuleIO {
   private final Queue<Double> turnPositionQueue;
 
   // Connection debouncers
-  private final Debouncer driveConnectedDebounce = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
-  private final Debouncer turnConnectedDebounce = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer driveConnectedDebounce =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer turnConnectedDebounce =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
 
   public ModuleIOSpark(int module) {
     zeroRotation =
