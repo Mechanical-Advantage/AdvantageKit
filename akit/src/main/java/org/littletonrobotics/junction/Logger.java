@@ -274,6 +274,16 @@ public class Logger {
    * operations to occur between cycles rather than interferring with the main thread.
    */
   static void periodicAfterUser(long userCodeLength, long periodicBeforeLength) {
+    periodicAfterUser(userCodeLength, periodicBeforeLength, null);
+  }
+
+  /**
+   * Periodic method to be called after the constructor of Robot and each loop cycle. Updates
+   * default log values and sends data to data receivers. Running this after user code allows IO
+   * operations to occur between cycles rather than interferring with the main thread.
+   */
+  static void periodicAfterUser(
+      long userCodeLength, long periodicBeforeLength, String extraConsoleData) {
     if (running) {
       // Capture conduit data
       ConduitApi conduit = ConduitApi.getInstance();
@@ -329,6 +339,9 @@ public class Logger {
       long consoleCaptureStart = RobotController.getFPGATime();
       if (enableConsole) {
         String consoleData = console.getNewData();
+        if (extraConsoleData != null) {
+          consoleData += extraConsoleData;
+        }
         if (!consoleData.isEmpty()) {
           recordOutput("Console", consoleData.trim());
         }
@@ -390,6 +403,18 @@ public class Logger {
      */
     public static void invokePeriodicAfterUser(long userCodeLength, long periodicBeforeLength) {
       periodicAfterUser(userCodeLength, periodicBeforeLength);
+    }
+
+    /**
+     * Invoke the "after user" periodic method.
+     *
+     * @param userCodeLength Timestamp information for logging
+     * @param periodicBeforeLength Timestamp information for logging
+     * @param extraConsoleData Console information for logging
+     */
+    public static void invokePeriodicAfterUser(
+        long userCodeLength, long periodicBeforeLength, String extraConsoleData) {
+      periodicAfterUser(userCodeLength, periodicBeforeLength, extraConsoleData);
     }
 
     /**
