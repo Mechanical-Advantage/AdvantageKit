@@ -8,6 +8,7 @@
 package org.littletonrobotics.junction;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.FileSystems;
@@ -166,6 +167,12 @@ public class ReplayWatch {
           "[AdvantageKit] Replay active... ("
               + formatter.format((System.currentTimeMillis() - startTime) * 1.0e-3)
               + "s)\r");
+      ByteArrayOutputStream result = new ByteArrayOutputStream();
+      byte[] buffer = new byte[1024];
+      for (int length; (length = gradle.getErrorStream().read(buffer)) != -1; ) {
+        result.write(buffer, 0, length);
+      }
+      System.out.println(result.toString("UTF-8"));
     }
 
     // Print result
