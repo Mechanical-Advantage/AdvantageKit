@@ -31,6 +31,30 @@ public class SwerveModule {
 }
 ```
 
+The `forceSerializable` parameter can be used to force the use of struct or Protobuf serialization for enum types, as shown in the example below. The class should inherit from [`StructSerializable`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/util/struct/StructSerializable.html), [`ProtobufSerializable`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/util/protobuf/ProtobufSerializable.html), or [`WPISerializable`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/util/WPISerializable.html).
+
+```java
+enum CustomEnum implements StructSerializable {
+    A(...),
+    B(...);
+
+    public final double value;
+    public static final Struct<ElevatorSetpoints> struct = ...;
+
+    Setpoint(double value) {
+        this.value = value;
+    }
+}
+
+@AutoLogOutput
+CustomEnum setpoint = CustomEnum.A; // Logs as an enum
+
+@AutoLogOutput(forceSerializable = true)
+CustomEnum setpoint = CustomEnum.A; // Logs as a struct
+```
+
+## Global Configuration
+
 By default, the parent class where `@AutoLogOutput` is used must be within the same package as `Robot` (or a subpackage). The following method can be called in the constructor of `Robot` to allow additional packages, such as a "lib" package outside of normal robot code:
 
 ```java
