@@ -41,7 +41,7 @@ public class DemoDrive extends SubsystemBase {
           Rotation2d.kZero,
           0.0,
           0.0,
-          new Pose2d());
+          Pose2d.kZero);
 
   @Override
   public void periodic() {
