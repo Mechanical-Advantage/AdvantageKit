@@ -13,6 +13,8 @@
 
 package org.littletonrobotics.junction;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.List;
@@ -121,11 +123,13 @@ public class LoggedRobot extends IterativeRobotBase {
         gcStatsCollector.update();
         Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
       }
-    } catch(Exception e) {
-      // Exception thrown, log crash information last minute
-      e.printStackTrace();
-      Logger.periodicAfterUser(0, 0);
-      throw e;
+    } catch (Exception exception) {
+      // Exception thrown, log crash information
+      StringWriter stringWriter = new StringWriter();
+      exception.printStackTrace(new PrintWriter(stringWriter));
+      Logger.periodicAfterUser(0, 0, stringWriter.toString());
+      Logger.end();
+      throw exception;
     }
   }
 
