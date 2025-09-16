@@ -1,15 +1,9 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction.networktables;
 
@@ -27,11 +21,10 @@ public class LoggedNetworkNumber extends LoggedNetworkInput {
   private double value;
 
   /**
-   * Creates a new LoggedNetworkNumber, for handling a number input sent via
-   * NetworkTables.
+   * Creates a new LoggedNetworkNumber, for handling a number input sent via NetworkTables.
    *
    * @param key The key for the number, published to the root table of NT or
-   *            "/DashboardInputs/{key}" when logged.
+   *     "/DashboardInputs/{key}" when logged.
    */
   public LoggedNetworkNumber(String key) {
     this.key = key;
@@ -41,11 +34,10 @@ public class LoggedNetworkNumber extends LoggedNetworkInput {
   }
 
   /**
-   * Creates a new LoggedNetworkNumber, for handling a number input sent via
-   * NetworkTables.
+   * Creates a new LoggedNetworkNumber, for handling a number input sent via NetworkTables.
    *
-   * @param key          The key for the number, published to the root table of NT
-   *                     or "/DashboardInputs/{key}" when logged.
+   * @param key The key for the number, published to the root table of NT or
+   *     "/DashboardInputs/{key}" when logged.
    * @param defaultValue The default value if no value in NT is found.
    */
   public LoggedNetworkNumber(String key, double defaultValue) {
@@ -54,34 +46,45 @@ public class LoggedNetworkNumber extends LoggedNetworkInput {
     this.value = defaultValue;
   }
 
-  /** Updates the default value, which is used if no value in NT is found. */
+  /**
+   * Updates the default value, which is used if no value in NT is found.
+   *
+   * @param defaultValue The new default value.
+   */
   public void setDefault(double defaultValue) {
     this.defaultValue = defaultValue;
     entry.set(entry.get(defaultValue));
   }
 
   /**
-   * Publishes a new value. Note that the value will not be returned by
-   * {@link #get()} until the next cycle.
+   * Publishes a new value. Note that the value will not be returned by {@link #get()} until the
+   * next cycle.
+   *
+   * @param value The new value.
    */
   public void set(double value) {
     entry.set(value);
   }
 
-  /** Returns the current value. */
+  /**
+   * Returns the current value.
+   *
+   * @return The current value.
+   */
   public double get() {
     return value;
   }
 
-  private final LoggableInputs inputs = new LoggableInputs() {
-    public void toLog(LogTable table) {
-      table.put(removeSlash(key), value);
-    }
+  private final LoggableInputs inputs =
+      new LoggableInputs() {
+        public void toLog(LogTable table) {
+          table.put(removeSlash(key), value);
+        }
 
-    public void fromLog(LogTable table) {
-      value = table.get(removeSlash(key), defaultValue);
-    }
-  };
+        public void fromLog(LogTable table) {
+          value = table.get(removeSlash(key), defaultValue);
+        }
+      };
 
   public void periodic() {
     if (!Logger.hasReplaySource()) {

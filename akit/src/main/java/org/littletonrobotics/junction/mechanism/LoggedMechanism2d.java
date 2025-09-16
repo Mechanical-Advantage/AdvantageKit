@@ -1,19 +1,9 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction.mechanism;
 
@@ -29,13 +19,11 @@ import java.util.Map.Entry;
 import org.littletonrobotics.junction.LogTable;
 
 /**
- * Visual 2D representation of arms, elevators, and general mechanisms through a
- * node-based API.
+ * Visual 2D representation of arms, elevators, and general mechanisms through a node-based API.
  *
- * <p>
- * A Mechanism2d object is published and contains at least one root node. A root
- * is the anchor point of other nodes (such as ligaments). Other nodes are
- * recursively appended based on other nodes.
+ * <p>A Mechanism2d object is published and contains at least one root node. A root is the anchor
+ * point of other nodes (such as ligaments). Other nodes are recursively appended based on other
+ * nodes.
  *
  * @see edu.wpi.first.wpilibj.smartdashboard.MechanismObject2d
  * @see edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
@@ -50,13 +38,11 @@ public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
   private StringPublisher m_colorPub;
 
   /**
-   * Create a new Mechanism2d with the given dimensions and default color (dark
-   * blue).
+   * Create a new Mechanism2d with the given dimensions and default color (dark blue).
    *
-   * <p>
-   * The dimensions represent the canvas that all the nodes are drawn on.
+   * <p>The dimensions represent the canvas that all the nodes are drawn on.
    *
-   * @param width  the width
+   * @param width the width
    * @param height the height
    */
   public LoggedMechanism2d(double width, double height) {
@@ -66,11 +52,10 @@ public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
   /**
    * Create a new Mechanism2d with the given dimensions.
    *
-   * <p>
-   * The dimensions represent the canvas that all the nodes are drawn on.
+   * <p>The dimensions represent the canvas that all the nodes are drawn on.
    *
-   * @param width           the width
-   * @param height          the height
+   * @param width the width
+   * @param height the height
    * @param backgroundColor the background color. Defaults to dark blue.
    */
   public LoggedMechanism2d(double width, double height, Color8Bit backgroundColor) {
@@ -96,13 +81,11 @@ public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
   /**
    * Get or create a root in this Mechanism2d with the given name and position.
    *
-   * <p>
-   * If a root with the given name already exists, the given x and y coordinates
-   * are not used.
+   * <p>If a root with the given name already exists, the given x and y coordinates are not used.
    *
    * @param name the root name
-   * @param x    the root x coordinate
-   * @param y    the root y coordinate
+   * @param x the root x coordinate
+   * @param y the root y coordinate
    * @return a new root joint object, or the existing one with the given name.
    */
   public synchronized LoggedMechanismRoot2d getRoot(String name, double x, double y) {
@@ -156,6 +139,11 @@ public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
     }
   }
 
+  /**
+   * Record the current value to the log. <b>This function should never be called by user code.</b>
+   *
+   * @param table The table to which data should be written.
+   */
   public synchronized void logOutput(LogTable table) {
     table.put(".type", "Mechanism2d");
     table.put(".controllable", false);

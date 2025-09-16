@@ -19,7 +19,7 @@ AdvantageKit is a logging, telemetry, and replay framework developed by Team 632
 **The steps below are required to complete a valid installation of AdvantageKit.**
 
 :::tip
-Instead of installing AdvantageKit in an existing project, consider using one of AdvantageKit's [template projects](/category/template-projects) to get started more quickly. These projects can be downloaded from the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest) and include prebuilt subsystems for **swerve drives**, **vision systems**, the **FIRST KitBot**, and more!
+Instead of installing AdvantageKit in an existing project, consider using one of AdvantageKit's [template projects](/getting-started/template-projects) to get started more quickly. These projects can be downloaded from the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest) and include prebuilt subsystems for **swerve drives**, **vision systems**, the **FIRST KitBot**, and more!
 :::
 
 1. Add the following blocks to the `build.gradle` file. Note that the lines under `dependencies` should be combined with the existing `dependencies` block.

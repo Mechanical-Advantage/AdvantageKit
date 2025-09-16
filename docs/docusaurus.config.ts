@@ -13,7 +13,7 @@ const config: Config = {
   baseUrl: "/",
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenMarkdownLinks: "throw",
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -22,6 +22,9 @@ const config: Config = {
     defaultLocale: "en",
     locales: ["en"]
   },
+
+  // Copy built Javadoc files
+  staticDirectories: ["static", "../akit/build/docs"],
 
   presets: [
     [
@@ -39,6 +42,28 @@ const config: Config = {
     ]
   ],
 
+  plugins: [
+    [
+      "@docusaurus/plugin-client-redirects",
+      {
+        redirects: [
+          {
+            to: "/getting-started/template-projects",
+            from: "/category/template-projects"
+          },
+          {
+            to: "/getting-started/common-issues",
+            from: "/category/common-issues"
+          },
+          {
+            to: "/data-flow/recording-inputs",
+            from: "/category/recording-inputs"
+          }
+        ]
+      }
+    ]
+  ],
+
   themeConfig: {
     image: "img/social.png",
     navbar: {
@@ -49,6 +74,11 @@ const config: Config = {
       },
       items: [
         {
+          href: "pathname:///javadoc",
+          label: "API Docs",
+          position: "right"
+        },
+        {
           href: "https://github.com/Mechanical-Advantage/AdvantageKit",
           label: "GitHub",
           position: "right"
@@ -56,7 +86,7 @@ const config: Config = {
       ]
     },
     footer: {
-      copyright: "Copyright © 2021-2025 FRC 6328",
+      copyright: "Copyright © 2021-2025 Littleton Robotics",
       links: [
         {
           label: "Littleton Robotics",
@@ -72,13 +102,17 @@ const config: Config = {
         }
       ]
     },
+    docs: {
+      sidebar: {
+        hideable: true
+      }
+    },
     colorMode: {
-      disableSwitch: true,
+      disableSwitch: false,
       respectPrefersColorScheme: true
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.gruvboxMaterialDark,
       additionalLanguages: ["java", "groovy"]
     },
     algolia: {

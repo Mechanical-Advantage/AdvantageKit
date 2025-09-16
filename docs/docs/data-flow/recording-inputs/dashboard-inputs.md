@@ -14,10 +14,10 @@ AdvantageKit provides several solutions to deal with this issue:
 
 - For subsystems that use NT input data (reading from coprocessors), we recommend treating the NetworkTables interaction as a hardware interface using an IO layer. See the [vision template project](/getting-started/template-projects/vision-template) as an example.
 - When reading dashboard inputs from NT (auto selector, tuning values, etc) AdvantageKit includes the following classes that correctly handle periodic logging and replay:
-  - [`LoggedDashboardChooser`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/junction/core/src/org/littletonrobotics/junction/networktables/LoggedDashboardChooser.java) - Replaces `SendableChooser` with equivalent functionality. See the example below.
-  - [`LoggedNetworkNumber`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/junction/core/src/org/littletonrobotics/junction/networktables/LoggedNetworkNumber.java) - Simple number field
-  - [`LoggedNetworkString`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/junction/core/src/org/littletonrobotics/junction/networktables/LoggedNetworkString.java) - Simple string field
-  - [`LoggedNetworkBoolean`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/junction/core/src/org/littletonrobotics/junction/networktables/LoggedNetworkBoolean.java) - Simple boolean field
+  - [`LoggedDashboardChooser`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/akit/src/main/java/org/littletonrobotics/junction/networktables/LoggedDashboardChooser.java) - Replaces `SendableChooser` with equivalent functionality. See the example below.
+  - [`LoggedNetworkNumber`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/akit/src/main/java/org/littletonrobotics/junction/networktables/LoggedNetworkNumber.java) - Simple number field
+  - [`LoggedNetworkString`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/akit/src/main/java/org/littletonrobotics/junction/networktables/LoggedNetworkString.java) - Simple string field
+  - [`LoggedNetworkBoolean`](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/akit/src/main/java/org/littletonrobotics/junction/networktables/LoggedNetworkBoolean.java) - Simple boolean field
 
 Example use of `LoggedDashboardChooser` for auto routines in a command-based project:
 

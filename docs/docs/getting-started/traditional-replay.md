@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-# How To: Traditional Replay
+# ⏪ How To: Traditional Replay
 
 ## Setup
 
@@ -51,8 +51,8 @@ We recommend **disabling the sim GUI** when running in replay. The GUI is disabl
 
 ## Replay Bubble
 
-The most straightforward uses of replay involve [logging additional outputs](./what-is-advantagekit/example-output-logging.md). Code can also be modified when running in log replay. However, this use case comes with limitations as **modified outputs cannot affect replayed inputs**. This issue is discussed in more detail in the clip below, which is part of 6328's [2024 Championship Conference](./what-is-advantagekit/champs-conference.md).
+The most straightforward uses of replay involve [logging additional outputs](./what-is-advantagekit/example-output-logging.md). Code can also be modified when running in log replay. However, this use case comes with limitations as **modified outputs cannot affect replayed inputs**. This issue is discussed in more detail in the clip below, which is part of 6328's [2025 Championship Conference](./what-is-advantagekit/champs-conference.md).
 
-<iframe width="100%" style={{"aspect-ratio": "16 / 9"}} src="https://www.youtube.com/embed/BrzPw6ngx4o?start=1676&end=1841" title="FRC Log Replay and Simulation (2024) -  FRC 6328 FIRST Championship Conference" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="100%" style={{"aspect-ratio": "16 / 9"}} src="https://www.youtube.com/embed/8FfwFQcvRmU?start=1957" title="FRC Log Replay and Simulation (2025) -  FRC 6328 FIRST Championship Conference" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ![Replay bubble](./img/replay-bubble.png)

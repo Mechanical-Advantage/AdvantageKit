@@ -1,27 +1,25 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
-package org.littletonrobotics.junction.inputs;
+package org.littletonrobotics.junction;
 
+import edu.wpi.first.networktables.ConnectionInfo;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import java.nio.ByteBuffer;
+import java.util.HashSet;
+import java.util.Set;
 import org.littletonrobotics.conduit.ConduitApi;
-import org.littletonrobotics.junction.LogTable;
 
-/**
- * Manages logging general system data.
- */
-public class LoggedSystemStats {
-  private LoggedSystemStats() {
-  }
+/** Manages logging general system data. */
+class LoggedSystemStats {
+  private static Set<String> lastNTRemoteIds = new HashSet<>();
+  private static ByteBuffer ntIntBuffer = ByteBuffer.allocate(4);
+
+  private LoggedSystemStats() {}
 
   public static void saveToLog(LogTable table) {
     // Update inputs from conduit
@@ -67,5 +65,28 @@ public class LoggedSystemStats {
     table.put("CANBus/TransmitErrorCount", conduit.getTransmitErrorCount());
 
     table.put("EpochTimeMicros", conduit.getEpochTime());
+
+    // Log NT client list
+    final var ntClientsTable = table.getSubtable("NTClients");
+    ConnectionInfo[] ntConnections = NetworkTableInstance.getDefault().getConnections();
+    Set<String> ntRemoteIds = new HashSet<>();
+
+    for (int i = 0; i < ntConnections.length; i++) {
+      lastNTRemoteIds.remove(ntConnections[i].remote_id);
+      ntRemoteIds.add(ntConnections[i].remote_id);
+      final var ntClientTable = ntClientsTable.getSubtable(ntConnections[i].remote_id);
+
+      ntClientTable.put("Connected", true);
+      ntClientTable.put("IPAddress", ntConnections[i].remote_ip);
+      ntClientTable.put("RemotePort", ntConnections[i].remote_port);
+      ntIntBuffer.rewind();
+      ntClientTable.put(
+          "ProtocolVersion", ntIntBuffer.putInt(ntConnections[i].protocol_version).array());
+    }
+
+    for (var remoteId : lastNTRemoteIds) {
+      ntClientsTable.put(remoteId + "/Connected", false);
+    }
+    lastNTRemoteIds = ntRemoteIds;
   }
 }
