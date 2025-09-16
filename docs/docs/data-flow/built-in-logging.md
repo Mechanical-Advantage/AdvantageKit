@@ -2,12 +2,12 @@
 sidebar_position: 2
 ---
 
-# Built-In Logging
+# 🗒️ Built-In Logging
 
 AdvantageKit automatically logs many important fields as inputs or outputs. No configuration is required to use these features.
 
 :::info
-Built-in input values are available during replay with guaranteed accuracy, and can be freely accessed in user code without manual logging. **All other inputs must be logged using an [IO interface](./recording-inputs/io-interfaces.md).**
+Built-in input values are available during replay with guaranteed accuracy and can be freely accessed in user code without manual logging. **All other inputs must be logged using an [IO interface](./recording-inputs/io-interfaces.md).**
 :::
 
 ## Inputs
@@ -38,7 +38,7 @@ The state of any alerts created through WPILib's [persistent alerts](https://doc
 
 ### Console
 
-Console output is automatically logged by AdvantageKit to the `Console"`field, and can be viewed using AdvantageScope's 💬 [Console](https://docs.advantagescope.org/tab-reference/console) tab. This field are available under the `RealOutputs` or `ReplayOutputs` table.
+Console output is automatically logged by AdvantageKit to the `Console` field, and can be viewed using AdvantageScope's 💬 [Console](https://docs.advantagescope.org/tab-reference/console) tab. This field is available under the `RealOutputs` or `ReplayOutputs` table.
 
 :::info
 Output from native code is not included when running in simulation.
@@ -54,15 +54,21 @@ Status data from the VH-109 radio is automatically logged every ~5 seconds. This
 
 ### Power Distribution Data
 
-The current on each channel, along with other useful stats, are automatically logged by AdvantageKit as outputs. The `LoggedPowerDistribution` class can be used to configure this behavior, such as manually setting the Power Distribution CAN ID. These fields are available under the `PowerDistribution` table.
+The current on each channel, along with other useful stats, are automatically logged by AdvantageKit as outputs under the `PowerDistribution` table. This feature works by default when using the CTRE PDP or REV PDH configured to the default CAN ID (ID 0 for the PDP and ID 1 for the PDH).
 
 :::warning
 This feature is only supported on Power Distribution devices that support current monitoring (the CTRE PDP and REV PDH). The CTRE PDP 2.0 is **not supported**.
 :::
 
+The `LoggedPowerDistribution` class can be used manually configure the power distribution type and CAN ID when not using the default configuration. This can be accomplished by adding the line below to the `Robot` constructor before `Logger.start()`:
+
+```java
+LoggedPowerDistribution.getInstance(50, ModuleType.kRev); // Example: PDH on CAN ID 50
+```
+
 ### System Stats
 
-Important status information from the roboRIO is automatically recorded, such as the battery voltage, rail status, CAN status, and system time. These fields are available under the `SystemStats` table.
+Important status information from the roboRIO is automatically recorded, such as the battery voltage, rail status, CAN status, system time, and NT client connections. These fields are available under the `SystemStats` table.
 
 ### Performance Data
 
@@ -72,6 +78,6 @@ Several important fields are automatically recorded to measure the performance o
 - `LoggedRobot/UserCodeMs`: The execution time of all user periodic code.
 - `LoggedRobot/LogPeriodicMS`: The execution time of all AdvantageKit periodic code.
 - `LoggedRobot/GCTimeMS`: The total execution time of the Java garbage collector within the last loop cycle, may or may not overlap with other code execution.
-- `LoggedRobot/GCCount`: The total number of collections performance by the Java garbage collector within the last loop cycle.
+- `LoggedRobot/GCCount`: The total number of collections performed by the Java garbage collector within the last loop cycle.
 - `Logger/QueuedCycle`: The number of cycles of data in queue to be written to data receivers.
-- `Logger/...MS`: The excution time of each step of the AdvantageKit periodic code.
+- `Logger/...MS`: The execution time of each step of the AdvantageKit periodic code.

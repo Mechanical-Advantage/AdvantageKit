@@ -4,6 +4,12 @@
 # Ignore Gradle build output directory
 build
 
+# Java bin directory
+bin
+
+# Generated templates
+/template_projects/generated
+
 ### macOS ###
 # General
 .DS_Store

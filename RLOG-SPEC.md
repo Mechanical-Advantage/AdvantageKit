@@ -4,7 +4,7 @@
 
 The first byte represents the log format revision. The decoding device should always check whether it supports the specified revision before continuing. Below is a list of possible revisions:
 
-- R1 = Supported by AdvantageKit v0.0.1-v1.8.1 and v2.2.0-v3.1.1. Uses a predefined set of field types.
+- R1 = Supported by AdvantageKit v0.0.1-v1.8.1 and v2.2.0-latest. Uses a predefined set of field types.
 - R2 = Supported by AdvantageKit v3.2.0 and newer. Uses string names for field types.
 
 All values are stored in big endian order.
@@ -37,7 +37,7 @@ Field messages represent a change to a single value. The structure of these mess
 
 1. Key ID (short, 2 bytes)
 2. Value type (1 byte) - Only if RLOG R1
-2. Value length (short, 2 bytes) - Only if RLOG R2
+3. Value length (short, 2 bytes) - Only if RLOG R2
 
 For RLOG R2, the value can follow any format. By default, use the [WPILOG-specified data types](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc#data-types).
 

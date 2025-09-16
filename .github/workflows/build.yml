@@ -21,6 +21,8 @@ jobs:
           java-version: "17"
       - name: "Install RoboRIO toolchain"
         run: ./gradlew :akit:installRoboRioToolchain
+      - name: "Check formatting"
+        run: ./gradlew spotlessCheck
       - name: "Build and test"
         run: ./gradlew :akit:build -Ponlylinuxathena
       - name: "Development: Publish local"
@@ -40,8 +42,8 @@ jobs:
         if: github.event_name == 'release'
         run: ./gradlew :akit:publish -Ponlylinuxathena "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
         env:
-          GITHUB_ACTOR: Mechanical-Advantage
-          GITHUB_TOKEN: ${{ github.token }}
+          ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: "Release: Upload vendordep"
         if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
@@ -55,29 +57,108 @@ jobs:
       - name: "Upload local repo"
         uses: actions/upload-artifact@v4
         with:
-          name: maven_Athena
+          name: maven_linuxathena
           path: akit/build/repos/releases
+      - name: "Generate template projects"
+        working-directory: template_projects
+        run: |
+          chmod +x generate_projects.sh
+          ./generate_projects.sh
+      - name: "Upload template projects"
+        uses: actions/upload-artifact@v4
+        with:
+          name: template_projects
+          path: template_projects/generated
+      - name: "Release: Upload template project (kitbot_2025)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: template_projects/generated/kitbot_2025.zip
+          asset_name: AdvantageKit_KitBot2025Template.zip
+          asset_content_type: application/zip
+      - name: "Release: Upload template project (diff_drive)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: template_projects/generated/diff_drive.zip
+          asset_name: AdvantageKit_DiffDriveTemplate.zip
+          asset_content_type: application/zip
+      - name: "Release: Upload template project (spark_swerve)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: template_projects/generated/spark_swerve.zip
+          asset_name: AdvantageKit_SparkSwerveTemplate.zip
+          asset_content_type: application/zip
+      - name: "Release: Upload template project (talonfx_swerve)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: template_projects/generated/talonfx_swerve.zip
+          asset_name: AdvantageKit_TalonFXSwerveTemplate.zip
+          asset_content_type: application/zip
+      - name: "Release: Upload template project (vision)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: template_projects/generated/vision.zip
+          asset_name: AdvantageKit_VisionTemplate.zip
+          asset_content_type: application/zip
+      - name: "Release: Upload template project (skeleton)"
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: template_projects/generated/skeleton.zip
+          asset_name: AdvantageKit_SkeletonTemplate.zip
+          asset_content_type: application/zip
 
   build-desktop:
     strategy:
       matrix:
         include:
-          - name: "Linux"
-            runner-image: ubuntu-latest
+          - name: "Linux (x64)"
+            runner-image: ubuntu-22.04
             classifier: "linuxx86-64"
+            container: ""
+          - name: "Linux (arm64)"
+            runner-image: ubuntu-22.04
+            classifier: "linuxarm64"
+            container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
           - name: "macOS"
             runner-image: macos-latest
             classifier: "osxuniversal"
+            container: ""
           - name: "Windows"
             runner-image: windows-latest
             classifier: "windowsx86-64"
+            container: ""
     name: "Build for ${{ matrix.name }}"
     runs-on: ${{ matrix.runner-image }}
+    container: ${{ matrix.container }}
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
       - name: "Setup Java"
         uses: actions/setup-java@v3
+        if: matrix.classifier != 'linuxarm64'
         with:
           distribution: "temurin"
           java-version: "17"
@@ -86,7 +167,9 @@ jobs:
         with:
           python-version: "3.13"
       - name: "Install Python dependencies"
-        run: pip install requests
+        uses: BSFishy/pip-action@v1
+        with:
+          packages: requests
       - name: "Build and test"
         run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1
       - name: "Development: Publish local"
@@ -102,11 +185,11 @@ jobs:
       - name: "Release: Publish zip"
         if: github.event_name == 'release'
         run: |
-          python publish_zip.py --url https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit --group_id org.littletonrobotics.akit --artifact_id akit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.classifier }} --file_path akit/build/outputs/_M__GROUP_org_littletonrobotics_akit_ID_akit-wpilibio_CLS-${{ matrix.classifier }}.zip --username Mechanical-Advantage --access_token ${{ secrets.GITHUB_TOKEN }}
+          python publish_zip.py --url https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release --group_id org.littletonrobotics.akit --artifact_id akit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.classifier }} --file_path akit/build/outputs/_M__GROUP_org_littletonrobotics_akit_ID_akit-wpilibio_CLS-${{ matrix.classifier }}.zip --username ${{ secrets.ARTIFACTORY_USERNAME }} --password ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: "Upload local repo"
         uses: actions/upload-artifact@v4
         with:
-          name: maven_${{ matrix.name }}
+          name: maven_${{ matrix.classifier }}
           path: akit/build/repos/releases
 
   combine:
@@ -117,29 +200,35 @@ jobs:
       - name: "Download Athena"
         uses: actions/download-artifact@v4
         with:
-          name: maven_Athena
-          path: maven_Athena
-      - name: "Download Linux"
+          name: maven_linuxathena
+          path: maven_linuxathena
+      - name: "Download Linux (x64)"
         uses: actions/download-artifact@v4
         with:
-          name: maven_Linux
-          path: maven_Linux
+          name: maven_linuxx86-64
+          path: maven_linuxx86-64
+      - name: "Download Linux (arm64)"
+        uses: actions/download-artifact@v4
+        with:
+          name: maven_linuxarm64
+          path: maven_linuxarm64
       - name: "Download macOS"
         uses: actions/download-artifact@v4
         with:
-          name: maven_macOS
-          path: maven_macOS
+          name: maven_osxuniversal
+          path: maven_osxuniversal
       - name: "Download Windows"
         uses: actions/download-artifact@v4
         with:
-          name: maven_Windows
-          path: maven_Windows
+          name: maven_windowsx86-64
+          path: maven_windowsx86-64
       - name: "Combine"
         run: |
-          rsync -a maven_Athena/* maven_offline
-          rsync -a maven_macOS/* maven_offline
-          rsync -a maven_Linux/* maven_offline
-          rsync -a maven_Windows/* maven_offline
+          rsync -a maven_linuxathena/* maven_offline
+          rsync -a maven_linuxx86-64/* maven_offline
+          rsync -a maven_linuxarm64/* maven_offline
+          rsync -a maven_osxuniversal/* maven_offline
+          rsync -a maven_windowsx86-64/* maven_offline
           zip -r maven_offline.zip maven_offline
       - name: "Upload artifact"
         uses: actions/upload-artifact@v4
@@ -162,3 +251,32 @@ jobs:
           asset_path: maven_offline.zip
           asset_name: maven_offline.zip
           asset_content_type: application/zip
+
+  build-docs:
+    name: "Build Docs"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      - name: "Setup Java"
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: docs/package-lock.json
+      - name: "Install Node.js dependencies"
+        run: cd docs && npm ci
+      - name: "Build Javadoc"
+        run: ./gradlew :akit:javadoc
+      - name: "Build docs"
+        run: cd docs && npm run build
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: docs/build/

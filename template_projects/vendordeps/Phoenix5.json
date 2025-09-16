@@ -1,0 +1,171 @@
+{
+    "fileName": "Phoenix5-frc2025-latest.json",
+    "name": "CTRE-Phoenix (v5)",
+    "version": "5.35.1",
+    "frcYear": "2025",
+    "uuid": "ab676553-b602-441f-a38d-f1296eff6537",
+    "mavenUrls": [
+        "https://maven.ctr-electronics.com/release/"
+    ],
+    "jsonUrl": "https://maven.ctr-electronics.com/release/com/ctre/phoenix/Phoenix5-frc2025-latest.json",
+    "requires": [
+        {
+            "uuid": "e995de00-2c64-4df5-8831-c1441420ff19",
+            "errorMessage": "Phoenix 5 requires low-level libraries from Phoenix 6.  Please add the Phoenix 6 vendordep before adding Phoenix 5.",
+            "offlineFileName": "Phoenix6-frc2025-latest.json",
+            "onlineUrl": "https://maven.ctr-electronics.com/release/com/ctre/phoenix6/latest/Phoenix6-frc2025-latest.json"
+        }
+    ],
+    "conflictsWith": [
+        {
+            "uuid": "e7900d8d-826f-4dca-a1ff-182f658e98af",
+            "errorMessage": "Users must use the Phoenix 5 replay vendordep when using the Phoenix 6 replay vendordep.",
+            "offlineFileName": "Phoenix6-replay-frc2025-latest.json"
+        },
+        {
+            "uuid": "fbc886a4-2cec-40c0-9835-71086a8cc3df",
+            "errorMessage": "Users cannot have both the replay and regular Phoenix 5 vendordeps in their robot program.",
+            "offlineFileName": "Phoenix5-replay-frc2025-latest.json"
+        }
+    ],
+    "javaDependencies": [
+        {
+            "groupId": "com.ctre.phoenix",
+            "artifactId": "api-java",
+            "version": "5.35.1"
+        },
+        {
+            "groupId": "com.ctre.phoenix",
+            "artifactId": "wpiapi-java",
+            "version": "5.35.1"
+        }
+    ],
+    "jniDependencies": [
+        {
+            "groupId": "com.ctre.phoenix",
+            "artifactId": "cci",
+            "version": "5.35.1",
+            "isJar": false,
+            "skipInvalidPlatforms": true,
+            "validPlatforms": [
+                "windowsx86-64",
+                "linuxx86-64",
+                "linuxarm64",
+                "linuxathena"
+            ],
+            "simMode": "hwsim"
+        },
+        {
+            "groupId": "com.ctre.phoenix.sim",
+            "artifactId": "cci-sim",
+            "version": "5.35.1",
+            "isJar": false,
+            "skipInvalidPlatforms": true,
+            "validPlatforms": [
+                "windowsx86-64",
+                "linuxx86-64",
+                "linuxarm64",
+                "osxuniversal"
+            ],
+            "simMode": "swsim"
+        }
+    ],
+    "cppDependencies": [
+        {
+            "groupId": "com.ctre.phoenix",
+            "artifactId": "wpiapi-cpp",
+            "version": "5.35.1",
+            "libName": "CTRE_Phoenix_WPI",
+            "headerClassifier": "headers",
+            "sharedLibrary": true,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "windowsx86-64",
+                "linuxx86-64",
+                "linuxarm64",
+                "linuxathena"
+            ],
+            "simMode": "hwsim"
+        },
+        {
+            "groupId": "com.ctre.phoenix",
+            "artifactId": "api-cpp",
+            "version": "5.35.1",
+            "libName": "CTRE_Phoenix",
+            "headerClassifier": "headers",
+            "sharedLibrary": true,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "windowsx86-64",
+                "linuxx86-64",
+                "linuxarm64",
+                "linuxathena"
+            ],
+            "simMode": "hwsim"
+        },
+        {
+            "groupId": "com.ctre.phoenix",
+            "artifactId": "cci",
+            "version": "5.35.1",
+            "libName": "CTRE_PhoenixCCI",
+            "headerClassifier": "headers",
+            "sharedLibrary": true,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "windowsx86-64",
+                "linuxx86-64",
+                "linuxarm64",
+                "linuxathena"
+            ],
+            "simMode": "hwsim"
+        },
+        {
+            "groupId": "com.ctre.phoenix.sim",
+            "artifactId": "wpiapi-cpp-sim",
+            "version": "5.35.1",
+            "libName": "CTRE_Phoenix_WPISim",
+            "headerClassifier": "headers",
+            "sharedLibrary": true,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "windowsx86-64",
+                "linuxx86-64",
+                "linuxarm64",
+                "osxuniversal"
+            ],
+            "simMode": "swsim"
+        },
+        {
+            "groupId": "com.ctre.phoenix.sim",
+            "artifactId": "api-cpp-sim",
+            "version": "5.35.1",
+            "libName": "CTRE_PhoenixSim",
+            "headerClassifier": "headers",
+            "sharedLibrary": true,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "windowsx86-64",
+                "linuxx86-64",
+                "linuxarm64",
+                "osxuniversal"
+            ],
+            "simMode": "swsim"
+        },
+        {
+            "groupId": "com.ctre.phoenix.sim",
+            "artifactId": "cci-sim",
+            "version": "5.35.1",
+            "libName": "CTRE_PhoenixCCISim",
+            "headerClassifier": "headers",
+            "sharedLibrary": true,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "windowsx86-64",
+                "linuxx86-64",
+                "linuxarm64",
+                "osxuniversal"
+            ],
+            "simMode": "swsim"
+        }
+    ]
+}

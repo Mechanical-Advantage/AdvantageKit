@@ -4,7 +4,9 @@
   "version": "${version}",
   "uuid": "d820cc26-74e3-11ec-90d6-0242ac120003",
   "frcYear": "${frcYear}",
-  "mavenUrls": [],
+  "mavenUrls": [
+    "https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release/"
+  ],
   "jsonUrl": "https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest/download/AdvantageKit.json",
   "javaDependencies": [
     {
@@ -22,9 +24,10 @@
       "isJar": false,
       "validPlatforms": [
         "linuxathena",
-        "windowsx86-64",
         "linuxx86-64",
-        "osxuniversal"
+        "linuxarm64",
+        "osxuniversal",
+        "windowsx86-64"
       ]
     }
   ],

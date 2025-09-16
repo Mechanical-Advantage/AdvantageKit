@@ -27,7 +27,7 @@ CTRE's [signal logging](https://v6.docs.ctr-electronics.com/en/stable/docs/api-r
 :::warning
 Hoot Replay is **non-deterministic**, which means that **no guarantee is made that replayed robot code will match the behavior of the real robot**. It is best used when debugging issues of limited scope that are highly dependent on Phoenix APIs.
 
-The accuracy of Hoot Replay is **affected by the speed of replay**, which limits its utility when running faster than real time or rapidly iterating on code.
+The accuracy of Hoot Replay is **affected by the speed of replay**, which limits its utility when running faster than real-time or rapidly iterating on code.
 :::
 
 Hoot logging is enabled by default and **does not require architecture changes to code**. This enables replay of simple logic (such as non-vision odometry) without requiring any code changes. However, replaying high-level logic dependent on non-Phoenix data (such as joysticks or vision inputs) may require code architecture changes to log and replay custom user signals.
@@ -37,7 +37,7 @@ Hoot logging is enabled by default and **does not require architecture changes t
 AdvantageKit guarantees **deterministic replay of robot code in simulation**, allowing for [additional fields to be logged](./example-output-logging.md) or [code logic to be adjusted](./example-bug-fixes.md) in replay with complete certainty of the original and adjusted behavior of the real robot. AdvantageKit **guarantees that the replayed robot code will match the behavior of the real robot**. Deterministic replay enables several important features of AdvantageKit:
 
 - Debug in replay with complete trust that **changes will be reflected as intended** on the real robot.
-- Replay logs at **any speed** without losing accuracy. This allows entire log files to be replayed many times faster than real-time, allowing for [**rapid iteration and testing**](./example-rapid-iteration.md) in replay. Plus, [Replay Watch](../replay-watch.md) allows code to be **replayed automatically without needed to repeatedly launch simulation**.
+- Replay logs at **any speed** without losing accuracy. This allows entire log files to be replayed many times faster than real-time, allowing for [**rapid iteration and testing**](./example-rapid-iteration.md) in replay. Plus, [Replay Watch](../replay-watch.md) allows code to be **replayed automatically without needing to repeatedly launch simulation**.
 - AdvantageKit automatically **merges original and replayed fields** in the same output log file, allowing for easy comparison. Replayed logs are **automatically opened in AdvantageScope.**
 - Breakpoints can be used to pause replay and **inspect code line-by-line** with no impact on replay accuracy.
 

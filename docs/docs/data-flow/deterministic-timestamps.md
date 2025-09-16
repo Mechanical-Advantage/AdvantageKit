@@ -2,11 +2,11 @@
 sidebar_position: 5
 ---
 
-# Deterministic Timestamps
+# ⏰ Deterministic Timestamps
 
 ### The Problem
 
-To guarantee accurate replay, all of the data used by the robot code must be included in the log file and replayed in simulation. This includes the current timestamp, which may be used for calculations in control loops. WPILib's default behavior is to read the timestamp directly from the FPGA every time a method like `Timer.getTimestamp()` is called. Every return value will be slightly different as the timestamp continues increasing throughout each loop cycle. This behavior is problematic for AdvantageKit replay, because the return values from those method calls are not logged and **cannot be accurately replayed in simulation**.
+To guarantee accurate replay, all of the data used by the robot code must be included in the log file and replayed in simulation. This includes the current timestamp, which may be used for calculations in control loops. WPILib's default behavior is to read the timestamp directly from the FPGA every time a method like `Timer.getTimestamp()` is called. Every return value will be slightly different as the timestamp continues increasing throughout each loop cycle. This behavior is problematic for AdvantageKit replay because the return values from those method calls are not logged and **cannot be accurately replayed in simulation**.
 
 AdvantageKit's solution is to use _synchronized timestamps_. The timestamp is read once from the FPGA at the start of the loop cycle and injected into WPILib. By default, all calls to `Timer.getTimestamp()` or similar return the synchronized timestamp from AdvantageKit instead of the "real" FPGA time. During replay, the logged timestamp is used for each loop cycle. The result is that all of the control logic is _deterministic_ and will **exactly match the behavior of the real robot**.
 

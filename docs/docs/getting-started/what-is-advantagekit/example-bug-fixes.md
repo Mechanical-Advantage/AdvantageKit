@@ -8,7 +8,7 @@ In addition to analyzing the robot code's behavior, we can also use replay to te
 
 ![Original odometry](img/example-6.gif)
 
-This movement is clearly impossible. Note that the Limelight on the robot is facing backwards, and couldn't possibly have detected the target at the center of the field when the position initially jumps across the field. Let's use the log data to dig deeper. The vision pipeline is based on the four detected corners of each piece of vision tape around the target. Plotting these points, we would expect to see a smooth curve like the image on the left. There are five pieces of tape with distinct corners. Instead, during this moment in the log we see the points to the right.
+This movement is clearly impossible. Note that the Limelight on the robot is facing backward, and couldn't possibly have detected the target at the center of the field when the position initially jumps across the field. Let's use the log data to dig deeper. The vision pipeline is based on the four detected corners of each piece of vision tape around the target. Plotting these points, we would expect to see a smooth curve like the image on the left. There are five pieces of tape with distinct corners. Instead, during this moment in the log, we see the points to the right.
 
 ![Vision data](img/example-7.png)
 
@@ -22,8 +22,8 @@ if (inputs.cornerX.length % 4 == 0 && inputs.cornerX.length == inputs.cornerY.le
 }
 ```
 
-After making this change, we run the code in replay and check the "ReplayOutputs". Unlike the first example, we've modified the original code and would expect the odometry to be different in replay. Here's the same clip as before, with the transluent robot representing the robot pose in replay:
+After making this change, we run the code in replay and check the "ReplayOutputs". Unlike the first example, we've modified the original code and would expect the odometry to be different in replay. Here's the same clip as before, with the translucent robot representing the robot pose in replay:
 
 ![Replayed odometry](img/example-8.gif)
 
-The adjusted code now properly rejects the invalid target and accepts the valid one (notice that real and replay poses converge when the robot is pointed towards the real target). We can now run this code in future matches with confidence, because we know exactly what the code _would have done if this new version was running on the field._
+The adjusted code now properly rejects the invalid target and accepts the valid one (notice that real and replay poses converge when the robot is pointed toward the real target). We can now run this code in future matches with confidence, because we know exactly what the code _would have done if this new version was running on the field._

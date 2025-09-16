@@ -1,15 +1,9 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction;
 
@@ -39,7 +33,7 @@ class RecordStruct implements Struct {
   private final List<BiConsumer<ByteBuffer, Object>> packFunctions = new ArrayList<>();
   private final List<Function<ByteBuffer, Object>> unpackFunctions = new ArrayList<>();
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "unused"})
   public RecordStruct(Class<?> recordClass) {
     this.recordClass = recordClass;
     typeName = recordClass.getSimpleName();
@@ -213,8 +207,7 @@ class RecordStruct implements Struct {
                   + recordClass.getSimpleName()
                   + "\"",
               true);
-          packFunctions.add((ByteBuffer bb, Object record) -> {
-          });
+          packFunctions.add((ByteBuffer bb, Object record) -> {});
           unpackFunctions.add((ByteBuffer bb) -> null);
         } else {
           size += struct.getSize();
@@ -245,8 +238,7 @@ class RecordStruct implements Struct {
                 + recordClass.getSimpleName()
                 + "\" uses an unsupported type and will not be logged. Check the AdvantageKit documentation for details on record logging.",
             true);
-        packFunctions.add((ByteBuffer bb, Object record) -> {
-        });
+        packFunctions.add((ByteBuffer bb, Object record) -> {});
         unpackFunctions.add((ByteBuffer bb) -> null);
       }
     }

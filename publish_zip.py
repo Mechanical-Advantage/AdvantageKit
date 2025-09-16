@@ -1,18 +1,26 @@
+# Copyright (c) 2021-2025 Littleton Robotics
+# http://github.com/Mechanical-Advantage
+#
+# Use of this source code is governed by a BSD
+# license that can be found in the LICENSE file
+# at the root directory of this project.
+
 import argparse
 import requests
+from requests.auth import HTTPBasicAuth
 import hashlib
 import os
 
 # Parse command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("--url", help="URL of maven repository")
-parser.add_argument("--group_id", help="GroupID of the artifact")
+parser.add_argument("--group_id", help="Group ID of the artifact")
 parser.add_argument("--artifact_id", help="Artifact ID of the artifact")
 parser.add_argument("--version", help="Version of the artifact")
 parser.add_argument("--classifier", help="Classifier of the artifact")
 parser.add_argument("--file_path", help="File path of the zip file to be published")
-parser.add_argument("--username", help="GitHub username")
-parser.add_argument("--access_token", help="GitHub personal access token")
+parser.add_argument("--username", help="Maven username")
+parser.add_argument("--password", help="Maven password")
 args = parser.parse_args()
 
 # Upload URL
@@ -54,36 +62,32 @@ if url.startswith(file_prefix):
         f.write(md5_content)
 
 else:
-    # Set the headers for the HTTP requests
-    headers = {
-        "Authorization": f"token {args.access_token}",
-        "Content-Type": "application/octet-stream",
-        "Accept": "application/vnd.github.v3+json"
-    }
+    # Set up auth for the HTTP requests
+    auth = HTTPBasicAuth(args.username, args.password)
 
     # Make the HTTP request to publish the zip file
-    response_zip = requests.put(url, headers=headers, data=zip_data)
+    response_zip = requests.put(url, auth=auth, data=zip_data)
 
     # Check the status code of the response
     if response_zip.status_code == 200 or response_zip.status_code == 201:
-        print("Zip file published to GitHub Packages Maven.")
+        print("Zip file published to Maven.")
     else:
         print(f"Error: {response_zip.status_code} - {response_zip.content.decode()}")
 
     # Make the HTTP request to publish the sha256 file
-    response_sha256 = requests.put(f"{url}.sha256", headers=headers, data=sha256_content)
+    response_sha256 = requests.put(f"{url}.sha256", auth=auth, data=sha256_content)
 
     # Check the status code of the response
     if response_sha256.status_code == 200 or response_sha256.status_code == 201:
-        print("SHA-256 file published to GitHub Packages Maven.")
+        print("SHA-256 file published to Maven.")
     else:
         print(f"Error: {response_sha256.status_code} - {response_sha256.content.decode()}")
 
     # Make the HTTP request to publish the md5 file
-    response_md5 = requests.put(f"{url}.md5", headers=headers, data=md5_content)
+    response_md5 = requests.put(f"{url}.md5", auth=auth, data=md5_content)
 
     # Check the status code of the response
     if response_md5.status_code == 200 or response_md5.status_code == 201:
-        print("MD5 file published to GitHub Packages Maven.")
+        print("MD5 file published to Maven.")
     else:
         print(f"Error: {response_md5.status_code} - {response_md5.content.decode()}")

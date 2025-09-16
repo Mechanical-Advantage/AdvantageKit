@@ -1,19 +1,15 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -30,14 +26,25 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Entry-point for replay watch functionality. Check the <a href=
+ * "https://docs.advantagekit.org/getting-started/replay-watch">documentation</a> for details.
+ */
 public class ReplayWatch {
   private static WatchService watcher;
   private static Map<WatchKey, Path> keys;
 
-  private ReplayWatch() {
-  }
+  private ReplayWatch() {}
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  /**
+   * Launch replay watch. Check the <a href=
+   * "https://docs.advantagekit.org/getting-started/replay-watch">documentation</a> for details.
+   *
+   * @param args Command line arguments, unused.
+   * @throws IOException If an IO error occurs.
+   * @throws InterruptedException If the thread is interrupted.
+   */
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public static void main(String[] args) throws IOException, InterruptedException {
     // Find input log
     String inputLog = LogFileUtil.findReplayLogEnvVar();
@@ -46,13 +53,18 @@ public class ReplayWatch {
     }
     if (inputLog == null) {
       System.out.println(
-          "No input log available for replay watch, please provide with the \"" + LogFileUtil.environmentVariable
+          "No input log available for replay watch, please provide with the \""
+              + LogFileUtil.environmentVariable
               + "\" environment variable or through AdvantageScope.");
       System.exit(1);
     }
 
+    // Check for spotless
+    System.out.print("[AdvantageKit] Starting...\r");
+    boolean hasSpotless = isSpotlessInstalled();
+
     // Run initial replay
-    launchReplay(inputLog);
+    launchReplay(inputLog, hasSpotless);
 
     // Create directory watcher
     watcher = FileSystems.getDefault().newWatchService();
@@ -114,26 +126,34 @@ public class ReplayWatch {
 
       // New update, run replay
       if (isNewUpdate && System.currentTimeMillis() - lastReplay > 250) {
-        launchReplay(inputLog);
+        launchReplay(inputLog, hasSpotless);
         lastReplay = System.currentTimeMillis();
       }
     }
   }
 
-  private static void launchReplay(String inputLog) throws IOException, InterruptedException {
+  private static void launchReplay(String inputLog, boolean hasSpotless)
+      throws IOException, InterruptedException {
     System.out.print("[AdvantageKit] Replay active... (0.0s)\r");
 
     // Launch Gradle
     boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-    var gradleBuilder = new ProcessBuilder(
-        isWindows ? "gradlew.bat" : "./gradlew",
-        "simulateJava",
-        "-x",
-        "test",
-        "-x",
-        "spotlessApply",
-        "-x",
-        "spotlessCheck");
+    var gradleBuilder =
+        new ProcessBuilder(
+            hasSpotless
+                ? new String[] {
+                  isWindows ? "gradlew.bat" : "./gradlew",
+                  "simulateJava",
+                  "-x",
+                  "test",
+                  "-x",
+                  "spotlessApply",
+                  "-x",
+                  "spotlessCheck"
+                }
+                : new String[] {
+                  isWindows ? "gradlew.bat" : "./gradlew", "simulateJava", "-x", "test"
+                });
     gradleBuilder.environment().put(LogFileUtil.environmentVariable, inputLog);
     var gradle = gradleBuilder.start();
 
@@ -142,8 +162,10 @@ public class ReplayWatch {
     long startTime = System.currentTimeMillis();
     while (gradle.isAlive()) {
       Thread.sleep(100);
-      System.out.print("[AdvantageKit] Replay active... ("
-          + formatter.format((System.currentTimeMillis() - startTime) * 1.0e-3) + "s)\r");
+      System.out.print(
+          "[AdvantageKit] Replay active... ("
+              + formatter.format((System.currentTimeMillis() - startTime) * 1.0e-3)
+              + "s)\r");
     }
 
     // Print result
@@ -154,27 +176,46 @@ public class ReplayWatch {
     }
   }
 
-  /**
-   * Register the given directory with the WatchService
-   */
+  private static boolean isSpotlessInstalled() throws IOException, InterruptedException {
+    // Launch Gradle
+    boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+    var gradleBuilder = new ProcessBuilder(isWindows ? "gradlew.bat" : "./gradlew", "tasks");
+    var gradle = gradleBuilder.start();
+
+    // Read Gradle output
+    BufferedReader reader = new BufferedReader(new InputStreamReader(gradle.getInputStream()));
+    StringBuilder builder = new StringBuilder();
+    String line = null;
+    while ((line = reader.readLine()) != null) {
+      builder.append(line);
+      builder.append(System.getProperty("line.separator"));
+    }
+    String result = builder.toString();
+    return result.contains("spotless");
+  }
+
+  /** Register the given directory with the WatchService */
   private static void register(Path dir) throws IOException {
-    WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
-        StandardWatchEventKinds.ENTRY_MODIFY);
+    WatchKey key =
+        dir.register(
+            watcher,
+            StandardWatchEventKinds.ENTRY_CREATE,
+            StandardWatchEventKinds.ENTRY_DELETE,
+            StandardWatchEventKinds.ENTRY_MODIFY);
     keys.put(key, dir);
   }
 
-  /**
-   * Register the given directory, and all its sub-directories, with the
-   * WatchService.
-   */
+  /** Register the given directory, and all its sub-directories, with the WatchService. */
   private static void registerAll(final Path start) throws IOException {
-    Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
-      @Override
-      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
-          throws IOException {
-        register(dir);
-        return FileVisitResult.CONTINUE;
-      }
-    });
+    Files.walkFileTree(
+        start,
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+              throws IOException {
+            register(dir);
+            return FileVisitResult.CONTINUE;
+          }
+        });
   }
 }

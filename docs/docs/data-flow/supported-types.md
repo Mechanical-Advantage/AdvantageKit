@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Supported Types
+# 📊 Supported Types
 
 Data is stored using string keys where slashes are used to denote subtables (similar to NetworkTables). Like NetworkTables, **all logged values are persistent (they will continue to appear on subsequent cycles until updated**).
 
@@ -28,19 +28,19 @@ _This issue is not applicable to struct logging, which is the default for all da
 
 Custom [record](https://www.baeldung.com/java-record-keyword) classes can be logged as structs, including support for single values, arrays, and 2D arrays as inputs or outputs. This enables efficient logging of custom complex data types, such as pose observations (check the [vision template](/getting-started/template-projects/vision-template) for examples).
 
-:::danger
-Record logging can take an extended period (>100ms) the first time that a value with any given type is logged. Subsequent logging calls using an object of the same type will be significantly faster. **Record values should always be logged for the first time when the robot is disabled.**
-:::
-
-Note that record fields must use only the following struct-compatible types:
+Note that record fields must use only the following struct-compatible types. Array types are not supported for record fields. We recommend logging using multiple top-level record arrays as needed.
 
 - Primitives: `boolean`, `short`, `int`, `long`, `float`, `double`
 - Enum values
 - Struct-compatible types (`Pose2d`, `SwerveModuleState`, etc.)
 - Record values (i.e. nested records)
 
-:::warning
-Array types are not supported for record fields. We recommend logging using multiple top-level record arrays as needed.
+:::tip
+Logging multiple record types of the same name can cause conflicts. All record classes should be uniquely named.
+:::
+
+:::danger
+Record logging can take an extended period (>100ms) the first time that a value with any given type is logged. Subsequent logging calls using an object of the same type will be significantly faster. **Record values should always be logged for the first time when the robot is disabled.**
 :::
 
 ### Units

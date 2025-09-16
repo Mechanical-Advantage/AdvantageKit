@@ -1,43 +1,35 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction;
-
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.util.List;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.IterativeRobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.wpilibj.IterativeRobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.util.List;
 
 /**
  * LoggedRobot implements the IterativeRobotBase robot program framework.
  *
- * <p>
- * The LoggedRobot class is intended to be subclassed by a user creating a robot
- * program, and will call all required AdvantageKit periodic methods.
+ * <p>The LoggedRobot class is intended to be subclassed by a user creating a robot program, and
+ * will call all required AdvantageKit periodic methods.
  *
- * <p>
- * periodic() functions from the base class are called on an interval by a
- * Notifier instance.
+ * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
  */
 public class LoggedRobot extends IterativeRobotBase {
+  /** Default loop period. */
   public static final double defaultPeriodSecs = 0.02;
+
   private final int notifier = NotifierJNI.initializeNotifier();
   private final long periodUs;
   private long nextCycleUs = 0;
@@ -61,6 +53,8 @@ public class LoggedRobot extends IterativeRobotBase {
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_AdvantageKit);
+    HAL.report(
+        tResourceType.kResourceType_LoggingFramework, tInstances.kLoggingFramework_AdvantageKit);
   }
 
   @Override
@@ -127,7 +121,11 @@ public class LoggedRobot extends IterativeRobotBase {
     NotifierJNI.stopNotifier(notifier);
   }
 
-  /** Sets whether to use standard timing or run as fast as possible. */
+  /**
+   * Sets whether to use standard timing or run as fast as possible.
+   *
+   * @param useTiming If true, use standard timing. If false, run as fast as possible.
+   */
   public void setUseTiming(boolean useTiming) {
     this.useTiming = useTiming;
   }

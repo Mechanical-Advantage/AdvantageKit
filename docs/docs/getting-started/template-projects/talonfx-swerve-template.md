@@ -10,17 +10,17 @@ import TabItem from '@theme/TabItem';
 AdvantageKit includes two swerve project templates with built-in support for advanced features:
 
 - Easy setup with Tuner X swerve project generator
-- High-frequency odometry
+- [High-frequency odometry](./high-frequency-odometry.md)
 - CANivore time sync (for Phoenix Pro users)
 - On-controller feedback loops
 - Physics simulation
 - Automated characterization routines
 - Dashboard alerts for disconnected devices
-- Pose estimator integration
+- Pose estimator integration using standard FPGA timestamps
 - Step-by-step setup and tuning instructions with a prebuilt AdvantageScope layout
 - **Deterministic replay** with a **guarantee of accuracy**
 
-By default, the TalonFX version of the swerve template is configured for robots with **four TalonFX drive motors, four TalonFX turn motors, four CANcoder, and a NavX or Pigeon 2 gyro**. See the [Spark Swerve Template](spark-swerve-template.md) for swerve robots using Spark Max/Flex.
+By default, the TalonFX version of the swerve template is configured for robots with **four TalonFX drive motors, four TalonFX turn motors, four CANcoders, and a NavX or Pigeon 2 gyro**. See the [Spark Swerve Template](spark-swerve-template.md) for swerve robots using Spark Max/Flex.
 
 :::info
 The AdvantageKit swerve templates are **open-source** and **fully customizable**:
@@ -32,10 +32,6 @@ The AdvantageKit swerve templates are **open-source** and **fully customizable**
 :::
 
 ## Setup
-
-:::warning
-This example project is part of the 2025 AdvantageKit beta release. If you encounter any issues during setup, please [open an issue](https://github.com/Mechanical-Advantage/AdvantageKit/issues).
-:::
 
 :::tip
 The swerve project folder includes a predefined AdvantageScope layout with tabs for each setup and tuning step described below. To open it, click `File` > `Import Layout...` in the tab bar of AdvantageScope and select the file `AdvantageScope Swerve Calibration.json` in the swerve project folder.
@@ -60,7 +56,7 @@ CTRE only permits the swerve project generator to be used on swerve robots with 
 
 6. On the final screen in Tuner X, choose "Generate only TunerConstants" and overwrite the file located at `src/main/java/frc/robot/generated/TunerConstants.java`.
 
-7. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L18) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/1db713d75b08a4315c9273cebf5b5e6a130ed3f7/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L171-L175). Before removing them, both lines will be marked as errors in VSCode.
+7. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/88be410fdbfd811e6f776197d41c0bea5f109b0e/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L17) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/88be410fdbfd811e6f776197d41c0bea5f109b0e/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L198-L202). Before removing them, both lines will be marked as errors in VSCode.
 
 8. In `TunerConstants.java`, change `kSteerInertia` to 0.004 and `kDriveInertia` to 0.025.
 
@@ -105,13 +101,13 @@ The project is configured to save log files when running on a real robot. **A FA
 The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**
 :::
 
-15. Manually rotate the turning position each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `k...SteerMotorInverted` or `kSteerGearRatio`.
+16. Manually rotate the turning position of each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `k...SteerMotorInverted` or `kSteerGearRatio`.
 
-16. Manually rotate each drive wheel and view the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `kDriveGearRatio`.
+17. Manually rotate each drive wheel and view the position in AdvantageScope (`/Drive/Module.../DrivePositionRad`). Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `kDriveGearRatio`.
 
-17. Manually rotate each module to align it directly forwards. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forwards.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
+18. Manually rotate each module to align it directly forward. **Verify using AdvantageScope that the drive position _increases_ when the wheel rotates such that the robot would be propelled forward.** We recommend pressing a straight object such as aluminum tubing against the pairs of left and right modules to ensure accurate alignment.
 
-18. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `k...EncoderOffset` for each module to `Radians.of(<insert value>)`. **The value saved in `TunerConstants` must be the _negative_ of the value displayed in AdvantageScope (i.e. positive values become negative and vice versa).**
+19. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `k...EncoderOffset` for each module to `Radians.of(<insert value>)`. **The value saved in `TunerConstants` must be the _negative_ of the value displayed in AdvantageScope (i.e. positive values become negative and vice versa).**
 
 </TabItem>
 </Tabs>
@@ -138,7 +134,7 @@ The AdvantageKit template requires different feedforward gains than CTRE's defau
 The drive `kS` and `kV` gains should **always** be characterized (as described below). The drive/turn `kA` gains and turn `kS` and `kV` gains are unnecessary in most cases, but can be tuned by advanced users.
 :::
 
-The project includes a simple feedforward routine that can be used to quicly measure the drive `kS` and `kV` values without requiring [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html):
+The project includes a simple feedforward routine that can be used to quickly measure the drive `kS` and `kV` values without requiring [SysId](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html):
 
 1. Tune turning PID gains as described [here](#driveturn-pid-tuning).
 
@@ -190,7 +186,7 @@ The project includes an automated wheel radius characterization routine, which o
 
 2. Select the "Drive Wheel Radius Characterization" auto routine.
 
-3. Enable the robot is autonomous. The robot will slowly rotate in place.
+3. Enable the robot in autonomous. The robot will slowly rotate in place.
 
 4. Disable the robot after at least one full rotation.
 
@@ -220,11 +216,11 @@ The effective maximum speed of a robot is typically slightly less than the thero
 
 1. Set `kSpeedAt12Volts` in `TunerConstants.java` to the theoretical max speed of the robot based on motor free speed and gearing. This value can typically be found on the product page for your chosen swerve modules.
 
-2. Place the robot in a open space.
+2. Place the robot in an open space.
 
 3. Plot the measured robot speed in AdvantageScope using the `/RealOutputs/SwerveChassisSpeeds/Measured` field.
 
-4. In teleop, drive forwards at full speed until the robot velocity is no longer increasing.
+4. In teleop, drive forward at full speed until the robot's velocity is no longer increasing.
 
 5. Record the maximum velocity achieved and update the value of `kSpeedAt12Volts`.
 
@@ -236,7 +232,7 @@ The value of `kSlipCurrent` can be tuned to avoid slipping the wheels.
 
 2. Using AdvantageScope, plot the current of a drive motor from the `/Drive/Module.../DriveCurrentAmps` key, and the velocity of the motor from the `/Drive/Module.../DriveVelocityRadPerSec` key.
 
-3. Accelerate forwards until the drive velocity increases (the wheel slips). Note the current at this time.
+3. Accelerate forward until the drive velocity increases (the wheel slips). Note the current at this time.
 
 4. Update the value of `kSlipCurrent` to this value.
 
@@ -263,7 +259,7 @@ To change the gyro implementation, switch `new GyroIOPigeon2()` in the `RobotCon
 The `PhoenixOdometryThread` class reads high-frequency gyro data for odometry alongside samples from drive encoders. This class supports both Phoenix signals and generic signals. Note that the gyro should be configured to publish signals at the same frequency as odometry. Call `registerSignal` with a double supplier to create a queue, as shown in the `GyroIONavX` implementation:
 
 ```java
-Queue<Double> yawPositionQueue = SparkOdometryThread.getInstance().registerSignal(navX::getAngle);
+Queue<Double> yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(navX::getAngle);
 ```
 
 :::info
@@ -286,7 +282,13 @@ By default, the project uses a CANcoder in remote/fused/sync mode. When using an
 turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 ```
 
-3. Reset the relative encoder position at startup:
+3. Replace `RotorToSensorRatio` with `SensorToMechanismRatio` as shown below:
+
+```java
+turnConfig.Feedback.SensorToMechanismRatio = constants.SteerMotorGearRatio;
+```
+
+4. Reset the relative encoder position at startup:
 
 ```java
 tryUntilOk(5, () -> turnTalon.setPosition(customEncoder.getPositionRotations(), 0.25));
@@ -304,6 +306,8 @@ private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest = new Mot
 ### Vision Integration
 
 The `Drive` subsystem uses WPILib's [`SwerveDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/SwerveDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples.
+
+Users migrating from CTRE's swerve library should note that the AdvantageKit template uses **standard FPGA timestamps** for pose estimation rather than CTRE's "current time." This means that pose estimates from Limelight or PhotonVision can be passed _directly_ to the pose estimator without needing to call [`Utils.fpgaToCurrentTime`](<https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/Utils.html#fpgaToCurrentTime(double)>).
 
 :::tip
 This project is compatible with AdvantageKit's [vision template project](./vision-template.md), which provides a starting point for implementing a pose estimation algorithm based on Limelight or PhotonVision.
@@ -337,3 +341,9 @@ public void runVelocity(ChassisSpeeds speeds) {
 ### Advanced Physics Simulation
 
 The project can be easily adapted to utilize Team 5516's [maple-sim](https://github.com/Shenzhen-Robotics-Alliance/Maple-Sim) library for simulation, which provides a full rigid-body simulation of the swerve drive and its interactions with the field. Check the documentation for more details on how to install and use the library.
+
+### Real-Time Thread Priority
+
+Optionally, the main thread can be configured to use [real-time](https://blogs.oracle.com/linux/post/task-priority) priority when running the command scheduler by removing the comments [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/a86d21b27034a36d051798e3eaef167076cd302b/template_projects/sources/talonfx_swerve/src/main/java/frc/robot/Robot.java#L110) and [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/a86d21b27034a36d051798e3eaef167076cd302b/template_projects/sources/talonfx_swerve/src/main/java/frc/robot/Robot.java#L120) (**IMPORTANT:** You must uncomment _both_ lines). This may improve the consistency of loop cycle timing in some cases, but should be used with caution as it will prevent other threads from running during the user code loop cycle (including internal threads required by NetworkTables, vendors, etc).
+
+This customization **should only be used if the loop cycle time is significantly less than 20ms**, which allows other threads to continue running between user code cycles. We always recommend **thoroughly testing this change** to ensure that it does not cause unintended side effects (examples include NetworkTables lag, CAN timeouts, etc). In general, **this customization is only recommended for advanced users** who understand the potential side-effects.

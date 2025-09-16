@@ -1,19 +1,9 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-// Copyright 2021-2024 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction.mechanism;
 
@@ -26,15 +16,12 @@ import org.littletonrobotics.junction.LogTable;
 /**
  * Root Mechanism2d node.
  *
- * <p>
- * A root is the anchor point of other nodes (such as ligaments).
+ * <p>A root is the anchor point of other nodes (such as ligaments).
  *
- * <p>
- * Do not create objects of this class directly! Obtain instances from the
- * {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d#getRoot(String, double, double)} factory method.
+ * <p>Do not create objects of this class directly! Obtain instances from the {@link
+ * edu.wpi.first.wpilibj.smartdashboard.Mechanism2d#getRoot(String, double, double)} factory method.
  *
- * <p>
- * Append other nodes by using {@link #append(MechanismObject2d)}.
+ * <p>Append other nodes by using {@link #append(LoggedMechanismObject2d)}.
  */
 public final class LoggedMechanismRoot2d implements AutoCloseable {
   private final String m_name;
@@ -49,8 +36,8 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
    * Package-private constructor for roots.
    *
    * @param name name
-   * @param x    x coordinate of root (provide only when constructing a root node)
-   * @param y    y coordinate of root (provide only when constructing a root node)
+   * @param x x coordinate of root (provide only when constructing a root node)
+   * @param y y coordinate of root (provide only when constructing a root node)
    */
   LoggedMechanismRoot2d(String name, double x, double y) {
     m_name = name;
@@ -74,13 +61,11 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
   /**
    * Append a Mechanism object that is based on this one.
    *
-   * @param <T>    The object type.
+   * @param <T> The object type.
    * @param object the object to add.
-   * @return the object given as a parameter, useful for variable assignments and
-   *         call chaining.
-   * @throws UnsupportedOperationException if the object's name is already used -
-   *                                       object names must
-   *                                       be unique.
+   * @return the object given as a parameter, useful for variable assignments and call chaining.
+   * @throws UnsupportedOperationException if the object's name is already used - object names must
+   *     be unique.
    */
   public synchronized <T extends LoggedMechanismObject2d> T append(T object) {
     if (m_objects.containsKey(object.getName())) {
@@ -121,6 +106,11 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
     }
   }
 
+  /**
+   * Get the name of the root.
+   *
+   * @return The name of the root.
+   */
   public String getName() {
     return m_name;
   }

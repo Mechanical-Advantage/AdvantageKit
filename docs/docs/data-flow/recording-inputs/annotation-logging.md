@@ -35,4 +35,4 @@ class MyInputsAutoLogged extends MyInputs implements LoggableInputs {
 }
 ```
 
-Note that you should use the `<className>AutoLogged` class, rather than your annotated class. The [AdvantageKit template projects](/category/template-projects) are a useful reference for how to use `@AutoLog` in a full project.
+Note that you should use the `<className>AutoLogged` class, rather than your annotated class. The [AdvantageKit template projects](/getting-started/template-projects) are a useful reference for how to use `@AutoLog` in a full project.
