@@ -9,6 +9,7 @@ package org.littletonrobotics.junction;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import org.littletonrobotics.conduit.ConduitApi;
@@ -104,7 +105,7 @@ class LoggedDriverStation {
       int[] povValues = joystickTable.get("POVs", new int[0]);
       DriverStationSim.setJoystickPOVCount(id, povValues.length);
       for (int i = 0; i < povValues.length; i++) {
-        DriverStationSim.setJoystickPOV(id, i, povValues[i]);
+        DriverStationDataJNI.setJoystickPOV(id, i, (byte) povValues[i]);
       }
 
       float[] axisValues = joystickTable.get("AxisValues", new float[0]);

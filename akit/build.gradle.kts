@@ -22,7 +22,7 @@ repositories {
 wpilibRepositories.use2027Repos()
 wpilibRepositories.addAllReleaseRepositories(project)
 
-val wpilibVersion = "2027.0.0-alpha-1"
+val wpilibVersion = "2027.0.0-alpha-2"
 
 dependencies {
     implementation("edu.wpi.first.cscore:cscore-java:$wpilibVersion")
