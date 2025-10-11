@@ -7,13 +7,19 @@
 
 package org.littletonrobotics.junction.mechanism;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import java.util.HashMap;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.littletonrobotics.junction.LogTable;
@@ -42,11 +48,23 @@ public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
    *
    * <p>The dimensions represent the canvas that all the nodes are drawn on.
    *
-   * @param width the width
-   * @param height the height
+   * @param width the width in meters
+   * @param height the height in meters
    */
   public LoggedMechanism2d(double width, double height) {
     this(width, height, new Color8Bit(0, 0, 32));
+  }
+
+  /**
+   * Create a new Mechanism2d with the given dimensions and default color (dark blue).
+   *
+   * <p>The dimensions represent the canvas that all the nodes are drawn on.
+   *
+   * @param width the width
+   * @param height the height
+   */
+  public LoggedMechanism2d(Distance x, Distance y) {
+    this(x.in(Meters), y.in(Meters));
   }
 
   /**
@@ -59,7 +77,7 @@ public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
    * @param backgroundColor the background color. Defaults to dark blue.
    */
   public LoggedMechanism2d(double width, double height, Color8Bit backgroundColor) {
-    m_roots = new HashMap<>();
+    m_roots = new LinkedHashMap<>();
     m_dims[0] = width;
     m_dims[1] = height;
     setBackgroundColor(backgroundColor);
@@ -156,5 +174,23 @@ public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
         root.logOutput(table.getSubtable(name));
       }
     }
+  }
+
+  /**
+   * Converts a forward facing Mechanism2d into a series of Pose3d objects. Poses are generated
+   * with standard coordinate frame (+x forward, +y left, +z up) and each pivot point is assumed
+   * to be at the origin of the model.
+   * 
+   * The order of the poses returned is based on the order of insertion. The first root inserted
+   * into the Mechanism2d goes first, and processed in a depth-first manner.
+   * 
+   * @return Pose3d[] representing each mechanism component
+   */
+  public synchronized ArrayList<Pose3d> generate3dMechanism() {
+    ArrayList<Pose3d> poses = new ArrayList<>();
+    for (Entry<String, LoggedMechanismRoot2d> root : m_roots.entrySet()) {
+      poses.addAll(root.getValue().generate3dMechanism());
+    }
+    return poses;
   }
 }
