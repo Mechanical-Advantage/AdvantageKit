@@ -18,7 +18,6 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-
 import org.littletonrobotics.junction.LogTable;
 
 /**
@@ -55,7 +54,7 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
     setAngle(angle);
     setLineWeight(lineWidth);
   }
-  
+
   /**
    * Create a new ligament.
    *
@@ -134,6 +133,15 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
   }
 
   /**
+   * Set the ligament's angle relative to its parent.
+   *
+   * @param angle the angle
+   */
+  public synchronized void setAngle(Angle angle) {
+    setAngle(angle.in(Degrees));
+  }
+
+  /**
    * Get the ligament's angle relative to its parent.
    *
    * @return the angle in degrees
@@ -155,6 +163,15 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
     if (m_lengthEntry != null) {
       m_lengthEntry.set(length);
     }
+  }
+
+  /**
+   * Set the ligament's length.
+   *
+   * @param length the line length
+   */
+  public synchronized void setLength(Distance length) {
+    setLength(length.in(Meters));
   }
 
   /**

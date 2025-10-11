@@ -38,6 +38,10 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
     implementation("edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3")
     implementation("us.hebi.quickbuf:quickbuf-runtime:1.3.3")
+
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<Javadoc> {
@@ -48,6 +52,10 @@ tasks.withType<Javadoc> {
         (this as StandardJavadocDocletOptions).stylesheetFile = file("javadoc.css")
         (this as StandardJavadocDocletOptions).addBooleanOption("Werror", true)
     }
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
 }
 
 java {

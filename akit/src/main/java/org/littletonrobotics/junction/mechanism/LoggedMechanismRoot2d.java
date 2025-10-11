@@ -7,7 +7,9 @@
 
 package org.littletonrobotics.junction.mechanism;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -15,12 +17,10 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.units.measure.Distance;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.littletonrobotics.junction.LogTable;
 
 /**
@@ -150,10 +150,10 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
    * Converts the Mechanism2d into a series of Pose3d objects. Poses are generated with standard
    * coordinate frame (+x forward, +y left, +z up) and each pivot point is assumed to be at the
    * origin of the model.
-   * 
-   * The order of the poses returned is based on the order of insertion. The first root inserted
+   *
+   * <p>The order of the poses returned is based on the order of insertion. The first root inserted
    * into the Mechanism2d goes first, and processed in a depth-first manner.
-   * 
+   *
    * @return list of poses for starting from the root point
    */
   public synchronized ArrayList<Pose3d> generate3dMechanism() {
@@ -164,14 +164,16 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
     for (Entry<String, LoggedMechanismObject2d> obj : m_objects.entrySet()) {
       // convert mech2d angle to Rotation3d
       // remembering that +rotation in 2d is -pitch in 3d
-      var new_rotation = new Rotation3d(0, -obj.getValue().getAngle(), 0);
+      var new_rotation = new Rotation3d(0, Degrees.of(-obj.getValue().getAngle()).in(Radians), 0);
 
-      // Generate the pose for the next 
+      // Generate the pose for the next segment
       var new_pose = new Pose3d(initial_pose.getTranslation(), new_rotation);
       poses.add(new_pose);
 
       // recurse down the length of that ligament
-      var next_pose = new_pose.transformBy(new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
+      var next_pose =
+          new_pose.transformBy(
+              new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
       var more_poses = obj.getValue().generate3dMechanism(next_pose);
       poses.addAll(more_poses);
     }

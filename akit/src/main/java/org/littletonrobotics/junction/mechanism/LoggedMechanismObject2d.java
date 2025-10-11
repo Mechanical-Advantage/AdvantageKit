@@ -7,16 +7,17 @@
 
 package org.littletonrobotics.junction.mechanism;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.NetworkTable;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.littletonrobotics.junction.LogTable;
 
 /**
@@ -103,7 +104,7 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
 
   /**
    * Propogates the mechanism2d down the tree structure.
-   * 
+   *
    * @param seed position to start the calculations at
    * @return array list of all poses generated from this point in a depth-first pattern
    */
@@ -114,14 +115,18 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
     for (Entry<String, LoggedMechanismObject2d> obj : m_objects.entrySet()) {
       // convert mech2d angle to Rotation3d
       // remembering that +rotation in 2d is -pitch in 3d
-      var new_rotation = new Rotation3d(0, -obj.getValue().getAngle(), 0);
+      var new_rotation = new Rotation3d(0, Degrees.of(-obj.getValue().getAngle()).in(Radians), 0);
+      new_rotation = initial_pose.getRotation().plus(new_rotation);
 
       // Generate the pose for the new joint
       var new_pose = new Pose3d(initial_pose.getTranslation(), new_rotation);
       poses.add(new_pose);
 
       // recurse down the length of that ligament
-      var next_pose = new_pose.transformBy(new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
+      var next_pose =
+          new_pose.transformBy(
+              new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
+
       var more_poses = obj.getValue().generate3dMechanism(next_pose);
       poses.addAll(more_poses);
     }
@@ -130,9 +135,9 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
   }
 
   /**
-   * Abstract helper function. A proxy for getLength() with Ligament2d, but would be
-   * something else like getRadius() for circular parts if they were to be implemented.
-   * 
+   * Abstract helper function. A proxy for getLength() with Ligament2d, but would be something else
+   * like getRadius() for circular parts if they were to be implemented.
+   *
    * @return distance in meters
    */
   public abstract double getObject2dRange();
@@ -140,7 +145,7 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
   /**
    * Abstract helper function. Should be common to all 2d parts, and assumes a normal xy or xz
    * positive direction of left or up, respectively.
-   * 
+   *
    * @return angle in degrees
    */
   public abstract double getAngle();
