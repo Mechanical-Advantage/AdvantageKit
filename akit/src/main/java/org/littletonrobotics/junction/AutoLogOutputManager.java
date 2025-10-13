@@ -35,6 +35,8 @@ public class AutoLogOutputManager {
   private static final List<Integer> scannedObjectHashes = new ArrayList<>();
   private static final Set<String> allowedPackages = new HashSet<>();
 
+  private AutoLogOutputManager() {}
+
   /**
    * Adds a new allowed package to use when scanning for annotations. By default, the parent class
    * where {@code @AutoLogOutput} is used must be within the same package as {@code Robot} (or a
@@ -228,7 +230,6 @@ public class AutoLogOutputManager {
       this.declaringClass = declaringClass;
     }
   }
-  ;
 
   /**
    * Finds the field in the provided class and its superclasses (must be public or protected in

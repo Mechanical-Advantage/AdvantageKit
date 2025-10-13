@@ -60,10 +60,10 @@ public class LoggedRobot extends IterativeRobotBase {
   }
 
   @Override
-  @SuppressWarnings("NoFinalizer")
-  protected void finalize() {
+  public void close() {
     NotifierJNI.stopNotifier(notifier);
     NotifierJNI.cleanNotifier(notifier);
+    super.close();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */

@@ -31,4 +31,7 @@ public abstract class LoggedNetworkInput {
       return key;
     }
   }
+
+  /** Creates a new LoggedNetworkInput. */
+  protected LoggedNetworkInput() {}
 }
