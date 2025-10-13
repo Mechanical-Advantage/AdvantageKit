@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "21"
       - name: "Install SystemCore toolchain"
         run: ./gradlew :akit:installSystemCoreToolchain
       - name: "Check formatting"
@@ -161,7 +161,7 @@ jobs:
         if: matrix.classifier != 'linuxarm64'
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "21"
       - name: "Setup Python"
         uses: actions/setup-python@v5
         with:
@@ -262,7 +262,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "21"
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
         with:
