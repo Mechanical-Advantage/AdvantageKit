@@ -98,6 +98,7 @@ public interface ConsoleSource extends AutoCloseable {
     private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(100);
     private final List<String> lines = new ArrayList<>();
 
+    /** Creates a new Systemcore console source. */
     public Systemcore() {
       thread = new Thread(this::run, "AdvantageKit_SystemcoreConsoleSource");
       thread.setDaemon(true);
