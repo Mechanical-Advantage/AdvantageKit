@@ -84,10 +84,10 @@ public interface ConsoleSource extends AutoCloseable {
   }
 
   /**
-   * Reads console data on SystemCore. Saves stdout and sterr from both Java and native code,
+   * Reads console data on Systemcore. Saves stdout and sterr from both Java and native code,
    * including lines logged before this class was instantiated.
    */
-  class SystemCore implements ConsoleSource {
+  class Systemcore implements ConsoleSource {
     private static final String[] command =
         new String[] {
           "/bin/bash",
@@ -98,8 +98,9 @@ public interface ConsoleSource extends AutoCloseable {
     private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(100);
     private final List<String> lines = new ArrayList<>();
 
-    public SystemCore() {
-      thread = new Thread(this::run, "AdvantageKit_SystemCoreConsoleSource");
+    /** Creates a new Systemcore console source. */
+    public Systemcore() {
+      thread = new Thread(this::run, "AdvantageKit_SystemcoreConsoleSource");
       thread.setDaemon(true);
       thread.start();
     }

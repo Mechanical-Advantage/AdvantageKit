@@ -165,7 +165,7 @@ public class Logger {
       // Start console capture
       if (enableConsole && console == null) {
         if (RobotBase.isReal()) {
-          console = new ConsoleSource.SystemCore();
+          console = new ConsoleSource.Systemcore();
         } else {
           console = new ConsoleSource.Simulator();
         }
