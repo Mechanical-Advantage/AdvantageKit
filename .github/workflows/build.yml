@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-systemcore:
-    name: "Build for SystemCore"
+    name: "Build for Systemcore"
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout repository"
@@ -19,7 +19,7 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
-      - name: "Install SystemCore toolchain"
+      - name: "Install Systemcore toolchain"
         run: ./gradlew :akit:installSystemCoreToolchain
       - name: "Check formatting"
         run: ./gradlew spotlessCheck
@@ -197,7 +197,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-systemcore, build-desktop]
     steps:
-      - name: "Download SystemCore"
+      - name: "Download Systemcore"
         uses: actions/download-artifact@v4
         with:
           name: maven_linuxsystemcore
