@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.LogTable;
  * appended to a published {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d} container are
  * nonfunctional.
  *
- * @see edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
+ * @see org.littletonrobotics.junction.mechanism.LoggedMechanism2d
  */
 public abstract class LoggedMechanismObject2d implements AutoCloseable {
   /** Relative to parent. */

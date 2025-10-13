@@ -35,6 +35,8 @@ public class AutoLogOutputManager {
   private static final List<Integer> scannedObjectHashes = new ArrayList<>();
   private static final Set<String> allowedPackages = new HashSet<>();
 
+  private AutoLogOutputManager() {}
+
   /**
    * Adds a new allowed package to use when scanning for annotations. By default, the parent class
    * where {@code @AutoLogOutput} is used must be within the same package as {@code Robot} (or a
@@ -118,6 +120,8 @@ public class AutoLogOutputManager {
                 // Get key
                 String keyParameter = method.getAnnotation(AutoLogOutput.class).key();
                 String key = makeKey(keyParameter, method.getName(), declaringClass, root);
+                boolean forceSerializable =
+                    method.getAnnotation(AutoLogOutput.class).forceSerializable();
 
                 // Register method
                 registerField(
@@ -132,7 +136,8 @@ public class AutoLogOutputManager {
                         e.printStackTrace();
                         return null;
                       }
-                    });
+                    },
+                    forceSerializable);
               }
             });
 
@@ -149,6 +154,8 @@ public class AutoLogOutputManager {
                 // Get key
                 String keyParameter = field.getAnnotation(AutoLogOutput.class).key();
                 String key = makeKey(keyParameter, field.getName(), declaringClass, root);
+                boolean forceSerializable =
+                    field.getAnnotation(AutoLogOutput.class).forceSerializable();
 
                 // Register field
                 registerField(
@@ -161,7 +168,8 @@ public class AutoLogOutputManager {
                         e.printStackTrace();
                         return null;
                       }
-                    });
+                    },
+                    forceSerializable);
                 return;
               }
 
@@ -222,7 +230,6 @@ public class AutoLogOutputManager {
       this.declaringClass = declaringClass;
     }
   }
-  ;
 
   /**
    * Finds the field in the provided class and its superclasses (must be public or protected in
@@ -308,7 +315,25 @@ public class AutoLogOutputManager {
    * @param type The type of object being logged.
    * @param supplier A supplier for the field values.
    */
-  private static void registerField(String key, Class<?> type, Supplier<?> supplier) {
+  private static void registerField(
+      String key, Class<?> type, Supplier<?> supplier, boolean forceSerializable) {
+    if (forceSerializable) {
+      callbacks.add(
+          () -> {
+            Object value = supplier.get();
+            if (value != null)
+              try {
+                Logger.recordOutput(key, (WPISerializable) value);
+              } catch (ClassCastException e) {
+                DriverStation.reportError(
+                    "[AdvantageKit] Auto serialization is not supported for type "
+                        + type.getSimpleName(),
+                    false);
+              }
+          });
+      return;
+    }
+
     if (!type.isArray()) {
       // Single types
       if (type.equals(boolean.class)) {

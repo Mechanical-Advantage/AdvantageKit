@@ -16,7 +16,11 @@ import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-/** Manages a chooser value published to the "SmartDashboard" table of NT. */
+/**
+ * Manages a chooser value published to the "SmartDashboard" table of NT.
+ *
+ * @param <V> The value type associated with each string key.
+ */
 public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
   private final String key;
   private String selectedValue = null;

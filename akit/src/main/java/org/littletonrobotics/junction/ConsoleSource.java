@@ -19,15 +19,20 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-interface ConsoleSource extends AutoCloseable {
-  /** Reads all console data that has been produced since the last call to this method. */
+/** Console logging source. Users should not interact with this class directly. */
+public interface ConsoleSource extends AutoCloseable {
+  /**
+   * Reads all console data that has been produced since the last call to this method.
+   *
+   * @return The console data
+   */
   public String getNewData();
 
   /**
    * Reads console data while running in the simulator. Saves stdout and sterr from Java only (not
    * native code), and only includes lines logged after this class was instantiated.
    */
-  class Simulator implements ConsoleSource {
+  public class Simulator implements ConsoleSource {
     private final PrintStream originalStdout;
     private final PrintStream originalStderr;
     private final ByteArrayOutputStream customStdout = new ByteArrayOutputStream();
@@ -35,6 +40,7 @@ interface ConsoleSource extends AutoCloseable {
     private int customStdoutPos = 0;
     private int customStderrPos = 0;
 
+    /** Create simulator console source. */
     public Simulator() {
       originalStdout = System.out;
       originalStderr = System.err;

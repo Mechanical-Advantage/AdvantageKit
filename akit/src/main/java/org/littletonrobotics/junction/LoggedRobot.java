@@ -12,6 +12,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.List;
@@ -55,61 +57,70 @@ public class LoggedRobot extends IterativeRobotBase {
   }
 
   @Override
-  @SuppressWarnings("NoFinalizer")
-  protected void finalize() {
+  public void close() {
     NotifierJNI.stopNotifier(notifier);
     NotifierJNI.cleanNotifier(notifier);
+    super.close();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
   @Override
   @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
-    // Robot init methods
-    long initStat = RobotController.getFPGATime();
-    robotInit();
-    if (isSimulation()) {
-      simulationInit();
-    }
-    long initEnd = RobotController.getFPGATime();
-
-    // Register auto logged outputs
-    AutoLogOutputManager.addObject(this);
-
-    // Save data from init cycle
-    Logger.periodicAfterUser(initEnd - initStat, 0);
-
-    // Tell the DS that the robot is ready to be enabled
-    System.out.println("********** Robot program startup complete **********");
-    DriverStationJNI.observeUserProgramStarting();
-
-    // Loop forever, calling the appropriate mode-dependent function
-    while (true) {
-      if (useTiming) {
-        long currentTimeUs = RobotController.getFPGATime();
-        if (nextCycleUs < currentTimeUs) {
-          // Loop overrun, start next cycle immediately
-          nextCycleUs = currentTimeUs;
-        } else {
-          // Wait before next cycle
-          NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
-          if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
-            // Break the loop if the notifier was stopped
-            Logger.end();
-            break;
-          }
-        }
-        nextCycleUs += periodUs;
+    try {
+      // Robot init methods
+      long initStart = RobotController.getFPGATime();
+      robotInit();
+      if (isSimulation()) {
+        simulationInit();
       }
+      long initEnd = RobotController.getFPGATime(); // Includes Robot constructor and robotInit
 
-      long periodicBeforeStart = RobotController.getFPGATime();
-      Logger.periodicBeforeUser();
-      long userCodeStart = RobotController.getFPGATime();
-      loopFunc();
-      long userCodeEnd = RobotController.getFPGATime();
+      // Register auto logged outputs
+      AutoLogOutputManager.addObject(this);
 
-      gcStatsCollector.update();
-      Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
+      // Save data from init cycle
+      Logger.periodicAfterUser(initEnd - initStart, 0);
+
+      // Tell the DS that the robot is ready to be enabled
+      System.out.println("********** Robot program startup complete **********");
+      DriverStationJNI.observeUserProgramStarting();
+
+      // Loop forever, calling the appropriate mode-dependent function
+      while (true) {
+        if (useTiming) {
+          long currentTimeUs = RobotController.getFPGATime();
+          if (nextCycleUs < currentTimeUs) {
+            // Loop overrun, start next cycle immediately
+            nextCycleUs = currentTimeUs;
+          } else {
+            // Wait before next cycle
+            NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
+            if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
+              // Break the loop if the notifier was stopped
+              Logger.end();
+              break;
+            }
+          }
+          nextCycleUs += periodUs;
+        }
+
+        long periodicBeforeStart = RobotController.getFPGATime();
+        Logger.periodicBeforeUser();
+        long userCodeStart = RobotController.getFPGATime();
+        loopFunc();
+        long userCodeEnd = RobotController.getFPGATime();
+
+        gcStatsCollector.update();
+        Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
+      }
+    } catch (Exception exception) {
+      // Exception thrown, log crash information
+      StringWriter stringWriter = new StringWriter();
+      exception.printStackTrace(new PrintWriter(stringWriter));
+      Logger.periodicAfterUser(0, 0, stringWriter.toString());
+      Logger.end();
+      throw exception;
     }
   }
 

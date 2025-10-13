@@ -41,6 +41,16 @@ class ReceiverThread extends Thread {
         }
       }
     } catch (InterruptedException exception) {
+      // Empty queue
+      while (!queue.isEmpty()) {
+        LogTable entry = queue.poll();
+        for (int i = 0; i < dataReceivers.size(); i++) {
+          try {
+            dataReceivers.get(i).putTable(entry);
+          } catch (InterruptedException e) {
+          }
+        }
+      }
 
       // End all data receivers
       for (int i = 0; i < dataReceivers.size(); i++) {
