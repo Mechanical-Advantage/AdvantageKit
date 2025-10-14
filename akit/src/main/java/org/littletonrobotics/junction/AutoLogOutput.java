@@ -34,4 +34,11 @@ public @interface AutoLogOutput {
    * @return Whether or not to force the Logger to use a serialized data method.
    */
   public boolean forceSerializable() default false;
+
+  /**
+   * The unit to save as metadata, used when visualizing the field in AdvantageScope.
+   *
+   * @return The value of the unit parameter.
+   */
+  public String unit() default "";
 }

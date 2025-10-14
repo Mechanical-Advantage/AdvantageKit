@@ -56,6 +56,7 @@ public class WPILOGWriter implements LogDataReceiver {
   private int timestampID;
   private Map<String, Integer> entryIDs;
   private Map<String, LoggableType> entryTypes;
+  private Map<String, String> entryUnits;
 
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
@@ -157,6 +158,7 @@ public class WPILOGWriter implements LogDataReceiver {
     // Reset data
     entryIDs = new HashMap<>();
     entryTypes = new HashMap<>();
+    entryUnits = new HashMap<>();
     logDate = null;
     logMatchText = null;
   }
@@ -291,16 +293,21 @@ public class WPILOGWriter implements LogDataReceiver {
 
       // Check if field should be updated
       LoggableType type = field.getValue().type;
+      String unit = field.getValue().unitStr;
       boolean appendData = false;
       if (!entryIDs.containsKey(field.getKey())) { // New field
+        String metadata =
+            unit == null
+                ? WPILOGConstants.entryMetadata
+                : WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", unit);
         entryIDs.put(
             field.getKey(),
             log.start(
-                field.getKey(),
-                field.getValue().getWPILOGType(),
-                WPILOGConstants.entryMetadata,
-                table.getTimestamp()));
+                field.getKey(), field.getValue().getWPILOGType(), metadata, table.getTimestamp()));
         entryTypes.put(field.getKey(), type);
+        if (unit != null) {
+          entryUnits.put(field.getKey(), unit);
+        }
         appendData = true;
       } else if (!field.getValue().equals(oldMap.get(field.getKey()))) { // Updated field
         appendData = true;
@@ -309,6 +316,14 @@ public class WPILOGWriter implements LogDataReceiver {
       // Append data
       if (appendData) {
         int id = entryIDs.get(field.getKey());
+
+        // Check if unit changed
+        if (unit != null && !unit.equals(entryUnits.get(field.getKey()))) {
+          log.setMetadata(id, unit, table.getTimestamp());
+          entryUnits.put(field.getKey(), unit);
+        }
+
+        // Add field value
         switch (field.getValue().type) {
           case Raw:
             log.appendRaw(id, field.getValue().getRaw(), table.getTimestamp());

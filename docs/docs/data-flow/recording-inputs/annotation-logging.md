@@ -36,3 +36,19 @@ class MyInputsAutoLogged extends MyInputs implements LoggableInputs {
 ```
 
 Note that you should use the `<className>AutoLogged` class, rather than your annotated class. The [AdvantageKit template projects](/getting-started/template-projects) are a useful reference for how to use `@AutoLog` in a full project.
+
+## Units
+
+To ensure that AdvantageScope will correctly [visualize unit data](https://docs.advantagescope.org/tab-reference/line-graph/units), units can be specified by modifying the field name or using a `Measure` object.
+
+:::info
+Unlike when logged as [outputs](/data-flow/recording-outputs/#units), `Measure` values in an inputs class are always logged using the **base unit** and not the user-specified unit (e.g. distances will always be logged in meters). This ensures that unit differences between IO implementations are not reflected in the logged data.
+:::
+
+```java
+@AutoLog
+public class MyInputs {
+    public double myDistanceMeters = 0.0;
+    public Distance myDistance = Meters.of(0.0);
+}
+```
