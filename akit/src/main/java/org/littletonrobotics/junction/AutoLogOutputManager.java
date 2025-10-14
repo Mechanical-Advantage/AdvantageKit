@@ -117,11 +117,11 @@ public class AutoLogOutputManager {
                   return;
                 }
 
-                // Get key
-                String keyParameter = method.getAnnotation(AutoLogOutput.class).key();
-                String key = makeKey(keyParameter, method.getName(), declaringClass, root);
-                boolean forceSerializable =
-                    method.getAnnotation(AutoLogOutput.class).forceSerializable();
+                // Get parameters
+                AutoLogOutput annotation = method.getAnnotation(AutoLogOutput.class);
+                String key = makeKey(annotation.key(), method.getName(), declaringClass, root);
+                boolean forceSerializable = annotation.forceSerializable();
+                String unit = annotation.unit();
 
                 // Register method
                 registerField(
@@ -137,7 +137,8 @@ public class AutoLogOutputManager {
                         return null;
                       }
                     },
-                    forceSerializable);
+                    forceSerializable,
+                    unit);
               }
             });
 
@@ -151,11 +152,11 @@ public class AutoLogOutputManager {
 
               // If annotated, try to add
               if (field.isAnnotationPresent(AutoLogOutput.class)) {
-                // Get key
-                String keyParameter = field.getAnnotation(AutoLogOutput.class).key();
-                String key = makeKey(keyParameter, field.getName(), declaringClass, root);
-                boolean forceSerializable =
-                    field.getAnnotation(AutoLogOutput.class).forceSerializable();
+                // Get parameters
+                AutoLogOutput annotation = field.getAnnotation(AutoLogOutput.class);
+                String key = makeKey(annotation.key(), field.getName(), declaringClass, root);
+                boolean forceSerializable = annotation.forceSerializable();
+                String unit = annotation.unit();
 
                 // Register field
                 registerField(
@@ -169,7 +170,8 @@ public class AutoLogOutputManager {
                         return null;
                       }
                     },
-                    forceSerializable);
+                    forceSerializable,
+                    unit);
                 return;
               }
 
@@ -314,9 +316,11 @@ public class AutoLogOutputManager {
    * @param key The string key to use for logging.
    * @param type The type of object being logged.
    * @param supplier A supplier for the field values.
+   * @param forceSerializable Whether or not to always use a serialized data method.
+   * @param unit The unit metadata.
    */
   private static void registerField(
-      String key, Class<?> type, Supplier<?> supplier, boolean forceSerializable) {
+      String key, Class<?> type, Supplier<?> supplier, boolean forceSerializable, String unit) {
     if (forceSerializable) {
       callbacks.add(
           () -> {
@@ -355,17 +359,34 @@ public class AutoLogOutputManager {
               if (value != null) Logger.recordOutput(key, (long) value);
             });
       } else if (type.equals(float.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (float) value);
-            });
+        if (unit.length() > 0) {
+          callbacks.add(
+              () -> {
+                Object value = supplier.get();
+                if (value != null) Logger.recordOutput(key, (float) value, unit);
+              });
+        } else {
+          callbacks.add(
+              () -> {
+                Object value = supplier.get();
+                if (value != null) Logger.recordOutput(key, (float) value);
+              });
+        }
+
       } else if (type.equals(double.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (double) value);
-            });
+        if (unit.length() > 0) {
+          callbacks.add(
+              () -> {
+                Object value = supplier.get();
+                if (value != null) Logger.recordOutput(key, (double) value, unit);
+              });
+        } else {
+          callbacks.add(
+              () -> {
+                Object value = supplier.get();
+                if (value != null) Logger.recordOutput(key, (double) value);
+              });
+        }
       } else if (type.equals(String.class)) {
         callbacks.add(
             () -> {
