@@ -9,17 +9,15 @@ package org.littletonrobotics.junction.networktables;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
-
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Manages a chooser value published to the "SmartDashboard" table of NT.
@@ -142,7 +140,7 @@ public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
   /**
    * Binds the callback to run whenever the selected option changes. There can only be one listener,
    * and this method overrites it with each invokation.
-   * 
+   *
    * @param listener The function to call that accepts the new value.
    */
   public void onChange(Consumer<V> listener) {
