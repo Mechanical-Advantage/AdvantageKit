@@ -7,8 +7,6 @@
 
 package org.littletonrobotics.junction.networktables;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.lang.reflect.Field;
@@ -144,7 +142,6 @@ public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
    * @param listener The function to call that accepts the new value.
    */
   public void onChange(Consumer<V> listener) {
-    requireNonNullParam(listener, "listener", "onChange");
     this.listener = listener;
   }
 
