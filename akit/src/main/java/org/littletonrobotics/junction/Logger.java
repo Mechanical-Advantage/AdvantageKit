@@ -1119,7 +1119,7 @@ public class Logger {
    * @param value The value of the field.
    */
   public static <U extends Unit> void recordOutput(String key, Measure<U> value) {
-    if (running) {
+    if (running && value != null) {
       // The measure overload of LogTable is intended primarily for input logging and
       // always uses the base unit. Calling the double overload ensures that the
       // user-specified unit is preserved.
