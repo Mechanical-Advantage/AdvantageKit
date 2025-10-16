@@ -63,6 +63,10 @@ Primitive suppliers (`BooleanSupplier`, `IntSupplier`, `LongSupplier`, and `Doub
 
 AdvantageKit can log 2D mechanism objects as outputs, which can be viewed using AdvantageScope. If not using `@AutoLogOutput`, note that the logging call only records the current state of the `Mechanism2d` and so it must be called periodically.
 
+:::tip
+The `generate3dMechanism()` method can be used to convert a `Mechanism2d` to an array of `Pose3d` objects compatible with [articulated components](https://docs.advantagescope.org/tab-reference/3d-field/#3d-components) in AdvantageScope.
+:::
+
 :::warning
 Mechanism objects must use the **`LoggedMechanism2d`** class to be compatible with AdvantageKit. This class is otherwise equivalent to the standard `Mechanism2d` class. Equivalent `LoggedMechanismRoot2d`, `LoggedMechanismObject2d`, and `LoggedMechanismLigament2d` classes are also provided.
 :::
