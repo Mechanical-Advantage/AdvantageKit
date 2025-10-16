@@ -1,22 +1,15 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.conduit;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.Joystick;
@@ -82,8 +75,7 @@ public class ConduitApi {
     int i;
     for (i = 0; i < eventNameBytes.length; i++) {
       eventNameBytes[i] = (byte) ds.eventName(i);
-      if (eventNameBytes[i] == 0)
-        break;
+      if (eventNameBytes[i] == 0) break;
     }
     return new String(eventNameBytes, 0, i, utf8Charset);
   }
@@ -92,8 +84,7 @@ public class ConduitApi {
     int i;
     for (i = 0; i < gameSpecificMessageBytes.length; i++) {
       gameSpecificMessageBytes[i] = (byte) ds.gameSpecificMessage(i);
-      if (gameSpecificMessageBytes[i] == 0)
-        break;
+      if (gameSpecificMessageBytes[i] == 0) break;
     }
     return new String(gameSpecificMessageBytes, 0, i, utf8Charset);
   }
@@ -126,8 +117,7 @@ public class ConduitApi {
     int i;
     for (i = 0; i < joystickNameBytes.length; i++) {
       joystickNameBytes[i] = (byte) joysticks[joystickId].name(i);
-      if (joystickNameBytes[i] == 0)
-        break;
+      if (joystickNameBytes[i] == 0) break;
     }
 
     return new String(joystickNameBytes, 0, i, utf8Charset);

@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Built-In Logging
+# 🗒️ Built-In Logging
 
 AdvantageKit automatically logs many important fields as inputs or outputs. No configuration is required to use these features.
 
@@ -23,6 +23,10 @@ The methods `RobotController.getFPGATime()` and `Timer.getFPGATimestamp()` are u
 ### Driver Station
 
 All values that can be accessed via the `DriverStation` or WPILib HID classes (`Joystick`, `XboxController`, etc) are automatically logged and replayed. These fields are available under the `DriverStation` table.
+
+:::danger
+The [`waitForDsConnection`](<https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/DriverStation.html#waitForDsConnection(double)>) method is not compatible with AdvantageKit.
+:::
 
 ### Dashboard Inputs
 
@@ -68,7 +72,7 @@ LoggedPowerDistribution.getInstance(50, ModuleType.kRev); // Example: PDH on CAN
 
 ### System Stats
 
-Important status information from the roboRIO is automatically recorded, such as the battery voltage, rail status, CAN status, and system time. These fields are available under the `SystemStats` table.
+Important status information from the roboRIO is automatically recorded, such as the battery voltage, rail status, CAN status, system time, and NT client connections. These fields are available under the `SystemStats` table.
 
 ### Performance Data
 

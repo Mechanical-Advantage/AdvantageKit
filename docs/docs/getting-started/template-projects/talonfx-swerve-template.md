@@ -5,12 +5,12 @@ sidebar_position: 4
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# TalonFX Swerve Template
+# TalonFX(S) Swerve Template
 
 AdvantageKit includes two swerve project templates with built-in support for advanced features:
 
 - Easy setup with Tuner X swerve project generator
-- High-frequency odometry
+- [High-frequency odometry](./high-frequency-odometry.md)
 - CANivore time sync (for Phoenix Pro users)
 - On-controller feedback loops
 - Physics simulation
@@ -20,7 +20,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Step-by-step setup and tuning instructions with a prebuilt AdvantageScope layout
 - **Deterministic replay** with a **guarantee of accuracy**
 
-By default, the TalonFX version of the swerve template is configured for robots with **four TalonFX drive motors, four TalonFX turn motors, four CANcoders, and a NavX or Pigeon 2 gyro**. See the [Spark Swerve Template](spark-swerve-template.md) for swerve robots using Spark Max/Flex.
+By default, the TalonFX(S) version of the swerve template is configured for robots with **four TalonFX drive motors, four TalonFX turn motors, four CANcoders, and a NavX or Pigeon 2 gyro**. An alternative IO implementation is provided for robots with **four TalonFXS drive motors, four TalonFXS turn motors, and four PWM encoders connected to CANdis**. These implementations can be freely mixed to support [alternative hardware configurations](#custom-module-implementations). Also see the [Spark Swerve Template](spark-swerve-template.md) for swerve robots using Spark Max/Flex.
 
 :::info
 The AdvantageKit swerve templates are **open-source** and **fully customizable**:
@@ -41,7 +41,7 @@ The swerve project folder includes a predefined AdvantageScope layout with tabs 
 <TabItem value="tuner-x" label="Swerve Project Generator" default>
 
 :::danger
-CTRE only permits the swerve project generator to be used on swerve robots with **exclusively CTRE hardware** (eight TalonFX controllers, four CANcoders, and a Pigeon 2). Otherwise, switch to the "Manual" tab for standard setup instructions.
+CTRE only permits the swerve project generator to be used on swerve robots with **exclusively CTRE hardware** (including a Pigeon 2). Otherwise, switch to the "Manual" tab for standard setup instructions.
 :::
 
 1. Download the TalonFX swerve template project from the AdvantageKit release on GitHub and open it in VSCode.
@@ -59,6 +59,8 @@ CTRE only permits the swerve project generator to be used on swerve robots with 
 7. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/88be410fdbfd811e6f776197d41c0bea5f109b0e/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L17) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/88be410fdbfd811e6f776197d41c0bea5f109b0e/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L198-L202). Before removing them, both lines will be marked as errors in VSCode.
 
 8. In `TunerConstants.java`, change `kSteerInertia` to 0.004 and `kDriveInertia` to 0.025.
+
+9. If the robot does not use the default arrangement of 8 TalonFXs and 4 CANcoders, please see the section [here](#custom-module-implementations) on alternative module IO implementations.
 
 :::warning
 The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**
@@ -87,7 +89,7 @@ The project is configured to save log files when running on a real robot. **A FA
 
 10. Set the value of `kPigeonId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
 
-11. For each module, set the values of `k...DriveMotorId`, `k...SteerMotorId`, and `k...EncoderId` to the correct CAN IDs of the drive TalonFX, turn TalonFX, and CANcoder (as configured in Tuner X).
+11. For each module, set the values of `k...DriveMotorId`, `k...SteerMotorId`, and `k...EncoderId` to the correct CAN IDs of the drive TalonFX(S), turn TalonFX(S), and CANcoder/CANdi (as configured in Tuner X).
 
 12. For each module, set the values of `k...XPos` and `k...YPos` based on the distance from each module to the center of the robot. Positive X values are closer to the front of the robot and positive Y values are closer to the left side of the robot.
 
@@ -109,6 +111,8 @@ The project is configured to save log files when running on a real robot. **A FA
 
 19. Record the value of `/Drive/Module.../TurnPosition` for each aligned module. Update the value of `k...EncoderOffset` for each module to `Radians.of(<insert value>)`. **The value saved in `TunerConstants` must be the _negative_ of the value displayed in AdvantageScope (i.e. positive values become negative and vice versa).**
 
+20. If the robot does not use the default arrangement of 8 TalonFXs and 4 CANcoders, please see the section [here](#custom-module-implementations) on alternative module IO implementations. If the robot does not use a Pigeon 2, please see the section [here](#custom-gyro-implementations) on alternative gyro options.
+
 </TabItem>
 </Tabs>
 
@@ -122,12 +126,16 @@ The project defaults to voltage control for both the drive and turn motors. Phoe
 Torque-current control requires different gains than voltage control. We recommend following the steps below to tune feedforward and PID gains.
 :::
 
+:::warning
+CTRE does not allow torque-current control on the TalonFXS.
+:::
+
 ### Feedforward Characterization
 
 The project includes default [feedforward gains](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-feedforward.html#introduction-to-dc-motor-feedforward) for velocity control of the drive motors (`kS` and `kV`), acceleration control of the drive motors (`kA`), and velocity control of the turn motors (`kS` and `kV`).
 
 :::info
-The AdvantageKit template requires different feedforward gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX firmware and not on the RIO.
+The AdvantageKit template requires different feedforward gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX(S) firmware and not on the RIO.
 :::
 
 :::tip
@@ -197,7 +205,7 @@ The project includes an automated wheel radius characterization routine, which o
 The project includes default gains for the drive velocity PID controllers and turn position PID controllers, which can be found in the `steerGains` and `driveGains` configs in `TunerConstants.java`. These gains should be tuned for each robot.
 
 :::info
-The AdvantageKit template requires different PID gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX firmware and not on the RIO.
+The AdvantageKit template requires different PID gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX(S) firmware and not on the RIO.
 :::
 
 :::tip
@@ -268,11 +276,16 @@ Reference the full `GyroIONavX` implementation for an example of how to create a
 
 ### Custom Module Implementations
 
-The implementation of `ModuleIOTalonFX` can be freely customized to support alternative hardware configurations, such as using a Spark Max as a turn controller. When integrating with Spark devices, we recommend referencing the implementation found in the `ModuleIOSpark` class of the [Spark Swerve Template](spark-swerve-template.md).
+The template project includes multiple IO implementations for different hardware arrangements, as listed below. The selected IO implementation can be changed in `RobotContainer`.
+
+- **`ModuleIOTalonFX`**: TalonFX drive controllers, TalonFX turn controllers, and CANcoders (default)
+- **`ModuleIOTalonFXS`**: TalonFXS drive controllers, TalonFXS turn controllers, and CANdis
+
+The implementations of `ModuleIOTalonFX` and `ModuleIOTalonFXS` can be freely customized to support alternative hardware configurations, such as mixing and matching the TalonFX/TalonFXS, using an alternative encoder, or using a Spark Max/Flex instead of a CTRE controller. **We recommend copying any configuration for alternative devices directly from an existing IO implementation whenever possible** (e.g. copying the CANcoder configuration from `ModuleIOTalonFX` to `ModuleIOTalonFXS`). When integrating with Spark devices, please see the example IO implementation in the `ModuleIOSpark` class of the [Spark Swerve Template](spark-swerve-template.md).
 
 As described in the previous section, the `PhoenixOdometryThread` supports non-Phoenix signals through the `registerSignal` method. This allows devices from different vendors to be freely mixed.
 
-By default, the project uses a CANcoder in remote/fused/sync mode. When using another absolute encoder (such as a duty cycle encoder or HELIUM Canandmag), we recommend reseting the relative encoder based on the absolute encoder; the relative encoder can then be used for PID control. In this case, the following changes are required:
+By default, the project uses a CANcoder/CANdi in remote/fused/sync mode. When using another absolute encoder (such as a duty cycle encoder or HELIUM Canandmag), we recommend reseting the relative encoder based on the absolute encoder; the relative encoder can then be used for PID control. In this case, the following changes are required:
 
 1. Create the encoder object in `ModuleIOTalonFX` and configure it appropriately.
 

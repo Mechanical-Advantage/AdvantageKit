@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Supported Types
+# 📊 Supported Types
 
 Data is stored using string keys where slashes are used to denote subtables (similar to NetworkTables). Like NetworkTables, **all logged values are persistent (they will continue to appear on subsequent cycles until updated**).
 
@@ -45,7 +45,11 @@ Record logging can take an extended period (>100ms) the first time that a value 
 
 ### Units
 
-WPILib includes a [units library](https://docs.wpilib.org/en/latest/docs/software/basic-programming/java-units.html) that can be used to simplify unit conversions. `Measure` objects can be logged and replayed by AdvantageKit. These values will be stored in the log as doubles using the [base unit](https://github.com/wpilibsuite/allwpilib/blob/main/wpiunits/src/main/java/edu/wpi/first/units/BaseUnits.java) for the measurement type (e.g. distances will always be logged in meters).
+AdvantageKit includes extensive support for unit-safe logging, including compatibility with AdvantageScope's [unit visualization](https://docs.advantagescope.org/tab-reference/line-graph/units) and the WPILib [units library](https://docs.wpilib.org/en/latest/docs/software/basic-programming/java-units.html). See the sections below for more information:
+
+- Input logging ([link](/data-flow/recording-inputs/annotation-logging#units))
+- Output logging ([link](/data-flow/recording-outputs/#units))
+- Output annotation logging ([link](/data-flow/recording-outputs/annotation-logging#unit))
 
 ### Colors
 

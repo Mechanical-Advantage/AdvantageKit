@@ -1,43 +1,37 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction;
-
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.util.List;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.IterativeRobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.wpilibj.IterativeRobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.util.List;
 
 /**
  * LoggedRobot implements the IterativeRobotBase robot program framework.
  *
- * <p>
- * The LoggedRobot class is intended to be subclassed by a user creating a robot
- * program, and will call all required AdvantageKit periodic methods.
+ * <p>The LoggedRobot class is intended to be subclassed by a user creating a robot program, and
+ * will call all required AdvantageKit periodic methods.
  *
- * <p>
- * periodic() functions from the base class are called on an interval by a
- * Notifier instance.
+ * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
  */
 public class LoggedRobot extends IterativeRobotBase {
+  /** Default loop period. */
   public static final double defaultPeriodSecs = 0.02;
+
   private final int notifier = NotifierJNI.initializeNotifier();
   private final long periodUs;
   private long nextCycleUs = 0;
@@ -61,64 +55,74 @@ public class LoggedRobot extends IterativeRobotBase {
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_AdvantageKit);
-    HAL.report(tResourceType.kResourceType_LoggingFramework, tInstances.kLoggingFramework_AdvantageKit);
+    HAL.report(
+        tResourceType.kResourceType_LoggingFramework, tInstances.kLoggingFramework_AdvantageKit);
   }
 
   @Override
-  @SuppressWarnings("NoFinalizer")
-  protected void finalize() {
+  public void close() {
     NotifierJNI.stopNotifier(notifier);
     NotifierJNI.cleanNotifier(notifier);
+    super.close();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
   @Override
   @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
-    // Robot init methods
-    robotInit();
-    if (isSimulation()) {
-      simulationInit();
-    }
-    long initEnd = RobotController.getFPGATime(); // Includes Robot constructor and robotInit
-
-    // Register auto logged outputs
-    AutoLogOutputManager.addObject(this);
-
-    // Save data from init cycle
-    Logger.periodicAfterUser(initEnd, 0);
-
-    // Tell the DS that the robot is ready to be enabled
-    System.out.println("********** Robot program startup complete **********");
-    DriverStationJNI.observeUserProgramStarting();
-
-    // Loop forever, calling the appropriate mode-dependent function
-    while (true) {
-      if (useTiming) {
-        long currentTimeUs = RobotController.getFPGATime();
-        if (nextCycleUs < currentTimeUs) {
-          // Loop overrun, start next cycle immediately
-          nextCycleUs = currentTimeUs;
-        } else {
-          // Wait before next cycle
-          NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
-          if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
-            // Break the loop if the notifier was stopped
-            Logger.end();
-            break;
-          }
-        }
-        nextCycleUs += periodUs;
+    try {
+      // Robot init methods
+      robotInit();
+      if (isSimulation()) {
+        simulationInit();
       }
+      long initEnd = RobotController.getFPGATime(); // Includes Robot constructor and robotInit
 
-      long periodicBeforeStart = RobotController.getFPGATime();
-      Logger.periodicBeforeUser();
-      long userCodeStart = RobotController.getFPGATime();
-      loopFunc();
-      long userCodeEnd = RobotController.getFPGATime();
+      // Register auto logged outputs
+      AutoLogOutputManager.addObject(this);
 
-      gcStatsCollector.update();
-      Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
+      // Save data from init cycle
+      Logger.periodicAfterUser(initEnd, 0);
+
+      // Tell the DS that the robot is ready to be enabled
+      System.out.println("********** Robot program startup complete **********");
+      DriverStationJNI.observeUserProgramStarting();
+
+      // Loop forever, calling the appropriate mode-dependent function
+      while (true) {
+        if (useTiming) {
+          long currentTimeUs = RobotController.getFPGATime();
+          if (nextCycleUs < currentTimeUs) {
+            // Loop overrun, start next cycle immediately
+            nextCycleUs = currentTimeUs;
+          } else {
+            // Wait before next cycle
+            NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
+            if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
+              // Break the loop if the notifier was stopped
+              Logger.end();
+              break;
+            }
+          }
+          nextCycleUs += periodUs;
+        }
+
+        long periodicBeforeStart = RobotController.getFPGATime();
+        Logger.periodicBeforeUser();
+        long userCodeStart = RobotController.getFPGATime();
+        loopFunc();
+        long userCodeEnd = RobotController.getFPGATime();
+
+        gcStatsCollector.update();
+        Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
+      }
+    } catch (Exception exception) {
+      // Exception thrown, log crash information
+      StringWriter stringWriter = new StringWriter();
+      exception.printStackTrace(new PrintWriter(stringWriter));
+      Logger.periodicAfterUser(0, 0, stringWriter.toString());
+      Logger.end();
+      throw exception;
     }
   }
 
@@ -128,7 +132,11 @@ public class LoggedRobot extends IterativeRobotBase {
     NotifierJNI.stopNotifier(notifier);
   }
 
-  /** Sets whether to use standard timing or run as fast as possible. */
+  /**
+   * Sets whether to use standard timing or run as fast as possible.
+   *
+   * @param useTiming If true, use standard timing. If false, run as fast as possible.
+   */
   public void setUseTiming(boolean useTiming) {
     this.useTiming = useTiming;
   }

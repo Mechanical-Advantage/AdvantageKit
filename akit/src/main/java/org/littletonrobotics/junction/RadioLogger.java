@@ -1,22 +1,14 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction;
 
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -24,7 +16,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import org.littletonrobotics.junction.LogTable.LogValue;
 
 class RadioLogger {
@@ -39,7 +30,7 @@ class RadioLogger {
   private static String statusJson = "";
 
   public static void periodic(LogTable table) {
-    if (notifier == null && RobotBase.isReal()) {
+    if (notifier == null && RobotController.getTeamNumber() != 0) {
       start();
     }
 
@@ -65,31 +56,33 @@ class RadioLogger {
     }
 
     // Launch notifier
-    notifier = new Notifier(
-        () -> {
-          // Request status from radio
-          StringBuilder response = new StringBuilder();
-          try {
-            HttpURLConnection connection = (HttpURLConnection) statusURL.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(connectTimeout);
-            connection.setReadTimeout(readTimeout);
+    notifier =
+        new Notifier(
+            () -> {
+              // Request status from radio
+              StringBuilder response = new StringBuilder();
+              try {
+                HttpURLConnection connection = (HttpURLConnection) statusURL.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(connectTimeout);
+                connection.setReadTimeout(readTimeout);
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-              for (String line; (line = reader.readLine()) != null;) {
-                response.append(line);
+                try (BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                  for (String line; (line = reader.readLine()) != null; ) {
+                    response.append(line);
+                  }
+                }
+              } catch (Exception e) {
               }
-            }
-          } catch (Exception e) {
-          }
 
-          // Update status
-          String responseStr = response.toString().replaceAll("\\s+", "");
-          synchronized (lock) {
-            isConnected = responseStr.length() > 0;
-            statusJson = responseStr;
-          }
-        });
+              // Update status
+              String responseStr = response.toString().replaceAll("\\s+", "");
+              synchronized (lock) {
+                isConnected = responseStr.length() > 0;
+                statusJson = responseStr;
+              }
+            });
     notifier.setName("AdvantageKit_RadioLogger");
     notifier.startPeriodic(requestPeriodSecs);
   }

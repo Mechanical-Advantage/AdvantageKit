@@ -6,7 +6,7 @@ sidebar_position: 3
 
 AdvantageKit includes two swerve project templates with built-in support for advanced features:
 
-- High-frequency odometry
+- [High-frequency odometry](./high-frequency-odometry.md)
 - On-controller feedback loops
 - Physics simulation
 - Automated characterization routines
@@ -15,7 +15,7 @@ AdvantageKit includes two swerve project templates with built-in support for adv
 - Step-by-step setup and tuning instructions with a prebuilt AdvantageScope layout
 - **Deterministic replay** with a **guarantee of accuracy**
 
-By default, the Spark version of the swerve template is configured for robots with **MAXSwerve modules, four NEO Vortex drive motors, four NEO 550 turn motors, four duty cycle absolute encoders, and a NavX or Pigeon 2 gyro**. See the [TalonFX Swerve Template](talonfx-swerve-template.md) for swerve robots using Talon FX.
+By default, the Spark version of the swerve template is configured for robots with **MAXSwerve modules, four NEO Vortex drive motors, four NEO 550 turn motors, four duty cycle absolute encoders, and a NavX or Pigeon 2 gyro**. See the [TalonFX(S) Swerve Template](talonfx-swerve-template.md) for swerve robots using Talon FX.
 
 :::info
 The AdvantageKit swerve templates are **open-source** and **fully customizable**:
@@ -222,7 +222,7 @@ Reference the full `GyroIONavX` implementation for an example of how to create a
 
 ### Custom Module Implementations
 
-The implementation of `ModuleIOSpark` can be freely customized to support alternative hardware configurations, such as using a TalonFX-based drive motor. When integrating with TalonFX devices, we recommend referencing the implementation found in the `ModuleIOTalonFX` class of the [TalonFX Swerve Template](talonfx-swerve-template.md).
+The implementation of `ModuleIOSpark` can be freely customized to support alternative hardware configurations, such as using a TalonFX(S)-based drive motor. When integrating with TalonFX(S) devices, we recommend referencing the implementation found in the `ModuleIOTalonFX` or `ModuleIOTalonFXS` classes of the [TalonFX(S) Swerve Template](talonfx-swerve-template.md).
 
 As described in the previous section, the `SparkOdometryThread` supports non-Spark signals through the `registerSignal` method. This allows devices from different vendors to be freely mixed.
 
