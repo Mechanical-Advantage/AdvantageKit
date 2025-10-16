@@ -18,6 +18,7 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructBuffer;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.util.Color;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -576,6 +577,17 @@ public class LogTable {
   public <U extends Unit> void put(String key, Measure<U> value) {
     if (value == null) return;
     put(key, new LogValue(value.baseUnitMagnitude(), null, value.baseUnit().name()));
+  }
+
+  /**
+   * Writes a new Color value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
+   */
+  public void put(String key, Color value) {
+    if (value == null) return;
+    put(key, value.toHexString());
   }
 
   /**
@@ -1349,6 +1361,21 @@ public class LogTable {
       double baseValue = get(key).getDouble(defaultValue.baseUnitMagnitude());
       double relativeValue = defaultValue.unit().fromBaseUnits(baseValue);
       return (M) new GenericMutableMeasureImpl<>(relativeValue, baseValue, defaultValue.unit());
+    } else {
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Reads a Color value from the table.
+   *
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
+  public Color get(String key, Color defaultValue) {
+    if (data.containsKey(prefix + key)) {
+      return new Color(get(key).getString(defaultValue.toHexString()));
     } else {
       return defaultValue;
     }

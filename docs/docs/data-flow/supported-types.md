@@ -51,6 +51,10 @@ AdvantageKit includes extensive support for unit-safe logging, including compati
 - Output logging ([link](/data-flow/recording-outputs/#units))
 - Output annotation logging ([link](/data-flow/recording-outputs/annotation-logging#unit))
 
+### Colors
+
+WPILib includes a [color library](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/util/Color.html) that can be used to simplify color operations. These values will be stored in the log as a string formatted in [Hex Triplet](https://en.wikipedia.org/wiki/Web_colors) color notation.
+
 ### Enums
 
 [Enum](https://www.w3schools.com/java/java_enums.asp) values can be logged and replayed by AdvantageKit. These values will be stored in the log as string values (using the [`name()`](https://docs.oracle.com/javase/8/docs/api/java/lang/Enum.html#name--) method).
