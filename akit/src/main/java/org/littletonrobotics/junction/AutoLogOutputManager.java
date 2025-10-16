@@ -1,28 +1,20 @@
-// Copyright 2021-2025 FRC 6328
+// Copyright (c) 2021-2025 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.littletonrobotics.junction;
 
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.util.WPISerializable;
-
+import edu.wpi.first.util.struct.StructSerializable;
+import edu.wpi.first.wpilibj.DriverStation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.ClassCastException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +24,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -43,13 +34,12 @@ public class AutoLogOutputManager {
   private static final Set<String> allowedPackages = new HashSet<>();
 
   /**
-   * Adds a new allowed package to use when scanning for annotations. By default,
-   * the parent class where {@code @AutoLogOutput} is used must be within the same
-   * package as {@code Robot} (or a subpackage). Calling this method registers a
-   * new allowed package, such as a "lib" package outside of normal robot code.
+   * Adds a new allowed package to use when scanning for annotations. By default, the parent class
+   * where {@code @AutoLogOutput} is used must be within the same package as {@code Robot} (or a
+   * subpackage). Calling this method registers a new allowed package, such as a "lib" package
+   * outside of normal robot code.
    *
-   * <p>
-   * This method must be called within the constructor of {@code Robot}.
+   * <p>This method must be called within the constructor of {@code Robot}.
    *
    * @param packageName The new allowed package name (e.g. "frc.lib")
    */
@@ -64,18 +54,17 @@ public class AutoLogOutputManager {
     }
   }
 
-    /**
-     * Adds Kotlin classes from the package of the given root object. This method
-     * scans the package of the root object to identify all Kotlin classes
-     * and adds them to the appropriate collection. For Kotlin object classes,
-     * it calls the {@link #addObject(Object)} method, while for other Kotlin
-     * classes (such as Kotlin files), it calls the {@link #addKotlinFile(Object)} method.
-     *
-     * @param root The root object from which the package will be scanned for Kotlin classes.
-     */
+  /**
+   * Adds Kotlin classes from the package of the given root object. This method scans the package of
+   * the root object to identify all Kotlin classes and adds them to the appropriate collection. For
+   * Kotlin object classes, it calls the {@link #addObject(Object)} method, while for other Kotlin
+   * classes (such as Kotlin files), it calls the {@link #addKotlinFile(Object)} method.
+   *
+   * @param root The root object from which the package will be scanned for Kotlin classes.
+   */
   public static void addKotlinPackage(Object root) {
     Set<Class<?>> kotlinClasses = getAllKotlinClassesInPackage(root.getClass().getPackageName());
-    for (Class<?> clazz: kotlinClasses) {
+    for (Class<?> clazz : kotlinClasses) {
       if (isKotlinObjectClass(clazz)) {
         addObject(clazz);
       } else {
@@ -84,14 +73,13 @@ public class AutoLogOutputManager {
     }
   }
 
-    /**
-     * Adds a Kotlin file to the collection of allowed packages and registers it
-     * by invoking {@link #addObjectImpl(Object, Class)} with the provided root
-     * object and its class. Kotlin's files are typically represented by classes
-     * ending in "Kt" and aren't object classes.
-     *
-     * @param root The Kotlin file to be added.
-     */
+  /**
+   * Adds a Kotlin file to the collection of allowed packages and registers it by invoking {@link
+   * #addObjectImpl(Object, Class)} with the provided root object and its class. Kotlin's files are
+   * typically represented by classes ending in "Kt" and aren't object classes.
+   *
+   * @param root The Kotlin file to be added.
+   */
   public static void addKotlinFile(Object root) {
     allowedPackages.add(root.getClass().getPackageName());
     addObjectImpl(root, (Class<?>) root);
@@ -105,20 +93,20 @@ public class AutoLogOutputManager {
   public static void addObject(Object root) {
     String packageName = root.getClass().getPackageName();
     if (!allowedPackages.contains(packageName)) {
-        addKotlinPackage(root);
-        allowedPackages.add(packageName);
+      addKotlinPackage(root);
+      allowedPackages.add(packageName);
     }
 
     addObjectImpl(root, root.getClass());
   }
 
-    /**
-     * Registers a root object, scanning for loggable fields recursively.
-     *
-     * @param root The object to scan recursively.
-     * @param rootClass The class of the root object, used for retrieving methods and fields.
-     *                  When called in a Java context, it should be root.getClass().
-     */
+  /**
+   * Registers a root object, scanning for loggable fields recursively.
+   *
+   * @param root The object to scan recursively.
+   * @param rootClass The class of the root object, used for retrieving methods and fields. When
+   *     called in a Java context, it should be root.getClass().
+   */
   private static void addObjectImpl(Object root, Class<?> rootClass) {
     // Check if package name is valid
     String packageName = root.getClass().getPackageName();
@@ -129,12 +117,10 @@ public class AutoLogOutputManager {
         break;
       }
     }
-    if (!packageNameValid)
-      return;
+    if (!packageNameValid) return;
 
     // Check if object has already been scanned
-    if (scannedObjectHashes.contains(root.hashCode()))
-      return;
+    if (scannedObjectHashes.contains(root.hashCode())) return;
     scannedObjectHashes.add(root.hashCode());
 
     // If array, loop over individual items
@@ -149,87 +135,86 @@ public class AutoLogOutputManager {
     }
 
     // Loop over declared methods
-    getAllMethods(rootClass).forEach((methodAndDeclaringClass) -> {
-      Method method = methodAndDeclaringClass.method;
-      Class<?> declaringClass = methodAndDeclaringClass.declaringClass;
-      if (!method.trySetAccessible())
-        return;
+    getAllMethods(rootClass)
+        .forEach(
+            (methodAndDeclaringClass) -> {
+              Method method = methodAndDeclaringClass.method;
+              Class<?> declaringClass = methodAndDeclaringClass.declaringClass;
+              if (!method.trySetAccessible()) return;
 
-      // If annotated, try to add
-      if (method.isAnnotationPresent(AutoLogOutput.class)) {
-        // Exit if invalid signature
-        if (method.getReturnType().equals(Void.TYPE)
-            || method.getParameterCount() > 0
-            || method.getExceptionTypes().length > 0) {
-          return;
-        }
+              // If annotated, try to add
+              if (method.isAnnotationPresent(AutoLogOutput.class)) {
+                // Exit if invalid signature
+                if (method.getReturnType().equals(Void.TYPE)
+                    || method.getParameterCount() > 0
+                    || method.getExceptionTypes().length > 0) {
+                  return;
+                }
 
-        // Get key
-        String keyParameter = method.getAnnotation(AutoLogOutput.class).key();
-        String key = makeKey(keyParameter, method.getName(), declaringClass, root);
+                // Get key
+                String keyParameter = method.getAnnotation(AutoLogOutput.class).key();
+                String key = makeKey(keyParameter, method.getName(), declaringClass, root);
 
-        // Register method
-        registerField(
-            key,
-            method.getReturnType(),
-            () -> {
-              try {
-                return method.invoke(root);
-              } catch (IllegalAccessException
-                  | IllegalArgumentException
-                  | InvocationTargetException e) {
-                e.printStackTrace();
-                return null;
+                // Register method
+                registerField(
+                    key,
+                    method.getReturnType(),
+                    () -> {
+                      try {
+                        return method.invoke(root);
+                      } catch (IllegalAccessException
+                          | IllegalArgumentException
+                          | InvocationTargetException e) {
+                        e.printStackTrace();
+                        return null;
+                      }
+                    });
               }
             });
-      }
-    });
 
     // Loop over declared fields
-    getAllFields(root.getClass()).forEach((fieldAndDeclaringClass) -> {
-      Field field = fieldAndDeclaringClass.field;
-      Class<?> declaringClass = fieldAndDeclaringClass.declaringClass;
-      if (!field.trySetAccessible())
-        return;
+    getAllFields(root.getClass())
+        .forEach(
+            (fieldAndDeclaringClass) -> {
+              Field field = fieldAndDeclaringClass.field;
+              Class<?> declaringClass = fieldAndDeclaringClass.declaringClass;
+              if (!field.trySetAccessible()) return;
 
-      // If annotated, try to add
-      if (field.isAnnotationPresent(AutoLogOutput.class)) {
-        // Get key
-        String keyParameter = field.getAnnotation(AutoLogOutput.class).key();
-        String key = makeKey(keyParameter, field.getName(), declaringClass, root);
+              // If annotated, try to add
+              if (field.isAnnotationPresent(AutoLogOutput.class)) {
+                // Get key
+                String keyParameter = field.getAnnotation(AutoLogOutput.class).key();
+                String key = makeKey(keyParameter, field.getName(), declaringClass, root);
 
-        // Register field
-        registerField(
-            key,
-            field.getType(),
-            () -> {
+                // Register field
+                registerField(
+                    key,
+                    field.getType(),
+                    () -> {
+                      try {
+                        return field.get(root);
+                      } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                        return null;
+                      }
+                    });
+                return;
+              }
+
+              // Scan field value
+              Object fieldValue = null;
               try {
-                return field.get(root);
+                fieldValue = field.get(root);
               } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-                return null;
+                return;
+              }
+              if (fieldValue != null) {
+                addObjectImpl(fieldValue, rootClass);
               }
             });
-        return;
-      }
-
-      // Scan field value
-      Object fieldValue = null;
-      try {
-        fieldValue = field.get(root);
-      } catch (IllegalArgumentException | IllegalAccessException e) {
-        return;
-      }
-      if (fieldValue != null) {
-        addObjectImpl(fieldValue, rootClass);
-      }
-    });
   }
 
-  /**
-   * Returns the set of all methods on the class and its superclasses (public and
-   * private).
-   */
+  /** Returns the set of all methods on the class and its superclasses (public and private). */
   private static List<MethodAndDeclaringClass> getAllMethods(Class<?> type) {
     List<MethodAndDeclaringClass> methods = new ArrayList<>();
     while (type != null && type != Object.class) {
@@ -249,12 +234,10 @@ public class AutoLogOutputManager {
       this.method = method;
       this.declaringClass = declaringClass;
     }
-  };
+  }
+  ;
 
-  /**
-   * Returns the set of all fields in the class and its superclasses (public and
-   * private).
-   */
+  /** Returns the set of all fields in the class and its superclasses (public and private). */
   private static List<FieldAndDeclaringClass> getAllFields(Class<?> type) {
     List<FieldAndDeclaringClass> fields = new ArrayList<>();
     while (type != null && type != Object.class) {
@@ -274,11 +257,12 @@ public class AutoLogOutputManager {
       this.field = field;
       this.declaringClass = declaringClass;
     }
-  };
+  }
+  ;
 
   /**
-   * Finds the field in the provided class and its superclasses (must be public or
-   * protected in superclasses). Returns null if the field cannot be found.
+   * Finds the field in the provided class and its superclasses (must be public or protected in
+   * superclasses). Returns null if the field cannot be found.
    */
   private static Field findField(Class<?> type, String fieldName) {
     try {
@@ -289,7 +273,8 @@ public class AutoLogOutputManager {
       while (type != null && type != Object.class) {
         try {
           Field field = type.getDeclaredField(fieldName);
-          if (Modifier.isPublic(field.getModifiers()) || Modifier.isProtected(field.getModifiers())) {
+          if (Modifier.isPublic(field.getModifiers())
+              || Modifier.isProtected(field.getModifiers())) {
             return field;
           }
         } catch (NoSuchFieldException | SecurityException e1) {
@@ -305,12 +290,13 @@ public class AutoLogOutputManager {
   /**
    * Generates a log key based on the field properties.
    *
-   * @param keyParameter   The user-provided key from the annotation
-   * @param valueName      The name of the field or method
+   * @param keyParameter The user-provided key from the annotation
+   * @param valueName The name of the field or method
    * @param declaringClass The class where this fields or method is declared
-   * @param parent         The parent object to read data from
+   * @param parent The parent object to read data from
    */
-  private static String makeKey(String keyParameter, String valueName, Class<?> declaringClass, Object parent) {
+  private static String makeKey(
+      String keyParameter, String valueName, Class<?> declaringClass, Object parent) {
     if (keyParameter.length() == 0) {
       // Auto generate from parent and value
       String key = declaringClass.getSimpleName() + "/";
@@ -325,11 +311,9 @@ public class AutoLogOutputManager {
       while (true) {
         // Find field name
         int openIndex = key.indexOf("{");
-        if (openIndex == -1)
-          break; // No more brackets
+        if (openIndex == -1) break; // No more brackets
         int closeIndex = key.indexOf("}", openIndex);
-        if (closeIndex == -1)
-          break; // No closing bracket
+        if (closeIndex == -1) break; // No closing bracket
         String fieldName = key.substring(openIndex + 1, closeIndex);
 
         // Get field value
@@ -339,7 +323,10 @@ public class AutoLogOutputManager {
           field = findField(declaringClass, fieldName);
           field.setAccessible(true);
           fieldValue = field.get(parent).toString();
-        } catch (SecurityException | IllegalArgumentException | IllegalAccessException | NullPointerException e) {
+        } catch (SecurityException
+            | IllegalArgumentException
+            | IllegalAccessException
+            | NullPointerException e) {
           // Use default field value
         }
 
@@ -353,8 +340,8 @@ public class AutoLogOutputManager {
   /**
    * Registers the periodic callback for a single field.
    *
-   * @param key      The string key to use for logging.
-   * @param type     The type of object being logged.
+   * @param key The string key to use for logging.
+   * @param type The type of object being logged.
    * @param supplier A supplier for the field values.
    */
   private static void registerField(String key, Class<?> type, Supplier<?> supplier) {
@@ -364,43 +351,37 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (boolean) value);
+              if (value != null) Logger.recordOutput(key, (boolean) value);
             });
       } else if (type.equals(int.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (int) value);
+              if (value != null) Logger.recordOutput(key, (int) value);
             });
       } else if (type.equals(long.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (long) value);
+              if (value != null) Logger.recordOutput(key, (long) value);
             });
       } else if (type.equals(float.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (float) value);
+              if (value != null) Logger.recordOutput(key, (float) value);
             });
       } else if (type.equals(double.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (double) value);
+              if (value != null) Logger.recordOutput(key, (double) value);
             });
       } else if (type.equals(String.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (String) value);
+              if (value != null) Logger.recordOutput(key, (String) value);
             });
       } else if (type.isEnum()) {
         callbacks.add(
@@ -414,50 +395,43 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (BooleanSupplier) value);
+              if (value != null) Logger.recordOutput(key, (BooleanSupplier) value);
             });
       } else if (IntSupplier.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (IntSupplier) value);
+              if (value != null) Logger.recordOutput(key, (IntSupplier) value);
             });
       } else if (LongSupplier.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (LongSupplier) value);
+              if (value != null) Logger.recordOutput(key, (LongSupplier) value);
             });
       } else if (DoubleSupplier.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (DoubleSupplier) value);
+              if (value != null) Logger.recordOutput(key, (DoubleSupplier) value);
             });
       } else if (Measure.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (Measure<?>) value);
+              if (value != null) Logger.recordOutput(key, (Measure<?>) value);
             });
       } else if (type.equals(LoggedMechanism2d.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (LoggedMechanism2d) value);
+              if (value != null) Logger.recordOutput(key, (LoggedMechanism2d) value);
             });
       } else if (type.isRecord()) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (Record) value);
+              if (value != null) Logger.recordOutput(key, (Record) value);
             });
       } else {
         callbacks.add(
@@ -468,7 +442,8 @@ public class AutoLogOutputManager {
                   Logger.recordOutput(key, (WPISerializable) value);
                 } catch (ClassCastException e) {
                   DriverStation.reportError(
-                      "[AdvantageKit] Auto serialization is not supported for type " + type.getSimpleName(),
+                      "[AdvantageKit] Auto serialization is not supported for type "
+                          + type.getSimpleName(),
                       false);
                 }
             });
@@ -480,50 +455,43 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (byte[]) value);
+              if (value != null) Logger.recordOutput(key, (byte[]) value);
             });
       } else if (componentType.equals(boolean.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (boolean[]) value);
+              if (value != null) Logger.recordOutput(key, (boolean[]) value);
             });
       } else if (componentType.equals(int.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (int[]) value);
+              if (value != null) Logger.recordOutput(key, (int[]) value);
             });
       } else if (componentType.equals(long.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (long[]) value);
+              if (value != null) Logger.recordOutput(key, (long[]) value);
             });
       } else if (componentType.equals(float.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (float[]) value);
+              if (value != null) Logger.recordOutput(key, (float[]) value);
             });
       } else if (componentType.equals(double.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (double[]) value);
+              if (value != null) Logger.recordOutput(key, (double[]) value);
             });
       } else if (componentType.equals(String.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (String[]) value);
+              if (value != null) Logger.recordOutput(key, (String[]) value);
             });
       } else if (componentType.isEnum()) {
         callbacks.add(
@@ -543,8 +511,7 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (Record[]) value);
+              if (value != null) Logger.recordOutput(key, (Record[]) value);
             });
       } else {
         callbacks.add(
@@ -569,50 +536,43 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (byte[][]) value);
+              if (value != null) Logger.recordOutput(key, (byte[][]) value);
             });
       } else if (componentType.equals(boolean.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (boolean[][]) value);
+              if (value != null) Logger.recordOutput(key, (boolean[][]) value);
             });
       } else if (componentType.equals(int.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (int[][]) value);
+              if (value != null) Logger.recordOutput(key, (int[][]) value);
             });
       } else if (componentType.equals(long.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (long[][]) value);
+              if (value != null) Logger.recordOutput(key, (long[][]) value);
             });
       } else if (componentType.equals(float.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (float[][]) value);
+              if (value != null) Logger.recordOutput(key, (float[][]) value);
             });
       } else if (componentType.equals(double.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (double[][]) value);
+              if (value != null) Logger.recordOutput(key, (double[][]) value);
             });
       } else if (componentType.equals(String.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (String[][]) value);
+              if (value != null) Logger.recordOutput(key, (String[][]) value);
             });
       } else if (componentType.isEnum()) {
         callbacks.add(
@@ -636,8 +596,7 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null)
-                Logger.recordOutput(key, (Record[][]) value);
+              if (value != null) Logger.recordOutput(key, (Record[][]) value);
             });
       } else {
         callbacks.add(
@@ -658,14 +617,13 @@ public class AutoLogOutputManager {
     }
   }
 
-    /**
-     * Checks if a given class is a Kotlin object class.
-     * This method checks if the class has a field named "INSTANCE", which
-     * all objects classes in kotlin have since they are singletons
-     *
-     * @param clazz The class to check.
-     * @return true if the class is a Kotlin object class, false otherwise.
-     */
+  /**
+   * Checks if a given class is a Kotlin object class. This method checks if the class has a field
+   * named "INSTANCE", which all objects classes in kotlin have since they are singletons
+   *
+   * @param clazz The class to check.
+   * @return true if the class is a Kotlin object class, false otherwise.
+   */
   private static boolean isKotlinObjectClass(Class<?> clazz) {
     try {
       return clazz.getDeclaredField("INSTANCE") != null;
@@ -674,13 +632,13 @@ public class AutoLogOutputManager {
     }
   }
 
-    /**
-     * Retrieves all Kotlin classes in a specified package.
-     *
-     * @param packageName The name of the package to scan for Kotlin classes.
-     * @return A {@link Set} of {@link Class} objects representing all Kotlin object classes or files with top level methods & fields
-     *         in the specified package.
-     */
+  /**
+   * Retrieves all Kotlin classes in a specified package.
+   *
+   * @param packageName The name of the package to scan for Kotlin classes.
+   * @return A {@link Set} of {@link Class} objects representing all Kotlin object classes or files
+   *     with top level methods & fields in the specified package.
+   */
   private static Set<Class<?>> getAllKotlinClassesInPackage(String packageName) {
     Reflections reflections = new Reflections(packageName, new SubTypesScanner(false));
 
