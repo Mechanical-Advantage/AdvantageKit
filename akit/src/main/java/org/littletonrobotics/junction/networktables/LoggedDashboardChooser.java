@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
@@ -24,8 +25,10 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
   private final String key;
   private String selectedValue = null;
+  private String previousValue = null;
   private SendableChooser<String> sendableChooser = new SendableChooser<>();
   private Map<String, V> options = new HashMap<>();
+  private Consumer<V> listener = null;
 
   private final LoggableInputs inputs =
       new LoggableInputs() {
@@ -133,6 +136,16 @@ public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
   }
 
   /**
+   * Binds the callback to run whenever the selected option changes. There can only be one listener,
+   * and this method overrites it with each invokation.
+   *
+   * @param listener The function to call that accepts the new value.
+   */
+  public void onChange(Consumer<V> listener) {
+    this.listener = listener;
+  }
+
+  /**
    * Returns the internal SendableChooser object, for use when setting up dashboard layouts. Do not
    * read data from the SendableChooser directly.
    *
@@ -147,5 +160,9 @@ public class LoggedDashboardChooser<V> extends LoggedNetworkInput {
       selectedValue = sendableChooser.getSelected();
     }
     Logger.processInputs(prefix + "/SmartDashboard", inputs);
+    if (previousValue != selectedValue) {
+      if (listener != null) listener.accept(get());
+      previousValue = selectedValue;
+    }
   }
 }
