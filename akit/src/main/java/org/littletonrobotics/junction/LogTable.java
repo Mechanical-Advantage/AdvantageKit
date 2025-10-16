@@ -18,6 +18,7 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructBuffer;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.util.Color;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -31,25 +32,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
-
-import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.protobuf.ProtobufBuffer;
-import edu.wpi.first.util.struct.StructBuffer;
-import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.struct.StructSerializable;
-import edu.wpi.first.util.WPISerializable;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.util.Color;
 import us.hebi.quickbuf.ProtoMessage;
 
-/**
- * A table of logged data in allowable types. Can reference another higher level
- * table.
- */
+/** A table of logged data in allowable types. Can reference another higher level table. */
 public class LogTable {
   private final String prefix;
   private final int depth;
@@ -125,8 +110,7 @@ public class LogTable {
   }
 
   /**
-   * Creates a new LogTable, copying data from the given source. The original
-   * table can be safely
+   * Creates a new LogTable, copying data from the given source. The original table can be safely
    * modified without affecting the copy.
    *
    * @param source The source table.
@@ -165,8 +149,7 @@ public class LogTable {
   }
 
   /**
-   * Creates a new LogTable for referencing a single subtable. Modifications to
-   * the subtable will be
+   * Creates a new LogTable for referencing a single subtable. Modifications to the subtable will be
    * reflected in the original object.
    *
    * @param tableName The name of the subtable. Do not include a trailing slash.
@@ -177,13 +160,11 @@ public class LogTable {
   }
 
   /**
-   * Returns a set of all values from the table. If reading a single subtable, the
-   * data will be a
+   * Returns a set of all values from the table. If reading a single subtable, the data will be a
    * copy. Otherwise, it will be a reference.
    *
-   * @param subtableOnly If true, include only values in the subtable (no prefix).
-   *                     If false, include
-   *                     all values.
+   * @param subtableOnly If true, include only values in the subtable (no prefix). If false, include
+   *     all values.
    * @return Map of the requested data.
    */
   public Map<String, LogValue> getAll(boolean subtableOnly) {
@@ -201,10 +182,8 @@ public class LogTable {
   }
 
   /**
-   * Checks whether the field can be updated with the specified type (it doesn't
-   * exist or is already
-   * the correct type). Sends a warning to the Driver Station if the existing type
-   * is different.
+   * Checks whether the field can be updated with the specified type (it doesn't exist or is already
+   * the correct type). Sends a warning to the Driver Station if the existing type is different.
    */
   private boolean writeAllowed(String key, LoggableType type, String customTypeStr) {
     LogValue currentValue = data.get(prefix + key);
@@ -240,45 +219,39 @@ public class LogTable {
   }
 
   /**
-   * Writes a new generic value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new generic value to the table. Skipped if the key already exists as a different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, LogValue value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     if (writeAllowed(key, value.type, value.customTypeStr)) {
       data.put(prefix + key, value);
     }
   }
 
   /**
-   * Writes a new Raw value to the table. Skipped if the key already exists as a
-   * different type.
+   * Writes a new Raw value to the table. Skipped if the key already exists as a different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, byte[] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     byte[] valueClone = new byte[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
   }
 
   /**
-   * Writes a new 2D Raw value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new 2D Raw value to the table. Skipped if the key already exists as a different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, byte[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -286,10 +259,9 @@ public class LogTable {
   }
 
   /**
-   * Writes a new Boolean value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new Boolean value to the table. Skipped if the key already exists as a different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, boolean value) {
@@ -297,32 +269,28 @@ public class LogTable {
   }
 
   /**
-   * Writes a new BooleanArray value to the table. Skipped if the key already
-   * exists as a different
+   * Writes a new BooleanArray value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, boolean[] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     boolean[] valueClone = new boolean[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
   }
 
   /**
-   * Writes a new 2D BooleanArray value to the table. Skipped if the key already
-   * exists as a
+   * Writes a new 2D BooleanArray value to the table. Skipped if the key already exists as a
    * different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, boolean[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -330,10 +298,9 @@ public class LogTable {
   }
 
   /**
-   * Writes a new Integer value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new Integer value to the table. Skipped if the key already exists as a different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, int value) {
@@ -341,16 +308,14 @@ public class LogTable {
   }
 
   /**
-   * Writes a new IntegerArray value to the table. Skipped if the key already
-   * exists as a different
+   * Writes a new IntegerArray value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, int[] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     long[] valueClone = new long[value.length];
     for (int i = 0; i < value.length; i++) {
       valueClone[i] = value[i];
@@ -359,16 +324,14 @@ public class LogTable {
   }
 
   /**
-   * Writes a new 2D IntegerArray value to the table. Skipped if the key already
-   * exists as a
+   * Writes a new 2D IntegerArray value to the table. Skipped if the key already exists as a
    * different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, int[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -376,10 +339,9 @@ public class LogTable {
   }
 
   /**
-   * Writes a new Integer value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new Integer value to the table. Skipped if the key already exists as a different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, long value) {
@@ -387,32 +349,28 @@ public class LogTable {
   }
 
   /**
-   * Writes a new IntegerArray value to the table. Skipped if the key already
-   * exists as a different
+   * Writes a new IntegerArray value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, long[] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     long[] valueClone = new long[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
   }
 
   /**
-   * Writes a new 2D IntegerArray value to the table. Skipped if the key already
-   * exists as a
+   * Writes a new 2D IntegerArray value to the table. Skipped if the key already exists as a
    * different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, long[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -420,10 +378,9 @@ public class LogTable {
   }
 
   /**
-   * Writes a new Float value to the table. Skipped if the key already exists as a
-   * different type.
+   * Writes a new Float value to the table. Skipped if the key already exists as a different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, float value) {
@@ -431,45 +388,40 @@ public class LogTable {
   }
 
   /**
-   * Writes a new Float value to the table with units. Skipped if the key already
-   * exists as a
+   * Writes a new Float value to the table with units. Skipped if the key already exists as a
    * different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
-   * @param unit  The unit to save as metadata.
+   * @param unit The unit to save as metadata.
    */
   public void put(String key, float value, String unit) {
     put(key, new LogValue(value, null, unit));
   }
 
   /**
-   * Writes a new FloatArray value to the table. Skipped if the key already exists
-   * as a different
+   * Writes a new FloatArray value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, float[] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     float[] valueClone = new float[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
   }
 
   /**
-   * Writes a new 2D FloatArray value to the table. Skipped if the key already
-   * exists as a different
+   * Writes a new 2D FloatArray value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, float[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -477,10 +429,9 @@ public class LogTable {
   }
 
   /**
-   * Writes a new Double value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new Double value to the table. Skipped if the key already exists as a different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, double value) {
@@ -488,45 +439,40 @@ public class LogTable {
   }
 
   /**
-   * Writes a new Double value to the table with units. Skipped if the key already
-   * exists as a
+   * Writes a new Double value to the table with units. Skipped if the key already exists as a
    * different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
-   * @param unit  The unit to save as metadata.
+   * @param unit The unit to save as metadata.
    */
   public void put(String key, double value, String unit) {
     put(key, new LogValue(value, null, unit));
   }
 
   /**
-   * Writes a new DoubleArray value to the table. Skipped if the key already
-   * exists as a different
+   * Writes a new DoubleArray value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, double[] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     double[] valueClone = new double[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
   }
 
   /**
-   * Writes a new 2D DoubleArray value to the table. Skipped if the key already
-   * exists as a
+   * Writes a new 2D DoubleArray value to the table. Skipped if the key already exists as a
    * different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, double[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -534,45 +480,39 @@ public class LogTable {
   }
 
   /**
-   * Writes a new String value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new String value to the table. Skipped if the key already exists as a different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, String value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key, new LogValue(value, null));
   }
 
   /**
-   * Writes a new StringArray value to the table. Skipped if the key already
-   * exists as a different
+   * Writes a new StringArray value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, String[] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     String[] valueClone = new String[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
   }
 
   /**
-   * Writes a new 2D StringArray value to the table. Skipped if the key already
-   * exists as a
+   * Writes a new 2D StringArray value to the table. Skipped if the key already exists as a
    * different type.
    *
-   * @param key   The field name.
+   * @param key The field name.
    * @param value The field value.
    */
   public void put(String key, String[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -580,31 +520,27 @@ public class LogTable {
   }
 
   /**
-   * Writes a new enum value to the table. Skipped if the key already exists as a
-   * different type.
+   * Writes a new enum value to the table. Skipped if the key already exists as a different type.
    *
-   * @param <E>   The enum type.
-   * @param key   The field name.
+   * @param <E> The enum type.
+   * @param key The field name.
    * @param value The field value.
    */
   public <E extends Enum<E>> void put(String key, E value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key, new LogValue(value.name(), null));
   }
 
   /**
-   * Writes a new enum array value to the table. Skipped if the key already exists
-   * as a different
+   * Writes a new enum array value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param <E>   The enum type.
-   * @param key   The field name.
+   * @param <E> The enum type.
+   * @param key The field name.
    * @param value The field value.
    */
   public <E extends Enum<E>> void put(String key, E[] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     String[] stringValues = new String[value.length];
     for (int i = 0; i < value.length; i++) {
       stringValues[i] = value[i].name();
@@ -613,17 +549,15 @@ public class LogTable {
   }
 
   /**
-   * Writes a new 2D enum array value to the table. Skipped if the key already
-   * exists as a different
+   * Writes a new 2D enum array value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param <E>   The enum type.
-   * @param key   The field name.
+   * @param <E> The enum type.
+   * @param key The field name.
    * @param value The field value.
    */
   public <E extends Enum<E>> void put(String key, E[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -631,44 +565,37 @@ public class LogTable {
   }
 
   /**
-   * Writes a new Measure value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new Measure value to the table. Skipped if the key already exists as a different type.
    *
-   * <p>
-   * This overload always records the value in its base unit. Use the double
-   * overload with a unit
+   * <p>This overload always records the value in its base unit. Use the double overload with a unit
    * string to record values with alternative units.
    *
-   * @param <U>   The unit type.
-   * @param key   The field name.
+   * @param <U> The unit type.
+   * @param key The field name.
    * @param value The field value.
    */
   public <U extends Unit> void put(String key, Measure<U> value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key, new LogValue(value.baseUnitMagnitude(), null, value.baseUnit().name()));
   }
 
   /**
-   * Writes a new Color value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new Color value to the table. Skipped if the key already exists as a different type.
    */
   public void put(String key, Color value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key, value.toHexString());
   }
 
   /**
    * Writes a new LoggableInput subtable to the table.
    *
-   * @param <T>   The input type.
-   * @param key   The field name.
+   * @param <T> The input type.
+   * @param key The field name.
    * @param value The field value.
    */
   public <T extends LoggableInputs> void put(String key, T value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     if (this.depth > 100) {
       DriverStation.reportWarning(
           "[AdvantageKit] Detected recursive table structure when logging value to field \""
@@ -702,18 +629,16 @@ public class LogTable {
   }
 
   /**
-   * Writes a new struct value to the table. Skipped if the key already exists as
-   * a different type.
+   * Writes a new struct value to the table. Skipped if the key already exists as a different type.
    *
-   * @param <T>    The struct type.
-   * @param key    The field name.
+   * @param <T> The struct type.
+   * @param key The field name.
    * @param struct The struct serialization object.
-   * @param value  The field value.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T> void put(String key, Struct<T> struct, T value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     addStructSchema(struct, new HashSet<>());
     if (!structBuffers.containsKey(struct.getTypeString())) {
       structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
@@ -727,19 +652,17 @@ public class LogTable {
   }
 
   /**
-   * Writes a new struct array value to the table. Skipped if the key already
-   * exists as a different
+   * Writes a new struct array value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param <T>    The struct type.
-   * @param key    The field name.
+   * @param <T> The struct type.
+   * @param key The field name.
    * @param struct The struct serialization object.
-   * @param value  The field value.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T> void put(String key, Struct<T> struct, T... value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     addStructSchema(struct, new HashSet<>());
     if (!structBuffers.containsKey(struct.getTypeString())) {
       structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
@@ -753,18 +676,16 @@ public class LogTable {
   }
 
   /**
-   * Writes a new 2D struct array value to the table. Skipped if the key already
-   * exists as a
+   * Writes a new 2D struct array value to the table. Skipped if the key already exists as a
    * different type.
    *
-   * @param <T>    The struct type.
-   * @param key    The field name.
+   * @param <T> The struct type.
+   * @param key The field name.
    * @param struct The struct serialization object.
-   * @param value  The field value.
+   * @param value The field value.
    */
   public <T> void put(String key, Struct<T> struct, T[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), struct, value[i]);
@@ -772,24 +693,23 @@ public class LogTable {
   }
 
   /**
-   * Writes a new protobuf value to the table. Skipped if the key already exists
-   * as a different
+   * Writes a new protobuf value to the table. Skipped if the key already exists as a different
    * type.
    *
-   * @param <T>           The value type.
+   * @param <T> The value type.
    * @param <MessageType> The protobuf message type.
-   * @param key           The field name.
-   * @param proto         The protobuf serialization object.
-   * @param value         The field value.
+   * @param key The field name.
+   * @param proto The protobuf serialization object.
+   * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T, MessageType extends ProtoMessage<?>> void put(
       String key, Protobuf<T, MessageType> proto, T value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     proto.forEachDescriptor(
         (name) -> data.containsKey("/.schema/" + name),
-        (typeString, schema) -> data.put("/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto")));
+        (typeString, schema) ->
+            data.put("/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto")));
     if (!protoBuffers.containsKey(proto.getTypeString())) {
       protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
 
@@ -802,7 +722,8 @@ public class LogTable {
             false);
       }
     }
-    ProtobufBuffer<T, MessageType> buffer = (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
+    ProtobufBuffer<T, MessageType> buffer =
+        (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
     ByteBuffer bb;
     try {
       bb = buffer.write(value);
@@ -852,18 +773,16 @@ public class LogTable {
   }
 
   /**
-   * Writes a new auto serialized value to the table. Skipped if the key already
-   * exists as a
+   * Writes a new auto serialized value to the table. Skipped if the key already exists as a
    * different type.
    *
-   * @param <T>   The object type.
-   * @param key   The field name.
+   * @param <T> The object type.
+   * @param key The field name.
    * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T extends WPISerializable> void put(String key, T value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     // If struct is supported, write as struct
     Struct<T> struct = (Struct<T>) findStructType(value.getClass());
     if (struct != null) {
@@ -883,18 +802,16 @@ public class LogTable {
   }
 
   /**
-   * Writes a new auto serialized array value to the table. Skipped if the key
-   * already exists as a
+   * Writes a new auto serialized array value to the table. Skipped if the key already exists as a
    * different type.
    *
-   * @param <T>   The object type.
-   * @param key   The field name.
+   * @param <T> The object type.
+   * @param key The field name.
    * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <T extends StructSerializable> void put(String key, T... value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     // If struct is supported, write as struct
     Struct<T> struct = (Struct<T>) findStructType(value.getClass().getComponentType());
     if (struct != null) {
@@ -908,17 +825,15 @@ public class LogTable {
   }
 
   /**
-   * Writes a new auto serialized 2D array value to the table. Skipped if the key
-   * already exists as
+   * Writes a new auto serialized 2D array value to the table. Skipped if the key already exists as
    * a different type.
    *
-   * @param <T>   The object type.
-   * @param key   The field name.
+   * @param <T> The object type.
+   * @param key The field name.
    * @param value The field value.
    */
   public <T extends StructSerializable> void put(String key, T[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -942,18 +857,16 @@ public class LogTable {
   }
 
   /**
-   * Writes a new auto serialized record value to the table. Skipped if the key
-   * already exists as a
+   * Writes a new auto serialized record value to the table. Skipped if the key already exists as a
    * different type.
    *
-   * @param <R>   The record type.
-   * @param key   The field name.
+   * @param <R> The record type.
+   * @param key The field name.
    * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> void put(String key, R value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     Struct<R> struct = (Struct<R>) findRecordStructType(value.getClass());
     if (struct != null) {
       put(key, struct, value);
@@ -961,18 +874,16 @@ public class LogTable {
   }
 
   /**
-   * Writes a new auto serialized record array value to the table. Skipped if the
-   * key already exists
+   * Writes a new auto serialized record array value to the table. Skipped if the key already exists
    * as a different type.
    *
-   * @param <R>   The record type.
-   * @param key   The field name.
+   * @param <R> The record type.
+   * @param key The field name.
    * @param value The field value.
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> void put(String key, R... value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     // If struct is supported, write as struct
     Struct<R> struct = (Struct<R>) findRecordStructType(value.getClass().getComponentType());
     if (struct != null) {
@@ -981,17 +892,15 @@ public class LogTable {
   }
 
   /**
-   * Writes a new auto serialized 2D record array value to the table. Skipped if
-   * the key already
+   * Writes a new auto serialized 2D record array value to the table. Skipped if the key already
    * exists as a different type.
    *
-   * @param <R>   The record type.
-   * @param key   The field name.
+   * @param <R> The record type.
+   * @param key The field name.
    * @param value The field value.
    */
   public <R extends Record> void put(String key, R[][] value) {
-    if (value == null)
-      return;
+    if (value == null) return;
     put(key + "/length", value.length);
     for (int i = 0; i < value.length; i++) {
       put(key + "/" + Integer.toString(i), value[i]);
@@ -1011,7 +920,7 @@ public class LogTable {
   /**
    * Reads a Raw value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1026,7 +935,7 @@ public class LogTable {
   /**
    * Reads a 2D Raw value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1045,7 +954,7 @@ public class LogTable {
   /**
    * Reads a Boolean value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1060,7 +969,7 @@ public class LogTable {
   /**
    * Reads a BooleanArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1075,7 +984,7 @@ public class LogTable {
   /**
    * Reads a 2D BooleanArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1094,7 +1003,7 @@ public class LogTable {
   /**
    * Reads an Integer value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1109,7 +1018,7 @@ public class LogTable {
   /**
    * Reads an IntegerArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1133,7 +1042,7 @@ public class LogTable {
   /**
    * Reads a 2D IntegerArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1152,7 +1061,7 @@ public class LogTable {
   /**
    * Reads an Integer value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1167,7 +1076,7 @@ public class LogTable {
   /**
    * Reads an IntegerArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1182,7 +1091,7 @@ public class LogTable {
   /**
    * Reads a 2D IntegerArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1201,7 +1110,7 @@ public class LogTable {
   /**
    * Reads a Float value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1216,7 +1125,7 @@ public class LogTable {
   /**
    * Reads a FloatArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1231,7 +1140,7 @@ public class LogTable {
   /**
    * Reads a 2D FloatArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1250,7 +1159,7 @@ public class LogTable {
   /**
    * Reads a Double value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1265,7 +1174,7 @@ public class LogTable {
   /**
    * Reads a DoubleArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1280,7 +1189,7 @@ public class LogTable {
   /**
    * Reads a 2D DoubleArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1299,7 +1208,7 @@ public class LogTable {
   /**
    * Reads a String value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1314,7 +1223,7 @@ public class LogTable {
   /**
    * Reads a StringArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1329,7 +1238,7 @@ public class LogTable {
   /**
    * Reads a 2D StringArray value from the table.
    *
-   * @param key          The field name.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1348,8 +1257,8 @@ public class LogTable {
   /**
    * Reads an enum value from the table.
    *
-   * @param <E>          The enum type.
-   * @param key          The field name.
+   * @param <E> The enum type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1366,18 +1275,18 @@ public class LogTable {
   /**
    * Reads an enum array value from the table.
    *
-   * @param <E>          The enum type.
-   * @param key          The field name.
+   * @param <E> The enum type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public <E extends Enum<E>> E[] get(String key, E[] defaultValue) {
     if (data.containsKey(prefix + key)) {
       String[] names = get(key).getStringArray(null);
-      if (names == null)
-        return defaultValue;
-      Class<? extends Enum> enumClass = (Class<? extends Enum>) defaultValue.getClass().getComponentType();
+      if (names == null) return defaultValue;
+      Class<? extends Enum> enumClass =
+          (Class<? extends Enum>) defaultValue.getClass().getComponentType();
       E[] values = (E[]) Array.newInstance(enumClass, names.length);
       for (int i = 0; i < names.length; i++) {
         values[i] = (E) Enum.valueOf(enumClass, names[i]);
@@ -1391,8 +1300,8 @@ public class LogTable {
   /**
    * Reads a 2D enum array value from the table.
    *
-   * @param <E>          The enum type.
-   * @param key          The field name.
+   * @param <E> The enum type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1402,8 +1311,9 @@ public class LogTable {
       int length = get(key + "/length", 0);
       E[][] value = (E[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
       for (int i = 0; i < length; i++) {
-        E[] defaultItemValue = (E[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
-            0);
+        E[] defaultItemValue =
+            (E[])
+                Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(), 0);
         value[i] = get(key + "/" + Integer.toString(i), defaultItemValue);
       }
       return value;
@@ -1415,9 +1325,9 @@ public class LogTable {
   /**
    * Reads a Measure value from the table.
    *
-   * @param <U>          The unit type.
-   * @param <M>          The measure type.
-   * @param key          The field name.
+   * @param <U> The unit type.
+   * @param <M> The measure type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1434,10 +1344,10 @@ public class LogTable {
   /**
    * Reads a MutableMeasure value from the table.
    *
-   * @param <U>          The unit type.
-   * @param <Base>       The base unit type
-   * @param <M>          The measure type.
-   * @param key          The field name.
+   * @param <U> The unit type.
+   * @param <Base> The base unit type
+   * @param <M> The measure type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1455,8 +1365,8 @@ public class LogTable {
 
   /**
    * Reads a Color value from the table.
-   * 
-   * @param key          The field name.
+   *
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1471,14 +1381,13 @@ public class LogTable {
   /**
    * Reads a LoggableInput subtable from the table.
    *
-   * @param <T>          The input type.
-   * @param key          The field name.
+   * @param <T> The input type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
   public <T extends LoggableInputs> T get(String key, T defaultValue) {
-    if (defaultValue == null)
-      return null;
+    if (defaultValue == null) return null;
     defaultValue.fromLog(getSubtable(key));
     return defaultValue;
   }
@@ -1486,9 +1395,9 @@ public class LogTable {
   /**
    * Reads a struct value from the table.
    *
-   * @param <T>          The struct type.
-   * @param key          The field name.
-   * @param struct       The struct serialization object.
+   * @param <T> The struct type.
+   * @param key The field name.
+   * @param struct The struct serialization object.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1508,9 +1417,9 @@ public class LogTable {
   /**
    * Reads a struct array value from the table.
    *
-   * @param <T>          The struct type.
-   * @param key          The field name.
-   * @param struct       The struct serialization object.
+   * @param <T> The struct type.
+   * @param key The field name.
+   * @param struct The struct serialization object.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1530,9 +1439,9 @@ public class LogTable {
   /**
    * Reads a 2D struct array value from the table.
    *
-   * @param <T>          The struct type.
-   * @param key          The field name.
-   * @param struct       The struct serialization object.
+   * @param <T> The struct type.
+   * @param key The field name.
+   * @param struct The struct serialization object.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1542,8 +1451,9 @@ public class LogTable {
       int length = get(key + "/length", 0);
       T[][] value = (T[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
       for (int i = 0; i < length; i++) {
-        T[] defaultItemValue = (T[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
-            0);
+        T[] defaultItemValue =
+            (T[])
+                Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(), 0);
         value[i] = get(key + "/" + Integer.toString(i), struct, defaultItemValue);
       }
       return value;
@@ -1555,11 +1465,11 @@ public class LogTable {
   /**
    * Reads a protobuf value from the table.
    *
-   * @param <T>           The value type.
+   * @param <T> The value type.
    * @param <MessageType> The protobuf message type.
-   * @param key           The field name.
-   * @param proto         The protobuf serialization object.
-   * @param defaultValue  The default field value.
+   * @param key The field name.
+   * @param proto The protobuf serialization object.
+   * @param defaultValue The default field value.
    * @return The field value.
    */
   @SuppressWarnings("unchecked")
@@ -1569,7 +1479,8 @@ public class LogTable {
       if (!protoBuffers.containsKey(proto.getTypeString())) {
         protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
       }
-      ProtobufBuffer<T, MessageType> buffer = (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
+      ProtobufBuffer<T, MessageType> buffer =
+          (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
       try {
         return buffer.read(get(key).getRaw());
       } catch (IOException e) {
@@ -1584,8 +1495,8 @@ public class LogTable {
   /**
    * Reads a serialized (struct/protobuf) value from the table.
    *
-   * @param <T>          The object type.
-   * @param key          The field name.
+   * @param <T> The object type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1612,8 +1523,8 @@ public class LogTable {
   /**
    * Reads a serialized (struct) array value from the table.
    *
-   * @param <T>          The object type.
-   * @param key          The field name.
+   * @param <T> The object type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1634,8 +1545,8 @@ public class LogTable {
   /**
    * Reads a serialized 2D (struct) array value from the table.
    *
-   * @param <T>          The object type.
-   * @param key          The field name.
+   * @param <T> The object type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1645,8 +1556,9 @@ public class LogTable {
       int length = get(key + "/length", 0);
       T[][] value = (T[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
       for (int i = 0; i < length; i++) {
-        T[] defaultItemValue = (T[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
-            0);
+        T[] defaultItemValue =
+            (T[])
+                Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(), 0);
         value[i] = get(key + "/" + Integer.toString(i), defaultItemValue);
       }
       return value;
@@ -1658,8 +1570,8 @@ public class LogTable {
   /**
    * Reads a serialized record value from the table.
    *
-   * @param <R>          The record type.
-   * @param key          The field name.
+   * @param <R> The record type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1680,8 +1592,8 @@ public class LogTable {
   /**
    * Reads a serialized record array value from the table.
    *
-   * @param <R>          The record type.
-   * @param key          The field name.
+   * @param <R> The record type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1690,7 +1602,8 @@ public class LogTable {
     if (data.containsKey(prefix + key)) {
       String typeString = data.get(prefix + key).customTypeStr;
       if (typeString.startsWith("struct:")) {
-        Struct<R> struct = (Struct<R>) findRecordStructType(defaultValue.getClass().getComponentType());
+        Struct<R> struct =
+            (Struct<R>) findRecordStructType(defaultValue.getClass().getComponentType());
         if (struct != null) {
           return get(key, struct, defaultValue);
         }
@@ -1702,8 +1615,8 @@ public class LogTable {
   /**
    * Reads a serialized 2D record array value from the table.
    *
-   * @param <R>          The record type.
-   * @param key          The field name.
+   * @param <R> The record type.
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
@@ -1713,8 +1626,9 @@ public class LogTable {
       int length = get(key + "/length", 0);
       R[][] value = (R[][]) Array.newInstance(defaultValue.getClass().getComponentType(), length);
       for (int i = 0; i < length; i++) {
-        R[] defaultItemValue = (R[]) Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(),
-            0);
+        R[] defaultItemValue =
+            (R[])
+                Array.newInstance(defaultValue.getClass().getComponentType().getComponentType(), 0);
         value[i] = get(key + "/" + Integer.toString(i), defaultItemValue);
       }
       return value;
@@ -1801,7 +1715,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(byte[] value, String typeStr) {
@@ -1814,7 +1728,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(boolean value, String typeStr) {
@@ -1827,7 +1741,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(long value, String typeStr) {
@@ -1840,7 +1754,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(float value, String typeStr) {
@@ -1853,7 +1767,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      * @param unitStr The unit name, or null if unitless.
      */
@@ -1867,7 +1781,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(double value, String typeStr) {
@@ -1880,7 +1794,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      * @param unitStr The unit name, or null if unitless.
      */
@@ -1894,7 +1808,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(String value, String typeStr) {
@@ -1911,7 +1825,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(boolean[] value, String typeStr) {
@@ -1924,7 +1838,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(long[] value, String typeStr) {
@@ -1937,7 +1851,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(float[] value, String typeStr) {
@@ -1950,7 +1864,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(double[] value, String typeStr) {
@@ -1963,7 +1877,7 @@ public class LogTable {
     /**
      * Creates a new LogValue.
      *
-     * @param value   The value.
+     * @param value The value.
      * @param typeStr The custom type string, or null for default.
      */
     public LogValue(String[] value, String typeStr) {
@@ -2183,8 +2097,7 @@ public class LogTable {
     }
 
     /**
-     * Returns the standard string type for WPILOGs. Returns the custom type string
-     * if not null.
+     * Returns the standard string type for WPILOGs. Returns the custom type string if not null.
      *
      * @return The type string.
      */
@@ -2197,8 +2110,7 @@ public class LogTable {
     }
 
     /**
-     * Returns the standard string type for NT4. Returns the custom type string if
-     * not null.
+     * Returns the standard string type for NT4. Returns the custom type string if not null.
      *
      * @return The type string.
      */
@@ -2276,32 +2188,34 @@ public class LogTable {
     StringArray;
 
     // https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/datalog.adoc#data-types
-    private static final List<String> wpilogTypes = List.of(
-        "raw",
-        "boolean",
-        "int64",
-        "float",
-        "double",
-        "string",
-        "boolean[]",
-        "int64[]",
-        "float[]",
-        "double[]",
-        "string[]");
+    private static final List<String> wpilogTypes =
+        List.of(
+            "raw",
+            "boolean",
+            "int64",
+            "float",
+            "double",
+            "string",
+            "boolean[]",
+            "int64[]",
+            "float[]",
+            "double[]",
+            "string[]");
 
     // https://github.com/wpilibsuite/allwpilib/blob/main/ntcore/doc/networktables4.adoc#supported-data-types
-    private static final List<String> nt4Types = List.of(
-        "raw",
-        "boolean",
-        "int",
-        "float",
-        "double",
-        "string",
-        "boolean[]",
-        "int[]",
-        "float[]",
-        "double[]",
-        "string[]");
+    private static final List<String> nt4Types =
+        List.of(
+            "raw",
+            "boolean",
+            "int",
+            "float",
+            "double",
+            "string",
+            "boolean[]",
+            "int[]",
+            "float[]",
+            "double[]",
+            "string[]");
 
     /**
      * Returns the standard string type for WPILOGs.
