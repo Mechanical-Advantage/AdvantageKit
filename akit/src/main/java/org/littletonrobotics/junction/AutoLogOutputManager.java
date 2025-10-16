@@ -28,6 +28,10 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
+/**
+ * Manages objects and packages for annotation logging of outputs with {@link
+ * org.littletonrobotics.junction.AutoLogOutput AutoLogOutput}.
+ */
 public class AutoLogOutputManager {
   private static final List<Runnable> callbacks = new ArrayList<>();
   private static final List<Integer> scannedObjectHashes = new ArrayList<>();
