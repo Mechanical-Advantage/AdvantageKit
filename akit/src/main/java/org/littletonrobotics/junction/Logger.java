@@ -16,6 +16,8 @@ import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.util.Color;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1384,6 +1386,25 @@ public class Logger {
   public static void recordOutput(String key, LoggedMechanism2d value) {
     if (running) {
       value.logOutput(outputTable.getSubtable(key));
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the simulator, use this
+   * method to record extra data based on the original inputs.
+   *
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
+   *
+   * @param key The name of the field to record. It will be stored under "/RealOutputs" or
+   *     "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public static void recordOutput(String key, Color value) {
+    if (running) {
+      outputTable.put(key, value);
     }
   }
 }
