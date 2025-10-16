@@ -581,6 +581,9 @@ public class LogTable {
 
   /**
    * Writes a new Color value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
    */
   public void put(String key, Color value) {
     if (value == null) return;
