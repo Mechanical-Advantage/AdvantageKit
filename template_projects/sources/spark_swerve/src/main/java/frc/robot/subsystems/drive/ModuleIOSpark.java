@@ -55,8 +55,10 @@ public class ModuleIOSpark implements ModuleIO {
   private final Queue<Double> turnPositionQueue;
 
   // Connection debouncers
-  private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
-  private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
+  private final Debouncer driveConnectedDebounce =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer turnConnectedDebounce =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
 
   public ModuleIOSpark(int module) {
     zeroRotation =
@@ -65,7 +67,7 @@ public class ModuleIOSpark implements ModuleIO {
           case 1 -> frontRightZeroRotation;
           case 2 -> backLeftZeroRotation;
           case 3 -> backRightZeroRotation;
-          default -> new Rotation2d();
+          default -> Rotation2d.kZero;
         };
     driveSpark =
         new SparkFlex(

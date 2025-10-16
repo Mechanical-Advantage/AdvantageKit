@@ -8,7 +8,6 @@
 package org.littletonrobotics.junction;
 
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -31,7 +30,7 @@ class RadioLogger {
   private static String statusJson = "";
 
   public static void periodic(LogTable table) {
-    if (notifier == null && RobotBase.isReal()) {
+    if (notifier == null && RobotController.getTeamNumber() != 0) {
       start();
     }
 

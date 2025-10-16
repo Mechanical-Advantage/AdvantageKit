@@ -33,6 +33,8 @@ public class AutoLogOutputManager {
   private static final List<Integer> scannedObjectHashes = new ArrayList<>();
   private static final Set<String> allowedPackages = new HashSet<>();
 
+  private AutoLogOutputManager() {}
+
   /**
    * Adds a new allowed package to use when scanning for annotations. By default, the parent class
    * where {@code @AutoLogOutput} is used must be within the same package as {@code Robot} (or a
@@ -151,9 +153,11 @@ public class AutoLogOutputManager {
                   return;
                 }
 
-                // Get key
-                String keyParameter = method.getAnnotation(AutoLogOutput.class).key();
-                String key = makeKey(keyParameter, method.getName(), declaringClass, root);
+                // Get parameters
+                AutoLogOutput annotation = method.getAnnotation(AutoLogOutput.class);
+                String key = makeKey(annotation.key(), method.getName(), declaringClass, root);
+                boolean forceSerializable = annotation.forceSerializable();
+                String unit = annotation.unit();
 
                 // Register method
                 registerField(
@@ -168,7 +172,9 @@ public class AutoLogOutputManager {
                         e.printStackTrace();
                         return null;
                       }
-                    });
+                    },
+                    forceSerializable,
+                    unit);
               }
             });
 
@@ -182,9 +188,11 @@ public class AutoLogOutputManager {
 
               // If annotated, try to add
               if (field.isAnnotationPresent(AutoLogOutput.class)) {
-                // Get key
-                String keyParameter = field.getAnnotation(AutoLogOutput.class).key();
-                String key = makeKey(keyParameter, field.getName(), declaringClass, root);
+                // Get parameters
+                AutoLogOutput annotation = field.getAnnotation(AutoLogOutput.class);
+                String key = makeKey(annotation.key(), field.getName(), declaringClass, root);
+                boolean forceSerializable = annotation.forceSerializable();
+                String unit = annotation.unit();
 
                 // Register field
                 registerField(
@@ -197,7 +205,9 @@ public class AutoLogOutputManager {
                         e.printStackTrace();
                         return null;
                       }
-                    });
+                    },
+                    forceSerializable,
+                    unit);
                 return;
               }
 
@@ -258,7 +268,6 @@ public class AutoLogOutputManager {
       this.declaringClass = declaringClass;
     }
   }
-  ;
 
   /**
    * Finds the field in the provided class and its superclasses (must be public or protected in
@@ -343,8 +352,28 @@ public class AutoLogOutputManager {
    * @param key The string key to use for logging.
    * @param type The type of object being logged.
    * @param supplier A supplier for the field values.
+   * @param forceSerializable Whether or not to always use a serialized data method.
+   * @param unit The unit metadata.
    */
-  private static void registerField(String key, Class<?> type, Supplier<?> supplier) {
+  private static void registerField(
+      String key, Class<?> type, Supplier<?> supplier, boolean forceSerializable, String unit) {
+    if (forceSerializable) {
+      callbacks.add(
+          () -> {
+            Object value = supplier.get();
+            if (value != null)
+              try {
+                Logger.recordOutput(key, (WPISerializable) value);
+              } catch (ClassCastException e) {
+                DriverStation.reportError(
+                    "[AdvantageKit] Auto serialization is not supported for type "
+                        + type.getSimpleName(),
+                    false);
+              }
+          });
+      return;
+    }
+
     if (!type.isArray()) {
       // Single types
       if (type.equals(boolean.class)) {
@@ -366,17 +395,34 @@ public class AutoLogOutputManager {
               if (value != null) Logger.recordOutput(key, (long) value);
             });
       } else if (type.equals(float.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (float) value);
-            });
+        if (unit.length() > 0) {
+          callbacks.add(
+              () -> {
+                Object value = supplier.get();
+                if (value != null) Logger.recordOutput(key, (float) value, unit);
+              });
+        } else {
+          callbacks.add(
+              () -> {
+                Object value = supplier.get();
+                if (value != null) Logger.recordOutput(key, (float) value);
+              });
+        }
+
       } else if (type.equals(double.class)) {
-        callbacks.add(
-            () -> {
-              Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (double) value);
-            });
+        if (unit.length() > 0) {
+          callbacks.add(
+              () -> {
+                Object value = supplier.get();
+                if (value != null) Logger.recordOutput(key, (double) value, unit);
+              });
+        } else {
+          callbacks.add(
+              () -> {
+                Object value = supplier.get();
+                if (value != null) Logger.recordOutput(key, (double) value);
+              });
+        }
       } else if (type.equals(String.class)) {
         callbacks.add(
             () -> {

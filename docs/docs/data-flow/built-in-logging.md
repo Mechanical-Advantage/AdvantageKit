@@ -24,6 +24,10 @@ The methods `RobotController.getFPGATime()` and `Timer.getFPGATimestamp()` are u
 
 All values that can be accessed via the `DriverStation` or WPILib HID classes (`Joystick`, `XboxController`, etc) are automatically logged and replayed. These fields are available under the `DriverStation` table.
 
+:::danger
+The [`waitForDsConnection`](<https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/DriverStation.html#waitForDsConnection(double)>) method is not compatible with AdvantageKit.
+:::
+
 ### Dashboard Inputs
 
 Dashboard inputs accessed **via AdvantageKit dashboard classes** are automatically logged and replayed. See [this page](./recording-inputs/dashboard-inputs.md) for details. These fields are available under the `NetworkInputs` table.

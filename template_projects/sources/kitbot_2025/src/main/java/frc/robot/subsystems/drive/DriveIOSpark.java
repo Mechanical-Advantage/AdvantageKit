@@ -93,7 +93,7 @@ public class DriveIOSpark implements DriveIO {
         (values) -> inputs.leftAppliedVolts = values[0] * values[1]);
     ifOk(
         leftLeader,
-        new DoubleSupplier[] {leftLeader::getOutputCurrent, leftLeader::getOutputCurrent},
+        new DoubleSupplier[] {leftLeader::getOutputCurrent, leftFollower::getOutputCurrent},
         (values) -> inputs.leftCurrentAmps = values);
 
     ifOk(rightLeader, rightEncoder::getPosition, (value) -> inputs.rightPositionRad = value);

@@ -20,6 +20,7 @@ public class NT4Publisher implements LogDataReceiver {
   private LogTable lastTable = new LogTable(0);
   private final IntegerPublisher timestampPublisher;
   private final Map<String, GenericPublisher> publishers = new HashMap<>();
+  private final Map<String, String> units = new HashMap<>();
 
   /** Creates a new NT4Publisher. */
   public NT4Publisher() {
@@ -46,6 +47,7 @@ public class NT4Publisher implements LogDataReceiver {
 
       // Create publisher if necessary
       String key = field.getKey().substring(1);
+      String unit = field.getValue().unitStr;
       GenericPublisher publisher = publishers.get(key);
       if (publisher == null) {
         publisher =
@@ -53,6 +55,18 @@ public class NT4Publisher implements LogDataReceiver {
                 .getTopic(key)
                 .genericPublish(field.getValue().getNT4Type(), PubSubOption.sendAll(true));
         publishers.put(key, publisher);
+
+        // Set initial unit
+        if (unit != null) {
+          akitTable.getTopic(key).setProperty("unit", "\"" + unit + "\"");
+          units.put(key, unit);
+        }
+      }
+
+      // Check if unit changed
+      if (unit != null && !unit.equals(units.get(key))) {
+        akitTable.getTopic(key).setProperty("unit", "\"" + unit + "\"");
+        units.put(key, unit);
       }
 
       // Write new data

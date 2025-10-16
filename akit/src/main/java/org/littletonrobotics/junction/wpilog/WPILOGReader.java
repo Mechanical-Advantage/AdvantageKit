@@ -93,15 +93,13 @@ public class WPILOGReader implements LogReplaySource {
 
       if (record.isControl()) {
         if (record.isStart()) { // Ignore other control records
-          if (record.getStartData().metadata.equals(WPILOGConstants.entryMetadata)) {
-            entryIDs.put(record.getStartData().entry, record.getStartData().name);
-            String typeStr = record.getStartData().type;
-            entryTypes.put(record.getStartData().entry, LoggableType.fromWPILOGType(typeStr));
-            if (typeStr.startsWith("proto:")
-                || typeStr.startsWith("struct:")
-                || typeStr.equals("structschema")) {
-              entryCustomTypes.put(record.getStartData().entry, typeStr);
-            }
+          entryIDs.put(record.getStartData().entry, record.getStartData().name);
+          String typeStr = record.getStartData().type;
+          entryTypes.put(record.getStartData().entry, LoggableType.fromWPILOGType(typeStr));
+          if (typeStr.startsWith("proto:")
+              || typeStr.startsWith("struct:")
+              || typeStr.equals("structschema")) {
+            entryCustomTypes.put(record.getStartData().entry, typeStr);
           }
         }
 

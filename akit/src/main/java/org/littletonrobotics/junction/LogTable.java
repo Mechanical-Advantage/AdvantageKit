@@ -387,6 +387,18 @@ public class LogTable {
   }
 
   /**
+   * Writes a new Float value to the table with units. Skipped if the key already exists as a
+   * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
+   * @param unit The unit to save as metadata.
+   */
+  public void put(String key, float value, String unit) {
+    put(key, new LogValue(value, null, unit));
+  }
+
+  /**
    * Writes a new FloatArray value to the table. Skipped if the key already exists as a different
    * type.
    *
@@ -423,6 +435,18 @@ public class LogTable {
    */
   public void put(String key, double value) {
     put(key, new LogValue(value, null));
+  }
+
+  /**
+   * Writes a new Double value to the table with units. Skipped if the key already exists as a
+   * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
+   * @param unit The unit to save as metadata.
+   */
+  public void put(String key, double value, String unit) {
+    put(key, new LogValue(value, null, unit));
   }
 
   /**
@@ -542,13 +566,16 @@ public class LogTable {
   /**
    * Writes a new Measure value to the table. Skipped if the key already exists as a different type.
    *
+   * <p>This overload always records the value in its base unit. Use the double overload with a unit
+   * string to record values with alternative units.
+   *
    * @param <U> The unit type.
    * @param key The field name.
    * @param value The field value.
    */
   public <U extends Unit> void put(String key, Measure<U> value) {
     if (value == null) return;
-    put(key, new LogValue(value.baseUnitMagnitude(), null));
+    put(key, new LogValue(value.baseUnitMagnitude(), null, value.baseUnit().name()));
   }
 
   /**
@@ -1596,6 +1623,9 @@ public class LogTable {
       if (field.getValue().customTypeStr != null) {
         output += "," + field.getValue().customTypeStr.toString();
       }
+      if (field.getValue().unitStr != null) {
+        output += "," + field.getValue().unitStr.toString();
+      }
       output += "]=";
       LogValue value = field.getValue();
       switch (value.type) {
@@ -1655,6 +1685,9 @@ public class LogTable {
     /** The custom type string. */
     public final String customTypeStr;
 
+    /** The name of the unit. */
+    public final String unitStr;
+
     /**
      * Creates a new LogValue.
      *
@@ -1664,6 +1697,7 @@ public class LogTable {
     public LogValue(byte[] value, String typeStr) {
       type = LoggableType.Raw;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1676,6 +1710,7 @@ public class LogTable {
     public LogValue(boolean value, String typeStr) {
       type = LoggableType.Boolean;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1688,6 +1723,7 @@ public class LogTable {
     public LogValue(long value, String typeStr) {
       type = LoggableType.Integer;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1700,6 +1736,21 @@ public class LogTable {
     public LogValue(float value, String typeStr) {
       type = LoggableType.Float;
       customTypeStr = typeStr;
+      unitStr = null;
+      this.value = value;
+    }
+
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     * @param unitStr The unit name, or null if unitless.
+     */
+    public LogValue(float value, String typeStr, String unitStr) {
+      type = LoggableType.Float;
+      customTypeStr = typeStr;
+      this.unitStr = unitStr;
       this.value = value;
     }
 
@@ -1712,6 +1763,21 @@ public class LogTable {
     public LogValue(double value, String typeStr) {
       type = LoggableType.Double;
       customTypeStr = typeStr;
+      unitStr = null;
+      this.value = value;
+    }
+
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     * @param unitStr The unit name, or null if unitless.
+     */
+    public LogValue(double value, String typeStr, String unitStr) {
+      type = LoggableType.Double;
+      customTypeStr = typeStr;
+      this.unitStr = unitStr;
       this.value = value;
     }
 
@@ -1724,6 +1790,7 @@ public class LogTable {
     public LogValue(String value, String typeStr) {
       type = LoggableType.String;
       customTypeStr = typeStr;
+      unitStr = null;
       if (value != null) {
         this.value = value;
       } else {
@@ -1740,6 +1807,7 @@ public class LogTable {
     public LogValue(boolean[] value, String typeStr) {
       type = LoggableType.BooleanArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1752,6 +1820,7 @@ public class LogTable {
     public LogValue(long[] value, String typeStr) {
       type = LoggableType.IntegerArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1764,6 +1833,7 @@ public class LogTable {
     public LogValue(float[] value, String typeStr) {
       type = LoggableType.FloatArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1776,6 +1846,7 @@ public class LogTable {
     public LogValue(double[] value, String typeStr) {
       type = LoggableType.DoubleArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1788,6 +1859,7 @@ public class LogTable {
     public LogValue(String[] value, String typeStr) {
       type = LoggableType.StringArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -2030,7 +2102,11 @@ public class LogTable {
     public boolean equals(Object other) {
       if (other instanceof LogValue) {
         LogValue otherValue = (LogValue) other;
-        if (otherValue.type.equals(type)) {
+        if (otherValue.type.equals(type)
+            && customTypeStr == otherValue.customTypeStr
+            && unitStr == otherValue.unitStr
+            && (customTypeStr == null || otherValue.customTypeStr.equals(customTypeStr))
+            && (unitStr == null || otherValue.unitStr.equals(unitStr))) {
           switch (type) {
             case Raw:
               return Arrays.equals(getRaw(), otherValue.getRaw());

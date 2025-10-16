@@ -7,7 +7,7 @@ For new projects, we highly recommend starting with one of the [template project
 - **[2025 KitBot Template](../template-projects/kitbot-2025-template.md)**: For robots based on the 2025 FIRST KitBot.
 - **[Differential Drive Template](../template-projects/diff-drive-template.md)**: For other differential drive (tank) robots.
 - **[Spark Swerve Template](../template-projects/spark-swerve-template.md)**: For swerve drives primarily using the Spark Max and Spark Flex, including NEO, NEO Vortex, or NEO 550 motors.
-- **[TalonFX Swerve Template](../template-projects/talonfx-swerve-template.md)**: For swerve drives primarily using TalonFX-based motors like the Falcon 500, Kraken X60, and Kraken X44.
+- **[TalonFX(S) Swerve Template](../template-projects/talonfx-swerve-template.md)**: For swerve drives primarily using TalonFX(S)-based motors like the Falcon 500, Kraken X60, Kraken X44, and Minion.
 - **[Vision Template](../template-projects/vision-template.md)**: Example code for running simple vision targeting and pose estimation.
 - **[Skeleton Template](../template-projects/skeleton-template.md)**: Simple project with AdvantageKit installed but without subsystems or control logic.
 

@@ -25,9 +25,9 @@ import org.littletonrobotics.junction.LogTable;
  * point of other nodes (such as ligaments). Other nodes are recursively appended based on other
  * nodes.
  *
- * @see edu.wpi.first.wpilibj.smartdashboard.MechanismObject2d
- * @see edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
- * @see edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d
+ * @see org.littletonrobotics.junction.mechanism.LoggedMechanismObject2d
+ * @see org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d
+ * @see org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d
  */
 public final class LoggedMechanism2d implements NTSendable, AutoCloseable {
   private NetworkTable m_table;
