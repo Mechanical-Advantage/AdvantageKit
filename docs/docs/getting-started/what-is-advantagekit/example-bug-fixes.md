@@ -2,7 +2,7 @@
 sidebar_position: 3
 ---
 
-# Replay Example: Bug Fixes
+# The Basics: Bug Fixes
 
 In addition to analyzing the robot code's behavior, we can also use replay to test improvements. 6328's 2022 robot used vision data from a Limelight to reset its odometry (calculated position on the field). This involves a complex pipeline in the robot code, and filtering invalid targets is critical. Below is a clip showing the robot's odometry during a particularly problematic moment. The green line indicates when vision data is being used to reset the position.
 

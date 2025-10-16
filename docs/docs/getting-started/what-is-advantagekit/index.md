@@ -17,3 +17,7 @@ AdvantageKit takes a different approach. This is what logging looks like with Ad
 ![Logging Diagram #3](img/what-is-diagram-3.png)
 
 Instead of logging a limited set of values from the user code, AdvantageKit records _all of the data flowing into the robot code_. Every sensor value, button press, and much more is logged every loop cycle. After a match, these values can be replayed to the robot code in a simulator. Since every input command is the same, all of the internal logic of the code is replayed exactly. This allows you to log extra fields after the fact, or modify pipelines to see how they _would have_ functioned during the match. This technique means that logging is more than just a tool for checking on specific issues; it's also a safety net that can be used to verify how any part of the code functions.
+
+:::tip
+To see what log replay looks like in practice, check the sections below on "The Basics" or find real case studies under the "Theory" section.
+:::

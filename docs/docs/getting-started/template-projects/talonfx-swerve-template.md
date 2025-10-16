@@ -10,7 +10,7 @@ import TabItem from '@theme/TabItem';
 AdvantageKit includes two swerve project templates with built-in support for advanced features:
 
 - Easy setup with Tuner X swerve project generator
-- [High-frequency odometry](./high-frequency-odometry.md)
+- [High-frequency odometry](/theory/high-frequency-odometry.md)
 - CANivore time sync (for Phoenix Pro users)
 - On-controller feedback loops
 - Physics simulation

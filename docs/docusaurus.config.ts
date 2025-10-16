@@ -58,6 +58,14 @@ const config: Config = {
           {
             to: "/data-flow/recording-inputs",
             from: "/category/recording-inputs"
+          },
+          {
+            to: "/theory/high-frequency-odometry",
+            from: "/getting-started/template-projects/high-frequency-odometry"
+          },
+          {
+            to: "/theory/hoot-replay-comparison",
+            from: "/getting-started/what-is-advantagekit/log-replay-comparison"
           }
         ]
       }

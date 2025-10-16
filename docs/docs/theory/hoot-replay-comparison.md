@@ -1,8 +1,8 @@
 ---
-sidebar_position: 5
+sidebar_position: 1
 ---
 
-# Comparison of Log Replay Tools
+# 🦉 Hoot Replay Comparison
 
 Several "replay"-compatible logging tools are available to FRC teams with different capabilities and use cases. The two primary options available to FRC teams are AdvantageKit and [Hoot Replay](https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/hoot-replay.html). This page serves as a comparison between these tools to help teams understand the key differences between them.
 

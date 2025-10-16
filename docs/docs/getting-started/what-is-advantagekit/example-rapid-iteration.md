@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-# Replay Example: Rapid Iteration
+# The Basics: Rapid Iteration
 
 Some uses cases of log replay benefit from rapid iteration. One such example is tuning pose estimation algorithms. WPILib's [built-in pose estimators](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-pose-estimators.html) include gains that adjust the trust in odometry and vision values. Adjusting these gains affects the stability and responsiveness of the pose estimates, but accurate testing requires real-world conditions (since the algorithm needs to be tuned to deal with the noise of real match conditions).
 

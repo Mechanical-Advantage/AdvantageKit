@@ -6,7 +6,7 @@ sidebar_position: 3
 
 AdvantageKit includes two swerve project templates with built-in support for advanced features:
 
-- [High-frequency odometry](./high-frequency-odometry.md)
+- [High-frequency odometry](/theory/high-frequency-odometry.md)
 - On-controller feedback loops
 - Physics simulation
 - Automated characterization routines

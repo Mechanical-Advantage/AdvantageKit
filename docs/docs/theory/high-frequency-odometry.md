@@ -1,11 +1,10 @@
 ---
-title: "Info: High-Frequency Odometry"
-sidebar_position: 7
+sidebar_position: 2
 ---
 
 import Results from "./img/high-freq-odometry-3.webp";
 
-# High-Frequency Odometry
+# 📍 High-Frequency Odometry
 
 The AdvantageKit swerve templates support high-frequency odometry on both Spark and TalonFX(S) hardware, which means that data from the drive motors, encoders, and gyro are sampled _faster_ than the primary 50 Hz loop cycle. The purpose of high-frequency odometry is to improve the accuracy and consistency of odometry data.
 
