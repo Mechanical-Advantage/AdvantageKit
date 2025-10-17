@@ -1,0 +1,80 @@
+// Copyright (c) 2021-2025 Littleton Robotics
+// http://github.com/Mechanical-Advantage
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+
+syntax = "proto3";
+
+package org.littletonrobotics.conduit.schema;
+
+message Joystick {
+  string name = 1;
+  int32 type = 2;
+  int32 axisCount = 3;
+  repeated int32 axisType = 4;
+  repeated double axisValue = 5;
+  int32 buttonCount = 6;
+  int32 buttons = 7;
+  int32 povCount = 8;
+  repeated int32 povValue = 9;
+  bool isXbox = 10;
+}
+
+message ControlWord {
+  bool enabled = 1;
+  bool autonomous = 2;
+  bool test = 3;
+  bool estop = 4;
+  bool fmsAttached = 5;
+  bool dsAttached = 6;
+}
+
+message DSData {
+  int32 allianceStation = 1;
+  string eventName = 2;
+  string gameSpecificMessage = 3;
+  int32 matchNumber = 4;
+  int32 replayNumber = 5;
+  int32 matchType = 6;
+  double matchTime = 7;
+  ControlWord controlWord = 8;
+  repeated Joystick joystick = 9;
+}
+
+message RailStatus {
+  double voltage = 1;
+  double current = 2;
+  bool active = 3;
+  int64 currentFaults = 4;
+}
+
+message CANStatus {
+  double utilization = 1;
+  int64 offCount = 2;
+  int64 txFullCount = 3;
+  int64 receiveErrorCount = 4;
+  int64 transmitErrorCount = 5;
+}
+
+message SystemData {
+  bool systemActive = 1;
+  bool brownedOut = 2;
+  int64 commsDisableCount = 3;
+  bool rslState = 4;
+  double batteryVoltage = 5;
+  double batteryCurrent = 6;
+  RailStatus rail3v3 = 7;
+  RailStatus rail5v = 8;
+  RailStatus rail6v = 9;
+  map<string, CANStatus> canStatus = 10;
+  int64 epochTimeMicros = 11;
+}
+
+message CoreInputs {
+  int64 timestamp = 1;
+  int64 seqnum = 2;
+  DSInputs ds = 3;
+  SystemData sys = 4;
+}
