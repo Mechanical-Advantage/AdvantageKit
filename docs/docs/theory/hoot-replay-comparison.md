@@ -12,7 +12,7 @@ Many non-replay logging options are also available (such as [WPILib data logging
 
 ## 🦋 Determinism
 
-The single biggest difference between Hoot Replay and AdvantageKit is **determinism**, the ability of each tool to replay robot code logic in a way that is **consistent, trustworthy, and robust to timing inconsistency**.
+The biggest difference between Hoot Replay and AdvantageKit is **determinism**, the ability of each tool to replay robot code logic in a way that is **consistent, trustworthy, and robust to timing inconsistency**.
 
 | AdvantageKit (Deterministic)                                                                                                                                                                      | Hoot Replay (Non-Deterministic)                                                                                                                                                                                                |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -129,7 +129,7 @@ Subsystems under Hoot Replay fall into the two categories shown below. Note that
 | **Natively Compatible** | Limited: CTRE devices only AND part of the replayed CAN bus                                                                                                            |
 | **Manual Logging**      | All other subsystems: CTRE devices (if not on the replayed CAN bus), non-CTRE devices, non-CAN sensors (e.g. RIO data), network devices (e.g. Limelight, PhotonVision) |
 
-By contrast, AdvantageKit builds all subsystems around the [IO layer](/data-flow/recording-inputs/io-interfaces) structure. This provides clean separation between parts of the code logic that must be isolated: high-level logic, simulation, and replayed code are never able to interact in unintended ways.
+By contrast, AdvantageKit builds all subsystems around the same [IO layer](/data-flow/recording-inputs/io-interfaces) structure. This provides clean separation between parts of the code logic that must be isolated: high-level logic, simulation, and replayed code are never able to interact in unintended ways.
 
 ### IO Layers vs. Hoot Replay
 
@@ -139,7 +139,7 @@ Both AdvantageKit and Hoot Replay require users to use alternative structures th
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Code Structure** | The functions of each subsystem are divided into several smaller classes.                                                                                                                 | All functions of the subsystem are combined into a single large class.                                                                                                    |
 | **Templates**      | ✅ [Template projects](/getting-started/template-projects) are provided for many subsystems including swerve drives and vision systems (compatible with several vendors).                 | ⚠️ Minimal examples are provided. No template projects for subsystems with manual logging.                                                                                |
-| **Data Flow**      | ✅ Data flow is well-defined to ensure clean separation between real, replay, and sim modes.                                                                                              | ❌ All data is accessible to all parts of the subsystem. Careful planning is required to ensure that modes are well-separated.                                            |
+| **Data Flow**      | ✅ Data flow is well-defined to ensure clean separation between real, replay, and sim modes.                                                                                              | ❌ All data is accessible to all parts of the subsystem. Careful planning and frequent testing is required to ensure that modes are well-separated.                       |
 | **Input Logging**  | ✅ Error-free logging of a large number of inputs is facilitated by [annotation](/data-flow/recording-inputs/annotation-logging) and [record](/data-flow/supported-types#records) logging | ❌ Each new input field requires several lines of additional boilerplate, which can easily cause subtle issues during replay if implemented incorrectly.                  |
 | **Dashboards**     | ✅ Convenience classes are provided to simplify the process of using [dashboard inputs](/data-flow/recording-inputs/dashboard-inputs)                                                     | ❌ All data must be logged manually by the user, even outside of subsystems.                                                                                              |
 
