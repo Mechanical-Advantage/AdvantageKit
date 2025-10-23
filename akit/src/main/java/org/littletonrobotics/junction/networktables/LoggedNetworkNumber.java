@@ -9,12 +9,13 @@ package org.littletonrobotics.junction.networktables;
 
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 /** Manages a number value published to the root table of NT. */
-public class LoggedNetworkNumber extends LoggedNetworkInput {
+public class LoggedNetworkNumber extends LoggedNetworkInput implements DoubleSupplier {
   private final String key;
   private final DoubleEntry entry;
   private double defaultValue = 0.0;
@@ -91,5 +92,10 @@ public class LoggedNetworkNumber extends LoggedNetworkInput {
       value = entry.get(defaultValue);
     }
     Logger.processInputs(prefix, inputs);
+  }
+
+  @Override
+  public double getAsDouble() {
+    return value;
   }
 }
