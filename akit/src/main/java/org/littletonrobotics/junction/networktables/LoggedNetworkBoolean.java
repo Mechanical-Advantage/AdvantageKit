@@ -9,16 +9,19 @@ package org.littletonrobotics.junction.networktables;
 
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 /** Manages a boolean value published to the root table of NT. */
-public class LoggedNetworkBoolean extends LoggedNetworkInput {
+public class LoggedNetworkBoolean extends LoggedNetworkInput implements BooleanSupplier {
   private final String key;
   private final BooleanEntry entry;
   private boolean defaultValue = false;
   private boolean value;
+  private final Trigger trigger;
 
   /**
    * Creates a new LoggedNetworkBoolean, for handling a boolean input sent via NetworkTables.
@@ -30,6 +33,7 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput {
     this.key = key;
     this.entry = NetworkTableInstance.getDefault().getBooleanTopic(key).getEntry(false);
     this.value = defaultValue;
+    this.trigger = Trigger(this::get);
     Logger.registerDashboardInput(this);
   }
 
@@ -91,5 +95,14 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput {
       value = entry.get(defaultValue);
     }
     Logger.processInputs(prefix, inputs);
+  }
+
+  public boolean getTrigger() {
+    return trigger;
+  }
+
+  @Override
+  public boolean getAsBoolean() {
+    return value;
   }
 }
