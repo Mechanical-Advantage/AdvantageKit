@@ -11,6 +11,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.WPISerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.util.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -436,6 +437,12 @@ public class AutoLogOutputManager {
             () -> {
               Object value = supplier.get();
               if (value != null) Logger.recordOutput(key, (LoggedMechanism2d) value);
+            });
+      } else if (type.equals(Color.class)) {
+        callbacks.add(
+            () -> {
+              Object value = supplier.get();
+              if (value != null) Logger.recordOutput(key, (Color) value);
             });
       } else if (type.isRecord()) {
         callbacks.add(
