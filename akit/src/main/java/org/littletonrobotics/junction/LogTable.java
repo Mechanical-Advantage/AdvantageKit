@@ -2247,6 +2247,8 @@ public class LogTable {
     public static LoggableType fromWPILOGType(String type) {
       if (wpilogTypes.contains(type)) {
         return LoggableType.values()[wpilogTypes.indexOf(type)];
+      } else if (type.equals("json")) {
+        return LoggableType.String;
       } else {
         return LoggableType.Raw;
       }
@@ -2261,6 +2263,8 @@ public class LogTable {
     public static LoggableType fromNT4Type(String type) {
       if (nt4Types.contains(type)) {
         return LoggableType.values()[nt4Types.indexOf(type)];
+      } else if (type.equals("json")) {
+        return LoggableType.String;
       } else {
         return LoggableType.Raw;
       }
