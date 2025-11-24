@@ -1,5 +1,9 @@
 # 📦 Installation
 
+:::tip
+Looking to install AdvantageKit in a [Python robot project](https://docs.wpilib.org/en/stable/docs/software/python/index.html)? Consider using **[PyKit](https://github.com/1757WestwoodRobotics/PyKit)**, an alternative to AdvantageKit developed by [Team 1757](https://whsrobotics.org) that supports deterministic replay in Python.
+:::
+
 ## New Projects
 
 For new projects, we highly recommend starting with one of the [template projects](/getting-started/template-projects) attached to the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases). These projects include detailed documentation and setup instructions for many common use cases:

@@ -64,7 +64,7 @@ const config: Config = {
             from: "/getting-started/template-projects/high-frequency-odometry"
           },
           {
-            to: "/theory/hoot-replay-comparison",
+            to: "/theory/log-replay-comparison",
             from: "/getting-started/what-is-advantagekit/log-replay-comparison"
           }
         ]
