@@ -21,8 +21,6 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +58,6 @@ public class ReplayWatch {
     }
 
     // Check for spotless
-    System.out.print("[AdvantageKit] Starting...\r");
     boolean hasSpotless = isSpotlessInstalled();
 
     // Run initial replay
@@ -134,45 +131,35 @@ public class ReplayWatch {
 
   private static void launchReplay(String inputLog, boolean hasSpotless)
       throws IOException, InterruptedException {
-    System.out.print("[AdvantageKit] Replay active... (0.0s)\r");
+    System.out.println("[AdvantageKit] Starting replay...");
 
     // Launch Gradle
     boolean isWindows = System.getProperty("os.name").startsWith("Windows");
     var gradleBuilder =
         new ProcessBuilder(
-            hasSpotless
-                ? new String[] {
-                  isWindows ? "gradlew.bat" : "./gradlew",
-                  "simulateJava",
-                  "-x",
-                  "test",
-                  "-x",
-                  "spotlessApply",
-                  "-x",
-                  "spotlessCheck"
-                }
-                : new String[] {
-                  isWindows ? "gradlew.bat" : "./gradlew", "simulateJava", "-x", "test"
-                });
+                hasSpotless
+                    ? new String[] {
+                      isWindows ? "gradlew.bat" : "./gradlew",
+                      "simulateJava",
+                      "-x",
+                      "test",
+                      "-x",
+                      "spotlessApply",
+                      "-x",
+                      "spotlessCheck"
+                    }
+                    : new String[] {
+                      isWindows ? "gradlew.bat" : "./gradlew", "simulateJava", "-x", "test"
+                    })
+            .inheritIO();
     gradleBuilder.environment().put(LogFileUtil.environmentVariable, inputLog);
     var gradle = gradleBuilder.start();
 
-    // Print timer
-    NumberFormat formatter = new DecimalFormat("#0.0");
-    long startTime = System.currentTimeMillis();
-    while (gradle.isAlive()) {
-      Thread.sleep(100);
-      System.out.print(
-          "[AdvantageKit] Replay active... ("
-              + formatter.format((System.currentTimeMillis() - startTime) * 1.0e-3)
-              + "s)\r");
-    }
-
     // Print result
-    if (gradle.exitValue() == 0) {
-      System.out.print("[AdvantageKit] Replay finished          \r");
+    if (gradle.waitFor() == 0) {
+      System.out.println("[AdvantageKit] Replay finished, waiting for changes...");
     } else {
-      System.out.print("[AdvantageKit] Replay failed             \r");
+      System.out.println("[AdvantageKit] Replay failed, waiting for changes...");
     }
   }
 
