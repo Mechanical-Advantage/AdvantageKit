@@ -5,7 +5,7 @@ plugins {
     id("java")
     id("google-test")
     id("edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin") version "2025.0"
-    id("edu.wpi.first.NativeUtils") version "2025.9.0"
+    id("edu.wpi.first.NativeUtils") version "2026.0.1"
     id("edu.wpi.first.GradleJni") version "1.1.0"
     id("edu.wpi.first.GradleVsCode") version "2.1.0"
     id("com.diffplug.spotless") version "6.25.0"
@@ -21,7 +21,7 @@ repositories {
 }
 wpilibRepositories.addAllReleaseRepositories(project)
 
-val wpilibVersion = "2025.3.2"
+val wpilibVersion = "2026.1.1-beta-1"
 
 dependencies {
     implementation("edu.wpi.first.cscore:cscore-java:$wpilibVersion")
