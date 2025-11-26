@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# 🦉 Log Replay Comparison
+# 🦋 Log Replay Comparison
 
 FRC teams have access to multiple logging tools that feature "replay" capabilities. These fall into the categories of **deterministic replay** ([AdvantageKit](/getting-started/what-is-advantagekit/), [PyKit](https://github.com/1757WestwoodRobotics/PyKit)) and **nondeterministic replay** ([Hoot Replay](https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/hoot-replay.html)). Each type of replay framework offers significantly different capabilities with regard to determinism, playback functionality, and code structure. This page compares these tools to help teams understand their key differences.
 
@@ -10,7 +10,7 @@ FRC teams have access to multiple logging tools that feature "replay" capabiliti
 Many non-replay logging options are also available (such as [WPILib data logging](https://docs.wpilib.org/en/stable/docs/software/telemetry/datalog.html) and [Epilogue](https://docs.wpilib.org/en/stable/docs/software/telemetry/robot-telemetry-with-annotations.html)), but this page focuses exclusively on replay-compatible logging tools.
 :::
 
-## 🦋 Determinism
+## 🔒 Determinism
 
 The biggest difference between replay frameworks the ability of each tool to replay robot code logic in a way that is **consistent, trustworthy, and robust to timing inconsistency**.
 
@@ -25,7 +25,7 @@ Determinism has a major impact on the practicality of log replay, since running 
 We are often asked by teams why they should care about deterministic replay. Non-deterministic replay creates butterfly effects that severely impact the accuracy of replay.
 
 <details>
-<summary>The Butterfly Effect</summary>
+<summary>🦋 The Butterfly Effect 🦋</summary>
 
 The [butterfly effect](https://en.wikipedia.org/wiki/Butterfly_effect) describes how small differences in the inputs to a complex system (like robot code) have ripple effects that can significantly impact the system's behavior in the future. Minor differences in inputs can have a much larger effect on outputs than one might intuitively expect.
 

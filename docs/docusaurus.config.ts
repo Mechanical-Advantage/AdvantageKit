@@ -66,6 +66,10 @@ const config: Config = {
           {
             to: "/theory/log-replay-comparison",
             from: "/getting-started/what-is-advantagekit/log-replay-comparison"
+          },
+          {
+            to: "/theory/deterministic-timestamps",
+            from: "/data-flow/deterministic-timestamps"
           }
         ]
       }
