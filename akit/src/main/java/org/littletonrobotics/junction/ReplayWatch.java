@@ -31,6 +31,7 @@ import java.util.Map;
 public class ReplayWatch {
   private static WatchService watcher;
   private static Map<WatchKey, Path> keys;
+  private static long lastReplayEndTime = 0;
 
   private ReplayWatch() {}
 
@@ -69,18 +70,17 @@ public class ReplayWatch {
     registerAll(Path.of("src").toAbsolutePath());
 
     // Wait for new events
-    long lastReplay = System.currentTimeMillis();
     while (true) {
       // Wait for signal
-      boolean isNewUpdate = false;
       WatchKey key = watcher.poll();
+      boolean isNewUpdate = false;
+
       if (key == null) {
         try {
           key = watcher.take();
         } catch (InterruptedException x) {
           return;
         }
-        isNewUpdate = true;
       }
 
       Path dir = keys.get(key);
@@ -108,6 +108,20 @@ public class ReplayWatch {
           } catch (IOException x) {
           }
         }
+
+        // Filter events based on timestamp
+        try {
+          if (Files.exists(child)) {
+            long fileModTime = Files.getLastModifiedTime(child).toMillis();
+            if (fileModTime > lastReplayEndTime) {
+              isNewUpdate = true;
+            }
+          } else {
+            isNewUpdate = true;
+          }
+        } catch (IOException e) {
+          isNewUpdate = true;
+        }
       }
 
       // Directory not accessible, remove
@@ -122,9 +136,8 @@ public class ReplayWatch {
       }
 
       // New update, run replay
-      if (isNewUpdate && System.currentTimeMillis() - lastReplay > 250) {
+      if (isNewUpdate) {
         launchReplay(inputLog, hasSpotless);
-        lastReplay = System.currentTimeMillis();
       }
     }
   }
@@ -161,6 +174,9 @@ public class ReplayWatch {
     } else {
       System.out.println("[AdvantageKit] Replay failed, waiting for changes...");
     }
+
+    // Update the timestamp immediately after build finishes
+    lastReplayEndTime = System.currentTimeMillis();
   }
 
   private static boolean isSpotlessInstalled() throws IOException, InterruptedException {
