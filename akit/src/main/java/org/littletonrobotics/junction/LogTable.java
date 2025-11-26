@@ -22,7 +22,9 @@ import edu.wpi.first.wpilibj.util.Color;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1347,6 +1349,9 @@ public class LogTable {
   /**
    * Reads a MutableMeasure value from the table.
    *
+   * Constructs, via reflection, an object of the same type as the default value.
+   * Assumes that the type has a (double, double, Unit) constructor.
+   *
    * @param <U> The unit type.
    * @param <Base> The base unit type
    * @param <M> The measure type.
@@ -1360,7 +1365,13 @@ public class LogTable {
     if (data.containsKey(prefix + key)) {
       double baseValue = get(key).getDouble(defaultValue.baseUnitMagnitude());
       double relativeValue = defaultValue.unit().fromBaseUnits(baseValue);
-      return (M) new GenericMutableMeasureImpl<>(relativeValue, baseValue, defaultValue.unit());
+      Class<M> defaultValueClazz = (Class<M>) defaultValue.getClass();
+      try {
+        Constructor<M> ctor = defaultValueClazz.getConstructor(double.class, double.class, defaultValue.unit().getClass());
+        return (M) ctor.newInstance(relativeValue, baseValue, defaultValue.unit());
+      } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException exc) {
+        throw new UnsupportedOperationException(defaultValueClazz + " lacks suitable constructor or can't be instantiated; exception was: " + exc);
+      }
     } else {
       return defaultValue;
     }
