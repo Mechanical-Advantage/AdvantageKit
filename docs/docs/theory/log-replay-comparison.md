@@ -153,8 +153,10 @@ The table below compares the implications of this structure against Hoot Replay'
 
 The code below represents a feature-complete Limelight vision subsystem built with both AdvantageKit (hardware abstraction) and Hoot Replay (data injection):
 
-- The AdvantageKit version creates clean separation between the different components of the vision system, making each class easier to understand and debug. Annotation, record, and enum logging allow for easy logging of complex data types.
-- The Hoot Replay version combines all of the functionality in a single class, with manual hooks to read and write data for each input field. Note that there is no obvious separation between the the replayed and non-replayed parts of the code, making it easy to read from invalid data sources.
+- The AdvantageKit version creates clean separation between the different components of the vision system, making each class easier to understand and debug. The hardware interface with automatic logging enforces clear and correct data flows _by default_. Annotation, record, and enum logging also allow complex data types to be logged with minimal effort, as shown in the `VisionIOInputs` class below.
+- The Hoot Replay version combines all of the functionality in a single class, with manual hooks to read and write data for each input field. Note that there is no obvious separation between the the replayed and non-replayed parts of the code, making it easy to read from invalid data sources or replay data incorrectly. The minimal utilities for logging complex types also result in a confusing structure for input data.
+
+<div class="small-code">
 
 <Tabs>
 <TabItem value="akit" label="AdvantageKit">
@@ -248,7 +250,7 @@ public class Vision extends SubsystemBase {
           VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
     }
 
-    // Log camera datadata
+    // Log camera metadata
     Logger.recordOutput("Vision/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
     Logger.recordOutput("Vision/RobotPoses", robotPoses.toArray(new Pose3d[robotPoses.size()]));
     Logger.recordOutput(
@@ -310,7 +312,7 @@ public interface VisionIO {
 </TabItem>
 <TabItem value="visioniolimelight" label="Hardware Implementation">
 
-_Vision hardware implementation (125 lines)_
+_Vision hardware implementation (103 lines)_
 
 ```java
 public class VisionIOLimelight implements VisionIO {
@@ -368,22 +370,11 @@ public class VisionIOLimelight implements VisionIO {
       }
       poseObservations.add(
           new PoseObservation(
-              // Timestamp, based on server timestamp of publish and latency
               rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,
-
-              // 3D pose estimate
               parsePose(rawSample.value),
-
-              // Ambiguity, using only the first tag because ambiguity isn't applicable for multitag
               rawSample.value.length >= 18 ? rawSample.value[17] : 0.0,
-
-              // Tag count
               (int) rawSample.value[7],
-
-              // Average tag distance
               rawSample.value[9],
-
-              // Observation type
               PoseObservationType.MEGATAG_1));
     }
     for (var rawSample : megatag2Subscriber.readQueue()) {
@@ -393,22 +384,11 @@ public class VisionIOLimelight implements VisionIO {
       }
       poseObservations.add(
           new PoseObservation(
-              // Timestamp, based on server timestamp of publish and latency
               rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,
-
-              // 3D pose estimate
               parsePose(rawSample.value),
-
-              // Ambiguity, zeroed because the pose is already disambiguated
               0.0,
-
-              // Tag count
               (int) rawSample.value[7],
-
-              // Average tag distance
               rawSample.value[9],
-
-              // Observation type
               PoseObservationType.MEGATAG_2));
     }
 
@@ -445,7 +425,7 @@ public class VisionIOLimelight implements VisionIO {
 </TabItem>
 <TabItem value="hoot" label="Hoot Replay">
 
-_Vision subsystem and hardware interface (266 lines)_
+_Vision subsystem and hardware interface (248 lines)_
 
 ```java
 public class HootVision extends SubsystemBase {
@@ -472,7 +452,7 @@ public class HootVision extends SubsystemBase {
   private int[] types = new int[] {};
   public int[] tagIds = new int[] {};
 
-  private final HootAutoReplay autoReplay =
+  private final HootAutoReplay hootReplay =
       new HootAutoReplay()
           .withBoolean("Connected", () -> connected, (value) -> connected = value.value)
           .withStruct(
@@ -548,23 +528,11 @@ public class HootVision extends SubsystemBase {
         }
         poseObservations.add(
             new PoseObservation(
-                // Timestamp, based on server timestamp of publish and latency
                 rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,
-
-                // 3D pose estimate
                 parsePose(rawSample.value),
-
-                // Ambiguity, using only the first tag because ambiguity isn't applicable for
-                // multitag
                 rawSample.value.length >= 18 ? rawSample.value[17] : 0.0,
-
-                // Tag count
                 (int) rawSample.value[7],
-
-                // Average tag distance
                 rawSample.value[9],
-
-                // Observation type
                 PoseObservationType.MEGATAG_1));
       }
       for (var rawSample : megatag2Subscriber.readQueue()) {
@@ -574,22 +542,11 @@ public class HootVision extends SubsystemBase {
         }
         poseObservations.add(
             new PoseObservation(
-                // Timestamp, based on server timestamp of publish and latency
                 rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3,
-
-                // 3D pose estimate
                 parsePose(rawSample.value),
-
-                // Ambiguity, zeroed because the pose is already disambiguated
                 0.0,
-
-                // Tag count
                 (int) rawSample.value[7],
-
-                // Average tag distance
                 rawSample.value[9],
-
-                // Observation type
                 PoseObservationType.MEGATAG_2));
       }
 
@@ -617,6 +574,7 @@ public class HootVision extends SubsystemBase {
         this.tagIds[i++] = tagId;
       }
     }
+    hootReplay.update();
 
     // Update disconnected alert
     disconnectedAlert.set(!connected);
@@ -678,14 +636,18 @@ public class HootVision extends SubsystemBase {
           VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
     }
 
-    // Log camera datadata
-    Logger.recordOutput("Vision/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
-    Logger.recordOutput("Vision/RobotPoses", robotPoses.toArray(new Pose3d[robotPoses.size()]));
-    Logger.recordOutput(
+    // Log camera metadata
+    SignalLogger.writeStructArray(
+        "Vision/TagPoses", Pose3d.struct, tagPoses.toArray(new Pose3d[tagPoses.size()]));
+    SignalLogger.writeStructArray(
+        "Vision/RobotPoses", Pose3d.struct, robotPoses.toArray(new Pose3d[robotPoses.size()]));
+    SignalLogger.writeStructArray(
         "Vision/RobotPosesAccepted",
+        Pose3d.struct,
         robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
-    Logger.recordOutput(
+    SignalLogger.writeStructArray(
         "Vision/RobotPosesRejected",
+        Pose3d.struct,
         robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
   }
 
@@ -717,11 +679,13 @@ public class HootVision extends SubsystemBase {
 ```
 
 :::danger
-Did you notice that this example of Hoot Replay actually has **four separate** subtle but critical issues that prevent replay from functioning? The monolithic structure of data injection and a lack of automatic logging options make subtle typos extremely common and challenging to debug.
+Did you notice that this example of Hoot Replay actually has **three separate** subtle but critical issues that prevent replay from functioning? The monolithic structure of data injection and a lack of automatic logging options make subtle typos extremely common and challenging to debug.
 :::
 
 </TabItem>
 </Tabs>
+
+</div>
 
 ## 📋 Miscellaneous
 
