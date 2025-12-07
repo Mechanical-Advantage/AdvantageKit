@@ -13,7 +13,9 @@ const config: Config = {
   baseUrl: "/",
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
+  markdown: {
+    hooks: { onBrokenMarkdownLinks: "throw", onBrokenMarkdownImages: "throw" }
+  },
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
