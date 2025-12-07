@@ -121,7 +121,7 @@ Deterministic replay means that accuracy is unaffected by the replay speed. Runn
 
 By contrast, Hoot Replay's non-deterministic approach presents users with difficult trade-offs between accuracy and practicality. Running at just 5x speed already has a **[major impact](#why-does-it-matter) on accuracy while still taking a full _2 minutes_** per replay iteration. Non-determinism makes replay more difficult to use in the high-pressure scenarios where it matters the most.
 
-The video below demonstrates what the difference in speed between deterministic and non-deterministic replay looks like in practice. Several replays of the same log are synchronized and shown in real-time.
+The video below demonstrates what the difference in speed between deterministic and non-deterministic replay looks like in practice on a short 5:48 match log. Several replays of the same log are synchronized and shown in real-time.
 
 <iframe width="100%" style={{"aspect-ratio": "3024 / 934"}} src="https://www.youtube.com/embed/SJ0F47Zej-4" title="Log Replay Speed Comparison" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
