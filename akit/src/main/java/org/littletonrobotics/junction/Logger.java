@@ -38,7 +38,7 @@ import us.hebi.quickbuf.ProtoMessage;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
-  private static final int receiverQueueCapcity = 500; // 10s at 50Hz
+  private static final int receiverQueueCapacity = 500; // 10s at 50Hz
 
   private static boolean running = false;
   private static long cycleCount = 0;
@@ -53,7 +53,7 @@ public class Logger {
 
   private static LogReplaySource replaySource;
   private static final BlockingQueue<LogTable> receiverQueue =
-      new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
+      new ArrayBlockingQueue<LogTable>(receiverQueueCapacity);
   private static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
   private static boolean receiverQueueFault = false;
 
