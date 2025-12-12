@@ -186,15 +186,20 @@ public class ReplayWatch {
     var gradle = gradleBuilder.start();
 
     // Read Gradle output
-    BufferedReader reader = new BufferedReader(new InputStreamReader(gradle.getInputStream()));
-    StringBuilder builder = new StringBuilder();
-    String line = null;
-    while ((line = reader.readLine()) != null) {
-      builder.append(line);
-      builder.append(System.getProperty("line.separator"));
+    try (BufferedReader reader =
+        new BufferedReader(new InputStreamReader(gradle.getInputStream()))) {
+      StringBuilder builder = new StringBuilder();
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        builder.append(line);
+        builder.append(System.getProperty("line.separator"));
+      }
+      String result = builder.toString();
+      gradle.waitFor();
+      return result.contains("spotless");
+    } finally {
+      gradle.destroy();
     }
-    String result = builder.toString();
-    return result.contains("spotless");
   }
 
   /** Register the given directory with the WatchService */
