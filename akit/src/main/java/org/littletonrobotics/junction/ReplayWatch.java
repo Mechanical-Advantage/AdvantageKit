@@ -189,7 +189,7 @@ public class ReplayWatch {
     try (BufferedReader reader =
         new BufferedReader(new InputStreamReader(gradle.getInputStream()))) {
       StringBuilder builder = new StringBuilder();
-      String line = null;
+      String line;
       while ((line = reader.readLine()) != null) {
         builder.append(line);
         builder.append(System.getProperty("line.separator"));
