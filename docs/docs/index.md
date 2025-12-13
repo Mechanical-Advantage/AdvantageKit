@@ -14,7 +14,7 @@ AdvantageKit is a logging, telemetry, and replay framework developed by [Team 63
 
 - **[AdvantageScope](https://docs.advantagescope.org)**, Team 6328's robot telemetry application which **does not require AdvantageKit to use**.
 - **[WPILib Data Logging](https://docs.wpilib.org/en/stable/docs/software/telemetry/datalog.html)**, a simpler logging system included in WPILib (does not support log replay in simulation, but covers the needs of most teams).
-- **[PyKit](https://github.com/1757WestwoodRobotics/PyKit)**, a deterministic logging and replay framework for Python robot project developed by [Team 1757](https://whsrobotics.org).
+- **[PyKit](https://github.com/1757WestwoodRobotics/PyKit)**, a deterministic logging and replay framework for Python robot projects developed by [Team 1757](https://whsrobotics.org).
 
 <DocCardList
 items={[

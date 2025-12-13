@@ -84,6 +84,9 @@ public class Example {
         // Alternative approach if not using @AutoLogOutput
         // (Must be called periodically)
         Logger.recordOutput("Example/Mechanism", mechanism);
+
+        // Log Pose3d objects for articulated components in AdvantageScope
+        Logger.recordOutput("Example/MechanismPoses", mechanism.generate3dMechanisms());
     }
 }
 ```
