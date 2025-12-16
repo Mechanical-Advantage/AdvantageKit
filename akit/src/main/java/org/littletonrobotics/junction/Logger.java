@@ -163,6 +163,17 @@ public class Logger {
         }
       }
 
+      // In replay, check that HAL sim extensions are not loaded
+      if (replaySource != null) {
+        String halSimEnv = System.getenv("HALSIM_EXTENSIONS");
+        if (halSimEnv != null && halSimEnv.length() > 0) {
+          DriverStation.reportError(
+              "All HAL simulation extensions must be disabled when running AdvantageKit replay, including the simulation GUI and DriverStation connection. Check the configuration in \"build.gradle\" and ensure that all checkboxes are disabled in the VSCode simulation popup.\n\n*** EXITING DUE TO INVALID SIMULATION CONFIGURATION, SEE ABOVE. ***",
+              false);
+          System.exit(1);
+        }
+      }
+
       // Start console capture
       if (enableConsole && console == null) {
         if (RobotBase.isReal()) {
