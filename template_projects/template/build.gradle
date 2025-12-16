@@ -106,9 +106,8 @@ test {
 // Simulation configuration (e.g. environment variables).
 //
 // The sim GUI is *disabled* by default to support running
-// AdvantageKit log replay from the command line. Set the
-// value to "true" to enable the sim GUI by default (this
-// is the standard WPILib behavior).
+// AdvantageKit log replay, which requires that all HAL
+// sim extensions be disabled.
 wpi.sim.addGui().defaultEnabled = false
 wpi.sim.addDriverstation()
 
