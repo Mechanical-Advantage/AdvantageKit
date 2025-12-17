@@ -66,7 +66,7 @@ java {
 // Spotless formatting
 spotless {
     java {
-        target("src/main/java/**/*.java", "autolog/src/main/java/**/*.java")
+        target("src/main/java/**/*.java", "src/test/java/**/*.java", "autolog/src/main/java/**/*.java")
         toggleOffOn()
         googleJavaFormat()
         removeUnusedImports()
