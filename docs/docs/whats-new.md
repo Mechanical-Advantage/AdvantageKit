@@ -1,12 +1,16 @@
 ---
+title: What's New in 2026?
 sidebar_position: 2
 ---
 
+import BannerLight from "./img/whats-new/banner-light.png";
+import BannerDark from "./img/whats-new/banner-dark.png";
 import MechanismImg from "./img/whats-new/mechanism.png";
 
-# What's New in 2026?
+#
 
-<h2 style={{textAlign: "center"}}>Replay, Refined</h2>
+<img src={BannerLight} className="light-only" />
+<img src={BannerDark} className="dark-only" />
 
 The 2026 version of AdvantageKit is now available in beta! In addition to adding support for WPILib 2026, this release includes several major new features and documentation improvements. To get started with the AdvantageKit 2026 beta, check the [installation page](/getting-started/installation/) and use the first release with version v26.0.0-beta-X. Check the full changelog for a complete list of changes. The most notable features in this release are documented below.
 
