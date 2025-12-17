@@ -65,10 +65,10 @@ public class LogTableTest {
         LogTable table = new LogTable(0);
 
         MutAngle mutAngle = Rotations.mutable(0.1);
-        table.put("MutableAngle", mutAngle);
+        table.put("Angle", mutAngle);
 
         MutAngle defaultMutAngle = Rotations.mutable(0.2);
-        MutAngle restoredMutAngle = table.get("MutableAngle", defaultMutAngle);
+        MutAngle restoredMutAngle = table.get("Angle", defaultMutAngle);
         assertTrue(restoredMutAngle.isEquivalent(mutAngle));
     }
 }
