@@ -6,6 +6,10 @@ Looking to install AdvantageKit in a [Python robot project](https://docs.wpilib.
 
 ## New Projects
 
+:::info
+Template projects are not currently available for the 2026 beta or 2027 alpha versions of AdvantageKit.
+:::
+
 For new projects, we highly recommend starting with one of the [template projects](/getting-started/template-projects) attached to the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases). These projects include detailed documentation and setup instructions for many common use cases:
 
 - **[2025 KitBot Template](../template-projects/kitbot-2025-template.md)**: For robots based on the 2025 FIRST KitBot.
