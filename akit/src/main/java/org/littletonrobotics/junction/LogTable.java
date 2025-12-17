@@ -10,7 +10,6 @@ package org.littletonrobotics.junction;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
 import edu.wpi.first.util.WPISerializable;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufBuffer;
@@ -1347,22 +1346,23 @@ public class LogTable {
   /**
    * Reads a MutableMeasure value from the table.
    *
+   * <p>Unlike other "get" methods, this method mutates the provided value instead of returning a
+   * new instance. The object returned from this method is the same instance as the provided value.
+   *
    * @param <U> The unit type.
    * @param <Base> The base unit type
    * @param <M> The measure type.
    * @param key The field name.
-   * @param defaultValue The default field value.
+   * @param value The field value, to be mutated.
    * @return The field value.
    */
-  @SuppressWarnings("unchecked")
   public <U extends Unit, Base extends Measure<U>, M extends MutableMeasure<U, Base, M>> M get(
-      String key, M defaultValue) {
+      String key, M value) {
     if (data.containsKey(prefix + key)) {
-      double baseValue = get(key).getDouble(defaultValue.baseUnitMagnitude());
-      double relativeValue = defaultValue.unit().fromBaseUnits(baseValue);
-      return (M) new GenericMutableMeasureImpl<>(relativeValue, baseValue, defaultValue.unit());
+      double baseValue = get(key).getDouble(value.baseUnitMagnitude());
+      return value.mut_setBaseUnitMagnitude(baseValue);
     } else {
-      return defaultValue;
+      return value;
     }
   }
 
