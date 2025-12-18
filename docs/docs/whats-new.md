@@ -31,7 +31,7 @@ Logger.recordOutput("MyCurrent", 42.0, Amps);
 
 @AutoLog
 public class Inputs {
-    public Distance current = Amps.of(63.28);
+    public Current current = Amps.of(63.28);
 }
 
 public class Outputs {
@@ -39,7 +39,7 @@ public class Outputs {
     private double setpoint = 44600.0;
 
     @AutoLogOutput
-    private Distance volts = Volts.of(12.6);
+    private Voltage volts = Volts.of(12.6);
 }
 ```
 
