@@ -70,7 +70,7 @@ public class Drive extends SubsystemBase {
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
           Logger.recordOutput(
-              "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+              "Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
         });
     PathPlannerLogging.setLogTargetPoseCallback(
         (targetPose) -> {
@@ -94,7 +94,7 @@ public class Drive extends SubsystemBase {
     io.updateInputs(inputs);
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive", inputs);
-    Logger.processInputs("Drive/Gyro", inputs);
+    Logger.processInputs("Drive/Gyro", gyroInputs);
 
     // Update gyro angle
     if (gyroInputs.connected) {
