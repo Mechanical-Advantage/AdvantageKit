@@ -319,7 +319,10 @@ public class WPILOGWriter implements LogDataReceiver {
 
         // Check if unit changed
         if (unit != null && !unit.equals(entryUnits.get(field.getKey()))) {
-          log.setMetadata(id, unit, table.getTimestamp());
+          log.setMetadata(
+              id,
+              WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", unit),
+              table.getTimestamp());
           entryUnits.put(field.getKey(), unit);
         }
 
