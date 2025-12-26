@@ -48,9 +48,11 @@ tasks.withType<Javadoc> {
     exclude("com/google/flatbuffers/**", "org/littletonrobotics/conduit/**")
     title = "AdvantageKit API"
     options {
-        (this as StandardJavadocDocletOptions).links("https://docs.oracle.com/en/java/javase/17/docs/api/", "https://github.wpilib.org/allwpilib/docs/release/java/")
-        (this as StandardJavadocDocletOptions).stylesheetFile = file("javadoc.css")
-        (this as StandardJavadocDocletOptions).addBooleanOption("Werror", true)
+        (this as StandardJavadocDocletOptions).apply {
+            links("https://docs.oracle.com/en/java/javase/17/docs/api/", "https://github.wpilib.org/allwpilib/docs/release/java/")
+            stylesheetFile = file("javadoc.css")
+            addBooleanOption("Werror", true)
+        }
     }
 }
 
