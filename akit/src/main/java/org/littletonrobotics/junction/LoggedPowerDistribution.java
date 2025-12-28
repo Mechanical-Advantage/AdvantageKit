@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import org.littletonrobotics.conduit.ConduitApi;
 
 /** Manages logging power distribution data. */
-class LoggedPowerDistribution {
+public class LoggedPowerDistribution {
   private static LoggedPowerDistribution instance;
 
   private int moduleID;
