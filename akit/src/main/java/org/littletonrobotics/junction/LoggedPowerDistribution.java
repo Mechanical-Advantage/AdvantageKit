@@ -48,7 +48,7 @@ public class LoggedPowerDistribution {
     return instance;
   }
 
-  public void saveToLog(LogTable table) {
+  void saveToLog(LogTable table) {
     ConduitApi conduit = ConduitApi.getInstance();
     table.put("Temperature", conduit.getPDPTemperature());
     table.put("Voltage", conduit.getPDPVoltage());
