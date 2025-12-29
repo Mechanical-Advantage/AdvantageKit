@@ -30,6 +30,12 @@ public class LoggedPowerDistribution {
     ConduitApi.getInstance().configurePowerDistribution(moduleID, this.moduleType);
   }
 
+  /**
+   * Returns the singleton instance of the power distribution logger, configuring it for the default
+   * module type and ID.
+   *
+   * @return The singleton LoggedPowerDistribution instance.
+   */
   public static LoggedPowerDistribution getInstance() {
     if (instance == null) {
       instance = new LoggedPowerDistribution();
@@ -37,6 +43,14 @@ public class LoggedPowerDistribution {
     return instance;
   }
 
+  /**
+   * Returns the singleton instance of the power distribution logger, configuring it for the
+   * specified module type and ID.
+   *
+   * @param moduleID The CAN ID of the power distribution module.
+   * @param moduleType The type of the power distribution module.
+   * @return The singleton LoggedPowerDistribution instance.
+   */
   public static LoggedPowerDistribution getInstance(
       int moduleID, PowerDistribution.ModuleType moduleType) {
     if (instance == null) {
