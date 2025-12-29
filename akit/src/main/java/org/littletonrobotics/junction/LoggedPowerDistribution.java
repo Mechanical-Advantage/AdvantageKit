@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import org.littletonrobotics.conduit.ConduitApi;
 
 /** Manages logging power distribution data. */
-class LoggedPowerDistribution {
+public class LoggedPowerDistribution {
   private static LoggedPowerDistribution instance;
 
   private int moduleID;
@@ -30,6 +30,12 @@ class LoggedPowerDistribution {
     ConduitApi.getInstance().configurePowerDistribution(moduleID, this.moduleType);
   }
 
+  /**
+   * Returns the singleton instance of the power distribution logger, configuring it for the default
+   * module type and ID.
+   *
+   * @return The singleton LoggedPowerDistribution instance.
+   */
   public static LoggedPowerDistribution getInstance() {
     if (instance == null) {
       instance = new LoggedPowerDistribution();
@@ -37,6 +43,14 @@ class LoggedPowerDistribution {
     return instance;
   }
 
+  /**
+   * Returns the singleton instance of the power distribution logger, configuring it for the
+   * specified module type and ID.
+   *
+   * @param moduleID The CAN ID of the power distribution module.
+   * @param moduleType The type of the power distribution module.
+   * @return The singleton LoggedPowerDistribution instance.
+   */
   public static LoggedPowerDistribution getInstance(
       int moduleID, PowerDistribution.ModuleType moduleType) {
     if (instance == null) {
@@ -48,7 +62,7 @@ class LoggedPowerDistribution {
     return instance;
   }
 
-  public void saveToLog(LogTable table) {
+  void saveToLog(LogTable table) {
     ConduitApi conduit = ConduitApi.getInstance();
     table.put("Temperature", conduit.getPDPTemperature());
     table.put("Voltage", conduit.getPDPVoltage());
