@@ -15,6 +15,7 @@ import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufBuffer;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructBuffer;
+import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
@@ -842,9 +843,9 @@ public class LogTable {
     }
   }
 
-  private Struct<?> findRecordStructType(Class<?> classObj) {
+  private Struct<?> findRecordStructType(Class<? extends Record> classObj) {
     if (!structTypeCache.containsKey(classObj.getName())) {
-      structTypeCache.put(classObj.getName(), new RecordStruct(classObj));
+      structTypeCache.put(classObj.getName(), StructGenerator.genRecord(classObj));
 
       // Warn about record logging when enabled
       if (DriverStation.isEnabled()) {
@@ -887,7 +888,7 @@ public class LogTable {
   public <R extends Record> void put(String key, R... value) {
     if (value == null) return;
     // If struct is supported, write as struct
-    Struct<R> struct = (Struct<R>) findRecordStructType(value.getClass().getComponentType());
+    Struct<R> struct = (Struct<R>) findRecordStructType((Class<? extends Record>) value.getClass().getComponentType());
     if (struct != null) {
       put(key, struct, value);
     }
@@ -1606,7 +1607,7 @@ public class LogTable {
       String typeString = data.get(prefix + key).customTypeStr;
       if (typeString.startsWith("struct:")) {
         Struct<R> struct =
-            (Struct<R>) findRecordStructType(defaultValue.getClass().getComponentType());
+            (Struct<R>) findRecordStructType((Class<? extends Record>) defaultValue.getClass().getComponentType());
         if (struct != null) {
           return get(key, struct, defaultValue);
         }
