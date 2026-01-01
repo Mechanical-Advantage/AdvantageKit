@@ -72,6 +72,10 @@ const config: Config = {
           {
             to: "/theory/deterministic-timestamps",
             from: "/data-flow/deterministic-timestamps"
+          },
+          {
+            to: "/getting-started/template-projects/kitbot-template",
+            from: "/getting-started/template-projects/kitbot-2025-template"
           }
         ]
       }
