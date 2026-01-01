@@ -72,7 +72,7 @@ spotless {
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
-        licenseHeader("// Copyright (c) 2021-2025 Littleton Robotics\n// http://github.com/Mechanical-Advantage\n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n\n")
+        licenseHeader("// Copyright (c) 2021-2026 Littleton Robotics\n// http://github.com/Mechanical-Advantage\n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n\n")
     }
     cpp {
         target("src/main/native/**/*.cc", "src/main/native/**/*.h", "src/test/native/**/*.cc", "src/test/native/**/*.h")
@@ -80,7 +80,7 @@ spotless {
         eclipseCdt()
         trimTrailingWhitespace()
         endWithNewline()
-        licenseHeader("// Copyright (c) 2021-2025 Littleton Robotics\n// http://github.com/Mechanical-Advantage\n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n\n")
+        licenseHeader("// Copyright (c) 2021-2026 Littleton Robotics\n// http://github.com/Mechanical-Advantage\n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n\n")
     }
 }
 

@@ -100,7 +100,7 @@ const config: Config = {
       ]
     },
     footer: {
-      copyright: "Copyright © 2021-2025 Littleton Robotics",
+      copyright: "Copyright © 2021-2026 Littleton Robotics",
       links: [
         {
           label: "Littleton Robotics",

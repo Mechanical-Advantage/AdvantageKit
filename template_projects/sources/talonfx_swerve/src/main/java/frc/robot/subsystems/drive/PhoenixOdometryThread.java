@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -129,8 +129,8 @@ public class PhoenixOdometryThread extends Thread {
       Drive.odometryLock.lock();
       try {
         // Sample timestamp is current FPGA time minus average CAN latency
-        //     Default timestamps from Phoenix are NOT compatible with
-        //     FPGA timestamps, this solution is imperfect but close
+        // Default timestamps from Phoenix are NOT compatible with
+        // FPGA timestamps, this solution is imperfect but close
         double timestamp = RobotController.getFPGATime() / 1e6;
         double totalLatency = 0.0;
         for (BaseStatusSignal signal : phoenixSignals) {

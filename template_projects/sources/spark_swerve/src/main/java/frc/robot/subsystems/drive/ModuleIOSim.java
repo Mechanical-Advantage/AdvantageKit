@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -79,7 +79,8 @@ public class ModuleIOSim implements ModuleIO {
     inputs.turnAppliedVolts = turnAppliedVolts;
     inputs.turnCurrentAmps = Math.abs(turnSim.getCurrentDrawAmps());
 
-    // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't matter)
+    // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't
+    // matter)
     inputs.odometryTimestamps = new double[] {Timer.getFPGATimestamp()};
     inputs.odometryDrivePositionsRad = new double[] {inputs.drivePositionRad};
     inputs.odometryTurnPositions = new Rotation2d[] {inputs.turnPosition};
