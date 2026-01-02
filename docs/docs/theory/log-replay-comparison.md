@@ -251,14 +251,10 @@ public class Vision extends SubsystemBase {
     }
 
     // Log camera metadata
-    Logger.recordOutput("Vision/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
-    Logger.recordOutput("Vision/RobotPoses", robotPoses.toArray(new Pose3d[robotPoses.size()]));
-    Logger.recordOutput(
-        "Vision/RobotPosesAccepted",
-        robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
-    Logger.recordOutput(
-        "Vision/RobotPosesRejected",
-        robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+    Logger.recordOutput("Vision/TagPoses", tagPoses.toArray(new Pose3d[0]));
+    Logger.recordOutput("Vision/RobotPoses", robotPoses.toArray(new Pose3d[0]));
+    Logger.recordOutput("Vision/RobotPosesAccepted", robotPosesAccepted.toArray(new Pose3d[0]));
+    Logger.recordOutput("Vision/RobotPosesRejected", robotPosesRejected.toArray(new Pose3d[0]));
   }
 
   @FunctionalInterface
@@ -638,17 +634,17 @@ public class HootVision extends SubsystemBase {
 
     // Log camera metadata
     SignalLogger.writeStructArray(
-        "Vision/TagPoses", Pose3d.struct, tagPoses.toArray(new Pose3d[tagPoses.size()]));
+        "Vision/TagPoses", Pose3d.struct, tagPoses.toArray(new Pose3d[0]));
     SignalLogger.writeStructArray(
-        "Vision/RobotPoses", Pose3d.struct, robotPoses.toArray(new Pose3d[robotPoses.size()]));
+        "Vision/RobotPoses", Pose3d.struct, robotPoses.toArray(new Pose3d[0]));
     SignalLogger.writeStructArray(
         "Vision/RobotPosesAccepted",
         Pose3d.struct,
-        robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
+        robotPosesAccepted.toArray(new Pose3d[0]));
     SignalLogger.writeStructArray(
         "Vision/RobotPosesRejected",
         Pose3d.struct,
-        robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+        robotPosesRejected.toArray(new Pose3d[0]));
   }
 
   /** Returns the X angle to the best target, which can be used for simple servoing with vision. */
