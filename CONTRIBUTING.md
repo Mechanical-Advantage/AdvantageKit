@@ -29,7 +29,7 @@ cd AdvantageKit
 3. **Install the roboRIO Toolchain:** (if needed)
 
 ```bash
-./gradlew installRoboRIOToolchain
+./gradlew :akit:installRoboRioToolchain
 ```
 
 4. **Build the Project:**
