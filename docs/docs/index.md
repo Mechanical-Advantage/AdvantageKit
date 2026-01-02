@@ -61,4 +61,4 @@ href: "/data-flow/sysid-compatibility"
 ]}
 />
 
-Feedback, feature requests, and bug reports are welcome on the [issues page](https://github.com/Mechanical-Advantage/AdvantageKit/issues). For non-public inquires, please send a message to software@team6328.org.
+Feedback, feature requests, and bug reports are welcome on the [issues page](https://github.com/Mechanical-Advantage/AdvantageKit/issues). See the [contribution page](https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/CONTRIBUTING.md) for more information on contributing to AdvantageKit. For non-public inquires, please send a message to software@team6328.org.
