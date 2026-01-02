@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -319,7 +319,10 @@ public class WPILOGWriter implements LogDataReceiver {
 
         // Check if unit changed
         if (unit != null && !unit.equals(entryUnits.get(field.getKey()))) {
-          log.setMetadata(id, unit, table.getTimestamp());
+          log.setMetadata(
+              id,
+              WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", unit),
+              table.getTimestamp());
           entryUnits.put(field.getKey(), unit);
         }
 

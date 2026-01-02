@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -6,10 +6,10 @@
 // at the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/HAL.h>
-#include <hal/PowerDistribution.h>
 #include <hal/CAN.h>
+#include <hal/HAL.h>
 #include <hal/Power.h>
+#include <hal/PowerDistribution.h>
 #include <wpi/timestamp.h>
 
 #include "conduit_schema_generated.h"
@@ -93,8 +93,8 @@ TEST(SizeTests, JoystickSizes) {
 TEST(SizeTests, PDPDataSizes) {
 	schema::PDPData pdp;
 
-	ASSERT_EQ(sizeof(decltype(HAL_InitializePowerDistribution(0,
-									HAL_PowerDistributionType_kCTRE, 0, 0))),
+	ASSERT_EQ(sizeof(decltype(HAL_InitializePowerDistribution(
+									0, HAL_PowerDistributionType_kCTRE, 0, 0))),
 			sizeof(decltype(pdp.handle())));
 
 	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0, 0))),
@@ -112,22 +112,23 @@ TEST(SizeTests, PDPDataSizes) {
 	ASSERT_EQ(sizeof(HAL_PowerDistributionStickyFaults),
 			sizeof(decltype(pdp.sticky_faults())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTemperature(0,0))),
+	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTemperature(0, 0))),
 			sizeof(decltype(pdp.temperature())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionVoltage(0,0))),
+	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionVoltage(0, 0))),
 			sizeof(decltype(pdp.voltage())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0,0))),
+	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0, 0))),
 			sizeof(decltype(pdp.channel_count())));
 
-	// Not sure how to test the array size for HAL_GetPowerDistributionAllChannelCurrents
+	// Not sure how to test the array size for
+	// HAL_GetPowerDistributionAllChannelCurrents
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalCurrent(0,0))),
+	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalCurrent(0, 0))),
 			sizeof(decltype(pdp.total_current())));
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalPower(0,0))),
+	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalPower(0, 0))),
 			sizeof(decltype(pdp.total_power())));
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalEnergy(0,0))),
+	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalEnergy(0, 0))),
 			sizeof(decltype(pdp.total_energy())));
 }
 
@@ -186,5 +187,4 @@ TEST(SizeTests, SysDataSizes) {
 
 	ASSERT_EQ(sizeof(decltype(wpi::GetSystemTime())),
 			sizeof(decltype(sys.epoch_time())));
-
 }

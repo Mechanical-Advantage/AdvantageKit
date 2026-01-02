@@ -12,13 +12,9 @@ import MechanismImg from "./img/whats-new/mechanism.png";
 <img src={BannerLight} className="light-only" />
 <img src={BannerDark} className="dark-only" />
 
-The 2026 version of AdvantageKit is now available in beta! In addition to adding support for WPILib 2026, this release includes several major new features and documentation improvements. To get started with the AdvantageKit 2026 beta, check the [installation page](/getting-started/installation/) and use the first release with version v26.0.0-beta-X. Check the full changelog for a complete list of changes. The most notable features in this release are documented below.
+The 2026 version of AdvantageKit is now available! Check the [installation docs](/getting-started/installation/) and [full changelog](https://github.com/Mechanical-Advantage/AdvantageKit/releases) for details. In addition to adding support for WPILib 2026, this release includes several major new features and documentation improvements. The most notable features in this release are documented below.
 
 **We value your feedback! Feedback, feature requests, and bug reports are welcome on the [issues page](https://github.com/Mechanical-Advantage/AdvantageKit/issues).**
-
-:::warning
-AdvantageKit 2026 is in beta, which means that teams will encounter issues not present in stable releases. Beta releases allow teams to experiment with upcoming features and provide feedback before the official release in January 2026. Users looking for a stable release should use AdvantageKit v4.1.6, the latest 2025 release.
-:::
 
 ## 🧮 Unit Logging
 

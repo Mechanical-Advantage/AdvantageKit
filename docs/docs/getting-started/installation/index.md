@@ -12,7 +12,7 @@ Template projects are not currently available for the 2026 beta or 2027 alpha ve
 
 For new projects, we highly recommend starting with one of the [template projects](/getting-started/template-projects) attached to the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases). These projects include detailed documentation and setup instructions for many common use cases:
 
-- **[2025 KitBot Template](../template-projects/kitbot-2025-template.md)**: For robots based on the 2025 FIRST KitBot.
+- **[2026 KitBot Template](../template-projects/kitbot-template.md)**: For robots based on the 2026 FIRST KitBot.
 - **[Differential Drive Template](../template-projects/diff-drive-template.md)**: For other differential drive (tank) robots.
 - **[Spark Swerve Template](../template-projects/spark-swerve-template.md)**: For swerve drives primarily using the Spark Max and Spark Flex, including NEO, NEO Vortex, or NEO 550 motors.
 - **[TalonFX(S) Swerve Template](../template-projects/talonfx-swerve-template.md)**: For swerve drives primarily using TalonFX(S)-based motors like the Falcon 500, Kraken X60, Kraken X44, and Minion.

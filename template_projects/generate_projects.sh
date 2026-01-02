@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2021-2025 Littleton Robotics
+# Copyright (c) 2021-2026 Littleton Robotics
 # http://github.com/Mechanical-Advantage
 #
 # Use of this source code is governed by a BSD
@@ -9,9 +9,9 @@
 
 # Constants
 WPILIB_VERSION="2026.1.1-beta-1"
-PROJECTS=(kitbot_2025 diff_drive spark_swerve talonfx_swerve vision skeleton)
+PROJECTS=(kitbot_2026 diff_drive spark_swerve talonfx_swerve vision skeleton)
 VENDORDEPS=(
-    "Studica PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # kitbot_2025
+    "Studica PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # kitbot_2026
     "Studica PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # diff_drive
     "Studica PathplannerLib Phoenix6 REVLib URCL WPILibNewCommands" # spark_swerve
     "Studica PathplannerLib Phoenix6 WPILibNewCommands" # talonfx_swerve

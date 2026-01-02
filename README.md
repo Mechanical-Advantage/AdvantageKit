@@ -9,4 +9,4 @@ AdvantageKit is a logging, telemetry, and replay framework developed by [Team 63
 
 **View the [online documentation](https://docs.advantagekit.org), or download template projects from the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases).**
 
-Feedback, feature requests, and bug reports are welcome on the [issues page](https://github.com/Mechanical-Advantage/AdvantageKit/issues). For non-public inquiries, please send a message to software@team6328.org.
+Feedback, feature requests, and bug reports are welcome on the [issues page](https://github.com/Mechanical-Advantage/AdvantageKit/issues). See the [contribution page](CONTRIBUTING.md) for more information on contributing to AdvantageKit. For non-public inquiries, please send a message to software@team6328.org.
