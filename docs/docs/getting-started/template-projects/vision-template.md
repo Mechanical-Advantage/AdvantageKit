@@ -40,10 +40,6 @@ High-quality pose estimation requires frequent iteration of all aspects of the c
 
 The project is primarily configured via the `VisionConstants` class, with comments explaining the purpose of each field. The selected vision implementation can be changed in the constructor of `RobotContainer`.
 
-:::warning
-The AprilTag layout defined the top of `VisionConstants` must be updated when using the AndyMark field layout, and should match the field layout configured in [AdvantageScope](https://docs.advantagescope.org/tab-reference/3d-field), [Limelight](https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-map-specification), and/or [PhotonVision](https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/multitag.html#updating-the-field-layout). **Please see [Team Update 12](https://firstfrc.blob.core.windows.net/frc2025/Manual/TeamUpdates/TeamUpdate12.pdf) for details.**
-:::
-
 :::tip
 In addition to pose estimation, this project include an example of simple targeting with AprilTags. For many games and robots, this is a significantly simpler method of accomplishing game objectives. Check the `getTargetX` method of `Vision` and `configureButtonBindings` method of `RobotContainer` for details.
 :::
