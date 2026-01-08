@@ -4,7 +4,7 @@ ext.licenseFile = files("${rootDir.parent}/LICENSE")
 
 def pubVersion = findProperty("publishingVersion") ?: "dev"
 
-def frcYear = '2026beta'
+def frcYear = '2026'
 
 task libraryBuild() {}
 

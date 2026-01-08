@@ -8,7 +8,7 @@
 # at the root directory of this project.
 
 # Constants
-WPILIB_VERSION="2026.1.1-beta-1"
+WPILIB_VERSION="2026.1.1"
 PROJECTS=(kitbot_2026 diff_drive spark_swerve talonfx_swerve vision skeleton)
 VENDORDEPS=(
     "Studica PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # kitbot_2026

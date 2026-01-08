@@ -21,7 +21,7 @@ repositories {
 }
 wpilibRepositories.addAllReleaseRepositories(project)
 
-val wpilibVersion = "2026.1.1-beta-1"
+val wpilibVersion = "2026.1.1"
 
 dependencies {
     implementation("edu.wpi.first.cscore:cscore-java:$wpilibVersion")
