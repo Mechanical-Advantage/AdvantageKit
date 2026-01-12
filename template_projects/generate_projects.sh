@@ -11,10 +11,10 @@
 WPILIB_VERSION="2026.1.1"
 PROJECTS=(kitbot_2026 diff_drive spark_swerve talonfx_swerve vision skeleton)
 VENDORDEPS=(
-    "Studica PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # kitbot_2026
-    "Studica PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # diff_drive
-    "Studica PathplannerLib Phoenix6 REVLib URCL WPILibNewCommands" # spark_swerve
-    "Studica PathplannerLib Phoenix6 WPILibNewCommands" # talonfx_swerve
+    "PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # kitbot_2026
+    "PathplannerLib Phoenix5 Phoenix6 REVLib URCL WPILibNewCommands" # diff_drive
+    "PathplannerLib Phoenix6 REVLib URCL WPILibNewCommands" # spark_swerve
+    "PathplannerLib Phoenix6 WPILibNewCommands" # talonfx_swerve
     "photonlib WPILibNewCommands" # vision
     "WPILibNewCommands" # skeleton
 )
