@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Example Path"
+            "name": "Launch"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Score"
+            "pathName": "Example Path"
           }
         }
       ]

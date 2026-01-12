@@ -21,10 +21,10 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOTalonSRX;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.roller.Roller;
-import frc.robot.subsystems.roller.RollerIO;
-import frc.robot.subsystems.roller.RollerIOSim;
-import frc.robot.subsystems.roller.RollerIOTalonSRX;
+import frc.robot.subsystems.superstructure.Superstructure;
+import frc.robot.subsystems.superstructure.SuperstructureIO;
+import frc.robot.subsystems.superstructure.SuperstructureIOSim;
+import frc.robot.subsystems.superstructure.SuperstructureIOTalonSRX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -36,7 +36,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final Roller roller;
+  private final Superstructure superstructure;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -50,24 +50,24 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive = new Drive(new DriveIOTalonSRX(), new GyroIOPigeon2());
-        roller = new Roller(new RollerIOTalonSRX());
+        superstructure = new Superstructure(new SuperstructureIOTalonSRX());
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         drive = new Drive(new DriveIOSim(), new GyroIO() {});
-        roller = new Roller(new RollerIOSim());
+        superstructure = new Superstructure(new SuperstructureIOSim());
         break;
 
       default:
         // Replayed robot, disable IO implementations
         drive = new Drive(new DriveIO() {}, new GyroIO() {});
-        roller = new Roller(new RollerIO() {});
+        superstructure = new Superstructure(new SuperstructureIO() {});
         break;
     }
 
     // Set up auto routines
-    NamedCommands.registerCommand("Score", roller.runPercent(1.0).withTimeout(3.0));
+    NamedCommands.registerCommand("Launch", superstructure.launch().withTimeout(6.0));
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
@@ -100,10 +100,10 @@ public class RobotContainer {
         DriveCommands.arcadeDrive(
             drive, () -> -controller.getLeftY(), () -> -controller.getRightX()));
 
-    // Default roller command, control with triggers
-    roller.setDefaultCommand(
-        roller.runTeleop(
-            () -> controller.getRightTriggerAxis(), () -> controller.getLeftTriggerAxis()));
+    // Control bindings for superstructure
+    controller.leftBumper().whileTrue(superstructure.intake());
+    controller.rightBumper().whileTrue(superstructure.launch());
+    controller.a().whileTrue(superstructure.eject());
   }
 
   /**
