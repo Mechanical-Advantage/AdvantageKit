@@ -200,7 +200,7 @@ By default, the project runs at **100Hz**. This value is stored as `odometryFreq
 
 ### Switching Between Spark Max and Flex
 
-Switching between the Spark Max and Spark Max for drive and turn motors is very simple. In the constructor of `ModuleIOSpark`, change the call instantiating the Spark object to use `CANSparkMax` or `CANSparkFlex`. The configuration object must also be changed to the corresponding `SparkMaxConfig` or `SparkFlexConfig` class.
+Switching between the Spark Max and Spark Flex for drive and turn motors is very simple. In the constructor of `ModuleIOSpark`, change the call instantiating the Spark object to use `CANSparkMax` or `CANSparkFlex`. The configuration object must also be changed to the corresponding `SparkMaxConfig` or `SparkFlexConfig` class.
 
 When switching between motor types, the `driveGearbox` and `turnGearbox` constants in `DriveConstants` should be updated accordingly.
 
