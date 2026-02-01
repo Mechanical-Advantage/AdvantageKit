@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -20,7 +20,7 @@ import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
 
 /** Sends log data over a socket connection using the RLOG format. */
-public class RLOGServer implements LogDataReceiver {
+public class RLOGServer implements LogDataReceiver, AutoCloseable {
   private final int port;
   private ServerThread thread;
   private RLOGEncoder encoder = new RLOGEncoder();
@@ -49,6 +49,11 @@ public class RLOGServer implements LogDataReceiver {
   }
 
   public void end() {
+    close();
+  }
+
+  @Override
+  public void close() {
     if (thread != null) {
       thread.close();
       thread = null;
@@ -75,7 +80,7 @@ public class RLOGServer implements LogDataReceiver {
     return fullData;
   }
 
-  private class ServerThread extends Thread {
+  private class ServerThread extends Thread implements AutoCloseable {
     private static final double heartbeatTimeoutSecs =
         3.0; // Close connection if heartbeat not received for this
     // length
@@ -195,6 +200,7 @@ public class RLOGServer implements LogDataReceiver {
               + socket.getInetAddress().getHostAddress());
     }
 
+    @Override
     public void close() {
       if (server != null) {
         try {
