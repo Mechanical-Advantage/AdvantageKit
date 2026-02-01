@@ -1,0 +1,5 @@
+{
+  "name": "Java 17 Codespace",
+  "image": "mcr.microsoft.com/devcontainers/java:17",
+  "features": {}
+}
