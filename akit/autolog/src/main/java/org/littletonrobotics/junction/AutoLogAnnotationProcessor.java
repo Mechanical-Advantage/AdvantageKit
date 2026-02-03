@@ -160,8 +160,14 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
 
               cloneBuilder.addCode("return copy;\n");
 
+              AnnotationSpec generated =
+                  AnnotationSpec.builder(ClassName.get("javax.annotation.processing", "Generated"))
+                      .addMember("value", "$S", AutoLogAnnotationProcessor.class.getCanonicalName())
+                      .build();
+
               TypeSpec type =
                   TypeSpec.classBuilder(autologgedClassName)
+                      .addAnnotation(generated)
                       .addModifiers(Modifier.PUBLIC)
                       .addSuperinterface(LOGGABLE_INPUTS_TYPE)
                       .addSuperinterface(ClassName.get("java.lang", "Cloneable"))
