@@ -207,6 +207,21 @@ model {
 
             nativeUtils.useRequiredLibrary(it, "driver_shared", "ntcore_shared")
         }
+
+        akit(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/*.cpp'
+                    }
+
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+            }
+        }
     }
     testSuites {
         wpilibioTest {
@@ -218,6 +233,16 @@ model {
             }
 
             nativeUtils.useRequiredLibrary(it, "wpilib_shared", "googletest_static")
+        }
+        akitTest {
+            sources.cpp {
+                source {
+                    srcDir 'src/test/native/cpp'
+                    include '**/*.cpp'
+                }
+            }
+
+            nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
         }
     }
 }
