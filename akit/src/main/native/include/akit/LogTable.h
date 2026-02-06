@@ -13,6 +13,7 @@
 #include <vector>
 #include <memory>
 
+#include <magic_enum/magic_enum.hpp>
 #include <frc/Errors.h>
 
 #include "akit/inputs/LoggableInputs.h"
@@ -256,14 +257,15 @@ public:
 	void put(std::string key, inputs::LoggableInputs &value) {
 		if (depth > 100) {
 			FRC_ReportWarning(
-					"[AdvantageKit] Detected recursive table structure when logging value to field \"{}{}\". using LoggableInputs. Consider revising the table structure or refactoring to avoid recursion.");
+					"[AdvantageKit] Detected recursive table structure when logging value to field \"{}{}\". using LoggableInputs. Consider revising the table structure or refactoring to avoid recursion.",
+					prefix, key);
 			return;
 		}
 		value.toLog(getSubtable(key));
 	}
 
 	void put(std::string key, bool value) {
-		put(key, LogValue{value, ""});
+		put(key, LogValue { value, "" });
 	}
 
 	void put(std::string key, double value) {
@@ -276,13 +278,15 @@ public:
 
 	bool get(std::string key, bool defaultValue) {
 		auto value = data.find(prefix + key);
-		if (value == data.end()) return defaultValue;
+		if (value == data.end())
+			return defaultValue;
 		return get(key).getBoolean(defaultValue);
 	}
 
 	double get(std::string key, double defaultValue) {
 		auto value = data.find(prefix + key);
-		if (value == data.end()) return defaultValue;
+		if (value == data.end())
+			return defaultValue;
 		return get(key).getDouble(defaultValue);
 	}
 
@@ -304,7 +308,8 @@ private:
 		if (currentValue->second.type != type) {
 			FRC_ReportWarning(
 					"[AdvantageKit] Failed to write to field \"{}{}\" - attempted to write {} value but expected {}",
-					prefix, key, type, currentValue->second.type);
+					prefix, key, magic_enum::enum_name(type),
+					magic_enum::enum_name(currentValue->second.type));
 			return false;
 		}
 		if (currentValue->second.customTypeStr != customTypeStr) {

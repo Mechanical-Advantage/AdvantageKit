@@ -1,0 +1,3 @@
+[submodule "akit/magic_enum"]
+	path = akit/magic_enum
+	url = https://github.com/Neargye/magic_enum.git
