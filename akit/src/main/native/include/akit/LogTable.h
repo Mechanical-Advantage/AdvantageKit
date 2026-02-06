@@ -262,6 +262,20 @@ public:
 		value.toLog(getSubtable(key));
 	}
 
+	void put(std::string key, bool value) {
+		put(key, LogValue{value, ""});
+	}
+
+	LogValue get(std::string key) {
+		return data.at(prefix + key);
+	}
+
+	bool get(std::string key, bool defaultValue) {
+		auto value = data.find(prefix + key);
+		if (value == data.end()) return defaultValue;
+		return get(key).getBoolean(defaultValue);
+	}
+
 private:
 	LogTable(std::string prefix, int depth, std::shared_ptr<long> timestamp,
 			std::unordered_map<std::string, LogValue> data) : prefix { prefix }, depth {
