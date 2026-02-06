@@ -33,11 +33,11 @@ class LoggedNetworkBoolean : public LoggedNetworkInput, public inputs::LoggableI
         return value;
     }
 
-    void toLog(LogTable& table) {
+    void toLog(LogTable table) override {
         table.put(removeSlash(key), value);
     }
 
-    void fromLog(LogTable& table) {
+    void fromLog(LogTable table) override {
         value = table.get(removeSlash(key), defaultValue);
     }
 

@@ -266,6 +266,10 @@ public:
 		put(key, LogValue{value, ""});
 	}
 
+	void put(std::string key, double value) {
+		put(key, LogValue(value, ""));
+	}
+
 	LogValue get(std::string key) {
 		return data.at(prefix + key);
 	}
@@ -274,6 +278,12 @@ public:
 		auto value = data.find(prefix + key);
 		if (value == data.end()) return defaultValue;
 		return get(key).getBoolean(defaultValue);
+	}
+
+	double get(std::string key, double defaultValue) {
+		auto value = data.find(prefix + key);
+		if (value == data.end()) return defaultValue;
+		return get(key).getDouble(defaultValue);
 	}
 
 private:
