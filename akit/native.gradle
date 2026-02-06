@@ -207,6 +207,23 @@ model {
 
             nativeUtils.useRequiredLibrary(it, "driver_shared")
         }
+
+        akit(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/*.cpp'
+                    }
+
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+            }
+
+            nativeUtils.useRequiredLibrary(it, "wpilib_shared")
+        }
     }
     testSuites {
         wpilibioTest {
