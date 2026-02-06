@@ -11,6 +11,11 @@
 #include <wpi/array.h>
 #include <any>
 #include <vector>
+#include <memory>
+
+#include <frc/Errors.h>
+
+#include "akit/inputs/LoggableInputs.h"
 
 namespace akit {
 
@@ -215,18 +220,83 @@ public:
 		std::any value;
 	};
 
-private:
-	class SharedTimestamp {
-	public:
-		int64_t value;
+	LogTable(long timestamp) : LogTable { "/", 0, std::make_shared<long>(0), { } } {
+	}
 
-		SharedTimestamp(int64_t value) : value { value } {
+	void setTimestamp(long timestamp) {
+		*this->timestamp = timestamp;
+	}
+
+	long getTimestamp() {
+		return *this->timestamp;
+	}
+
+	LogTable getSubtable(std::string tableName) {
+		return LogTable { prefix + tableName + "/", *this };
+	}
+
+	std::unordered_map<std::string, LogValue> getAll(bool subtableOnly) {
+		if (subtableOnly) {
+			std::unordered_map<std::string, LogValue> result;
+			for (const auto &field : data) {
+				if (field.first.starts_with(prefix))
+					result.emplace(field.first.substr(prefix.size()),
+							field.second);
+			}
+			return result;
+		} else
+			return data;
+	}
+
+	void put(std::string key, LogValue value) {
+		if (writeAllowed(key, value.type, value.customTypeStr))
+			data.emplace(prefix + key, value);
+	}
+
+	void put(std::string key, inputs::LoggableInputs &value) {
+		if (depth > 100) {
+			FRC_ReportWarning(
+					"[AdvantageKit] Detected recursive table structure when logging value to field \"{}{}\". using LoggableInputs. Consider revising the table structure or refactoring to avoid recursion.");
+			return;
 		}
-	};
+		value.toLog(getSubtable(key));
+	}
+
+private:
+	LogTable(std::string prefix, int depth, std::shared_ptr<long> timestamp,
+			std::unordered_map<std::string, LogValue> data) : prefix { prefix }, depth {
+			depth }, timestamp { timestamp }, data { data } {
+	}
+
+	LogTable(std::string prefix, const LogTable &parent) : LogTable { prefix,
+			parent.depth + 1, parent.timestamp, parent.data } {
+	}
+
+	bool writeAllowed(std::string key, LoggableType type,
+			std::string customTypeStr) {
+		auto currentValue = data.find(prefix + key);
+		if (currentValue == data.end())
+			return true;
+		if (currentValue->second.type != type) {
+			FRC_ReportWarning(
+					"[AdvantageKit] Failed to write to field \"{}{}\" - attempted to write {} value but expected {}",
+					prefix, key, type, currentValue->second.type);
+			return false;
+		}
+		if (currentValue->second.customTypeStr != customTypeStr) {
+			FRC_ReportWarning(
+					"[AdvantageKit] Failed to write to field \"{}{}\" - attempted to write {} value but expected {}",
+					prefix, key, customTypeStr,
+					currentValue->second.customTypeStr);
+			return false;
+		}
+		return true;
+	}
 
 	std::string prefix;
 	int depth;
-	SharedTimestamp timestamp;
+	std::shared_ptr<long> timestamp;
+	std::unordered_map<std::string, LogValue> data;
 };
 
 }
