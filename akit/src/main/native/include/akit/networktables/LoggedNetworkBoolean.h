@@ -52,7 +52,7 @@ public:
 		value = table.get(removeSlash(key), defaultValue);
 	}
 
-	void periodic() {
+	void periodic() override {
 		/*
 		 if (!Logger.hasReplaySource()) {
 		 value = entry.get(defaultValue);
