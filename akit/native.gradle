@@ -217,7 +217,7 @@ model {
                     }
 
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'magic_enum/include'
+                        srcDirs 'src/main/native/include', 'src/main/generated/include', 'src/main/thirdparty/include', 'magic_enum/include'
                     }
                 }
             }
