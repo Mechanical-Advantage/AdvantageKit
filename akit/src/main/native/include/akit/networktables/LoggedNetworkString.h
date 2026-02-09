@@ -19,45 +19,21 @@ namespace nt {
 class LoggedNetworkString: public LoggedNetworkInput,
 		public inputs::LoggableInputs {
 public:
-	LoggedNetworkString(std::string key) : key { key }, entry {
-			::nt::NetworkTableInstance::GetDefault().GetStringTopic(key).GetEntry(
-					"") } {
-		// Logger.registerDashboardInput(this)
-	}
+	LoggedNetworkString(std::string key);
 
-	LoggedNetworkString(std::string key, std::string defaultValue) : LoggedNetworkString {
-			key } {
-		setDefault(defaultValue);
-		value = defaultValue;
-	}
+	LoggedNetworkString(std::string key, std::string defaultValue);
 
-	void setDefault(std::string defaultValue) {
-		this->defaultValue = defaultValue;
-		entry.Set(entry.Get(defaultValue));
-	}
+	void setDefault(std::string defaultValue);
 
-	void set(std::string value) {
-		entry.Set(value);
-	}
+	void set(std::string value);
 
-	std::string get() {
-		return value;
-	}
+	std::string get();
 
-	void toLog(LogTable table) override {
-		table.put(removeSlash(key), value);
-	}
+	void toLog(LogTable &&table) override;
 
-	void fromLog(LogTable table) override {
-		value = table.get(removeSlash(key), defaultValue);
-	}
+	void fromLog(LogTable &&table) override;
 
-	void periodic() override {
-		// if (!Logger.hasReplaySource()) {
-		//   value = entry.get(defaultValue);
-		// }
-		// Logger.processInputs(prefix, inputs);
-	}
+	void periodic() override;
 
 private:
 	std::string key;
