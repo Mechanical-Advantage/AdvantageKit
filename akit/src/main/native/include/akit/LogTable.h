@@ -108,80 +108,34 @@ public:
 			return getStringArray( { });
 		}
 
-		inline std::vector<std::byte> getRaw(
-				std::vector<std::byte> defaultValue) const {
-			return type == LoggableType::Raw ?
-					std::any_cast < std::vector < std::byte >> (value) :
-					defaultValue;
-		}
+		std::vector<std::byte> getRaw(
+				std::vector<std::byte> defaultValue) const;
 
-		inline bool getBoolean(bool defaultValue) const {
-			return type == LoggableType::Boolean ?
-					std::any_cast<bool>(value) : defaultValue;
-		}
+		bool getBoolean(bool defaultValue) const;
 
-		inline long getInteger(long defaultValue) const {
-			return type == LoggableType::Integer ?
-					std::any_cast<long>(value) : defaultValue;
-		}
+		long getInteger(long defaultValue) const;
 
-		inline float getFloat(float defaultValue) const {
-			return type == LoggableType::Float ?
-					std::any_cast<float>(value) : defaultValue;
-		}
+		float getFloat(float defaultValue) const;
 
-		inline double getDouble(double defaultValue) const {
-			return type == LoggableType::Double ?
-					std::any_cast<double>(value) : defaultValue;
-		}
+		double getDouble(double defaultValue) const;
 
-		inline std::string getString(std::string defaultValue) const {
-			return type == LoggableType::String ?
-					std::any_cast < std::string > (value) : defaultValue;
-		}
+		std::string getString(std::string defaultValue) const;
 
-		inline std::vector<bool> getBooleanArray(
-				std::vector<bool> defaultValue) const {
-			return type == LoggableType::BooleanArray ?
-					std::any_cast<std::vector<bool>>(value) : defaultValue;
-		}
+		std::vector<bool> getBooleanArray(std::vector<bool> defaultValue) const;
 
-		inline std::vector<long> getIntegerArray(
-				std::vector<long> defaultValue) const {
-			return type == LoggableType::IntegerArray ?
-					std::any_cast<std::vector<long>>(value) : defaultValue;
-		}
+		std::vector<long> getIntegerArray(std::vector<long> defaultValue) const;
 
-		inline std::vector<float> getFloatArray(
-				std::vector<float> defaultValue) const {
-			return type == LoggableType::FloatArray ?
-					std::any_cast<std::vector<float>>(value) : defaultValue;
-		}
+		std::vector<float> getFloatArray(std::vector<float> defaultValue) const;
 
-		inline std::vector<double> getDoubleArray(
-				std::vector<double> defaultValue) const {
-			return type == LoggableType::DoubleArray ?
-					std::any_cast<std::vector<double>>(value) : defaultValue;
-		}
+		std::vector<double> getDoubleArray(
+				std::vector<double> defaultValue) const;
 
-		inline std::vector<std::string> getStringArray(
-				std::vector<std::string> defaultValue) const {
-			return type == LoggableType::StringArray ?
-					std::any_cast < std::vector < std::string >> (value) :
-					defaultValue;
-		}
+		std::vector<std::string> getStringArray(
+				std::vector<std::string> defaultValue) const;
 
-		inline std::string getWPILOGType() const {
-			if (customTypeStr.empty())
-				return std::string { WPILOG_TYPES[static_cast<int>(type)] };
-			return customTypeStr;
-		}
+		std::string getWPILOGType() const;
 
-		inline std::string getNT4Type() const {
-			if (customTypeStr.empty())
-				return std::string { NT4_TYPES[static_cast<int>(type)] };
-			return customTypeStr;
-		}
+		std::string getNT4Type() const;
 
 		bool operator==(const LogValue &other) const {
 			if (other.type == type && customTypeStr == other.customTypeStr
