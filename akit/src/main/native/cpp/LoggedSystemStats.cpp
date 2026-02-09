@@ -59,7 +59,7 @@ void LoggedSystemStats::saveToLog(LogTable &&table) {
 			nt::NetworkTableInstance::GetDefault().GetConnections();
 	std::unordered_set < std::string > ntRemoteIds;
 
-	for (int i = 0; i < ntConnections.size(); i++) {
+	for (size_t i = 0; i < ntConnections.size(); i++) {
 		lastNTRemoteIds.erase(ntConnections[i].remote_id);
 		ntRemoteIds.insert(ntConnections[i].remote_id);
 		LogTable ntClientTable = ntClientsTable.getSubtable(
@@ -70,6 +70,6 @@ void LoggedSystemStats::saveToLog(LogTable &&table) {
 		ntClientTable.put("RemotePort", ntConnections[i].remote_port);
 		ntIntBuffer = std::bit_cast<std::array<std::byte, 4>>(
 				ntConnections[i].protocol_version);
-		ntClientTable.put("ProtocolVersion", ntIntBuffer);
+		ntClientTable.put("ProtocolVersion", std::vector<std::byte>{ntIntBuffer.begin(), ntIntBuffer.end()});
 	}
 }
