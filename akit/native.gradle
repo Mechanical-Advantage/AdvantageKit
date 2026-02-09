@@ -208,7 +208,11 @@ model {
             nativeUtils.useRequiredLibrary(it, "driver_shared")
         }
 
-        akit(NativeLibrarySpec) {
+        akit(JniNativeLibrarySpec) {
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
+            // Leave these for future proofing
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
             sources {
                 cpp {
                     source {

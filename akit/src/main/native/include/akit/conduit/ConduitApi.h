@@ -6,7 +6,6 @@
 // at the root directory of this project.
 
 #pragma once
-#include <array>
 #include <hal/PowerDistribution.h>
 #include "conduit/wpilibio.h"
 #include "conduit_schema_generated.h"
@@ -16,6 +15,10 @@ namespace akit {
 namespace conduit {
 
 class ConduitApi {
+	static constexpr int NUM_JOYSTICKS = 6;
+	static constexpr int NUM_JOYSTICK_AXES = 12;
+	static constexpr int NUM_JOYSTICK_POVS = 12;
+
 public:
 	static ConduitApi& getInstance();
 	void captureData() {
@@ -31,11 +34,13 @@ public:
 	}
 
 	std::string getEventName() {
-		return std::string { inputs.ds().event_name()->data() };
+		return std::string {
+				reinterpret_cast<const char*>(inputs.ds().event_name()->data()) };
 	}
 
 	std::string getGameSpecificMessage() {
-		return std::string { inputs.ds().game_specific_message()->data() };
+		return std::string {
+				reinterpret_cast<const char*>(inputs.ds().game_specific_message()->data()) };
 	}
 
 	uint16_t getGameSpecificMessageSize() {
@@ -63,7 +68,8 @@ public:
 	}
 
 	std::string getJoystickName(int id) {
-		return std::string { inputs.ds().joysticks()->Get(id)->name() };
+		return std::string {
+				reinterpret_cast<const char*>(inputs.ds().joysticks()->Get(id)->name()) };
 	}
 
 	uint8_t getJoystickType(int id) {
@@ -83,13 +89,17 @@ public:
 	}
 
 	std::array<uint8_t, NUM_JOYSTICK_AXES> getAxisTypes(int id) {
-		auto types = inputs.ds().joysticks()->Get(id)->axis_types();
-		return {types->begin(), types->end()};
+		std::array < uint8_t, NUM_JOYSTICK_AXES > types;
+		auto rawTypes = inputs.ds().joysticks()->Get(id)->axis_types();
+		std::copy_n(types.begin(), rawTypes->begin(), NUM_JOYSTICK_AXES);
+		return types;
 	}
 
 	std::array<float, NUM_JOYSTICK_AXES> getAxisValues(int id) {
-		auto values = inputs.ds().joysticks()->Get(id)->axis_values();
-		return (values->begin(), values->end());
+		std::array<float, NUM_JOYSTICK_AXES> values;
+		auto rawValues = inputs.ds().joysticks()->Get(id)->axis_values();
+		std::copy_n(values.begin(), rawValues->begin(), NUM_JOYSTICK_AXES);
+		return values;
 	}
 
 	int16_t getPovCount(int id) {
@@ -97,12 +107,14 @@ public:
 	}
 
 	std::array<int16_t, NUM_JOYSTICK_POVS> getPovValues(int id) {
-		auto values = inputs.ds().joysticks()->Get(id)->pov_values();
-		return {values->begin(), values->end()};
+		std::array < int16_t, NUM_JOYSTICK_POVS > values;
+		auto rawValues = inputs.ds().joysticks()->Get(id)->pov_values();
+		std::copy_n(values.begin(), rawValues->begin(), NUM_JOYSTICK_POVS);
+		return values;
 	}
 
 	bool isXbox(int id) {
-		return inputs.ds().joysticks()->Get(id).is_xbox();
+		return inputs.ds().joysticks()->Get(id)->is_xbox();
 	}
 
 	double getPDPTemperature() {
@@ -138,11 +150,13 @@ public:
 	}
 
 	std::string getSerialNumber() {
-		return std::string { inputs.sys().serial_number().data() };
+		return std::string {
+				reinterpret_cast<const char*>(inputs.sys().serial_number()->data()) };
 	}
 
 	std::string getComments() {
-		return std::string { inputs.sys().comments().data() };
+		return std::string {
+				reinterpret_cast<const char*>(inputs.sys().comments()->data()) };
 	}
 
 	int32_t getTeamNumber() {
@@ -186,7 +200,7 @@ public:
 	}
 
 	double getUserCurrent3v3() {
-		return inputs.sys().user_current_3v();
+		return inputs.sys().user_current_3v3();
 	}
 
 	bool getUserActive3v3() {
@@ -298,12 +312,8 @@ private:
 		wpilibio::start();
 		if (wpilibio::shared_buf == 0)
 			wpilibio::make_buffer();
-		return *wpilibio::shared_buf;
+		return *static_cast<org::littletonrobotics::conduit::schema::CoreInputs*>(wpilibio::shared_buf);
 	}
-
-	static constexpr int NUM_JOYSTICKS = 6;
-	static constexpr int NUM_JOYSTICK_AXES = 12;
-	static constexpr int NUM_JOYSTICK_POVS = 12;
 
 	org::littletonrobotics::conduit::schema::CoreInputs &inputs;
 };
