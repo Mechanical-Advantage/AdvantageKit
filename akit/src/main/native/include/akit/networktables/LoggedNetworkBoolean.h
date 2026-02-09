@@ -19,47 +19,21 @@ namespace nt {
 class LoggedNetworkBoolean: public LoggedNetworkInput,
 		public inputs::LoggableInputs {
 public:
-	LoggedNetworkBoolean(std::string key) : key { key }, entry {
-			::nt::NetworkTableInstance::GetDefault().GetBooleanTopic(key).GetEntry(
-					false) }, value { defaultValue } {
-		// Logger.registerDashboardInput(this)
-	}
+	LoggedNetworkBoolean(std::string key);
 
-	LoggedNetworkBoolean(std::string key, bool defaultValue) : LoggedNetworkBoolean {
-			key } {
-		setDefault(defaultValue);
-		value = defaultValue;
-	}
+	LoggedNetworkBoolean(std::string key, bool defaultValue);
 
-	void setDefault(bool defaultValue) {
-		this->defaultValue = defaultValue;
-		entry.Set(entry.Get(defaultValue));
-	}
+	void setDefault(bool defaultValue);
 
-	void set(bool value) {
-		entry.Set(value);
-	}
+	void set(bool value);
 
-	bool get() {
-		return value;
-	}
+	bool get();
 
-	void toLog(LogTable table) override {
-		table.put(removeSlash(key), value);
-	}
+	void toLog(LogTable &&table) override;
 
-	void fromLog(LogTable table) override {
-		value = table.get(removeSlash(key), defaultValue);
-	}
+	void fromLog(LogTable &&table) override;
 
-	void periodic() override {
-		/*
-		 if (!Logger.hasReplaySource()) {
-		 value = entry.get(defaultValue);
-		 }
-		 Logger.processInputs(prefix, inputs);
-		 */
-	}
+	void periodic() override;
 
 private:
 	std::string key;
