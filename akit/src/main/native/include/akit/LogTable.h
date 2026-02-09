@@ -15,6 +15,8 @@
 
 #include <magic_enum/magic_enum.hpp>
 #include <frc/Errors.h>
+#include <frc/util/Color.h>
+#include <units/base.h>
 
 #include "akit/inputs/LoggableInputs.h"
 
@@ -137,39 +139,7 @@ public:
 
 		std::string getNT4Type() const;
 
-		bool operator==(const LogValue &other) const {
-			if (other.type == type && customTypeStr == other.customTypeStr
-					&& unitStr == other.unitStr
-					&& (customTypeStr.empty()
-							|| other.customTypeStr == customTypeStr)
-					&& (unitStr.empty() || other.unitStr == unitStr)) {
-				switch (type) {
-				case LoggableType::Raw:
-					return getRaw() == other.getRaw();
-				case LoggableType::Boolean:
-					return getBoolean() == other.getBoolean();
-				case LoggableType::Integer:
-					return getInteger() == other.getInteger();
-				case LoggableType::Float:
-					return getFloat() == other.getFloat();
-				case LoggableType::Double:
-					return getDouble() == other.getDouble();
-				case LoggableType::String:
-					return getString() == other.getString();
-				case LoggableType::BooleanArray:
-					return getBooleanArray() == other.getBooleanArray();
-				case LoggableType::IntegerArray:
-					return getIntegerArray() == other.getIntegerArray();
-				case LoggableType::FloatArray:
-					return getFloatArray() == other.getFloatArray();
-				case LoggableType::DoubleArray:
-					return getDoubleArray() == other.getDoubleArray();
-				case LoggableType::StringArray:
-					return getStringArray() == other.getStringArray();
-				}
-			}
-			return false;
-		}
+		bool operator==(const LogValue &other) const;
 
 	private:
 		std::any value;
@@ -178,34 +148,119 @@ public:
 	LogTable(long timestamp) : LogTable { "/", 0, std::make_shared<long>(0), { } } {
 	}
 
-	void setTimestamp(long timestamp) {
+	inline void setTimestamp(long timestamp) {
 		*this->timestamp = timestamp;
 	}
 
-	long getTimestamp() {
+	inline long getTimestamp() {
 		return *this->timestamp;
 	}
 
-	LogTable getSubtable(std::string tableName) {
+	inline LogTable getSubtable(std::string tableName) {
 		return LogTable { prefix + tableName + "/", *this };
 	}
 
-	std::unordered_map<std::string, LogValue> getAll(bool subtableOnly) {
-		if (subtableOnly) {
-			std::unordered_map<std::string, LogValue> result;
-			for (const auto &field : data) {
-				if (field.first.starts_with(prefix))
-					result.emplace(field.first.substr(prefix.size()),
-							field.second);
-			}
-			return result;
-		} else
-			return data;
+	std::unordered_map<std::string, LogValue> getAll(bool subtableOnly);
+
+	void put(std::string key, LogValue value);
+
+	inline void put(std::string key, std::vector<std::byte> value) {
+		put(key, LogValue { value, "" });
 	}
 
-	void put(std::string key, LogValue value) {
-		if (writeAllowed(key, value.type, value.customTypeStr))
-			data.emplace(prefix + key, value);
+	void put(std::string key, std::vector<std::vector<std::byte>> value);
+
+	inline void put(std::string key, bool value) {
+		put(key, LogValue { value, "" });
+	}
+
+	inline void put(std::string key, std::vector<bool> value) {
+		put(key, LogValue { value, "" });
+	}
+
+	void put(std::string key, std::vector<std::vector<bool>> value);
+
+	inline void put(std::string key, long value) {
+		put(key, LogValue { value, "" });
+	}
+
+	inline void put(std::string key, std::vector<long> value) {
+		put(key, LogValue(value, ""));
+	}
+
+	void put(std::string key, std::vector<std::vector<long>> value);
+
+	inline void put(std::string key, float value) {
+		put(key, LogValue { value, "" });
+	}
+
+	inline void put(std::string key, float value, std::string unitStr) {
+		put(key, LogValue { value, "", unitStr });
+	}
+
+	inline void put(std::string key, std::vector<float> value) {
+		put(key, LogValue { value, "" });
+	}
+
+	void put(std::string key, std::vector<std::vector<float>> value);
+
+	inline void put(std::string key, double value) {
+		put(key, LogValue { value, "" });
+	}
+
+	inline void put(std::string key, double value, std::string unitStr) {
+		put(key, LogValue { value, "", unitStr });
+	}
+
+	inline void put(std::string key, std::vector<double> value) {
+		put(key, LogValue { value, "" });
+	}
+
+	void put(std::string key, std::vector<std::vector<double>> value);
+
+	inline void put(std::string key, std::string value) {
+		put(key, LogValue { value, "" });
+	}
+
+	inline void put(std::string key, std::vector<std::string> value) {
+		put(key, LogValue { value, "" });
+	}
+
+	void put(std::string key, std::vector<std::vector<std::string>> value);
+
+	template <typename T>
+	requires std::is_enum_v<T>
+	inline void put(std::string key, T value) {
+		put(key, LogValue { magic_enum::enum_name(value), "" });
+	}
+
+	template <typename T>
+	requires std::is_enum_v<T>
+	void put(std::string key, std::vector<T> value) {
+		std::vector < std::string > stringValues;
+		for (auto val : value)
+			stringValues.emplace_back(magic_enum::enum_name(val));
+		put(key, LogValue { stringValues, "" });
+	}
+
+	template <typename T>
+	requires std::is_enum_v<T>
+	void put(std::string key, std::vector<std::vector<T>> value) {
+		put(key + "/length", static_cast<long>(value.size()));
+		for (int i = 0; i < value.size(); i++)
+			put(key + "/" + std::to_string(i), value[i]);
+	}
+
+	template <typename U>
+	requires units::traits::is_unit_v<U>
+	inline void put(std::string key, U value) {
+		put(key,
+				LogValue { U::base_unit { value }.value(), "",
+						U::base_unit { }.abbreviation() });
+	}
+
+	inline void put(std::string key, frc::Color value) {
+		put(key, value.HexString());
 	}
 
 	void put(std::string key, inputs::LoggableInputs &value) {
@@ -216,18 +271,6 @@ public:
 			return;
 		}
 		value.toLog(getSubtable(key));
-	}
-
-	void put(std::string key, bool value) {
-		put(key, LogValue { value, "" });
-	}
-
-	void put(std::string key, double value) {
-		put(key, LogValue(value, ""));
-	}
-
-	void put(std::string key, std::string value) {
-		put(key, LogValue { value, "" });
 	}
 
 	LogValue get(std::string key) {
@@ -266,26 +309,7 @@ private:
 	}
 
 	bool writeAllowed(std::string key, LoggableType type,
-			std::string customTypeStr) {
-		auto currentValue = data.find(prefix + key);
-		if (currentValue == data.end())
-			return true;
-		if (currentValue->second.type != type) {
-			FRC_ReportWarning(
-					"[AdvantageKit] Failed to write to field \"{}{}\" - attempted to write {} value but expected {}",
-					prefix, key, magic_enum::enum_name(type),
-					magic_enum::enum_name(currentValue->second.type));
-			return false;
-		}
-		if (currentValue->second.customTypeStr != customTypeStr) {
-			FRC_ReportWarning(
-					"[AdvantageKit] Failed to write to field \"{}{}\" - attempted to write {} value but expected {}",
-					prefix, key, customTypeStr,
-					currentValue->second.customTypeStr);
-			return false;
-		}
-		return true;
-	}
+			std::string customTypeStr);
 
 	std::string prefix;
 	int depth;
