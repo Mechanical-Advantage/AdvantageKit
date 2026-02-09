@@ -89,6 +89,12 @@ std::vector<bool> LogTable::LogValue::getBooleanArray(
 			std::any_cast<std::vector<bool>>(value) : defaultValue;
 }
 
+std::vector<long> LogTable::LogValue::getIntegerArray(
+		std::vector<long> defaultValue) const {
+	return type == LoggableType::IntegerArray ?
+			std::any_cast<std::vector<long>>(value) : defaultValue;
+}
+
 std::vector<float> LogTable::LogValue::getFloatArray(
 		std::vector<float> defaultValue) const {
 	return type == LoggableType::FloatArray ?
@@ -237,6 +243,9 @@ void LogTable::addStructSchema(std::string typeString, std::string schema,
 	seen.insert(typeString);
 
 	data.emplace(key,
-			LogValue { std::vector<std::byte> { reinterpret_cast<std::byte*>(schema.data()), reinterpret_cast<std::byte*>(schema.data()) + schema.size() },
-					"" });
+			LogValue {
+					std::vector<std::byte> {
+							reinterpret_cast<std::byte*>(schema.data()),
+							reinterpret_cast<std::byte*>(schema.data())
+									+ schema.size() }, "" });
 }

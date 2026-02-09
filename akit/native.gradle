@@ -227,6 +227,10 @@ model {
             }
 
             nativeUtils.useRequiredLibrary(it, "wpilib_shared")
+
+            binaries.all {
+                lib project: ':', library: 'wpilibio', linkage: 'static'
+            }
         }
     }
     testSuites {
@@ -249,6 +253,10 @@ model {
             }
 
             nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
+
+            binaries.all {
+                lib project: ':', library: 'wpilibio', linkage: 'static'
+            }
         }
     }
 }

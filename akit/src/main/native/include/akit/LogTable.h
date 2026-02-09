@@ -257,11 +257,8 @@ public:
 	template <typename U>
 	requires units::traits::is_unit_t_v<U>
 	inline void put(std::string key, U value) {
-		put(key,
-				LogValue {
-						value.template convert<U::unit_type::base_unit_type>().value(),
-						"",
-						value.template convert<U::unit_type::base_unit_type>().abbreviation() });
+		auto converted = value.template convert<U::unit_type::base_unit_type>();
+		put(key, LogValue { converted.value(), "", converted.abbreviation() });
 	}
 
 	inline void put(std::string key, frc::Color value) {
@@ -310,67 +307,67 @@ public:
 		std::string key = "/.schema/" + typeString;
 
 		if (data.contains(key))
-			return;
+		return;
 		std::unordered_set < std::string > seen;
 		seen.insert(typeString);
 
-		data.emplace(key, LogValue { wpi::GetStructSchemaBytes<T>(),
-				"structschema" });
-	wpi::ForEachStructSchema([&](std::string_view typeString, std::string_view schema) {addStructSchema(std::string{typeString}, std::string{schema}, seen);});
-}
+		data.emplace(key, LogValue {wpi::GetStructSchemaBytes<T>(),
+					"structschema"});
+		wpi::ForEachStructSchema([&](std::string_view typeString, std::string_view schema) {addStructSchema(std::string {typeString}, std::string {schema}, seen);});
+	}
 
-template <typename T>
-requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-void put(std::string key, T value) {
-	addStructSchema<T>();
-	std::array<std::byte, wpi::GetStructSize<T>()> buffer;
-	wpi::PackStruct < T > (buffer);
-	put(key, LogValue { buffer, wpi::GetStructTypeString<T>() });
-}
+	template <typename T>
+	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
+	void put(std::string key, T value) {
+		addStructSchema<T>();
+		std::array<std::byte, wpi::GetStructSize<T>()> buffer;
+		wpi::PackStruct < T > (buffer);
+		put(key, LogValue {buffer, wpi::GetStructTypeString<T>()});
+	}
 
-template <typename T>
-requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-void put(std::string key, std::initializer_list<T> values) {
-	addStructSchema<T>();
-	std::vector < std::byte
-			> buffer { values.size() * wpi::GetStructSize<T>() };
-	int i = 0;
-	for (const T &value : values)
+	template <typename T>
+	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
+	void put(std::string key, std::initializer_list<T> values) {
+		addStructSchema<T>();
+		std::vector < std::byte
+		> buffer {values.size() * wpi::GetStructSize<T>()};
+		int i = 0;
+		for (const T &value : values)
 		wpi::PackStruct(
 				std::span < std::byte
-						> (buffer).subspan(i++ * wpi::GetStructSize<T>()),
+				> (buffer).subspan(i++ * wpi::GetStructSize<T>()),
 				value);
-	put(key, LogValue { buffer, wpi::GetStructTypeString<T>() + "[]" });
-}
+		put(key, LogValue {buffer, wpi::GetStructTypeString<T>() + "[]"});
+	}
 
-template <typename T>
-requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-void put(std::string key, std::vector<std::vector<T>> value) {
-	put(key + "/length", value.size());
-	for (int i = 0; i < value.size(); i++)
+	template <typename T>
+	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
+	void put(std::string key, std::vector<std::vector<T>> value) {
+		put(key + "/length", value.size());
+		for (int i = 0; i < value.size(); i++)
 		put(key + "/" + std::to_string(i), value[i]);
-}
+	}
 
 private:
-LogTable(std::string prefix, int depth, std::shared_ptr<long> timestamp,
-		std::unordered_map<std::string, LogValue> data) : prefix { prefix }, depth {
-		depth }, timestamp { timestamp }, data { data } {
-}
+	LogTable(std::string prefix, int depth, std::shared_ptr<long> timestamp,
+			std::unordered_map<std::string, LogValue> data) : prefix { prefix }, depth {
+			depth }, timestamp { timestamp }, data { data } {
+	}
 
-LogTable(std::string prefix, const LogTable &parent) : LogTable { prefix,
-		parent.depth + 1, parent.timestamp, parent.data } {
-}
+	LogTable(std::string prefix, const LogTable &parent) : LogTable { prefix,
+			parent.depth + 1, parent.timestamp, parent.data } {
+	}
 
-bool writeAllowed(std::string key, LoggableType type,
-		std::string customTypeStr);
+	bool writeAllowed(std::string key, LoggableType type,
+			std::string customTypeStr);
 
-void addStructSchema(std::string typeString, std::string schema,
-		std::unordered_set<std::string> &seen);
+	void addStructSchema(std::string typeString, std::string schema,
+			std::unordered_set<std::string> &seen);
 
-std::string prefix;
-int depth;
-std::shared_ptr<long> timestamp;
-std::unordered_map<std::string, LogValue> data;
+	std::string prefix;
+	int depth;
+	std::shared_ptr<long> timestamp;
+	std::unordered_map<std::string, LogValue> data;
 };
 
 }
