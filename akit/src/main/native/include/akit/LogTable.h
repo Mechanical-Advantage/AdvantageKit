@@ -304,7 +304,7 @@ public:
 	}
 
 	template <typename T>
-	requires wpi::StructSerializable<T>
+	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
 	void addStructSchema() {
 		std::string typeString = wpi::GetStructTypeString<T>();
 		std::string key = "/.schema/" + typeString;
@@ -320,7 +320,7 @@ public:
 }
 
 template <typename T>
-requires wpi::StructSerializable<T>
+requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
 void put(std::string key, T value) {
 	addStructSchema<T>();
 	std::array<std::byte, wpi::GetStructSize<T>()> buffer;
@@ -329,7 +329,7 @@ void put(std::string key, T value) {
 }
 
 template <typename T>
-requires wpi::StructSerializable<T>
+requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
 void put(std::string key, std::initializer_list<T> values) {
 	addStructSchema<T>();
 	std::vector < std::byte
@@ -344,7 +344,7 @@ void put(std::string key, std::initializer_list<T> values) {
 }
 
 template <typename T>
-requires wpi::StructSerializable<T>
+requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
 void put(std::string key, std::vector<std::vector<T>> value) {
 	put(key + "/length", value.size());
 	for (int i = 0; i < value.size(); i++)
