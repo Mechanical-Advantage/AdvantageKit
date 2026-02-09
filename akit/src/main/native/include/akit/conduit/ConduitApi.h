@@ -89,7 +89,7 @@ public:
 	}
 
 	std::array<long, NUM_JOYSTICK_AXES> getAxisTypes(int id) {
-		std::array < long, NUM_JOYSTICK_AXES > types;
+		std::array<long, NUM_JOYSTICK_AXES> types;
 		auto rawTypes = inputs.ds().joysticks()->Get(id)->axis_types();
 		std::copy_n(rawTypes->begin(), NUM_JOYSTICK_AXES, types.begin());
 		return types;
@@ -107,7 +107,7 @@ public:
 	}
 
 	std::array<long, NUM_JOYSTICK_POVS> getPovValues(int id) {
-		std::array < long, NUM_JOYSTICK_POVS > values;
+		std::array<long, NUM_JOYSTICK_POVS> values;
 		auto rawValues = inputs.ds().joysticks()->Get(id)->pov_values();
 		std::copy_n(rawValues->begin(), NUM_JOYSTICK_POVS, values.begin());
 		return values;
@@ -308,12 +308,7 @@ private:
 	ConduitApi() : inputs { getCoreInputs() } {
 	}
 
-	static org::littletonrobotics::conduit::schema::CoreInputs& getCoreInputs() {
-		wpilibio::start();
-		if (wpilibio::shared_buf == 0)
-			wpilibio::make_buffer();
-		return *static_cast<org::littletonrobotics::conduit::schema::CoreInputs*>(wpilibio::shared_buf);
-	}
+	static org::littletonrobotics::conduit::schema::CoreInputs& getCoreInputs();
 
 	org::littletonrobotics::conduit::schema::CoreInputs &inputs;
 };

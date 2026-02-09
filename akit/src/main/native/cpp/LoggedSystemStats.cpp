@@ -67,9 +67,11 @@ void LoggedSystemStats::saveToLog(LogTable &&table) {
 
 		ntClientTable.put("Connected", true);
 		ntClientTable.put("IPAddress", ntConnections[i].remote_ip);
-		ntClientTable.put("RemotePort", static_cast<long>(ntConnections[i].remote_port));
+		ntClientTable.put("RemotePort",
+				static_cast<long>(ntConnections[i].remote_port));
 		ntIntBuffer = std::bit_cast<std::array<std::byte, 4>>(
 				ntConnections[i].protocol_version);
-		ntClientTable.put("ProtocolVersion", std::vector<std::byte>{ntIntBuffer.begin(), ntIntBuffer.end()});
+		ntClientTable.put("ProtocolVersion", std::vector<std::byte> {
+				ntIntBuffer.begin(), ntIntBuffer.end() });
 	}
 }
