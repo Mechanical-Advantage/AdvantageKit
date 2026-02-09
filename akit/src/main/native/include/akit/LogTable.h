@@ -275,47 +275,6 @@ public:
 		value.toLog(getSubtable(key));
 	}
 
-	LogValue get(std::string key) {
-		return data.at(prefix + key);
-	}
-
-	bool get(std::string key, bool defaultValue) {
-		auto value = data.find(prefix + key);
-		if (value == data.end())
-			return defaultValue;
-		return get(key).getBoolean(defaultValue);
-	}
-
-	double get(std::string key, double defaultValue) {
-		auto value = data.find(prefix + key);
-		if (value == data.end())
-			return defaultValue;
-		return get(key).getDouble(defaultValue);
-	}
-
-	std::string get(std::string key, std::string defaultValue) {
-		auto value = data.find(prefix + key);
-		if (value == data.end())
-			return defaultValue;
-		return get(key).getString(defaultValue);
-	}
-
-	template <typename T>
-	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	void addStructSchema() {
-		std::string typeString = wpi::GetStructTypeString<T>();
-		std::string key = "/.schema/" + typeString;
-
-		if (data.contains(key))
-		return;
-		std::unordered_set < std::string > seen;
-		seen.insert(typeString);
-
-		data.emplace(key, LogValue {wpi::GetStructSchemaBytes<T>(),
-					"structschema"});
-		wpi::ForEachStructSchema([&](std::string_view typeString, std::string_view schema) {addStructSchema(std::string {typeString}, std::string {schema}, seen);});
-	}
-
 	template <typename T>
 	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
 	void put(std::string key, T value) {
@@ -348,6 +307,127 @@ public:
 		put(key + "/" + std::to_string(i), value[i]);
 	}
 
+	inline LogValue get(std::string key) {
+		return data.at(prefix + key);
+	}
+
+	std::vector<std::byte> get(std::string key,
+			std::vector<std::byte> defaultValue);
+	std::vector<std::vector<std::byte>> get(std::string key,
+			std::vector<std::vector<std::byte>> defaultValue);
+
+	bool get(std::string key, bool defaultValue);
+	std::vector<bool> get(std::string key, std::vector<bool> defaultValue);
+	std::vector<std::vector<bool>> get(std::string key,
+			std::vector<std::vector<bool>> defaultValue);
+
+	long get(std::string key, long defaultValue);
+	std::vector<long> get(std::string key, std::vector<long> defaultValue);
+	std::vector<std::vector<long>> get(std::string key,
+			std::vector<std::vector<long>> defaultValue);
+
+	float get(std::string key, float defaultValue);
+	std::vector<float> get(std::string key, std::vector<float> defaultValue);
+	std::vector<std::vector<float>> get(std::string key,
+			std::vector<std::vector<float>> defaultValue);
+
+	double get(std::string key, double defaultValue);
+	std::vector<double> get(std::string key, std::vector<double> defaultValue);
+	std::vector<std::vector<double>> get(std::string key,
+			std::vector<std::vector<double>> defaultValue);
+
+	std::string get(std::string key, std::string defaultValue);
+	std::vector<std::string> get(std::string key,
+			std::vector<std::string> defaultValue);
+	std::vector<std::vector<std::string>> get(std::string key,
+			std::vector<std::vector<std::string>> defaultValue);
+
+	template <typename T>
+	requires std::is_enum_v<T>
+	T get(std::string key, T defaultValue) {
+		if (data.contains(prefix + key))
+			return magic_enum::enum_cast(
+					get(key).getString(magic_enum::enum_name(defaultValue)));
+		else
+			return defaultValue;
+	}
+
+	template <typename T>
+	requires std::is_enum_v<T>
+	std::vector<T> get(std::string key, std::vector<T> defaultValue) {
+		if (data.contains(prefix + key)) {
+			std::vector < std::string > names = get(key).getStringArray( { });
+			std::vector < T > enums;
+			for (const auto &name : names)
+				enums.emplace_back(magic_enum::enum_cast < T > (name));
+			return enums;
+		} else
+			return defaultValue;
+	}
+
+	template <typename T>
+	requires std::is_enum_v<T>
+	std::vector<std::vector<T>> get(std::string key,
+			std::vector<std::vector<T>> defaultValue) {
+		if (data.contains(prefix + key)) {
+			long length = get(key + "/length", 0L);
+			std::vector < std::vector < T >> values;
+			for (int i = 0; i < length; i++)
+				values.emplace_back(
+						get(key + "/" + std::to_string(i), defaultValue[i]));
+			return values;
+		} else
+			return defaultValue;
+	}
+
+	template <typename U>
+	requires units::traits::is_unit_t_v<U>
+	U get(std::string key, U defaultValue) {
+		using BaseUnit = U::unit_type::base_unit_type;
+		if (data.contains(prefix + key)) {
+			auto converted = defaultValue.template convert<BaseUnit>();
+			return BaseUnit { get(key).getDouble(converted.value()) };
+		} else
+			return defaultValue;
+	}
+
+	frc::Color get(std::string key, frc::Color defaultValue);
+
+	inputs::LoggableInputs get(std::string key,
+			inputs::LoggableInputs defaultValue);
+
+	template <typename T>
+	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
+	T get(std::string key, T defaultValue) {
+		if (data.contains(prefix + key))
+		return wpi::UnpackStruct<T>(get(key).getRaw());
+		else return defaultValue;
+	}
+
+	template <typename T>
+	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
+	std::vector<T> get(std::string key, std::vector<T> defaultValue) {
+		if (data.contains(prefix + key)) {
+			std::vector<std::byte> buffer = get(key).getRaw();
+			std::vector<T> structs {buffer.size() / wpi::GetStructSize<T>()};
+			for (int i = 0; i < structs.size(); i++)
+			wpi::UnpackStructInto(structs.data() + i, std::span<std::byte> {buffer}.subspan(i * wpi::GetStructSize<T>()));
+			return structs;
+		} else return defaultValue;
+	}
+
+	template <typename T>
+	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
+	std::vector<std::vector<T>> get(std::string key, std::vector<std::vector<T>> defaultValue) {
+		if (data.contains(prefix + key)) {
+			long length = get(key + "/length", 0L);
+			std::vector<std::vector<T>> structs;
+			for (int i = 0; i < length; i++) {
+				structs.emplace_back(get(key + "/" + std::to_string(i), defaultValue[i]));
+			}
+		} else return defaultValue;
+	}
+
 private:
 	LogTable(std::string prefix, int depth, std::shared_ptr<long> timestamp,
 			std::unordered_map<std::string, LogValue> data) : prefix { prefix }, depth {
@@ -360,6 +440,22 @@ private:
 
 	bool writeAllowed(std::string key, LoggableType type,
 			std::string customTypeStr);
+
+	template <typename T>
+	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
+	void addStructSchema() {
+		std::string typeString = wpi::GetStructTypeString<T>();
+		std::string key = "/.schema/" + typeString;
+
+		if (data.contains(key))
+		return;
+		std::unordered_set < std::string > seen;
+		seen.insert(typeString);
+
+		data.emplace(key, LogValue {wpi::GetStructSchemaBytes<T>(),
+					"structschema"});
+		wpi::ForEachStructSchema([&](std::string_view typeString, std::string_view schema) {addStructSchema(std::string {typeString}, std::string {schema}, seen);});
+	}
 
 	void addStructSchema(std::string typeString, std::string schema,
 			std::unordered_set<std::string> &seen);
