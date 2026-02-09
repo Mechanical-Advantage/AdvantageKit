@@ -7,6 +7,7 @@
 
 #pragma once
 #include <array>
+#include <hal/PowerDistribution.h>
 #include "conduit/wpilibio.h"
 #include "conduit_schema_generated.h"
 
@@ -117,6 +118,10 @@ public:
 
 	double getPDPTotalEnergy() {
 		return inputs.pdp().total_energy();
+	}
+
+	double getPDPTotalPower() {
+		return inputs.pdp().total_power();
 	}
 
 	double getFPGAVersion() {
@@ -251,7 +256,7 @@ public:
 		return inputs.sys().epoch_time();
 	}
 
-	void configurePowerDistribution(int moduleID, int type) {
+	void configurePowerDistribution(int moduleID, HAL_PowerDistributionType type) {
 		// FIXME: Unimplemented
 	}
 
