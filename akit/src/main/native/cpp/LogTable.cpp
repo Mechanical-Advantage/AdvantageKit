@@ -151,3 +151,79 @@ bool LogTable::LogValue::operator==(const LogValue &other) const {
 	}
 	return false;
 }
+
+std::unordered_map<std::string, LogTable::LogValue> LogTable::getAll(
+		bool subtableOnly) {
+	if (subtableOnly) {
+		std::unordered_map < std::string, LogValue > result;
+		for (const auto &field : data) {
+			if (field.first.starts_with(prefix))
+				result.emplace(field.first.substr(prefix.size()), field.second);
+		}
+		return result;
+	} else
+		return data;
+}
+
+bool LogTable::writeAllowed(std::string key, LoggableType type,
+		std::string customTypeStr) {
+	auto currentValue = data.find(prefix + key);
+	if (currentValue == data.end())
+		return true;
+	if (currentValue->second.type != type) {
+		FRC_ReportWarning(
+				"[AdvantageKit] Failed to write to field \"{}{}\" - attempted to write {} value but expected {}",
+				prefix, key, magic_enum::enum_name(type),
+				magic_enum::enum_name(currentValue->second.type));
+		return false;
+	}
+	if (currentValue->second.customTypeStr != customTypeStr) {
+		FRC_ReportWarning(
+				"[AdvantageKit] Failed to write to field \"{}{}\" - attempted to write {} value but expected {}",
+				prefix, key, customTypeStr, currentValue->second.customTypeStr);
+		return false;
+	}
+	return true;
+}
+
+void LogTable::put(std::string key, LogTable::LogValue value) {
+	if (writeAllowed(key, value.type, value.customTypeStr))
+		data.emplace(prefix + key, value);
+}
+
+void LogTable::put(std::string key, std::vector<std::vector<std::byte>> value) {
+	put(key + "/length", static_cast<long>(value.size()));
+	for (int i = 0; i < value.size(); i++)
+		put(key + "/" + std::to_string(i), value[i]);
+}
+
+void LogTable::put(std::string key, std::vector<std::vector<bool>> value) {
+	put(key + "/length", static_cast<long>(value.size()));
+	for (int i = 0; i < value.size(); i++)
+		put(key + "/" + std::to_string(i), value[i]);
+}
+
+void LogTable::put(std::string key, std::vector<std::vector<long>> value) {
+	put(key + "/length", static_cast<long>(value.size()));
+	for (int i = 0; i < value.size(); i++)
+		put(key + "/" + std::to_string(i), value[i]);
+}
+
+void LogTable::put(std::string key, std::vector<std::vector<float>> value) {
+	put(key + "/length", static_cast<long>(value.size()));
+	for (int i = 0; i < value.size(); i++)
+		put(key + "/" + std::to_string(i), value[i]);
+}
+
+void LogTable::put(std::string key, std::vector<std::vector<double>> value) {
+	put(key + "/length", static_cast<long>(value.size()));
+	for (int i = 0; i < value.size(); i++)
+		put(key + "/" + std::to_string(i), value[i]);
+}
+
+void LogTable::put(std::string key,
+		std::vector<std::vector<std::string>> value) {
+	put(key + "/length", static_cast<long>(value.size()));
+	for (int i = 0; i < value.size(); i++)
+		put(key + "/" + std::to_string(i), value[i]);
+}
