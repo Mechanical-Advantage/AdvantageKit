@@ -96,6 +96,11 @@ public:
 		return inputs.ds().joysticks()->Get(id)->pov_count();
 	}
 
+	std::array<int16_t, NUM_JOYSTICK_POVS> getPovValues(int id) {
+		auto values = inputs.ds().joysticks()->Get(id)->pov_values();
+		return {values->begin(), values->end()};
+	}
+
 	bool isXbox(int id) {
 		return inputs.ds().joysticks()->Get(id).is_xbox();
 	}
@@ -256,7 +261,8 @@ public:
 		return inputs.sys().epoch_time();
 	}
 
-	void configurePowerDistribution(int moduleID, HAL_PowerDistributionType type) {
+	void configurePowerDistribution(int moduleID,
+			HAL_PowerDistributionType type) {
 		// FIXME: Unimplemented
 	}
 
