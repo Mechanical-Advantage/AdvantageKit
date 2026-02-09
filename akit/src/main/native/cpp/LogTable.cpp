@@ -23,7 +23,7 @@ LogTable::LogValue::LogValue(float value, std::string typeStr) : type {
 }
 LogTable::LogValue::LogValue(float value, std::string typeStr,
 		std::string unitStr) : type { LoggableType::Float }, customTypeStr {
-		customTypeStr }, unitStr { unitStr }, value { value } {
+		typeStr }, unitStr { unitStr }, value { value } {
 }
 LogTable::LogValue::LogValue(double value, std::string typeStr) : type {
 		LoggableType::Double }, customTypeStr { typeStr }, value { value } {
@@ -193,37 +193,50 @@ void LogTable::put(std::string key, LogTable::LogValue value) {
 
 void LogTable::put(std::string key, std::vector<std::vector<std::byte>> value) {
 	put(key + "/length", static_cast<long>(value.size()));
-	for (int i = 0; i < value.size(); i++)
+	for (size_t i = 0; i < value.size(); i++)
 		put(key + "/" + std::to_string(i), value[i]);
 }
 
 void LogTable::put(std::string key, std::vector<std::vector<bool>> value) {
 	put(key + "/length", static_cast<long>(value.size()));
-	for (int i = 0; i < value.size(); i++)
+	for (size_t i = 0; i < value.size(); i++)
 		put(key + "/" + std::to_string(i), value[i]);
 }
 
 void LogTable::put(std::string key, std::vector<std::vector<long>> value) {
 	put(key + "/length", static_cast<long>(value.size()));
-	for (int i = 0; i < value.size(); i++)
+	for (size_t i = 0; i < value.size(); i++)
 		put(key + "/" + std::to_string(i), value[i]);
 }
 
 void LogTable::put(std::string key, std::vector<std::vector<float>> value) {
 	put(key + "/length", static_cast<long>(value.size()));
-	for (int i = 0; i < value.size(); i++)
+	for (size_t i = 0; i < value.size(); i++)
 		put(key + "/" + std::to_string(i), value[i]);
 }
 
 void LogTable::put(std::string key, std::vector<std::vector<double>> value) {
 	put(key + "/length", static_cast<long>(value.size()));
-	for (int i = 0; i < value.size(); i++)
+	for (size_t i = 0; i < value.size(); i++)
 		put(key + "/" + std::to_string(i), value[i]);
 }
 
 void LogTable::put(std::string key,
 		std::vector<std::vector<std::string>> value) {
 	put(key + "/length", static_cast<long>(value.size()));
-	for (int i = 0; i < value.size(); i++)
+	for (size_t i = 0; i < value.size(); i++)
 		put(key + "/" + std::to_string(i), value[i]);
+}
+
+void LogTable::addStructSchema(std::string typeString, std::string schema,
+		std::unordered_set<std::string> &seen) {
+	std::string key = "/.schema/" + typeString;
+
+	if (data.contains(key))
+		return;
+	seen.insert(typeString);
+
+	data.emplace(key,
+			LogValue { std::vector<std::byte> { reinterpret_cast<std::byte*>(schema.data()), reinterpret_cast<std::byte*>(schema.data()) + schema.size() },
+					"" });
 }
