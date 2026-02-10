@@ -17,28 +17,9 @@ namespace nt {
 
 class NT4Publisher: LogDataReceiver {
 public:
-	NT4Publisher() : akitTable {
-			::nt::NetworkTableInstance::GetDefault().GetTable("/AdvantageKit") }, timestampPublisher {
-			akitTable->GetIntegerTopic(TIMESTAMP_KEY.substr(1)).Publish( {
-					.sendAll = true }) } {
-	}
+	NT4Publisher();
 
-	void putTable(LogTable table) override {
-		timestampPublisher.Set(table.getTimestamp(), table.getTimestamp());
-
-		std::unordered_map < std::string, LogTable::LogValue > newMap =
-				table.getAll(false);
-		std::unordered_map < std::string, LogTable::LogValue > oldMap =
-				lastTable.getAll(false);
-
-		for (const auto &field : newMap) {
-			if (field.second == oldMap.at(field.first))
-				continue;
-
-			std::string key = field.first.substr(1);
-			std::string unit = field.second.unitStr;
-		}
-	}
+	void putTable(LogTable &&table) override;
 
 private:
 	std::shared_ptr<::nt::NetworkTable> akitTable;
