@@ -17,7 +17,7 @@ public:
 
 	virtual void start() = 0;
 	virtual void end() = 0;
-	virtual void putTable(LogTable table) = 0;
+	virtual void putTable(LogTable &&table) = 0;
 };
 
 }
