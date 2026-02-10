@@ -93,6 +93,7 @@
         "regex": "cpp",
         "source_location": "cpp",
         "future": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "*.mac": "cpp"
     }
 }

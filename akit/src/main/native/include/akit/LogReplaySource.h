@@ -16,7 +16,7 @@ public:
 
 	virtual void end() = 0;
 
-	virtual bool updateTable(LogTable table);
+	virtual bool updateTable(LogTable&& table);
 };
 
 }
