@@ -64,7 +64,7 @@ void WPILOGWriter::start() {
 void WPILOGWriter::end() {
 	log.release();
 
-	bool shouldOpen;
+	bool shouldOpen = false;
 	switch (openBehavior) {
 	case AdvantageScopeOpenBehavior::ALWAYS:
 		shouldOpen = frc::RobotBase::IsSimulation();
@@ -72,8 +72,7 @@ void WPILOGWriter::end() {
 	case AdvantageScopeOpenBehavior::AUTO:
 		shouldOpen = frc::RobotBase::IsSimulation(); // && Logger.hasReplaySource();
 		break;
-	case AdvantageScopeOpenBehavior::NEVER:
-		shouldOpen = false;
+	default:
 		break;
 	}
 	if (shouldOpen) {
