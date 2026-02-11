@@ -1,3 +1,6 @@
 [submodule "akit/magic_enum"]
 	path = akit/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
+[submodule "akit/httprequest"]
+	path = akit/httprequest
+	url = https://github.com/elnormous/HTTPRequest.git
