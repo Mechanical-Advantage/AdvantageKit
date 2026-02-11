@@ -15,6 +15,10 @@ namespace mech {
 
 class LoggedMechanismRoot2d {
 public:
+	LoggedMechanismRoot2d(std::string name, units::meter_t x, units::meter_t y) : name {
+			name }, x { x }, y { y } {
+	}
+
 	LoggedMechanismObject2d* append(
 			std::unique_ptr<LoggedMechanismObject2d> object);
 
@@ -26,16 +30,12 @@ public:
 
 	std::vector<frc::Pose3d> generate3dMechanism();
 
-private:
-	LoggedMechanismRoot2d(std::string name, units::meter_t x, units::meter_t y) : name {
-			name }, x { x }, y { y } {
-	}
-
 	void update(std::shared_ptr<nt::NetworkTable> table);
 
-	void flush();
-
 	void logOutput(LogTable &&table);
+
+private:
+	void flush();
 
 	std::string name;
 	std::shared_ptr<nt::NetworkTable> table;
