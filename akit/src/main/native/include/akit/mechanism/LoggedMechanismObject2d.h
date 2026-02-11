@@ -28,7 +28,7 @@ public:
 
 	void update(std::shared_ptr<nt::NetworkTable> table);
 
-	void logOutput(LogTable &&table);
+	virtual void logOutput(LogTable &&table);
 
 protected:
 	LoggedMechanismObject2d(std::string name) : name { name } {
