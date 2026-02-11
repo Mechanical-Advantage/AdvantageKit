@@ -95,6 +95,7 @@
         "future": "cpp",
         "cinttypes": "cpp",
         "*.mac": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "csignal": "cpp"
     }
 }
