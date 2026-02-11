@@ -28,7 +28,9 @@ public:
 
 	void setAngle(units::degree_t angle);
 
-	void setAngle(frc::Rotation2d angle);
+	void setAngle(frc::Rotation2d angle) {
+		setAngle(angle.Degrees());
+	}
 
 	units::degree_t getAngle() override;
 
@@ -48,7 +50,7 @@ protected:
 	void updateEntries(std::shared_ptr<nt::NetworkTable> table) override;
 
 private:
-	void logTable(LogTable &&table);
+	void logOutput(LogTable &&table) override;
 
 	units::meter_t getObject2dRange() override {
 		return getLength();
@@ -61,7 +63,7 @@ private:
 	nt::StringEntry colorEntry;
 	units::meter_t length;
 	nt::DoubleEntry lengthEntry;
-	units::pound_t weight;
+	double weight;
 	nt::DoubleEntry weightEntry;
 };
 
