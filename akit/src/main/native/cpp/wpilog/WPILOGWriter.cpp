@@ -86,7 +86,7 @@ void WPILOGWriter::end() {
 	}
 }
 
-void WPILOGWriter::putTable(LogTable &&table) {
+void WPILOGWriter::putTable(LogTable &table) {
 	if (!isOpen)
 		return;
 

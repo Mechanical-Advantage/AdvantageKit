@@ -19,7 +19,7 @@ class NT4Publisher: LogDataReceiver {
 public:
 	NT4Publisher();
 
-	void putTable(LogTable &&table) override;
+	void putTable(LogTable &table) override;
 
 private:
 	std::shared_ptr<::nt::NetworkTable> akitTable;

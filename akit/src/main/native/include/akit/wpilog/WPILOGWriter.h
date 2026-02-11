@@ -43,7 +43,7 @@ public:
 
 	void end() override;
 
-	void putTable(LogTable &&table) override;
+	void putTable(LogTable &table) override;
 
 private:
 	static constexpr double TIMESTAMP_UPDATE_DELAY = 5;

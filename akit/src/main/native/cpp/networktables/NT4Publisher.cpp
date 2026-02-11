@@ -17,7 +17,7 @@ NT4Publisher::NT4Publisher() : akitTable {
 				.sendAll = true }) } {
 }
 
-void NT4Publisher::putTable(LogTable &&table) {
+void NT4Publisher::putTable(LogTable &table) {
 	timestampPublisher.Set(table.getTimestamp(), table.getTimestamp());
 
 	std::unordered_map < std::string, LogTable::LogValue > newMap =
