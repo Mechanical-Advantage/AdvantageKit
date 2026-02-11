@@ -22,61 +22,13 @@ protected:
 	LoggedRobot() : LoggedRobot { kDefaultPeriod } {
 	}
 
-	LoggedRobot(units::second_t period) : frc::IterativeRobotBase { period }, periodUs {
-			period.value() * 1000000 } {
-		HAL_SetNotifierName(notifier, "LoggedRobot", nullptr);
-		HAL_Report(HALUsageReporting::kResourceType_Framework,
-				HALUsageReporting::kFramework_AdvantageKit);
-		HAL_Report(HALUsageReporting::kResourceType_LoggingFramework,
-				HALUsageReporting::kLoggingFramework_AdvantageKit);
-	}
+	LoggedRobot(units::second_t period);
 
-	~LoggedRobot() override {
-		HAL_StopNotifier(notifier, nullptr);
-		HAL_CleanNotifier(notifier);
-	}
+	~LoggedRobot() override;
 
-	void StartCompetition() override {
-		RobotInit();
-		if (IsSimulation())
-			SimulationInit();
-		uint64_t initEnd = frc::RobotController::GetFPGATime();
+	void StartCompetition() override;
 
-		// AutoLogOutputManager.addObject(this);
-
-		// Logger.periodicAfterUser(initEnd, 0);
-
-		std::puts("\n********** Robot program startup complete **********");
-		HAL_ObserveUserProgramStarting();
-
-		while (true) {
-			if (useTiming) {
-				long currentTimeUs = frc::RobotController::GetFPGATime();
-				if (nextCycleUs < currentTimeUs)
-					nextCycleUs = currentTimeUs;
-				else {
-					HAL_UpdateNotifierAlarm(notifier, nextCycleUs, nullptr);
-					if (HAL_WaitForNotifierAlarm(notifier, nullptr) == 0) {
-						// Logger.end();
-						// break;
-					}
-				}
-				nextCycleUs += periodUs;
-			}
-
-			uint64_t periodicBeforeStart = frc::RobotController::GetFPGATime();
-			// Logger.periodicBeforeUser();
-			uint64_t userCodeStart = frc::RobotController::GetFPGATime();
-			LoopFunc();
-			uint64_t userCodeEnd = frc::RobotController::GetFPGATime();
-
-			// Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
-		}
-	}
-
-	void EndCompetition() override {
-		HAL_StopNotifier(notifier, nullptr);
-	}
+	void EndCompetition() override;
 
 	void SetUseTiming(bool useTiming) {
 		this->useTiming = useTiming;
@@ -85,8 +37,8 @@ protected:
 private:
 	HAL_NotifierHandle notifier { HAL_InitializeNotifier(nullptr) };
 	bool useTiming = true;
-	uint64_t nextCycleUs;
-	uint64_t periodUs;
+	units::second_t nextCycleUs;
+	units::second_t periodUs;
 };
 
 }
