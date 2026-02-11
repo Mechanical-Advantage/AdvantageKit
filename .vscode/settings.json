@@ -94,6 +94,7 @@
         "source_location": "cpp",
         "future": "cpp",
         "cinttypes": "cpp",
-        "*.mac": "cpp"
+        "*.mac": "cpp",
+        "filesystem": "cpp"
     }
 }
