@@ -15,7 +15,8 @@ namespace mech {
 
 class LoggedMechanismRoot2d {
 public:
-	LoggedMechanismObject2d append(LoggedMechanismObject2d object);
+	LoggedMechanismObject2d* append(
+			std::unique_ptr<LoggedMechanismObject2d> object);
 
 	void setPosition(units::meter_t x, units::meter_t y);
 
@@ -38,7 +39,7 @@ private:
 
 	std::string name;
 	std::shared_ptr<nt::NetworkTable> table;
-	std::unordered_map<std::string, LoggedMechanismObject2d> objects;
+	std::unordered_map<std::string, std::unique_ptr<LoggedMechanismObject2d>> objects;
 	units::meter_t x;
 	nt::DoublePublisher xPub;
 	units::meter_t y;

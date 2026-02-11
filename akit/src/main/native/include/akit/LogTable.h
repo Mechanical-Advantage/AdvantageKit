@@ -257,7 +257,9 @@ public:
 	template <typename U>
 	requires units::traits::is_unit_t_v<U>
 	inline void put(std::string key, U value) {
-		auto converted = value.template convert<U::unit_type::base_unit_type>();
+		auto converted = value.template convert<
+				units::unit<std::ratio<1>,
+						units::traits::base_unit_of<typename U::unit_type>>>();
 		put(key, LogValue { converted.value(), "", converted.abbreviation() });
 	}
 
@@ -383,7 +385,7 @@ public:
 	template <typename U>
 	requires units::traits::is_unit_t_v<U>
 	U get(std::string key, U defaultValue) {
-		using BaseUnit = U::unit_type::base_unit_type;
+		using BaseUnit = units::unit<std::ratio<1>, units::traits::base_unit_of<typename U::unit_type>>;
 		if (data.contains(prefix + key)) {
 			auto converted = defaultValue.template convert<BaseUnit>();
 			return BaseUnit { get(key).getDouble(converted.value()) };
