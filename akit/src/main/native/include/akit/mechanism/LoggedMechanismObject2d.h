@@ -30,7 +30,8 @@ protected:
 	LoggedMechanismObject2d(std::string name) : name { name } {
 	}
 
-	LoggedMechanismObject2d append(LoggedMechanismObject2d object);
+	LoggedMechanismObject2d* append(
+			std::unique_ptr<LoggedMechanismObject2d> object);
 
 	virtual void updateEntries(std::shared_ptr<nt::NetworkTable> table) = 0;
 
@@ -41,7 +42,7 @@ private:
 
 	std::string name;
 	std::shared_ptr<nt::NetworkTable> table;
-	std::unordered_map<std::string, LoggedMechanismObject2d> objects;
+	std::unordered_map<std::string, std::unique_ptr<LoggedMechanismObject2d>> objects;
 };
 
 }
