@@ -18,7 +18,8 @@ public:
 
 private:
 	static constexpr units::second_t REQUEST_PERIOD = 5_s;
-	static constexpr units::millisecond_t TIMEOUT = 500_ms;
+	static constexpr units::second_t CONNECTION_TIMEOUT = 500_ms;
+	static constexpr units::second_t READ_TIMEOUT = 500_ms;
 
 	static void start();
 

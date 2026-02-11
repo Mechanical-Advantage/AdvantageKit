@@ -7,7 +7,9 @@
 
 #include <regex>
 #include <frc/RobotController.h>
-#include <HTTPRequest.hpp>
+
+#include <httplib.h>
+
 #include "akit/RadioLogger.h"
 
 using namespace akit;
@@ -26,14 +28,16 @@ void RadioLogger::periodic(LogTable &&table) {
 
 void RadioLogger::start() {
 	int teamNumber = frc::RobotController::GetTeamNumber();
-	std::string url = fmt::format("http://10.{}.{}.1/status", teamNumber / 100,
+	std::string url = fmt::format("http://10.{}.{}.1", teamNumber / 100,
 			teamNumber % 100);
 	notifier = frc::Notifier { [url] {
-		http::Request request { url };
-		auto response = request.send("GET", "", { }, std::chrono::milliseconds {
-				static_cast<int>(TIMEOUT.value()) });
-		std::string responseStr = std::regex_replace(
-				std::string { response.body.begin(), response.body.end() },
+		httplib::Client request { url };
+		request.set_connection_timeout(std::chrono::duration<double> {
+				CONNECTION_TIMEOUT.value() });
+		request.set_read_timeout(
+				std::chrono::duration<double> { READ_TIMEOUT.value() });
+		auto response = request.Get("/status");
+		std::string responseStr = std::regex_replace(response->body,
 				std::regex { "\\s+" }, "");
 		isConnected = responseStr.size() > 0;
 		statusJson = responseStr;
