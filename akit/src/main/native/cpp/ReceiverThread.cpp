@@ -15,7 +15,7 @@ ReceiverThread::ReceiverThread(std::queue<LogTable> queue) : queue { queue } {
 
 void ReceiverThread::addDataReceiver(
 		std::unique_ptr<LogDataReceiver> receiver) {
-	dataReceivers.emplace_back(receiver);
+	dataReceivers.emplace_back(std::move(receiver));
 }
 
 void ReceiverThread::run() {
