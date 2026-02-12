@@ -41,7 +41,7 @@ public:
 
 private:
 	std::shared_ptr<nt::NetworkTable> table;
-	std::unordered_map<std::string, LoggedMechanismRoot2d> roots;
+	std::unordered_map<std::string, std::unique_ptr<LoggedMechanismRoot2d>> roots;
 	wpi::array<double, 2> dims;
 	std::string color;
 	nt::DoubleArrayPublisher dimsPub;

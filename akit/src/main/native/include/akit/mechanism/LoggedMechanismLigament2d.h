@@ -65,6 +65,7 @@ private:
 	nt::DoubleEntry lengthEntry;
 	double weight;
 	nt::DoubleEntry weightEntry;
+	std::mutex mutex;
 };
 
 }
