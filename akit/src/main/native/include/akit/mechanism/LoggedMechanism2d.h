@@ -46,6 +46,7 @@ private:
 	std::string color;
 	nt::DoubleArrayPublisher dimsPub;
 	nt::StringPublisher colorPub;
+	std::mutex mutex;
 };
 
 }

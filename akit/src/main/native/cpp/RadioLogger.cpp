@@ -24,7 +24,7 @@ void RadioLogger::periodic(LogTable &&table) {
 		start();
 
 	{
-		std::lock_guard < std::mutex > lock { mutex };
+		std::lock_guard lock { mutex };
 		table.put("Connected", isConnected);
 		table.put("Status", LogTable::LogValue { statusJson, "json" });
 	}
@@ -44,7 +44,7 @@ void RadioLogger::start() {
 		std::string responseStr = std::regex_replace(response->body,
 				std::regex { "\\s+" }, "");
 		{
-			std::lock_guard < std::mutex > lock { mutex };
+			std::lock_guard lock { mutex };
 			isConnected = responseStr.size() > 0;
 			statusJson = responseStr;
 		}
