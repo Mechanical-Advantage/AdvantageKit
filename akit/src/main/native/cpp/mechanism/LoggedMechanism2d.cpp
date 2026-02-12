@@ -14,12 +14,13 @@ LoggedMechanismRoot2d& LoggedMechanism2d::getRoot(std::string name,
 		units::meter_t x, units::meter_t y) {
 	auto existing = roots.find(name);
 	if (existing != roots.end())
-		return existing->second;
+		return *existing->second;
 
-	roots.emplace(name, LoggedMechanismRoot2d { name, x, y });
+	roots.emplace(name,
+			std::make_unique < LoggedMechanismRoot2d > (name, x, y));
 	if (table)
-		roots.at(name).update(table->GetSubTable(name));
-	return roots.at(name);
+		roots.at(name)->update(table->GetSubTable(name));
+	return *roots.at(name);
 }
 
 void LoggedMechanism2d::setBackgroundColor(frc::Color8Bit color) {
@@ -38,7 +39,7 @@ void LoggedMechanism2d::InitSendable(nt::NTSendableBuilder &builder) {
 		colorPub = table->GetStringTopic("backgroundColor").Publish();
 		colorPub.Set(color);
 		for (auto &root : roots)
-			root.second.update(table->GetSubTable(root.first));
+			root.second->update(table->GetSubTable(root.first));
 	}
 }
 
@@ -49,5 +50,5 @@ void LoggedMechanism2d::logOutput(LogTable &&table) {
 	table.put("dims", std::vector<double> { dims.begin(), dims.end() });
 	table.put("backgroundColor", color);
 	for (auto &root : roots)
-		root.second.logOutput(table.getSubtable(root.first));
+		root.second->logOutput(table.getSubtable(root.first));
 }

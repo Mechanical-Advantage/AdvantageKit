@@ -44,6 +44,7 @@ private:
 	nt::DoublePublisher xPub;
 	units::meter_t y;
 	nt::DoublePublisher yPub;
+	std::mutex mutex;
 };
 
 }

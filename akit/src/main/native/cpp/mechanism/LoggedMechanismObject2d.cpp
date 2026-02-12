@@ -11,6 +11,7 @@ using namespace akit::mech;
 
 LoggedMechanismObject2d* LoggedMechanismObject2d::append(
 		std::unique_ptr<LoggedMechanismObject2d> object) {
+	std::lock_guard lock { mutex };
 	if (objects.contains(object->getName()))
 		throw std::runtime_error { "Mechanism object names must be unique!" };
 
@@ -23,6 +24,7 @@ LoggedMechanismObject2d* LoggedMechanismObject2d::append(
 }
 
 void LoggedMechanismObject2d::update(std::shared_ptr<nt::NetworkTable> table) {
+	std::lock_guard lock { mutex };
 	this->table = table;
 	updateEntries(this->table);
 	for (auto &obj : objects)
@@ -30,6 +32,7 @@ void LoggedMechanismObject2d::update(std::shared_ptr<nt::NetworkTable> table) {
 }
 
 void LoggedMechanismObject2d::logOutput(LogTable &&table) {
+	std::lock_guard lock { mutex };
 	for (auto &obj : objects)
 		obj.second->logOutput(table.getSubtable(obj.second->name));
 }

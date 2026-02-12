@@ -43,6 +43,7 @@ private:
 	std::string name;
 	std::shared_ptr<nt::NetworkTable> table;
 	std::unordered_map<std::string, std::unique_ptr<LoggedMechanismObject2d>> objects;
+	std::mutex mutex;
 };
 
 }
