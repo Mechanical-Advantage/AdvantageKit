@@ -17,13 +17,17 @@ using namespace akit;
 std::optional<frc::Notifier> RadioLogger::notifier;
 bool RadioLogger::isConnected = false;
 std::string RadioLogger::statusJson;
+std::mutex RadioLogger::mutex;
 
 void RadioLogger::periodic(LogTable &&table) {
 	if (!notifier && frc::RobotController::GetTeamNumber() != 0)
 		start();
 
-	table.put("Connected", isConnected);
-	table.put("Status", LogTable::LogValue { statusJson, "json" });
+	{
+		std::lock_guard < std::mutex > lock { mutex };
+		table.put("Connected", isConnected);
+		table.put("Status", LogTable::LogValue { statusJson, "json" });
+	}
 }
 
 void RadioLogger::start() {
@@ -39,8 +43,11 @@ void RadioLogger::start() {
 		auto response = request.Get("/status");
 		std::string responseStr = std::regex_replace(response->body,
 				std::regex { "\\s+" }, "");
-		isConnected = responseStr.size() > 0;
-		statusJson = responseStr;
+		{
+			std::lock_guard < std::mutex > lock { mutex };
+			isConnected = responseStr.size() > 0;
+			statusJson = responseStr;
+		}
 	} };
 	notifier->SetName("AdvantageKit_RadioLogger");
 	notifier->StartPeriodic(REQUEST_PERIOD);

@@ -11,12 +11,13 @@
 #include <queue>
 #include <sstream>
 #include <iostream>
+#include <mutex>
 
 namespace akit {
 
 class ConsoleSource {
 public:
-    virtual ~ConsoleSource() = default;
+	virtual ~ConsoleSource() = default;
 	virtual std::string getNewData() = 0;
 };
 

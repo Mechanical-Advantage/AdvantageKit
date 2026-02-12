@@ -26,6 +26,7 @@ private:
 	static std::optional<frc::Notifier> notifier;
 	static bool isConnected;
 	static std::string statusJson;
+	static std::mutex mutex;
 };
 
 }
