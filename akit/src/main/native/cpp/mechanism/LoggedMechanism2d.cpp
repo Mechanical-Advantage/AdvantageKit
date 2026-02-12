@@ -23,22 +23,27 @@ LoggedMechanismRoot2d& LoggedMechanism2d::getRoot(std::string name,
 }
 
 void LoggedMechanism2d::setBackgroundColor(frc::Color8Bit color) {
+	std::lock_guard lock { mutex };
 	this->color = color.HexString();
 	colorPub.Set(this->color);
 }
 
 void LoggedMechanism2d::InitSendable(nt::NTSendableBuilder &builder) {
 	builder.SetSmartDashboardType("Mechanism2d");
-	table = builder.GetTable();
-	dimsPub = table->GetDoubleArrayTopic("dims").Publish();
-	dimsPub.Set(dims);
-	colorPub = table->GetStringTopic("backgroundColor").Publish();
-	colorPub.Set(color);
-	for (auto &root : roots)
-		root.second.update(table->GetSubTable(root.first));
+	{
+		std::lock_guard lock { mutex };
+		table = builder.GetTable();
+		dimsPub = table->GetDoubleArrayTopic("dims").Publish();
+		dimsPub.Set(dims);
+		colorPub = table->GetStringTopic("backgroundColor").Publish();
+		colorPub.Set(color);
+		for (auto &root : roots)
+			root.second.update(table->GetSubTable(root.first));
+	}
 }
 
 void LoggedMechanism2d::logOutput(LogTable &&table) {
+	std::lock_guard lock { mutex };
 	table.put(".type", "Mechanism2d");
 	table.put(".controllable", false);
 	table.put("dims", std::vector<double> { dims.begin(), dims.end() });
