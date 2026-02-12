@@ -1,3 +1,10 @@
+// Copyright (c) 2021-2026 Littleton Robotics
+// http://github.com/Mechanical-Advantage
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+
 #pragma once
 #include <string>
 #include <thread>
@@ -8,48 +15,64 @@
 namespace akit {
 
 class ConsoleSource {
-    public:
-    virtual std::string getNewData() = 0;
+public:
+    virtual ~ConsoleSource() = default;
+	virtual std::string getNewData() = 0;
+};
 
-    class Simulator : public ConsoleSource {
-        public:
-        Simulator() {
-            std::cout.rdbuf(splitCout.rdbuf());
-            std::cout.rdbuf(splitCerr.rdbuf());
-        }
+class SimulatorConsoleSource: public ConsoleSource {
+public:
+	SimulatorConsoleSource();
+	~SimulatorConsoleSource() override;
 
-        private:
-        class SplitBuffer : public std::streambuf {
-            public:
-            SplitBuffer(std::streambuf* original, std::ostringstream& capture)
-                : original{original}, capture{capture} {}
-            
-            protected:
-            int overflow(int c) override {
-                if (c == EOF) return !EOF;
+	std::string getNewData() override;
 
-                original->sputc(c);
-                capture.put(static_cast<char>(c));
-                return c;
-            }
+private:
+	class SplitBuffer: public std::streambuf {
+	public:
+		SplitBuffer(std::streambuf *original, std::ostringstream &capture) : original {
+				original }, capture { capture } {
+		}
 
-            private:
-            std::streambuf* original;
-            std::ostringstream& capture;
-        };
+	protected:
+		int overflow(int c) override;
 
-        std::streambuf* originalCout{std::cout.rdbuf()};
-        std::streambuf* originalCerr{std::cout.rdbuf()};
+	private:
+		std::streambuf *original;
+		std::ostringstream &capture;
+	};
 
-        std::ostringstream capturedCout;
-        std::ostringstream capturedCerr;
+	std::streambuf *originalCout;
+	std::streambuf *originalCerr;
 
-        SplitBuffer splitCout{originalCout, capturedCout};
-        SplitBuffer splitCerr{originalCerr, capturedCerr};
+	std::ostringstream capturedCout;
+	std::ostringstream capturedCerr;
 
-        size_t coutPos = 0;
-        size_t cerrPos = 0;
-    };
+	SplitBuffer splitCout { originalCout, capturedCout };
+	SplitBuffer splitCerr { originalCerr, capturedCerr };
+
+	size_t coutPos = 0;
+	size_t cerrPos = 0;
+};
+
+class RoboRIOConsoleSource: public ConsoleSource {
+public:
+	~RoboRIOConsoleSource() override;
+
+	std::string getNewData() override;
+
+protected:
+	virtual std::string getFilePath() {
+		return "/home/lvuser/FRC_UserProgram.log";
+	}
+
+private:
+	void run();
+
+	std::atomic<bool> running = true;
+	std::thread thread { &RoboRIOConsoleSource::run, this };
+	std::mutex mutex;
+	std::queue<std::string> queue;
 };
 
 }
