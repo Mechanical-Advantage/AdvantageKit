@@ -13,12 +13,12 @@ namespace akit {
 
 class LoggedPowerDistribution {
 public:
-	static LoggedPowerDistribution& getInstance();
+	static LoggedPowerDistribution& GetInstance();
 
-	static LoggedPowerDistribution& getInstance(int moduleID,
+	static LoggedPowerDistribution& GetInstance(int moduleID,
 			HAL_PowerDistributionType moduleType);
 
-	void saveToLog(LogTable &&table);
+	void SaveToLog(LogTable &&table);
 
 	LoggedPowerDistribution() : LoggedPowerDistribution {
 			HAL_DEFAULT_POWER_DISTRIBUTION_MODULE,

@@ -22,7 +22,7 @@ SimulatorConsoleSource::~SimulatorConsoleSource() {
 	std::cerr.rdbuf(originalCerr);
 }
 
-std::string SimulatorConsoleSource::getNewData() {
+std::string SimulatorConsoleSource::GetNewData() {
 	std::string fullOut = capturedCout.str();
 	std::string newOut = fullOut.substr(coutPos);
 	coutPos = fullOut.size();
@@ -47,33 +47,25 @@ RoboRIOConsoleSource::~RoboRIOConsoleSource() {
 	thread.join();
 }
 
-std::string RoboRIOConsoleSource::getNewData() {
-	std::vector<std::string> lines;
-	lines.reserve(100);
-	
-	{
-		std::lock_guard < std::mutex > lock { mutex };
-		while (!queue.empty()) {
-			lines.push_back(queue.front());
-			queue.pop();
-		}
-	}
+std::string RoboRIOConsoleSource::GetNewData() {
+	std::string lines[100];
+	size_t numLines = queue.try_dequeue_bulk(lines, 100);
 
 	std::ostringstream out;
-	for (size_t i = 0; i < lines.size(); i++) {
+	for (size_t i = 0; i < numLines; i++) {
 		out << lines[i];
-		if (i + 1 < lines.size())
+		if (i + 1 < numLines)
 			out << '\n';
 	}
 	return out.str();
 }
 
-void RoboRIOConsoleSource::run() {
-	std::ifstream file { getFilePath() };
+void RoboRIOConsoleSource::Run() {
+	std::ifstream file { GetFilePath() };
 	if (!file.is_open()) {
 		FRC_ReportError(frc::err::Error,
 				"[AdvantageKit] Failed to open console file \"{}\", disabling console capture.",
-				getFilePath());
+				GetFilePath());
 		return;
 	}
 

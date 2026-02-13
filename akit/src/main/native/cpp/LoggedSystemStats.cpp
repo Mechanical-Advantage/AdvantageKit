@@ -13,51 +13,51 @@ using namespace akit;
 std::unordered_set<std::string> LoggedSystemStats::lastNTRemoteIds;
 std::array<std::byte, 4> LoggedSystemStats::ntIntBuffer;
 
-void LoggedSystemStats::saveToLog(LogTable &&table) {
+void LoggedSystemStats::SaveToLog(LogTable &&table) {
 	conduit::ConduitApi &inst = conduit::ConduitApi::getInstance();
 
-	table.put("FPGAVersion", inst.getFPGAVersion());
-	table.put("FPGARevision", inst.getFPGARevision());
-	table.put("SerialNumber", inst.getSerialNumber());
-	table.put("Comments", inst.getComments());
-	table.put("TeamNumber", inst.getTeamNumber());
-	table.put("FPGAButton", inst.getFPGAButton());
-	table.put("SystemActive", inst.getSystemActive());
-	table.put("BrownedOut", inst.getBrownedOut());
-	table.put("CommsDisableCount", inst.getCommsDisableCount());
-	table.put("RSLState", inst.getRSLState());
-	table.put("SystemTimeValid", inst.getSystemTimeValid());
+	table.Put("FPGAVersion", inst.getFPGAVersion());
+	table.Put("FPGARevision", inst.getFPGARevision());
+	table.Put("SerialNumber", inst.getSerialNumber());
+	table.Put("Comments", inst.getComments());
+	table.Put("TeamNumber", inst.getTeamNumber());
+	table.Put("FPGAButton", inst.getFPGAButton());
+	table.Put("SystemActive", inst.getSystemActive());
+	table.Put("BrownedOut", inst.getBrownedOut());
+	table.Put("CommsDisableCount", inst.getCommsDisableCount());
+	table.Put("RSLState", inst.getRSLState());
+	table.Put("SystemTimeValid", inst.getSystemTimeValid());
 
-	table.put("BatteryVoltage", inst.getVoltageVin());
-	table.put("BatteryCurrent", inst.getCurrentVin());
+	table.Put("BatteryVoltage", inst.getVoltageVin());
+	table.Put("BatteryCurrent", inst.getCurrentVin());
 
-	table.put("3v3Rail/Voltage", inst.getUserVoltage3v3());
-	table.put("3v3Rail/Current", inst.getUserCurrent3v3());
-	table.put("3v3Rail/Active", inst.getUserActive3v3());
-	table.put("3v3Rail/CurrentFaults", inst.getUserCurrentFaults3v3());
+	table.Put("3v3Rail/Voltage", inst.getUserVoltage3v3());
+	table.Put("3v3Rail/Current", inst.getUserCurrent3v3());
+	table.Put("3v3Rail/Active", inst.getUserActive3v3());
+	table.Put("3v3Rail/CurrentFaults", inst.getUserCurrentFaults3v3());
 
-	table.put("5vRail/Voltage", inst.getUserVoltage5v());
-	table.put("5vRail/Current", inst.getUserCurrent5v());
-	table.put("5vRail/Active", inst.getUserActive5v());
-	table.put("5vRail/CurrentFaults", inst.getUserCurrentFaults5v());
+	table.Put("5vRail/Voltage", inst.getUserVoltage5v());
+	table.Put("5vRail/Current", inst.getUserCurrent5v());
+	table.Put("5vRail/Active", inst.getUserActive5v());
+	table.Put("5vRail/CurrentFaults", inst.getUserCurrentFaults5v());
 
-	table.put("6vRail/Voltage", inst.getUserVoltage6v());
-	table.put("6vRail/Current", inst.getUserCurrent6v());
-	table.put("6vRail/Active", inst.getUserActive6v());
-	table.put("6vRail/CurrentFaults", inst.getUserCurrentFaults6v());
+	table.Put("6vRail/Voltage", inst.getUserVoltage6v());
+	table.Put("6vRail/Current", inst.getUserCurrent6v());
+	table.Put("6vRail/Active", inst.getUserActive6v());
+	table.Put("6vRail/CurrentFaults", inst.getUserCurrentFaults6v());
 
-	table.put("BrownoutVoltage", inst.getBrownoutVoltage());
-	table.put("CPUTempCelsius", inst.getCPUTemp());
+	table.Put("BrownoutVoltage", inst.getBrownoutVoltage());
+	table.Put("CPUTempCelsius", inst.getCPUTemp());
 
-	table.put("CANBus/Utilization", inst.getCANBusUtilization());
-	table.put("CANBus/OffCount", inst.getBusOffCount());
-	table.put("CANBus/TxFullCount", inst.getTxFullCount());
-	table.put("CANBus/ReceiveErrorCount", inst.getReceiveErrorCount());
-	table.put("CANBus/TransmitErrorCount", inst.getTransmitErrorCount());
+	table.Put("CANBus/Utilization", inst.getCANBusUtilization());
+	table.Put("CANBus/OffCount", inst.getBusOffCount());
+	table.Put("CANBus/TxFullCount", inst.getTxFullCount());
+	table.Put("CANBus/ReceiveErrorCount", inst.getReceiveErrorCount());
+	table.Put("CANBus/TransmitErrorCount", inst.getTransmitErrorCount());
 
-	table.put("EpochTimeMicros", inst.getEpochTime());
+	table.Put("EpochTimeMicros", inst.getEpochTime());
 
-	LogTable ntClientsTable = table.getSubtable("NTClients");
+	LogTable ntClientsTable = table.GetSubtable("NTClients");
 	std::vector < nt::ConnectionInfo > ntConnections =
 			nt::NetworkTableInstance::GetDefault().GetConnections();
 	std::unordered_set < std::string > ntRemoteIds;
@@ -65,15 +65,15 @@ void LoggedSystemStats::saveToLog(LogTable &&table) {
 	for (size_t i = 0; i < ntConnections.size(); i++) {
 		lastNTRemoteIds.erase(ntConnections[i].remote_id);
 		ntRemoteIds.insert(ntConnections[i].remote_id);
-		LogTable ntClientTable = ntClientsTable.getSubtable(
+		LogTable ntClientTable = ntClientsTable.GetSubtable(
 				ntConnections[i].remote_id);
 
-		ntClientTable.put("Connected", true);
-		ntClientTable.put("IPAddress", ntConnections[i].remote_ip);
-		ntClientTable.put("RemotePort", ntConnections[i].remote_port);
+		ntClientTable.Put("Connected", true);
+		ntClientTable.Put("IPAddress", ntConnections[i].remote_ip);
+		ntClientTable.Put("RemotePort", ntConnections[i].remote_port);
 		ntIntBuffer = std::bit_cast<std::array<std::byte, 4>>(
 				ntConnections[i].protocol_version);
-		ntClientTable.put("ProtocolVersion", std::vector<std::byte> {
+		ntClientTable.Put("ProtocolVersion", std::vector<std::byte> {
 				ntIntBuffer.begin(), ntIntBuffer.end() });
 	}
 }

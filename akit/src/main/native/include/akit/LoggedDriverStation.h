@@ -12,8 +12,8 @@ namespace akit {
 
 class LoggedDriverStation {
 public:
-	static void saveToLog(LogTable &&table);
-	static void replayFromLog(LogTable &&table);
+	static void SaveToLog(LogTable &&table);
+	static void ReplayFromLog(LogTable &&table);
 };
 
 }

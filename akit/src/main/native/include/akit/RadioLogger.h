@@ -14,14 +14,14 @@ namespace akit {
 
 class RadioLogger {
 public:
-	static void periodic(LogTable &&table);
+	static void Periodic(LogTable &&table);
 
 private:
 	static constexpr units::second_t REQUEST_PERIOD = 5_s;
 	static constexpr units::second_t CONNECTION_TIMEOUT = 500_ms;
 	static constexpr units::second_t READ_TIMEOUT = 500_ms;
 
-	static void start();
+	static void Start();
 
 	static std::optional<frc::Notifier> notifier;
 	static bool isConnected;

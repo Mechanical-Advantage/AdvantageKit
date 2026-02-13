@@ -46,74 +46,74 @@ LogTable::LogValue::LogValue(std::vector<std::string> value,
 		typeStr }, value { value } {
 }
 
-std::vector<std::byte> LogTable::LogValue::getRaw(
+std::vector<std::byte> LogTable::LogValue::GetRaw(
 		std::vector<std::byte> defaultValue) const {
 	return type == LoggableType::Raw ?
 			std::any_cast < std::vector < std::byte >> (value) : defaultValue;
 }
 
-bool LogTable::LogValue::getBoolean(bool defaultValue) const {
+bool LogTable::LogValue::GetBoolean(bool defaultValue) const {
 	return type == LoggableType::Boolean ?
 			std::any_cast<bool>(value) : defaultValue;
 }
 
-long LogTable::LogValue::getInteger(long defaultValue) const {
+long LogTable::LogValue::GetInteger(long defaultValue) const {
 	return type == LoggableType::Integer ?
 			std::any_cast<long>(value) : defaultValue;
 }
 
-float LogTable::LogValue::getFloat(float defaultValue) const {
+float LogTable::LogValue::GetFloat(float defaultValue) const {
 	return type == LoggableType::Float ?
 			std::any_cast<float>(value) : defaultValue;
 }
 
-double LogTable::LogValue::getDouble(double defaultValue) const {
+double LogTable::LogValue::GetDouble(double defaultValue) const {
 	return type == LoggableType::Double ?
 			std::any_cast<double>(value) : defaultValue;
 }
 
-std::string LogTable::LogValue::getString(std::string defaultValue) const {
+std::string LogTable::LogValue::GetString(std::string defaultValue) const {
 	return type == LoggableType::String ?
 			std::any_cast < std::string > (value) : defaultValue;
 }
 
-std::vector<bool> LogTable::LogValue::getBooleanArray(
+std::vector<bool> LogTable::LogValue::GetBooleanArray(
 		std::vector<bool> defaultValue) const {
 	return type == LoggableType::BooleanArray ?
 			std::any_cast<std::vector<bool>>(value) : defaultValue;
 }
 
-std::vector<long> LogTable::LogValue::getIntegerArray(
+std::vector<long> LogTable::LogValue::GetIntegerArray(
 		std::vector<long> defaultValue) const {
 	return type == LoggableType::IntegerArray ?
 			std::any_cast<std::vector<long>>(value) : defaultValue;
 }
 
-std::vector<float> LogTable::LogValue::getFloatArray(
+std::vector<float> LogTable::LogValue::GetFloatArray(
 		std::vector<float> defaultValue) const {
 	return type == LoggableType::FloatArray ?
 			std::any_cast<std::vector<float>>(value) : defaultValue;
 }
 
-std::vector<double> LogTable::LogValue::getDoubleArray(
+std::vector<double> LogTable::LogValue::GetDoubleArray(
 		std::vector<double> defaultValue) const {
 	return type == LoggableType::DoubleArray ?
 			std::any_cast<std::vector<double>>(value) : defaultValue;
 }
 
-std::vector<std::string> LogTable::LogValue::getStringArray(
+std::vector<std::string> LogTable::LogValue::GetStringArray(
 		std::vector<std::string> defaultValue) const {
 	return type == LoggableType::StringArray ?
 			std::any_cast < std::vector < std::string >> (value) : defaultValue;
 }
 
-std::string LogTable::LogValue::getWPILOGType() const {
+std::string LogTable::LogValue::GetWPILOGType() const {
 	if (customTypeStr.empty())
 		return std::string { WPILOG_TYPES[static_cast<int>(type)] };
 	return customTypeStr;
 }
 
-std::string LogTable::LogValue::getNT4Type() const {
+std::string LogTable::LogValue::GetNT4Type() const {
 	if (customTypeStr.empty())
 		return std::string { NT4_TYPES[static_cast<int>(type)] };
 	return customTypeStr;
@@ -126,33 +126,33 @@ bool LogTable::LogValue::operator==(const LogValue &other) const {
 			&& (unitStr.empty() || other.unitStr == unitStr)) {
 		switch (type) {
 		case LoggableType::Raw:
-			return getRaw() == other.getRaw();
+			return GetRaw() == other.GetRaw();
 		case LoggableType::Boolean:
-			return getBoolean() == other.getBoolean();
+			return GetBoolean() == other.GetBoolean();
 		case LoggableType::Integer:
-			return getInteger() == other.getInteger();
+			return GetInteger() == other.GetInteger();
 		case LoggableType::Float:
-			return getFloat() == other.getFloat();
+			return GetFloat() == other.GetFloat();
 		case LoggableType::Double:
-			return getDouble() == other.getDouble();
+			return GetDouble() == other.GetDouble();
 		case LoggableType::String:
-			return getString() == other.getString();
+			return GetString() == other.GetString();
 		case LoggableType::BooleanArray:
-			return getBooleanArray() == other.getBooleanArray();
+			return GetBooleanArray() == other.GetBooleanArray();
 		case LoggableType::IntegerArray:
-			return getIntegerArray() == other.getIntegerArray();
+			return GetIntegerArray() == other.GetIntegerArray();
 		case LoggableType::FloatArray:
-			return getFloatArray() == other.getFloatArray();
+			return GetFloatArray() == other.GetFloatArray();
 		case LoggableType::DoubleArray:
-			return getDoubleArray() == other.getDoubleArray();
+			return GetDoubleArray() == other.GetDoubleArray();
 		case LoggableType::StringArray:
-			return getStringArray() == other.getStringArray();
+			return GetStringArray() == other.GetStringArray();
 		}
 	}
 	return false;
 }
 
-std::unordered_map<std::string, LogTable::LogValue> LogTable::getAll(
+std::unordered_map<std::string, LogTable::LogValue> LogTable::GetAll(
 		bool subtableOnly) {
 	if (subtableOnly) {
 		std::unordered_map < std::string, LogValue > result;
@@ -165,7 +165,7 @@ std::unordered_map<std::string, LogTable::LogValue> LogTable::getAll(
 		return data;
 }
 
-bool LogTable::writeAllowed(std::string key, LoggableType type,
+bool LogTable::WriteAllowed(std::string key, LoggableType type,
 		std::string customTypeStr) {
 	auto currentValue = data.find(prefix + key);
 	if (currentValue == data.end())
@@ -186,12 +186,12 @@ bool LogTable::writeAllowed(std::string key, LoggableType type,
 	return true;
 }
 
-void LogTable::put(std::string key, LogTable::LogValue value) {
-	if (writeAllowed(key, value.type, value.customTypeStr))
+void LogTable::Put(std::string key, LogTable::LogValue value) {
+	if (WriteAllowed(key, value.type, value.customTypeStr))
 		data.emplace(prefix + key, value);
 }
 
-void LogTable::addStructSchema(std::string typeString, std::string schema,
+void LogTable::AddStructSchema(std::string typeString, std::string schema,
 		std::unordered_set<std::string> &seen) {
 	std::string key = "/.schema/" + typeString;
 
@@ -207,77 +207,77 @@ void LogTable::addStructSchema(std::string typeString, std::string schema,
 									+ schema.size() }, "" });
 }
 
-std::vector<std::byte> LogTable::get(std::string key,
+std::vector<std::byte> LogTable::Get(std::string key,
 		std::vector<std::byte> defaultValue) {
 	if (data.contains(prefix + key))
-		return get(key).getRaw(defaultValue);
+		return Get(key).GetRaw(defaultValue);
 	else
 		return defaultValue;
 }
 
-bool LogTable::get(std::string key, bool defaultValue) {
+bool LogTable::Get(std::string key, bool defaultValue) {
 	if (data.contains(prefix + key))
-		return get(key).getBoolean(defaultValue);
+		return Get(key).GetBoolean(defaultValue);
 	else
 		return defaultValue;
 }
 
-std::vector<bool> LogTable::get(std::string key,
+std::vector<bool> LogTable::Get(std::string key,
 		std::vector<bool> defaultValue) {
 	if (data.contains(prefix + key))
-		return get(key).getBooleanArray(defaultValue);
+		return Get(key).GetBooleanArray(defaultValue);
 	else
 		return defaultValue;
 }
 
-float LogTable::get(std::string key, float defaultValue) {
+float LogTable::Get(std::string key, float defaultValue) {
 	if (data.contains(prefix + key))
-		return get(key).getFloat(defaultValue);
+		return Get(key).GetFloat(defaultValue);
 	else
 		return defaultValue;
 }
 
-std::vector<float> LogTable::get(std::string key,
+std::vector<float> LogTable::Get(std::string key,
 		std::vector<float> defaultValue) {
 	if (data.contains(prefix + key))
-		return get(key).getFloatArray(defaultValue);
+		return Get(key).GetFloatArray(defaultValue);
 	else
 		return defaultValue;
 }
 
-double LogTable::get(std::string key, double defaultValue) {
+double LogTable::Get(std::string key, double defaultValue) {
 	if (data.contains(prefix + key))
-		return get(key).getInteger(defaultValue);
+		return Get(key).GetInteger(defaultValue);
 	else
 		return defaultValue;
 }
 
-std::vector<double> LogTable::get(std::string key,
+std::vector<double> LogTable::Get(std::string key,
 		std::vector<double> defaultValue) {
 	if (data.contains(prefix + key))
-		return get(key).getDoubleArray(defaultValue);
+		return Get(key).GetDoubleArray(defaultValue);
 	else
 		return defaultValue;
 }
 
-std::string LogTable::get(std::string key, std::string defaultValue) {
+std::string LogTable::Get(std::string key, std::string defaultValue) {
 	if (data.contains(prefix + key))
-		return get(key).getString(defaultValue);
+		return Get(key).GetString(defaultValue);
 	else
 		return defaultValue;
 }
 
-std::vector<std::string> LogTable::get(std::string key,
+std::vector<std::string> LogTable::Get(std::string key,
 		std::vector<std::string> defaultValue) {
 	if (data.contains(prefix + key))
-		return get(key).getStringArray(defaultValue);
+		return Get(key).GetStringArray(defaultValue);
 	else
 		return defaultValue;
 }
 
-frc::Color LogTable::get(std::string key, frc::Color defaultValue) {
+frc::Color LogTable::Get(std::string key, frc::Color defaultValue) {
 	if (data.contains(prefix + key))
-		return frc::Color { get(key).getString(defaultValue.HexString()) };
+		return frc::Color { Get(key).GetString(defaultValue.HexString()) };
 	else
 		return defaultValue;
 }

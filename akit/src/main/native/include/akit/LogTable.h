@@ -67,37 +67,37 @@ public:
 		LogValue(std::vector<double> value, std::string typeStr);
 		LogValue(std::vector<std::string> value, std::string typeStr);
 
-		std::vector<std::byte> getRaw(
+		std::vector<std::byte> GetRaw(
 				std::vector<std::byte> defaultValue = { }) const;
 
-		bool getBoolean(bool defaultValue = false) const;
+		bool GetBoolean(bool defaultValue = false) const;
 
-		long getInteger(long defaultValue = 0) const;
+		long GetInteger(long defaultValue = 0) const;
 
-		float getFloat(float defaultValue = 0) const;
+		float GetFloat(float defaultValue = 0) const;
 
-		double getDouble(double defaultValue = 0) const;
+		double GetDouble(double defaultValue = 0) const;
 
-		std::string getString(std::string defaultValue = "") const;
+		std::string GetString(std::string defaultValue = "") const;
 
-		std::vector<bool> getBooleanArray(
+		std::vector<bool> GetBooleanArray(
 				std::vector<bool> defaultValue = { }) const;
 
-		std::vector<long> getIntegerArray(
+		std::vector<long> GetIntegerArray(
 				std::vector<long> defaultValue = { }) const;
 
-		std::vector<float> getFloatArray(
+		std::vector<float> GetFloatArray(
 				std::vector<float> defaultValue = { }) const;
 
-		std::vector<double> getDoubleArray(std::vector<double> defaultValue =
+		std::vector<double> GetDoubleArray(std::vector<double> defaultValue =
 				{ }) const;
 
-		std::vector<std::string> getStringArray(
+		std::vector<std::string> GetStringArray(
 				std::vector<std::string> defaultValue = { }) const;
 
-		std::string getWPILOGType() const;
+		std::string GetWPILOGType() const;
 
-		std::string getNT4Type() const;
+		std::string GetNT4Type() const;
 
 		bool operator==(const LogValue &other) const;
 
@@ -109,99 +109,99 @@ public:
 			< units::second_t > (0), { } } {
 	}
 
-	inline void setTimestamp(units::second_t timestamp) {
+	inline void SetTimestamp(units::second_t timestamp) {
 		*this->timestamp = timestamp;
 	}
 
-	inline units::second_t getTimestamp() {
+	inline units::second_t GetTimestamp() {
 		return *this->timestamp;
 	}
 
-	inline LogTable getSubtable(std::string tableName) {
+	inline LogTable GetSubtable(std::string tableName) {
 		return LogTable { prefix + tableName + "/", *this };
 	}
 
-	std::unordered_map<std::string, LogValue> getAll(bool subtableOnly);
+	std::unordered_map<std::string, LogValue> GetAll(bool subtableOnly);
 
-	void put(std::string key, LogValue value);
+	void Put(std::string key, LogValue value);
 
 	template<typename T>
-	inline void put(std::string key, T value) {
-		put(key, LogValue { value, "" });
+	inline void Put(std::string key, T value) {
+		Put(key, LogValue { value, "" });
 	}
 
 	template<typename T>
-	inline void put(std::string key, std::vector<T> value) {
-		put(key, LogValue { value, "" });
+	inline void Put(std::string key, std::vector<T> value) {
+		Put(key, LogValue { value, "" });
 	}
 
 	template<typename T>
-	void put(std::string key, std::vector<std::vector<T>> value) {
-		put(key + "/length", static_cast<long>(value.size()));
+	void Put(std::string key, std::vector<std::vector<T>> value) {
+		Put(key + "/length", static_cast<long>(value.size()));
 		for (size_t i = 0; i < value.size(); i++)
-			put(key + "/" + std::to_string(i), value[i]);
+			Put(key + "/" + std::to_string(i), value[i]);
 	}
 
 	template <typename T>
 	requires std::is_integral_v<T>
-	void put(std::string key, T value) {
-		put(key, LogValue { static_cast<long>(value), "" });
+	void Put(std::string key, T value) {
+		Put(key, LogValue { static_cast<long>(value), "" });
 	}
 
 	template <typename E>
 	requires std::is_enum_v<E>
-	inline void put(std::string key, E value) {
-		put(key, LogValue { magic_enum::enum_name(value), "" });
+	inline void Put(std::string key, E value) {
+		Put(key, LogValue { magic_enum::enum_name(value), "" });
 	}
 
 	template <typename E>
 	requires std::is_enum_v<E> && magic_enum::detail::is_reflected_v<std::decay_t<E>, magic_enum::detail::subtype_v<E>>
-	void put(std::string key, std::vector<E> value) {
+	void Put(std::string key, std::vector<E> value) {
 		std::vector < std::string > stringValues;
 		for (auto val : value)
 		stringValues.emplace_back(magic_enum::enum_name(val));
-		put(key, LogValue {stringValues, ""});
+		Put(key, LogValue {stringValues, ""});
 	}
 
 	template <typename U>
 	requires units::traits::is_unit_t_v<U>
-	inline void put(std::string key, U value) {
-		put(key, LogValue { value.value(), "", value.name() });
+	inline void Put(std::string key, U value) {
+		Put(key, LogValue { value.value(), "", value.name() });
 	}
 
 	template <typename S>
 	requires std::is_convertible_v<S, std::string> && (!std::is_same_v<S, std::string>)
-	inline void put(std::string key, S value) {
-		put(key, std::string {value});
+	inline void Put(std::string key, S value) {
+		Put(key, std::string {value});
 	}
 
-	inline void put(std::string key, frc::Color value) {
-		put(key, value.HexString());
+	inline void Put(std::string key, frc::Color value) {
+		Put(key, value.HexString());
 	}
 
-	void put(std::string key, inputs::LoggableInputs &value) {
+	void Put(std::string key, inputs::LoggableInputs &value) {
 		if (depth > 100) {
 			FRC_ReportWarning(
 					"[AdvantageKit] Detected recursive table structure when logging value to field \"{}{}\". using LoggableInputs. Consider revising the table structure or refactoring to avoid recursion.",
 					prefix, key);
 			return;
 		}
-		value.toLog(getSubtable(key));
+		value.toLog(GetSubtable(key));
 	}
 
 	template <typename T>
 	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	void put(std::string key, T value) {
-		addStructSchema<T>();
+	void Put(std::string key, T value) {
+		AddStructSchema<T>();
 		std::array<std::byte, wpi::GetStructSize<T>()> buffer;
 		wpi::PackStruct < T > (buffer);
-		put(key, LogValue {buffer, wpi::GetStructTypeString<T>()});
+		Put(key, LogValue {buffer, wpi::GetStructTypeString<T>()});
 	}
 
 	template <typename T>
 	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	void put(std::string key, std::initializer_list<T> values) {
-		addStructSchema<T>();
+	void Put(std::string key, std::initializer_list<T> values) {
+		AddStructSchema<T>();
 		std::vector < std::byte
 		> buffer {values.size() * wpi::GetStructSize<T>()};
 		int i = 0;
@@ -210,23 +210,23 @@ public:
 				std::span < std::byte
 				> (buffer).subspan(i++ * wpi::GetStructSize<T>()),
 				value);
-		put(key, LogValue {buffer, wpi::GetStructTypeString<T>() + "[]"});
+		Put(key, LogValue {buffer, wpi::GetStructTypeString<T>() + "[]"});
 	}
 
-	inline LogValue get(std::string key) {
+	inline LogValue Get(std::string key) {
 		return data.at(prefix + key);
 	}
 
 	template<typename T>
-	std::vector<std::vector<T>> get(std::string key,
+	std::vector<std::vector<T>> Get(std::string key,
 			std::vector<std::vector<T>> defaultValue) {
 		if (data.contains(prefix + key + "/length")) {
 			std::vector < std::vector
 					< T
-							>> value { static_cast<size_t>(get(key + "/length",
+							>> value { static_cast<size_t>(Get(key + "/length",
 									0)) };
 			for (size_t i = 0; i < value.size(); i++)
-				value[i] = get(key, +"/", std::to_string(i),
+				value[i] = Get(key, +"/", std::to_string(i),
 						std::vector<T> { });
 			return value;
 		} else
@@ -235,55 +235,55 @@ public:
 
 	template <typename T>
 	requires std::is_integral_v<T>
-	T get(std::string key, T defaultValue) {
+	T Get(std::string key, T defaultValue) {
 		if (data.contains(prefix + key))
-			return static_cast<T>(get(key).getInteger(defaultValue));
+			return static_cast<T>(Get(key).GetInteger(defaultValue));
 		else
 			return defaultValue;
 	}
 
 	template <typename T>
 	requires std::is_integral_v<T>
-	std::vector<T> get(std::string key, std::vector<T> defaultValue) {
+	std::vector<T> Get(std::string key, std::vector<T> defaultValue) {
 		if (data.contains(prefix + key)) {
-			std::vector<long> value = get(key).getIntegerArray(
+			std::vector<long> value = Get(key).GetIntegerArray(
 					{ defaultValue.begin(), defaultValue.end() });
 			return {value.begin(), value.end()};
 		} else
 			return defaultValue;
 	}
 
-	std::vector<std::byte> get(std::string key,
+	std::vector<std::byte> Get(std::string key,
 			std::vector<std::byte> defaultValue);
 
-	bool get(std::string key, bool defaultValue);
-	std::vector<bool> get(std::string key, std::vector<bool> defaultValue);
+	bool Get(std::string key, bool defaultValue);
+	std::vector<bool> Get(std::string key, std::vector<bool> defaultValue);
 
-	float get(std::string key, float defaultValue);
-	std::vector<float> get(std::string key, std::vector<float> defaultValue);
+	float Get(std::string key, float defaultValue);
+	std::vector<float> Get(std::string key, std::vector<float> defaultValue);
 
-	double get(std::string key, double defaultValue);
-	std::vector<double> get(std::string key, std::vector<double> defaultValue);
+	double Get(std::string key, double defaultValue);
+	std::vector<double> Get(std::string key, std::vector<double> defaultValue);
 
-	std::string get(std::string key, std::string defaultValue);
-	std::vector<std::string> get(std::string key,
+	std::string Get(std::string key, std::string defaultValue);
+	std::vector<std::string> Get(std::string key,
 			std::vector<std::string> defaultValue);
 
 	template <typename T>
 	requires std::is_enum_v<T>
-	T get(std::string key, T defaultValue) {
+	T Get(std::string key, T defaultValue) {
 		if (data.contains(prefix + key))
 			return magic_enum::enum_cast(
-					get(key).getString(magic_enum::enum_name(defaultValue)));
+					Get(key).GetString(magic_enum::enum_name(defaultValue)));
 		else
 			return defaultValue;
 	}
 
 	template <typename T>
 	requires std::is_enum_v<T>
-	std::vector<T> get(std::string key, std::vector<T> defaultValue) {
+	std::vector<T> Get(std::string key, std::vector<T> defaultValue) {
 		if (data.contains(prefix + key)) {
-			std::vector < std::string > names = get(key).getStringArray( { });
+			std::vector < std::string > names = Get(key).GetStringArray( { });
 			std::vector < T > enums;
 			for (const auto &name : names)
 				enums.emplace_back(magic_enum::enum_cast < T > (name));
@@ -294,33 +294,33 @@ public:
 
 	template <typename U>
 	requires units::traits::is_unit_t_v<U>
-	U get(std::string key, U defaultValue) {
+	U Get(std::string key, U defaultValue) {
 		using BaseUnit = units::unit<std::ratio<1>, units::traits::base_unit_of<typename U::unit_type>>;
 		if (data.contains(prefix + key)) {
 			auto converted = defaultValue.template convert<BaseUnit>();
-			return BaseUnit { get(key).getDouble(converted.value()) };
+			return BaseUnit { Get(key).GetDouble(converted.value()) };
 		} else
 			return defaultValue;
 	}
 
-	frc::Color get(std::string key, frc::Color defaultValue);
+	frc::Color Get(std::string key, frc::Color defaultValue);
 
-	inputs::LoggableInputs get(std::string key,
+	inputs::LoggableInputs Get(std::string key,
 			inputs::LoggableInputs defaultValue);
 
 	template <typename T>
 	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	T get(std::string key, T defaultValue) {
+	T Get(std::string key, T defaultValue) {
 		if (data.contains(prefix + key))
-		return wpi::UnpackStruct<T>(get(key).getRaw());
+		return wpi::UnpackStruct<T>(Get(key).GetRaw());
 		else return defaultValue;
 	}
 
 	template <typename T>
 	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	std::vector<T> get(std::string key, std::vector<T> defaultValue) {
+	std::vector<T> Get(std::string key, std::vector<T> defaultValue) {
 		if (data.contains(prefix + key)) {
-			std::vector<std::byte> buffer = get(key).getRaw();
+			std::vector<std::byte> buffer = Get(key).GetRaw();
 			std::vector<T> structs {buffer.size() / wpi::GetStructSize<T>()};
 			for (int i = 0; i < structs.size(); i++)
 			wpi::UnpackStructInto(structs.data() + i, std::span<std::byte> {buffer}.subspan(i * wpi::GetStructSize<T>()));
@@ -339,12 +339,12 @@ private:
 			parent.depth + 1, parent.timestamp, parent.data } {
 	}
 
-	bool writeAllowed(std::string key, LoggableType type,
+	bool WriteAllowed(std::string key, LoggableType type,
 			std::string customTypeStr);
 
 	template <typename T>
 	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	void addStructSchema() {
+	void AddStructSchema() {
 		std::string typeString = wpi::GetStructTypeString<T>();
 		std::string key = "/.schema/" + typeString;
 
@@ -355,10 +355,10 @@ private:
 
 		data.emplace(key, LogValue {wpi::GetStructSchemaBytes<T>(),
 					"structschema"});
-		wpi::ForEachStructSchema([&](std::string_view typeString, std::string_view schema) {addStructSchema(std::string {typeString}, std::string {schema}, seen);});
+		wpi::ForEachStructSchema([&](std::string_view typeString, std::string_view schema) {AddStructSchema(std::string {typeString}, std::string {schema}, seen);});
 	}
 
-	void addStructSchema(std::string typeString, std::string schema,
+	void AddStructSchema(std::string typeString, std::string schema,
 			std::unordered_set<std::string> &seen);
 
 	std::string prefix;

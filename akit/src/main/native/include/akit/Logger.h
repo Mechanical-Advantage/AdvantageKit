@@ -17,61 +17,61 @@ namespace akit {
 
 class Logger {
 public:
-	static void setReplaySource(std::unique_ptr<LogReplaySource> replaySource);
-	static void addDataReceiver(std::unique_ptr<LogDataReceiver> dataReceiver);
-	static void registerDashboardInput(nt::LoggedNetworkInput&);
+	static void SetReplaySource(std::unique_ptr<LogReplaySource> replaySource);
+	static void AddDataReceiver(std::unique_ptr<LogDataReceiver> dataReceiver);
+	static void RegisterDashboardInput(nt::LoggedNetworkInput&);
 	// static void registerURCL();
-	static void recordMetadata(std::string key, std::string value);
-	static void disableConsoleCapture() {
+	static void RecordMetadata(std::string key, std::string value);
+	static void DisableConsoleCapture() {
 		enableConsole = false;
 	}
-	static bool hasReplaySource() {
+	static bool HasReplaySource() {
 		return static_cast<bool>(replaySource);
 	}
-	static void start();
-	static void end();
-	static void periodicBeforeUser();
-	static void periodicAfterUser(units::millisecond_t userCodeLength,
+	static void Start();
+	static void End();
+	static void PeriodicBeforeUser();
+	static void PeriodicAfterUser(units::millisecond_t userCodeLength,
 			units::millisecond_t periodicBeforeLength,
 			std::string extraConsoleData = "");
 
 	class AdvancedHooks {
 	public:
 		AdvancedHooks() = delete;
-		static void disableRobotBaseCheck() {
+		static void DisableRobotBaseCheck() {
 			checkRobotBase = false;
 		}
-		static void invokePeriodicBeforeUser() {
-			periodicBeforeUser();
+		static void InvokePeriodicBeforeUser() {
+			PeriodicBeforeUser();
 		}
-		static void invokePeriodicAfterUser(units::millisecond_t userCodeLength,
+		static void InvokePeriodicAfterUser(units::millisecond_t userCodeLength,
 				units::millisecond_t periodicBeforeLength,
 				std::string extraConsoleData = "") {
-			periodicAfterUser(userCodeLength, periodicBeforeLength,
+			PeriodicAfterUser(userCodeLength, periodicBeforeLength,
 					extraConsoleData);
 		}
-		static void setConsoleSource(std::unique_ptr<ConsoleSource> console) {
+		static void SetConsoleSource(std::unique_ptr<ConsoleSource> console) {
 			Logger::console = std::move(console);
 		}
 	};
 
-	static bool getReceiverQueueFault() {
+	static bool GetReceiverQueueFault() {
 		return receiverQueueFault;
 	}
-	static units::second_t getTimestamp();
-	static void runEveryN(size_t n, std::function<void()> function);
-	static void processInputs(std::string key, inputs::LoggableInputs &inputs);
+	static units::second_t GetTimestamp();
+	static void RunEveryN(size_t n, std::function<void()> function);
+	static void ProcessInputs(std::string key, inputs::LoggableInputs &inputs);
 
 	template<typename T>
-	inline static void recordOutput(std::string key, T value) {
+	inline static void RecordOutput(std::string key, T value) {
 		if (running)
-			outputTable->put(key, value);
+			outputTable->Put(key, value);
 	}
 	template<typename T>
-	inline static void recordOutput(std::string key, std::function<T()> value) {
+	inline static void RecordOutput(std::string key, std::function<T()> value) {
 		recordOutput(value());
 	}
-	static void recordOutput(std::string key, mech::LoggedMechanism2d &value);
+	static void RecordOutput(std::string key, mech::LoggedMechanism2d &value);
 
 private:
 	static constexpr int RECEIVER_QUEUE_CAPACITY = 500;

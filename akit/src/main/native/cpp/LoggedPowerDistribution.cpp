@@ -12,13 +12,13 @@ using namespace akit;
 
 std::unique_ptr<LoggedPowerDistribution> LoggedPowerDistribution::instance;
 
-LoggedPowerDistribution& LoggedPowerDistribution::getInstance() {
+LoggedPowerDistribution& LoggedPowerDistribution::GetInstance() {
 	if (!instance)
 		instance = std::make_unique<LoggedPowerDistribution>();
 	return *instance;
 }
 
-LoggedPowerDistribution& LoggedPowerDistribution::getInstance(int moduleID,
+LoggedPowerDistribution& LoggedPowerDistribution::GetInstance(int moduleID,
 		HAL_PowerDistributionType moduleType) {
 	if (!instance)
 		instance = std::make_unique < LoggedPowerDistribution
@@ -26,22 +26,22 @@ LoggedPowerDistribution& LoggedPowerDistribution::getInstance(int moduleID,
 	return *instance;
 }
 
-void LoggedPowerDistribution::saveToLog(LogTable &&table) {
+void LoggedPowerDistribution::SaveToLog(LogTable &&table) {
 	conduit::ConduitApi &inst = conduit::ConduitApi::getInstance();
-	table.put("Temperature", inst.getPDPTemperature());
-	table.put("Voltage", inst.getPDPVoltage());
+	table.Put("Temperature", inst.getPDPTemperature());
+	table.Put("Voltage", inst.getPDPVoltage());
 	std::array<double, 24> currents;
 	for (size_t i = 0; i < currents.size(); i++)
 		currents[i] = inst.getPDPChannelCurrent(i);
-	table.put("ChannelCurrent",
+	table.Put("ChannelCurrent",
 			std::vector<double> { currents.begin(), currents.end() });
-	table.put("TotalCurrent", inst.getPDPTotalCurrent());
-	table.put("TotalPower", inst.getPDPTotalPower());
-	table.put("TotalEnergy", inst.getPDPTotalEnergy());
+	table.Put("TotalCurrent", inst.getPDPTotalCurrent());
+	table.Put("TotalPower", inst.getPDPTotalPower());
+	table.Put("TotalEnergy", inst.getPDPTotalEnergy());
 
-	table.put("ChannelCount", inst.getPDPChannelCount());
-	table.put("Faults", inst.getPDPFaults());
-	table.put("StickyFaults", inst.getPDPStickyFaults());
+	table.Put("ChannelCount", inst.getPDPChannelCount());
+	table.Put("Faults", inst.getPDPFaults());
+	table.Put("StickyFaults", inst.getPDPStickyFaults());
 }
 
 LoggedPowerDistribution::LoggedPowerDistribution(int moduleID,

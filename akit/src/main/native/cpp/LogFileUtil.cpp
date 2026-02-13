@@ -15,7 +15,7 @@
 using namespace akit;
 namespace fs = std::filesystem;
 
-std::string LogFileUtil::addPathSuffix(std::string path, std::string suffix) {
+std::string LogFileUtil::AddPathSuffix(std::string path, std::string suffix) {
 	size_t dotIndex = path.find_last_of('.');
 	if (dotIndex == std::string::npos)
 		return path;
@@ -33,8 +33,8 @@ std::string LogFileUtil::addPathSuffix(std::string path, std::string suffix) {
 		return basename + suffix + extension;
 }
 
-std::string LogFileUtil::findReplayLog() {
-	std::string envPath = findReplayLogEnvVar();
+std::string LogFileUtil::FindReplayLog() {
+	std::string envPath = FindReplayLogEnvVar();
 	if (!envPath.empty()) {
 		std::cout << "[AdvantageKit] Replaying log from "
 				<< ENVIRONMENT_VARIABLE << " environment variable: \""
@@ -42,7 +42,7 @@ std::string LogFileUtil::findReplayLog() {
 		return envPath;
 	}
 
-	std::string advantageScopeLogPath = findReplayLogAdvantageScope();
+	std::string advantageScopeLogPath = FindReplayLogAdvantageScope();
 	if (!advantageScopeLogPath.empty()) {
 		std::cout << "[AdvantageKit] Replaying log from AdvantageScope: \""
 				<< advantageScopeLogPath << "\"\n";
@@ -51,17 +51,17 @@ std::string LogFileUtil::findReplayLog() {
 
 	std::cout << "No log provided with the " << ENVIRONMENT_VARIABLE
 			<< " environment variable or through AdvantageScope. Enter path to file: ";
-	std::string filename = findReplayLogUser();
+	std::string filename = FindReplayLogUser();
 	if (filename[0] == '\'' || filename[0] == '"')
 		filename = filename.substr(1, filename.size() - 1);
 	return filename;
 }
 
-std::string LogFileUtil::findReplayLogEnvVar() {
+std::string LogFileUtil::FindReplayLogEnvVar() {
 	return std::getenv(ENVIRONMENT_VARIABLE.data());
 }
 
-std::string LogFileUtil::findReplayLogAdvantageScope() {
+std::string LogFileUtil::FindReplayLogAdvantageScope() {
 	fs::path advantageScopeTempPath = fs::temp_directory_path()
 			/ ADVANTAGESCOPE_FILENAME;
 	std::ifstream file { advantageScopeTempPath };
@@ -70,7 +70,7 @@ std::string LogFileUtil::findReplayLogAdvantageScope() {
 	return advantageScopeLogPath;
 }
 
-std::string LogFileUtil::findReplayLogUser() {
+std::string LogFileUtil::FindReplayLogUser() {
 	std::string filename;
 	std::getline(std::cin, filename);
 	return filename;

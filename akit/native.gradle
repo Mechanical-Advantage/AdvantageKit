@@ -221,7 +221,7 @@ model {
                     }
 
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/generated/include', 'src/main/thirdparty/include', 'magic_enum/include', 'httplib', 'concurrentqueue'
+                        srcDirs 'src/main/native/include', 'src/main/generated/include', 'src/main/thirdparty/include', 'magic_enum/include', 'httplib', 'concurrentqueue', 'readerwriterqueue'
                     }
                 }
             }

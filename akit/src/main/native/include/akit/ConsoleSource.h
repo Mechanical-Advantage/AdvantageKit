@@ -11,14 +11,14 @@
 #include <sstream>
 #include <iostream>
 #include <mutex>
-#include <blockingconcurrentqueue.h>
+#include <readerwritercircularbuffer.h>
 
 namespace akit {
 
 class ConsoleSource {
 public:
 	virtual ~ConsoleSource() = default;
-	virtual std::string getNewData() = 0;
+	virtual std::string GetNewData() = 0;
 };
 
 class SimulatorConsoleSource: public ConsoleSource {
@@ -26,7 +26,7 @@ public:
 	SimulatorConsoleSource();
 	~SimulatorConsoleSource() override;
 
-	std::string getNewData() override;
+	std::string GetNewData() override;
 
 private:
 	class SplitBuffer: public std::streambuf {
@@ -60,20 +60,20 @@ class RoboRIOConsoleSource: public ConsoleSource {
 public:
 	~RoboRIOConsoleSource() override;
 
-	std::string getNewData() override;
+	std::string GetNewData() override;
 
 protected:
-	virtual std::string getFilePath() {
+	virtual std::string GetFilePath() {
 		return "/home/lvuser/FRC_UserProgram.log";
 	}
 
 private:
-	void run();
+	void Run();
 
 	std::atomic<bool> running = true;
-	std::thread thread { &RoboRIOConsoleSource::run, this };
+	std::thread thread { &RoboRIOConsoleSource::Run, this };
 	std::mutex mutex;
-	moodycamel::BlockingConcurrentQueue<std::string> queue{100};
+	moodycamel::BlockingReaderWriterCircularBuffer<std::string> queue{100};
 };
 
 }
