@@ -125,100 +125,54 @@ public:
 
 	void put(std::string key, LogValue value);
 
-	inline void put(std::string key, std::vector<std::byte> value) {
+	template<typename T>
+	inline void put(std::string key, T value) {
 		put(key, LogValue { value, "" });
 	}
 
-	void put(std::string key, std::vector<std::vector<std::byte>> value);
-
-	inline void put(std::string key, bool value) {
+	template<typename T>
+	inline void put(std::string key, std::vector<T> value) {
 		put(key, LogValue { value, "" });
 	}
 
-	inline void put(std::string key, std::vector<bool> value) {
-		put(key, LogValue { value, "" });
+	template<typename T>
+	void put(std::string key, std::vector<std::vector<T>> value) {
+		put(key + "/length", static_cast<long>(value.size()));
+		for (size_t i = 0; i < value.size(); i++)
+			put(key + "/" + std::to_string(i), value[i]);
 	}
-
-	void put(std::string key, std::vector<std::vector<bool>> value);
-
-	inline void put(std::string key, long value) {
-		put(key, LogValue { value, "" });
-	}
-
-	inline void put(std::string key, std::vector<long> value) {
-		put(key, LogValue(value, ""));
-	}
-
-	void put(std::string key, std::vector<std::vector<long>> value);
-
-	inline void put(std::string key, float value) {
-		put(key, LogValue { value, "" });
-	}
-
-	inline void put(std::string key, float value, std::string unitStr) {
-		put(key, LogValue { value, "", unitStr });
-	}
-
-	inline void put(std::string key, std::vector<float> value) {
-		put(key, LogValue { value, "" });
-	}
-
-	void put(std::string key, std::vector<std::vector<float>> value);
-
-	inline void put(std::string key, double value) {
-		put(key, LogValue { value, "" });
-	}
-
-	inline void put(std::string key, double value, std::string unitStr) {
-		put(key, LogValue { value, "", unitStr });
-	}
-
-	inline void put(std::string key, std::vector<double> value) {
-		put(key, LogValue { value, "" });
-	}
-
-	void put(std::string key, std::vector<std::vector<double>> value);
-
-	inline void put(std::string key, std::string value) {
-		put(key, LogValue { value, "" });
-	}
-
-	inline void put(std::string key, std::vector<std::string> value) {
-		put(key, LogValue { value, "" });
-	}
-
-	void put(std::string key, std::vector<std::vector<std::string>> value);
 
 	template <typename T>
-	requires std::is_enum_v<T>
-	inline void put(std::string key, T value) {
+	requires std::is_integral_v<T>
+	void put(std::string key, T value) {
+		put(key, LogValue { static_cast<long>(value), "" });
+	}
+
+	template <typename E>
+	requires std::is_enum_v<E>
+	inline void put(std::string key, E value) {
 		put(key, LogValue { magic_enum::enum_name(value), "" });
 	}
 
-	template <typename T>
-	requires std::is_enum_v<T>
-	void put(std::string key, std::vector<T> value) {
+	template <typename E>
+	requires std::is_enum_v<E> && magic_enum::detail::is_reflected_v<std::decay_t<E>, magic_enum::detail::subtype_v<E>>
+	void put(std::string key, std::vector<E> value) {
 		std::vector < std::string > stringValues;
 		for (auto val : value)
-			stringValues.emplace_back(magic_enum::enum_name(val));
-		put(key, LogValue { stringValues, "" });
-	}
-
-	template <typename T>
-	requires std::is_enum_v<T>
-	void put(std::string key, std::vector<std::vector<T>> value) {
-		put(key + "/length", static_cast<long>(value.size()));
-		for (int i = 0; i < value.size(); i++)
-			put(key + "/" + std::to_string(i), value[i]);
+		stringValues.emplace_back(magic_enum::enum_name(val));
+		put(key, LogValue {stringValues, ""});
 	}
 
 	template <typename U>
 	requires units::traits::is_unit_t_v<U>
 	inline void put(std::string key, U value) {
-		auto converted = value.template convert<
-				units::unit<std::ratio<1>,
-						units::traits::base_unit_of<typename U::unit_type>>>();
-		put(key, LogValue { converted.value(), "", converted.abbreviation() });
+		put(key, LogValue { value.value(), "", value.name() });
+	}
+
+	template <typename S>
+	requires std::is_convertible_v<S, std::string> && (!std::is_same_v<S, std::string>)
+	inline void put(std::string key, S value) {
+		put(key, std::string {value});
 	}
 
 	inline void put(std::string key, frc::Color value) {
@@ -259,48 +213,61 @@ public:
 		put(key, LogValue {buffer, wpi::GetStructTypeString<T>() + "[]"});
 	}
 
-	template <typename T>
-	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	void put(std::string key, std::vector<std::vector<T>> value) {
-		put(key + "/length", value.size());
-		for (int i = 0; i < value.size(); i++)
-		put(key + "/" + std::to_string(i), value[i]);
-	}
-
 	inline LogValue get(std::string key) {
 		return data.at(prefix + key);
 	}
 
+	template<typename T>
+	std::vector<std::vector<T>> get(std::string key,
+			std::vector<std::vector<T>> defaultValue) {
+		if (data.contains(prefix + key + "/length")) {
+			std::vector < std::vector
+					< T
+							>> value { static_cast<size_t>(get(key + "/length",
+									0)) };
+			for (size_t i = 0; i < value.size(); i++)
+				value[i] = get(key, +"/", std::to_string(i),
+						std::vector<T> { });
+			return value;
+		} else
+			return defaultValue;
+	}
+
+	template <typename T>
+	requires std::is_integral_v<T>
+	T get(std::string key, T defaultValue) {
+		if (data.contains(prefix + key))
+			return static_cast<T>(get(key).getInteger(defaultValue));
+		else
+			return defaultValue;
+	}
+
+	template <typename T>
+	requires std::is_integral_v<T>
+	std::vector<T> get(std::string key, std::vector<T> defaultValue) {
+		if (data.contains(prefix + key)) {
+			std::vector<long> value = get(key).getIntegerArray(
+					{ defaultValue.begin(), defaultValue.end() });
+			return {value.begin(), value.end()};
+		} else
+			return defaultValue;
+	}
+
 	std::vector<std::byte> get(std::string key,
 			std::vector<std::byte> defaultValue);
-	std::vector<std::vector<std::byte>> get(std::string key,
-			std::vector<std::vector<std::byte>> defaultValue);
 
 	bool get(std::string key, bool defaultValue);
 	std::vector<bool> get(std::string key, std::vector<bool> defaultValue);
-	std::vector<std::vector<bool>> get(std::string key,
-			std::vector<std::vector<bool>> defaultValue);
-
-	long get(std::string key, long defaultValue);
-	std::vector<long> get(std::string key, std::vector<long> defaultValue);
-	std::vector<std::vector<long>> get(std::string key,
-			std::vector<std::vector<long>> defaultValue);
 
 	float get(std::string key, float defaultValue);
 	std::vector<float> get(std::string key, std::vector<float> defaultValue);
-	std::vector<std::vector<float>> get(std::string key,
-			std::vector<std::vector<float>> defaultValue);
 
 	double get(std::string key, double defaultValue);
 	std::vector<double> get(std::string key, std::vector<double> defaultValue);
-	std::vector<std::vector<double>> get(std::string key,
-			std::vector<std::vector<double>> defaultValue);
 
 	std::string get(std::string key, std::string defaultValue);
 	std::vector<std::string> get(std::string key,
 			std::vector<std::string> defaultValue);
-	std::vector<std::vector<std::string>> get(std::string key,
-			std::vector<std::vector<std::string>> defaultValue);
 
 	template <typename T>
 	requires std::is_enum_v<T>
@@ -321,21 +288,6 @@ public:
 			for (const auto &name : names)
 				enums.emplace_back(magic_enum::enum_cast < T > (name));
 			return enums;
-		} else
-			return defaultValue;
-	}
-
-	template <typename T>
-	requires std::is_enum_v<T>
-	std::vector<std::vector<T>> get(std::string key,
-			std::vector<std::vector<T>> defaultValue) {
-		if (data.contains(prefix + key)) {
-			long length = get(key + "/length", 0L);
-			std::vector < std::vector < T >> values;
-			for (int i = 0; i < length; i++)
-				values.emplace_back(
-						get(key + "/" + std::to_string(i), defaultValue[i]));
-			return values;
 		} else
 			return defaultValue;
 	}
@@ -373,18 +325,6 @@ public:
 			for (int i = 0; i < structs.size(); i++)
 			wpi::UnpackStructInto(structs.data() + i, std::span<std::byte> {buffer}.subspan(i * wpi::GetStructSize<T>()));
 			return structs;
-		} else return defaultValue;
-	}
-
-	template <typename T>
-	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	std::vector<std::vector<T>> get(std::string key, std::vector<std::vector<T>> defaultValue) {
-		if (data.contains(prefix + key)) {
-			long length = get(key + "/length", 0L);
-			std::vector<std::vector<T>> structs;
-			for (int i = 0; i < length; i++) {
-				structs.emplace_back(get(key + "/" + std::to_string(i), defaultValue[i]));
-			}
 		} else return defaultValue;
 	}
 

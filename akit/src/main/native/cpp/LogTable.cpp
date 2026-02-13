@@ -191,43 +191,6 @@ void LogTable::put(std::string key, LogTable::LogValue value) {
 		data.emplace(prefix + key, value);
 }
 
-void LogTable::put(std::string key, std::vector<std::vector<std::byte>> value) {
-	put(key + "/length", static_cast<long>(value.size()));
-	for (size_t i = 0; i < value.size(); i++)
-		put(key + "/" + std::to_string(i), value[i]);
-}
-
-void LogTable::put(std::string key, std::vector<std::vector<bool>> value) {
-	put(key + "/length", static_cast<long>(value.size()));
-	for (size_t i = 0; i < value.size(); i++)
-		put(key + "/" + std::to_string(i), value[i]);
-}
-
-void LogTable::put(std::string key, std::vector<std::vector<long>> value) {
-	put(key + "/length", static_cast<long>(value.size()));
-	for (size_t i = 0; i < value.size(); i++)
-		put(key + "/" + std::to_string(i), value[i]);
-}
-
-void LogTable::put(std::string key, std::vector<std::vector<float>> value) {
-	put(key + "/length", static_cast<long>(value.size()));
-	for (size_t i = 0; i < value.size(); i++)
-		put(key + "/" + std::to_string(i), value[i]);
-}
-
-void LogTable::put(std::string key, std::vector<std::vector<double>> value) {
-	put(key + "/length", static_cast<long>(value.size()));
-	for (size_t i = 0; i < value.size(); i++)
-		put(key + "/" + std::to_string(i), value[i]);
-}
-
-void LogTable::put(std::string key,
-		std::vector<std::vector<std::string>> value) {
-	put(key + "/length", static_cast<long>(value.size()));
-	for (size_t i = 0; i < value.size(); i++)
-		put(key + "/" + std::to_string(i), value[i]);
-}
-
 void LogTable::addStructSchema(std::string typeString, std::string schema,
 		std::unordered_set<std::string> &seen) {
 	std::string key = "/.schema/" + typeString;
@@ -252,19 +215,6 @@ std::vector<std::byte> LogTable::get(std::string key,
 		return defaultValue;
 }
 
-std::vector<std::vector<std::byte>> LogTable::get(std::string key,
-		std::vector<std::vector<std::byte>> defaultValue) {
-	if (data.contains(prefix + key + "/length")) {
-		std::vector < std::vector < std::byte >> value {
-				static_cast<size_t>(get(key + "/length", 0L)) };
-		for (size_t i = 0; i < value.size(); i++)
-			value[i] = get(key + "/" + std::to_string(i),
-					std::vector<std::byte> { });
-		return value;
-	} else
-		return defaultValue;
-}
-
 bool LogTable::get(std::string key, bool defaultValue) {
 	if (data.contains(prefix + key))
 		return get(key).getBoolean(defaultValue);
@@ -277,47 +227,6 @@ std::vector<bool> LogTable::get(std::string key,
 	if (data.contains(prefix + key))
 		return get(key).getBooleanArray(defaultValue);
 	else
-		return defaultValue;
-}
-
-std::vector<std::vector<bool>> LogTable::get(std::string key,
-		std::vector<std::vector<bool>> defaultValue) {
-	if (data.contains(prefix + key + "/length")) {
-		std::vector<std::vector<bool>> value { static_cast<size_t>(get(
-				key + "/length", 0L)) };
-		for (size_t i = 0; i < value.size(); i++)
-			value[i] = get(key + "/" + std::to_string(i),
-					std::vector<bool> { });
-		return value;
-	} else
-		return defaultValue;
-}
-
-long LogTable::get(std::string key, long defaultValue) {
-	if (data.contains(prefix + key))
-		return get(key).getInteger(defaultValue);
-	else
-		return defaultValue;
-}
-
-std::vector<long> LogTable::get(std::string key,
-		std::vector<long> defaultValue) {
-	if (data.contains(prefix + key))
-		return get(key).getIntegerArray(defaultValue);
-	else
-		return defaultValue;
-}
-
-std::vector<std::vector<long>> LogTable::get(std::string key,
-		std::vector<std::vector<long>> defaultValue) {
-	if (data.contains(prefix + key + "/length")) {
-		std::vector<std::vector<long>> value { static_cast<size_t>(get(
-				key + "/length", 0L)) };
-		for (size_t i = 0; i < value.size(); i++)
-			value[i] = get(key + "/" + std::to_string(i),
-					std::vector<long> { });
-		return value;
-	} else
 		return defaultValue;
 }
 
@@ -336,19 +245,6 @@ std::vector<float> LogTable::get(std::string key,
 		return defaultValue;
 }
 
-std::vector<std::vector<float>> LogTable::get(std::string key,
-		std::vector<std::vector<float>> defaultValue) {
-	if (data.contains(prefix + key + "/length")) {
-		std::vector<std::vector<float>> value { static_cast<size_t>(get(
-				key + "/length", 0L)) };
-		for (size_t i = 0; i < value.size(); i++)
-			value[i] = get(key + "/" + std::to_string(i),
-					std::vector<float> { });
-		return value;
-	} else
-		return defaultValue;
-}
-
 double LogTable::get(std::string key, double defaultValue) {
 	if (data.contains(prefix + key))
 		return get(key).getInteger(defaultValue);
@@ -364,19 +260,6 @@ std::vector<double> LogTable::get(std::string key,
 		return defaultValue;
 }
 
-std::vector<std::vector<double>> LogTable::get(std::string key,
-		std::vector<std::vector<double>> defaultValue) {
-	if (data.contains(prefix + key + "/length")) {
-		std::vector<std::vector<double>> value { static_cast<size_t>(get(
-				key + "/length", 0L)) };
-		for (size_t i = 0; i < value.size(); i++)
-			value[i] = get(key + "/" + std::to_string(i),
-					std::vector<double> { });
-		return value;
-	} else
-		return defaultValue;
-}
-
 std::string LogTable::get(std::string key, std::string defaultValue) {
 	if (data.contains(prefix + key))
 		return get(key).getString(defaultValue);
@@ -389,19 +272,6 @@ std::vector<std::string> LogTable::get(std::string key,
 	if (data.contains(prefix + key))
 		return get(key).getStringArray(defaultValue);
 	else
-		return defaultValue;
-}
-
-std::vector<std::vector<std::string>> LogTable::get(std::string key,
-		std::vector<std::vector<std::string>> defaultValue) {
-	if (data.contains(prefix + key + "/length")) {
-		std::vector < std::vector < std::string >> value {
-				static_cast<size_t>(get(key + "/length", 0L)) };
-		for (size_t i = 0; i < value.size(); i++)
-			value[i] = get(key + "/" + std::to_string(i),
-					std::vector<std::string> { });
-		return value;
-	} else
 		return defaultValue;
 }
 

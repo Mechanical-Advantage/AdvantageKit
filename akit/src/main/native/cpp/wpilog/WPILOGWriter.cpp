@@ -110,7 +110,7 @@ void WPILOGWriter::putTable(LogTable &table) {
 		}
 
 		frc::DriverStation::MatchType matchType = frc::DriverStation::kNone;
-		switch (table.get("DriverStation/MatchType", 0L)) {
+		switch (table.get("DriverStation/MatchType", 0)) {
 		case 1:
 			matchType = frc::DriverStation::kPractice;
 			break;
@@ -137,7 +137,7 @@ void WPILOGWriter::putTable(LogTable &table) {
 				break;
 			}
 			logMatchText += std::to_string(
-					table.get("DriverStation/MatchNumber", 0L));
+					table.get("DriverStation/MatchNumber", 0));
 		}
 
 		std::string eventName = table.get("DriverStation/EventName",

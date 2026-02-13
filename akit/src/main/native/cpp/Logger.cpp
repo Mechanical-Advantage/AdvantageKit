@@ -200,8 +200,7 @@ void Logger::periodicAfterUser(units::millisecond_t userCodeLength,
 				periodicBeforeLength + periodicAfterLength);
 		recordOutput("LoggedRobot/FullCycleMS",
 				periodicBeforeLength + userCodeLength + periodicAfterLength);
-		recordOutput("Logger/QueuedCycles",
-				static_cast<long>(receiverQueue.size_approx()));
+		recordOutput("Logger/QueuedCycles", receiverQueue.size_approx());
 
 		receiverQueueFault = !receiverQueue.try_enqueue(entry);
 		if (receiverQueueFault)
@@ -230,46 +229,3 @@ void Logger::processInputs(std::string key, inputs::LoggableInputs &inputs) {
 			inputs.fromLog(entry.getSubtable(key));
 	}
 }
-
-#define RECORD_OUTPUT(type) void Logger::recordOutput(std::string key, type value) { if (running) outputTable->put(key, value); }
-
-RECORD_OUTPUT(std::vector<std::byte>);
-RECORD_OUTPUT(std::vector<std::vector<std::byte>>);
-
-RECORD_OUTPUT(bool);
-RECORD_OUTPUT(std::vector<bool>);
-RECORD_OUTPUT(std::vector<std::vector<bool>>);
-void Logger::recordOutput(std::string key, std::function<bool()> value) {
-	if (running)
-		outputTable->put(key, value());
-}
-
-RECORD_OUTPUT(long);
-RECORD_OUTPUT(std::vector<long>);
-RECORD_OUTPUT(std::vector<std::vector<long>>);
-void Logger::recordOutput(std::string key, std::function<long()> value) {
-	if (running)
-		outputTable->put(key, value());
-}
-
-RECORD_OUTPUT(float);
-RECORD_OUTPUT(std::vector<float>);
-RECORD_OUTPUT(std::vector<std::vector<float>>);
-void Logger::recordOutput(std::string key, std::function<float()> value) {
-	if (running)
-		outputTable->put(key, value());
-}
-
-RECORD_OUTPUT(double);
-RECORD_OUTPUT(std::vector<double>);
-RECORD_OUTPUT(std::vector<std::vector<double>>);
-void Logger::recordOutput(std::string key, std::function<double()> value) {
-	if (running)
-		outputTable->put(key, value());
-}
-
-RECORD_OUTPUT(std::string);
-RECORD_OUTPUT(std::vector<std::string>);
-RECORD_OUTPUT(std::vector<std::vector<std::string>>);
-
-#undef RECORD_OUTPUT

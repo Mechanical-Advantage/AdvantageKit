@@ -63,16 +63,16 @@ void LoggedDriverStation::saveToLog(LogTable &&table) {
 
 void LoggedDriverStation::replayFromLog(LogTable &&table) {
 	frc::sim::DriverStationSim::SetAllianceStationId(
-			static_cast<HAL_AllianceStationID>(table.get("AllianceStation", 0L)));
+			static_cast<HAL_AllianceStationID>(table.get("AllianceStation", 0)));
 	frc::sim::DriverStationSim::SetEventName(
 			table.get("EventName", std::string { "" }));
 	frc::sim::DriverStationSim::SetGameSpecificMessage(
 			table.get("GameSpecificMessage", std::string { "" }));
-	frc::sim::DriverStationSim::SetMatchNumber(table.get("MatchNumber", 0L));
-	frc::sim::DriverStationSim::SetReplayNumber(table.get("ReplayNumber", 0L));
+	frc::sim::DriverStationSim::SetMatchNumber(table.get("MatchNumber", 0));
+	frc::sim::DriverStationSim::SetReplayNumber(table.get("ReplayNumber", 0));
 
 	frc::DriverStation::MatchType matchType = frc::DriverStation::kNone;
-	switch (table.get("MatchType", 0L)) {
+	switch (table.get("MatchType", 0)) {
 	case 1:
 		matchType = frc::DriverStation::kPractice;
 		break;
@@ -99,13 +99,13 @@ void LoggedDriverStation::replayFromLog(LogTable &&table) {
 		frc::sim::DriverStationSim::SetJoystickName(id,
 				joystickTable.get("Name", std::string { "" }));
 		frc::sim::DriverStationSim::SetJoystickType(id,
-				joystickTable.get("Type", 0L));
+				joystickTable.get("Type", 0));
 		frc::sim::DriverStationSim::SetJoystickIsXbox(id,
 				joystickTable.get("Xbox", false));
 		frc::sim::DriverStationSim::SetJoystickButtonCount(id,
-				joystickTable.get("ButtonCount", 0L));
+				joystickTable.get("ButtonCount", 0));
 		frc::sim::DriverStationSim::SetJoystickButtons(id,
-				joystickTable.get("ButtonValues", 0L));
+				joystickTable.get("ButtonValues", 0));
 
 		std::vector<long> povValues = joystickTable.get("POVs",
 				std::vector<long> { });
