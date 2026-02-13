@@ -10,7 +10,7 @@
 using namespace akit;
 
 ReceiverThread::ReceiverThread(
-		moodycamel::BlockingReaderWriterQueue<LogTable> &queue) : queue { queue } {
+		moodycamel::BlockingConcurrentQueue<LogTable> &queue) : queue { queue } {
 	thread.detach();
 }
 

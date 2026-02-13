@@ -28,7 +28,7 @@ std::vector<akit::nt::LoggedNetworkInput*> Logger::dashboardInputs;
 bool Logger::enableConsole = true;
 bool Logger::checkRobotBase = true;
 std::unique_ptr<LogReplaySource> Logger::replaySource;
-moodycamel::BlockingReaderWriterQueue<LogTable> Logger::receiverQueue {
+moodycamel::BlockingConcurrentQueue<LogTable> Logger::receiverQueue {
 		Logger::RECEIVER_QUEUE_CAPACITY };
 std::unique_ptr<ReceiverThread> Logger::receiverThread;
 bool Logger::receiverQueueFault = false;
