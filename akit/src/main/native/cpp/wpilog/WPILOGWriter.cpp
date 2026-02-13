@@ -14,6 +14,7 @@
 #include <frc/RobotController.h>
 #include "akit/wpilog/WPILOGWriter.h"
 #include "akit/wpilog/WPILOGConstants.h"
+#include "akit/Logger.h"
 
 using namespace akit::wpilog;
 namespace fs = std::filesystem;
@@ -58,7 +59,7 @@ void WPILOGWriter::start() {
 	timestampID =
 			log->Start(TIMESTAMP_KEY,
 					LogTable::WPILOG_TYPES[static_cast<int>(LogTable::LoggableType::Integer)]);
-	lastTable = LogTable { 0 };
+	lastTable = LogTable { 0_s };
 }
 
 void WPILOGWriter::end() {
@@ -70,7 +71,8 @@ void WPILOGWriter::end() {
 		shouldOpen = frc::RobotBase::IsSimulation();
 		break;
 	case AdvantageScopeOpenBehavior::AUTO:
-		shouldOpen = frc::RobotBase::IsSimulation(); // && Logger.hasReplaySource();
+		shouldOpen = frc::RobotBase::IsSimulation()
+				&& Logger::hasReplaySource();
 		break;
 	default:
 		break;

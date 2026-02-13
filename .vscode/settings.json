@@ -96,6 +96,10 @@
         "cinttypes": "cpp",
         "*.mac": "cpp",
         "filesystem": "cpp",
-        "csignal": "cpp"
+        "csignal": "cpp",
+        "matrixfunctions": "cpp",
+        "queue": "cpp",
+        "strstream": "cpp",
+        "cfenv": "cpp"
     }
 }

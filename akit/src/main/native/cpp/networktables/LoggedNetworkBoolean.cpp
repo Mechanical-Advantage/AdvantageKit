@@ -6,12 +6,14 @@
 // at the root directory of this project.
 
 #include "akit/networktables/LoggedNetworkBoolean.h"
+#include "akit/Logger.h"
 
 using namespace akit::nt;
 
 LoggedNetworkBoolean::LoggedNetworkBoolean(std::string key) : key { key }, entry {
 		::nt::NetworkTableInstance::GetDefault().GetBooleanTopic(key).GetEntry(
 				false) }, value { defaultValue } {
+	Logger::registerDashboardInput(*this);
 }
 
 LoggedNetworkBoolean::LoggedNetworkBoolean(std::string key, bool defaultValue) : LoggedNetworkBoolean {
@@ -42,4 +44,7 @@ void LoggedNetworkBoolean::fromLog(LogTable &&table) {
 }
 
 void LoggedNetworkBoolean::periodic() {
+	if (!Logger::hasReplaySource())
+		value = entry.Get(defaultValue);
+	Logger::processInputs(std::string { PREFIX }, *this);
 }

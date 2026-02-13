@@ -16,11 +16,11 @@ namespace akit {
 
 class LoggedSystemStats {
 public:
-	void saveToLog(LogTable &&table);
+	static void saveToLog(LogTable &&table);
 
 private:
-	std::unordered_set<std::string> lastNTRemoteIds;
-	std::array<std::byte, 4> ntIntBuffer;
+	static std::unordered_set<std::string> lastNTRemoteIds;
+	static std::array<std::byte, 4> ntIntBuffer;
 };
 
 }

@@ -28,7 +28,7 @@ void WPILOGReader::start() {
 	iterator = reader->begin();
 }
 
-bool WPILOGReader::updateTable(LogTable &&table) {
+bool WPILOGReader::updateTable(LogTable &table) {
 	if (!isValid)
 		return false;
 
@@ -61,12 +61,16 @@ bool WPILOGReader::updateTable(LogTable &&table) {
 					bool firstTimestamp = timestamp.has_value();
 					int64_t time;
 					record.GetInteger(&time);
-					timestamp = time;
+					timestamp =
+							units::microsecond_t { static_cast<double>(time) };
 					if (firstTimestamp)
 						table.setTimestamp(*timestamp);
 					else
 						break;
-				} else if (timestamp && record.GetTimestamp() == timestamp) {
+				} else if (timestamp
+						&& units::microsecond_t {
+								static_cast<double>(record.GetTimestamp()) }
+								== timestamp) {
 					entry->second = entry->second.substr(1);
 					if (entry->second.starts_with("ReplayOutputs"))
 						continue;

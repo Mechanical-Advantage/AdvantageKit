@@ -26,7 +26,7 @@ public:
 		return name;
 	}
 
-	void update(std::shared_ptr<nt::NetworkTable> table);
+	void update(std::shared_ptr<::nt::NetworkTable> table);
 
 	virtual void logOutput(LogTable &&table);
 
@@ -37,11 +37,11 @@ protected:
 	LoggedMechanismObject2d* append(
 			std::unique_ptr<LoggedMechanismObject2d> object);
 
-	virtual void updateEntries(std::shared_ptr<nt::NetworkTable> table) = 0;
+	virtual void updateEntries(std::shared_ptr<::nt::NetworkTable> table) = 0;
 
 private:
 	std::string name;
-	std::shared_ptr<nt::NetworkTable> table;
+	std::shared_ptr<::nt::NetworkTable> table;
 	std::unordered_map<std::string, std::unique_ptr<LoggedMechanismObject2d>> objects;
 	std::mutex mutex;
 };

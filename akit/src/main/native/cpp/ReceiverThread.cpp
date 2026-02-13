@@ -9,7 +9,8 @@
 
 using namespace akit;
 
-ReceiverThread::ReceiverThread(std::queue<LogTable> queue) : queue { queue } {
+ReceiverThread::ReceiverThread(
+		moodycamel::BlockingReaderWriterQueue<LogTable> &queue) : queue { queue } {
 	thread.detach();
 }
 
@@ -23,10 +24,10 @@ void ReceiverThread::run() {
 		receiver->start();
 
 	while (true) {
-		LogTable entry = queue.front();
-		queue.pop();
+		std::optional < LogTable > entry;
+		queue.wait_dequeue(entry);
 
 		for (auto &receiver : dataReceivers)
-			receiver->putTable(entry);
+			receiver->putTable(*entry);
 	}
 }

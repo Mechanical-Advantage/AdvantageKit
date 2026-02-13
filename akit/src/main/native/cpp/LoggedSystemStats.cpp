@@ -10,6 +10,9 @@
 
 using namespace akit;
 
+std::unordered_set<std::string> LoggedSystemStats::lastNTRemoteIds;
+std::array<std::byte, 4> LoggedSystemStats::ntIntBuffer;
+
 void LoggedSystemStats::saveToLog(LogTable &&table) {
 	conduit::ConduitApi &inst = conduit::ConduitApi::getInstance();
 

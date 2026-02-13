@@ -18,7 +18,9 @@ NT4Publisher::NT4Publisher() : akitTable {
 }
 
 void NT4Publisher::putTable(LogTable &table) {
-	timestampPublisher.Set(table.getTimestamp(), table.getTimestamp());
+	timestampPublisher.Set(
+			units::microsecond_t { table.getTimestamp() }.value(),
+			units::microsecond_t { table.getTimestamp() }.value());
 
 	std::unordered_map < std::string, LogTable::LogValue > newMap =
 			table.getAll(false);
@@ -55,52 +57,54 @@ void NT4Publisher::putTable(LogTable &table) {
 			auto value = field.second.getRaw();
 			publisher->second.SetRaw(std::span {
 					reinterpret_cast<uint8_t*>(value.data()), value.size() },
-					table.getTimestamp());
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		}
 		case LogTable::LoggableType::Boolean:
 			publisher->second.SetBoolean(field.second.getBoolean(),
-					table.getTimestamp());
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		case LogTable::LoggableType::BooleanArray: {
 			auto value = field.second.getBooleanArray();
 			publisher->second.SetBooleanArray(std::vector<int> { value.begin(),
-					value.end() }, table.getTimestamp());
+					value.end() },
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		}
 		case LogTable::LoggableType::Integer:
 			publisher->second.SetInteger(field.second.getInteger(),
-					table.getTimestamp());
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		case LogTable::LoggableType::IntegerArray: {
 			auto value = field.second.getIntegerArray();
 			publisher->second.SetIntegerArray(std::vector<int64_t> {
-					value.begin(), value.end() }, table.getTimestamp());
+					value.begin(), value.end() },
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		}
 		case LogTable::LoggableType::Float:
 			publisher->second.SetFloat(field.second.getFloat(),
-					table.getTimestamp());
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		case LogTable::LoggableType::FloatArray:
 			publisher->second.SetFloatArray(field.second.getFloatArray(),
-					table.getTimestamp());
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		case LogTable::LoggableType::Double:
 			publisher->second.SetDouble(field.second.getDouble(),
-					table.getTimestamp());
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		case LogTable::LoggableType::DoubleArray:
 			publisher->second.SetDoubleArray(field.second.getDoubleArray(),
-					table.getTimestamp());
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		case LogTable::LoggableType::String:
 			publisher->second.SetString(field.second.getString(),
-					table.getTimestamp());
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		case LogTable::LoggableType::StringArray:
 			publisher->second.SetStringArray(field.second.getStringArray(),
-					table.getTimestamp());
+					units::microsecond_t { table.getTimestamp() }.value());
 			break;
 		}
 	}
