@@ -62,70 +62,14 @@ public:
 	static void runEveryN(size_t n, std::function<void()> function);
 	static void processInputs(std::string key, inputs::LoggableInputs &inputs);
 
-	static void recordOutput(std::string key, std::vector<std::byte> value);
-	static void recordOutput(std::string key,
-			std::vector<std::vector<std::byte>> value);
-	static void recordOutput(std::string key, bool value);
-	static void recordOutput(std::string key, std::function<bool()> value);
-	static void recordOutput(std::string key, std::vector<bool> value);
-	static void recordOutput(std::string key,
-			std::vector<std::vector<bool>> value);
-	static void recordOutput(std::string key, long value);
-	static void recordOutput(std::string key, std::function<long()> value);
-	static void recordOutput(std::string key, std::vector<long> value);
-	static void recordOutput(std::string key,
-			std::vector<std::vector<long>> value);
-	static void recordOutput(std::string key, float value);
-	static void recordOutput(std::string key, std::function<float()> value);
-	static void recordOutput(std::string key, std::vector<float> value);
-	static void recordOutput(std::string key,
-			std::vector<std::vector<float>> value);
-	static void recordOutput(std::string key, double value);
-	static void recordOutput(std::string key, std::function<double()> value);
-	static void recordOutput(std::string key, std::vector<double> value);
-	static void recordOutput(std::string key,
-			std::vector<std::vector<double>> value);
-	static void recordOutput(std::string key, std::string value);
-	static void recordOutput(std::string key, std::vector<std::string> value);
-	static void recordOutput(std::string key,
-			std::vector<std::vector<std::string>> value);
-	template <typename E>
-	requires std::is_enum_v<E>
-	static void recordOutput(std::string key, E value) {
+	template<typename T>
+	inline static void recordOutput(std::string key, T value) {
 		if (running)
 			outputTable->put(key, value);
 	}
-	template <typename E>
-	requires std::is_enum_v<E>
-	static void recordOutput(std::string key, std::vector<E> value) {
-		if (running)
-			outputTable->put(key, value);
-	}
-	template <typename E>
-	requires std::is_enum_v<E>
-	static void recordOutput(std::string key,
-			std::vector<std::vector<E>> value) {
-		if (running)
-			outputTable->put(key, value);
-	}
-	template <typename U>
-	requires units::traits::is_unit_t_v<U>
-	static void recordOutput(std::string key, U value) {
-		if (running)
-			outputTable->put(key, value.value(), value.name());
-	}
-	template <typename S>
-	requires wpi::StructSerializable<S> && (!std::is_arithmetic_v<S>)
-	static void recordOutput(std::string key, S value) {
-		if (running) outputTable->put(key, value);
-	}template <typename S>
-	requires wpi::StructSerializable<S> && (!std::is_arithmetic_v<S>)
-	static void recordOutput(std::string key, std::vector<S> value) {
-		if (running) outputTable->put(key, value);
-	}template <typename S>
-	requires wpi::StructSerializable<S> && (!std::is_arithmetic_v<S>)
-	static void recordOutput(std::string key, std::vector<std::vector<S>> value) {
-		if (running) outputTable->put(key, value);
+	template<typename T>
+	inline static void recordOutput(std::string key, std::function<T()> value) {
+		recordOutput(value());
 	}
 	static void recordOutput(std::string key, mech::LoggedMechanism2d &value);
 
