@@ -18,15 +18,9 @@ LogTable::LogValue::LogValue(bool value, std::string typeStr) : type {
 LogTable::LogValue::LogValue(long value, std::string typeStr) : type {
 		LoggableType::Integer }, customTypeStr { typeStr }, value { value } {
 }
-LogTable::LogValue::LogValue(float value, std::string typeStr) : type {
-		LoggableType::Float }, customTypeStr { typeStr }, value { value } {
-}
 LogTable::LogValue::LogValue(float value, std::string typeStr,
 		std::string unitStr) : type { LoggableType::Float }, customTypeStr {
 		typeStr }, unitStr { unitStr }, value { value } {
-}
-LogTable::LogValue::LogValue(double value, std::string typeStr) : type {
-		LoggableType::Double }, customTypeStr { typeStr }, value { value } {
 }
 LogTable::LogValue::LogValue(double value, std::string typeStr,
 		std::string unitStr) : type { LoggableType::Double }, customTypeStr {
