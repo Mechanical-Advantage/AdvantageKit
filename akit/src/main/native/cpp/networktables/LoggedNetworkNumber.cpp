@@ -6,12 +6,14 @@
 // at the root directory of this project.
 
 #include "akit/networktables/LoggedNetworkNumber.h"
+#include "akit/Logger.h"
 
 using namespace akit::nt;
 
 LoggedNetworkNumber::LoggedNetworkNumber(std::string key) : key { key }, entry {
 		::nt::NetworkTableInstance::GetDefault().GetDoubleTopic(key).GetEntry(0) }, value {
 		defaultValue } {
+	Logger::registerDashboardInput(*this);
 }
 
 LoggedNetworkNumber::LoggedNetworkNumber(std::string key, double defaultValue) : LoggedNetworkNumber {
@@ -42,4 +44,7 @@ void LoggedNetworkNumber::fromLog(LogTable &&table) {
 }
 
 void LoggedNetworkNumber::periodic() {
+	if (!Logger::hasReplaySource())
+		value = entry.Get(defaultValue);
+	Logger::processInputs(std::string { PREFIX }, *this);
 }

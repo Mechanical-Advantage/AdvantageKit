@@ -23,7 +23,7 @@ public:
 
 private:
 	std::shared_ptr<::nt::NetworkTable> akitTable;
-	LogTable lastTable { 0 };
+	LogTable lastTable { 0_s };
 	::nt::IntegerPublisher timestampPublisher;
 	std::unordered_map<std::string, ::nt::GenericPublisher> publishers;
 	std::unordered_map<std::string, std::string> units;

@@ -5,8 +5,9 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-#include "akit/LoggedRobot.h"
 #include <frc/Timer.h>
+#include "akit/LoggedRobot.h"
+#include "akit/Logger.h"
 
 using namespace akit;
 
@@ -29,6 +30,10 @@ void LoggedRobot::StartCompetition() {
 	if (IsSimulation())
 		SimulationInit();
 
+	units::millisecond_t initEnd = frc::Timer::GetFPGATimestamp();
+
+	Logger::periodicAfterUser(initEnd, 0_s);
+
 	std::puts("\n********** Robot program startup complete **********");
 	HAL_ObserveUserProgramStarting();
 
@@ -41,14 +46,22 @@ void LoggedRobot::StartCompetition() {
 				HAL_UpdateNotifierAlarm(notifier, units::microsecond_t {
 						nextCycleUs }.value(), nullptr);
 				if (HAL_WaitForNotifierAlarm(notifier, nullptr) == 0) {
-					// Logger.end();
-					// break;
+					Logger::end();
+					break;
 				}
 			}
 			nextCycleUs += periodUs;
 		}
 
+		units::millisecond_t periodicBeforeStart =
+				frc::Timer::GetFPGATimestamp();
+		Logger::periodicBeforeUser();
+		units::millisecond_t userCodeStart = frc::Timer::GetFPGATimestamp();
 		LoopFunc();
+		units::second_t userCodeEnd = frc::Timer::GetFPGATimestamp();
+
+		Logger::periodicAfterUser(userCodeEnd - userCodeStart,
+				userCodeStart - periodicBeforeStart);
 	}
 }
 

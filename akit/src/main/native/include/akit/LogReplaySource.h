@@ -14,9 +14,9 @@ class LogReplaySource {
 public:
 	virtual void start() = 0;
 
-	virtual void end() = 0;
+	virtual ~LogReplaySource() = default;
 
-	virtual bool updateTable(LogTable &&table) = 0;
+	virtual bool updateTable(LogTable &table) = 0;
 };
 
 }

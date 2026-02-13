@@ -18,8 +18,8 @@
 #include <magic_enum/magic_enum.hpp>
 #include <frc/Errors.h>
 #include <frc/util/Color.h>
-#include <units/base.h>
 #include <units/angle.h>
+#include <units/time.h>
 
 #include "akit/inputs/LoggableInputs.h"
 
@@ -148,14 +148,15 @@ public:
 		std::any value;
 	};
 
-	LogTable(long timestamp) : LogTable { "/", 0, std::make_shared<long>(0), { } } {
+	LogTable(units::second_t timestamp) : LogTable { "/", 0, std::make_shared
+			< units::second_t > (0), { } } {
 	}
 
-	inline void setTimestamp(long timestamp) {
+	inline void setTimestamp(units::second_t timestamp) {
 		*this->timestamp = timestamp;
 	}
 
-	inline long getTimestamp() {
+	inline units::second_t getTimestamp() {
 		return *this->timestamp;
 	}
 
@@ -431,7 +432,8 @@ public:
 	}
 
 private:
-	LogTable(std::string prefix, int depth, std::shared_ptr<long> timestamp,
+	LogTable(std::string prefix, int depth,
+			std::shared_ptr<units::second_t> timestamp,
 			std::unordered_map<std::string, LogValue> data) : prefix { prefix }, depth {
 			depth }, timestamp { timestamp }, data { data } {
 	}
@@ -464,7 +466,7 @@ private:
 
 	std::string prefix;
 	int depth;
-	std::shared_ptr<long> timestamp;
+	std::shared_ptr<units::second_t> timestamp;
 	std::unordered_map<std::string, LogValue> data;
 };
 

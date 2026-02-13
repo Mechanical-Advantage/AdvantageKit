@@ -19,7 +19,7 @@ public:
 	}
 
 	void start() override;
-	bool updateTable(LogTable &&table);
+	bool updateTable(LogTable &table);
 
 private:
 	std::string filename;
@@ -28,7 +28,7 @@ private:
 	std::optional<wpi::log::DataLogReader> reader;
 	std::optional<wpi::log::DataLogIterator> iterator;
 
-	std::optional<long> timestamp;
+	std::optional<units::second_t> timestamp;
 	std::unordered_map<int, std::string> entryIDs;
 	std::unordered_map<int, LogTable::LoggableType> entryTypes;
 	std::unordered_map<int, std::string> entryCustomTypes;

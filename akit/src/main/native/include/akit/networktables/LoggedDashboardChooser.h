@@ -11,6 +11,7 @@
 #include "akit/networktables/LoggedNetworkInput.h"
 #include "akit/inputs/LoggableInputs.h"
 #include "akit/LogTable.h"
+#include "akit/Logger.h"
 
 namespace akit {
 
@@ -31,7 +32,7 @@ public:
 	LoggedDashboardChooser(std::string key) : key { key } {
 		frc::SmartDashboard::PutData(key, &sendableChooser);
 		periodic();
-		// Logger.registerDashboardInput(this);
+		Logger::registerDashboardInput(*this);
 	}
 
 	void addOption(std::string key, T value) {
@@ -57,14 +58,14 @@ public:
 	}
 
 	void periodic() override {
-		// if (!Logger.hasReplaySource()) {
-		// selectedValue = sendableChooser.getSelected();
-		// }
-		// Logger.processInputs(prefix + "/SmartDashboard", inputs);
-		// if (previousValue != selectedValue) {
-		// if (listener != null) listener.accept(get());
-		// previousValue = selectedValue;
-		// }
+		if (!Logger::hasReplaySource())
+			selectedValue = sendableChooser.GetSelected();
+		Logger::processInputs(prefix + "/SmartDashboard", *this);
+		if (previousValue != selectedValue) {
+			if (listener)
+				listener(get());
+			previousValue = selectedValue;
+		}
 	}
 
 private:
@@ -73,7 +74,7 @@ private:
 	std::string previousValue;
 	frc::SendableChooser<std::string> sendableChooser;
 	std::unordered_map<std::string, T> options;
-	std::function<T()> listener;
+	std::function<void(T)> listener;
 };
 
 }

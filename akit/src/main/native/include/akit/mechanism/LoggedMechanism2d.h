@@ -16,7 +16,7 @@ namespace akit {
 
 namespace mech {
 
-class LoggedMechanism2d: public nt::NTSendable {
+class LoggedMechanism2d: public ::nt::NTSendable {
 public:
 	LoggedMechanism2d(units::meter_t width, units::meter_t height) : LoggedMechanism2d {
 			width, height, frc::Color8Bit { 0, 0, 32 } } {
@@ -37,15 +37,15 @@ public:
 
 	std::vector<frc::Pose3d> generate3dMechanism();
 
-	void InitSendable(nt::NTSendableBuilder &builder) override;
+	void InitSendable(::nt::NTSendableBuilder &builder) override;
 
 private:
-	std::shared_ptr<nt::NetworkTable> table;
+	std::shared_ptr<::nt::NetworkTable> table;
 	std::unordered_map<std::string, std::unique_ptr<LoggedMechanismRoot2d>> roots;
 	wpi::array<double, 2> dims;
 	std::string color;
-	nt::DoubleArrayPublisher dimsPub;
-	nt::StringPublisher colorPub;
+	::nt::DoubleArrayPublisher dimsPub;
+	::nt::StringPublisher colorPub;
 	std::mutex mutex;
 };
 
