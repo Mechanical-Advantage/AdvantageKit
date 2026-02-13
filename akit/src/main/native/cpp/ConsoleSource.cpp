@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <frc/Errors.h>
+#include <vector>
 #include "akit/ConsoleSource.h"
 
 using namespace akit;
@@ -47,7 +48,9 @@ RoboRIOConsoleSource::~RoboRIOConsoleSource() {
 }
 
 std::string RoboRIOConsoleSource::getNewData() {
-	std::vector < std::string > lines;
+	std::vector<std::string> lines;
+	lines.reserve(100);
+	
 	{
 		std::lock_guard < std::mutex > lock { mutex };
 		while (!queue.empty()) {

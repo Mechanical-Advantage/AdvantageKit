@@ -8,10 +8,10 @@
 #pragma once
 #include <string>
 #include <thread>
-#include <queue>
 #include <sstream>
 #include <iostream>
 #include <mutex>
+#include <blockingconcurrentqueue.h>
 
 namespace akit {
 
@@ -73,7 +73,7 @@ private:
 	std::atomic<bool> running = true;
 	std::thread thread { &RoboRIOConsoleSource::run, this };
 	std::mutex mutex;
-	std::queue<std::string> queue;
+	moodycamel::BlockingConcurrentQueue<std::string> queue{100};
 };
 
 }

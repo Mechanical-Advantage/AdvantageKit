@@ -4,6 +4,6 @@
 [submodule "akit/httplib"]
 	path = akit/httplib
 	url = https://github.com/yhirose/cpp-httplib
-[submodule "akit/readwriterqueue"]
-	path = akit/readerwriterqueue
-	url = https://github.com/cameron314/readerwriterqueue
+[submodule "akit/concurrentqueue"]
+	path = akit/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue
