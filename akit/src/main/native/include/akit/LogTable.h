@@ -58,10 +58,8 @@ public:
 		LogValue(std::vector<std::byte> value, std::string typeStr);
 		LogValue(bool value, std::string typeStr);
 		LogValue(long value, std::string typeStr);
-		LogValue(float value, std::string typeStr);
-		LogValue(float value, std::string typeStr, std::string unitStr);
-		LogValue(double value, std::string typeStr);
-		LogValue(double value, std::string typeStr, std::string unitStr);
+		LogValue(float value, std::string typeStr, std::string unitStr = "");
+		LogValue(double value, std::string typeStr, std::string unitStr = "");
 		LogValue(std::string value, std::string typeStr);
 		LogValue(std::vector<bool> value, std::string typeStr);
 		LogValue(std::vector<long> value, std::string typeStr);
@@ -69,74 +67,33 @@ public:
 		LogValue(std::vector<double> value, std::string typeStr);
 		LogValue(std::vector<std::string> value, std::string typeStr);
 
-		inline std::vector<std::byte> getRaw() const {
-			return getRaw( { });
-		}
-
-		inline bool getBoolean() const {
-			return getBoolean(false);
-		}
-
-		inline long getInteger() const {
-			return getInteger(0);
-		}
-
-		inline float getFloat() const {
-			return getFloat(0);
-		}
-
-		inline double getDouble() const {
-			return getDouble(0);
-		}
-
-		inline std::string getString() const {
-			return getString("");
-		}
-
-		inline std::vector<bool> getBooleanArray() const {
-			return getBooleanArray( { });
-		}
-
-		inline std::vector<long> getIntegerArray() const {
-			return getIntegerArray( { });
-		}
-
-		inline std::vector<float> getFloatArray() const {
-			return getFloatArray( { });
-		}
-
-		inline std::vector<double> getDoubleArray() const {
-			return getDoubleArray( { });
-		}
-
-		inline std::vector<std::string> getStringArray() const {
-			return getStringArray( { });
-		}
-
 		std::vector<std::byte> getRaw(
-				std::vector<std::byte> defaultValue) const;
+				std::vector<std::byte> defaultValue = { }) const;
 
-		bool getBoolean(bool defaultValue) const;
+		bool getBoolean(bool defaultValue = false) const;
 
-		long getInteger(long defaultValue) const;
+		long getInteger(long defaultValue = 0) const;
 
-		float getFloat(float defaultValue) const;
+		float getFloat(float defaultValue = 0) const;
 
-		double getDouble(double defaultValue) const;
+		double getDouble(double defaultValue = 0) const;
 
-		std::string getString(std::string defaultValue) const;
+		std::string getString(std::string defaultValue = "") const;
 
-		std::vector<bool> getBooleanArray(std::vector<bool> defaultValue) const;
+		std::vector<bool> getBooleanArray(
+				std::vector<bool> defaultValue = { }) const;
 
-		std::vector<long> getIntegerArray(std::vector<long> defaultValue) const;
+		std::vector<long> getIntegerArray(
+				std::vector<long> defaultValue = { }) const;
 
-		std::vector<float> getFloatArray(std::vector<float> defaultValue) const;
+		std::vector<float> getFloatArray(
+				std::vector<float> defaultValue = { }) const;
 
-		std::vector<double> getDoubleArray(
-				std::vector<double> defaultValue) const;
+		std::vector<double> getDoubleArray(std::vector<double> defaultValue =
+				{ }) const;
 
 		std::vector<std::string> getStringArray(
-				std::vector<std::string> defaultValue) const;
+				std::vector<std::string> defaultValue = { }) const;
 
 		std::string getWPILOGType() const;
 
