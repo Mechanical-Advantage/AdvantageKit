@@ -19,18 +19,18 @@ bool RadioLogger::isConnected = false;
 std::string RadioLogger::statusJson;
 std::mutex RadioLogger::mutex;
 
-void RadioLogger::periodic(LogTable &&table) {
+void RadioLogger::Periodic(LogTable &&table) {
 	if (!notifier && frc::RobotController::GetTeamNumber() != 0)
-		start();
+		Start();
 
 	{
 		std::lock_guard lock { mutex };
-		table.put("Connected", isConnected);
-		table.put("Status", LogTable::LogValue { statusJson, "json" });
+		table.Put("Connected", isConnected);
+		table.Put("Status", LogTable::LogValue { statusJson, "json" });
 	}
 }
 
-void RadioLogger::start() {
+void RadioLogger::Start() {
 	int teamNumber = frc::RobotController::GetTeamNumber();
 	std::string url = fmt::format("http://10.{}.{}.1", teamNumber / 100,
 			teamNumber % 100);

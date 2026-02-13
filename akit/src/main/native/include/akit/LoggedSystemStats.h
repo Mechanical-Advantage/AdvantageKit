@@ -16,7 +16,7 @@ namespace akit {
 
 class LoggedSystemStats {
 public:
-	static void saveToLog(LogTable &&table);
+	static void SaveToLog(LogTable &&table);
 
 private:
 	static std::unordered_set<std::string> lastNTRemoteIds;

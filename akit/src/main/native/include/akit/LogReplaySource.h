@@ -12,11 +12,11 @@ namespace akit {
 
 class LogReplaySource {
 public:
-	virtual void start() = 0;
+	virtual void Start() = 0;
 
 	virtual ~LogReplaySource() = default;
 
-	virtual bool updateTable(LogTable &table) = 0;
+	virtual bool UpdateTable(LogTable &table) = 0;
 };
 
 }

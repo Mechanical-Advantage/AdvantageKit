@@ -14,12 +14,12 @@ ReceiverThread::ReceiverThread(
 	thread.detach();
 }
 
-void ReceiverThread::addDataReceiver(
+void ReceiverThread::AddDataReceiver(
 		std::unique_ptr<LogDataReceiver> receiver) {
 	dataReceivers.emplace_back(std::move(receiver));
 }
 
-void ReceiverThread::run() {
+void ReceiverThread::Run() {
 	for (auto &receiver : dataReceivers)
 		receiver->start();
 

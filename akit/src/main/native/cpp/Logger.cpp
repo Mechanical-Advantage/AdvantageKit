@@ -33,27 +33,27 @@ moodycamel::BlockingConcurrentQueue<LogTable> Logger::receiverQueue {
 std::unique_ptr<ReceiverThread> Logger::receiverThread;
 bool Logger::receiverQueueFault = false;
 
-void Logger::setReplaySource(std::unique_ptr<LogReplaySource> replaySource) {
+void Logger::SetReplaySource(std::unique_ptr<LogReplaySource> replaySource) {
 	if (!running)
 		Logger::replaySource = std::move(replaySource);
 }
 
-void Logger::addDataReceiver(std::unique_ptr<LogDataReceiver> dataReceiver) {
+void Logger::AddDataReceiver(std::unique_ptr<LogDataReceiver> dataReceiver) {
 	if (!running)
-		receiverThread->addDataReceiver(std::move(dataReceiver));
+		receiverThread->AddDataReceiver(std::move(dataReceiver));
 }
 
-void Logger::registerDashboardInput(
+void Logger::RegisterDashboardInput(
 		akit::nt::LoggedNetworkInput &dashboardInput) {
 	dashboardInputs.push_back(&dashboardInput);
 }
 
-void Logger::recordMetadata(std::string key, std::string value) {
+void Logger::RecordMetadata(std::string key, std::string value) {
 	if (!running)
 		metadata.insert( { key, value });
 }
 
-void Logger::start() {
+void Logger::Start() {
 	if (!running) {
 		running = true;
 
@@ -78,29 +78,29 @@ void Logger::start() {
 		}
 
 		if (replaySource)
-			replaySource->start();
+			replaySource->Start();
 
 		if (!replaySource)
-			outputTable = entry.getSubtable("RealOutputs");
+			outputTable = entry.GetSubtable("RealOutputs");
 		else
-			outputTable = entry.getSubtable("ReplayOutputs");
+			outputTable = entry.GetSubtable("ReplayOutputs");
 
-		LogTable metadataTable = entry.getSubtable(
+		LogTable metadataTable = entry.GetSubtable(
 				replaySource ? "RealMetadata" : "ReplayMetadata");
 		for (auto &entry : metadata)
-			metadataTable.put(entry.first, entry.second);
+			metadataTable.Put(entry.first, entry.second);
 
 		receiverThread = std::make_unique < ReceiverThread > (receiverQueue);
 
 		frc::RobotController::SetTimeSource([] {
-			return units::microsecond_t { getTimestamp() }.value();
+			return units::microsecond_t { GetTimestamp() }.value();
 		});
 
-		periodicBeforeUser();
+		PeriodicBeforeUser();
 	}
 }
 
-void Logger::end() {
+void Logger::End() {
 	if (running) {
 		running = false;
 		console.release();
@@ -111,24 +111,24 @@ void Logger::end() {
 	}
 }
 
-void Logger::periodicBeforeUser() {
+void Logger::PeriodicBeforeUser() {
 	cycleCount++;
 	if (running) {
 		units::second_t entryUpdateStart = frc::Timer::GetFPGATimestamp();
 		if (!replaySource) {
 			std::lock_guard lock { entryMutex };
-			entry.setTimestamp(frc::Timer::GetFPGATimestamp());
+			entry.SetTimestamp(frc::Timer::GetFPGATimestamp());
 		} else {
-			if (!replaySource->updateTable(entry)) {
-				end();
+			if (!replaySource->UpdateTable(entry)) {
+				End();
 				std::exit(1);
 			}
 		}
 
 		units::millisecond_t dsStart = frc::Timer::GetFPGATimestamp();
-		if (hasReplaySource())
+		if (HasReplaySource())
 			LoggedDriverStation::replayFromLog(
-					entry.getSubtable("DriverStation"));
+					entry.GetSubtable("DriverStation"));
 
 		units::millisecond_t dashboardInputsStart =
 				frc::Timer::GetFPGATimestamp();
@@ -137,16 +137,16 @@ void Logger::periodicBeforeUser() {
 		units::millisecond_t dashboardInputsEnd =
 				frc::Timer::GetFPGATimestamp();
 
-		recordOutput("Logger/EntryUpdateMS", dsStart - entryUpdateStart);
-		if (hasReplaySource())
-			recordOutput("Logger/DriverStationMS",
+		RecordOutput("Logger/EntryUpdateMS", dsStart - entryUpdateStart);
+		if (HasReplaySource())
+			RecordOutput("Logger/DriverStationMS",
 					dashboardInputsStart - dsStart);
-		recordOutput("Logger/DashboardInputsMS",
+		RecordOutput("Logger/DashboardInputsMS",
 				dashboardInputsEnd - dashboardInputsStart);
 	}
 }
 
-void Logger::periodicAfterUser(units::millisecond_t userCodeLength,
+void Logger::PeriodicAfterUser(units::millisecond_t userCodeLength,
 		units::millisecond_t periodicBeforeLength,
 		std::string extraConsoleData) {
 	if (running) {
@@ -156,24 +156,24 @@ void Logger::periodicAfterUser(units::millisecond_t userCodeLength,
 		inst.captureData();
 
 		units::millisecond_t dsStart = frc::Timer::GetFPGATimestamp();
-		if (!hasReplaySource())
-			LoggedDriverStation::saveToLog(entry.getSubtable("DriverStation"));
+		if (!HasReplaySource())
+			LoggedDriverStation::saveToLog(entry.GetSubtable("DriverStation"));
 
 		units::millisecond_t conduitSaveStart = frc::Timer::GetFPGATimestamp();
-		if (!hasReplaySource()) {
-			LoggedSystemStats::saveToLog(entry.getSubtable("SystemStats"));
+		if (!HasReplaySource()) {
+			LoggedSystemStats::saveToLog(entry.GetSubtable("SystemStats"));
 			LoggedPowerDistribution &loggedPowerDistribution =
 					LoggedPowerDistribution::getInstance();
 			loggedPowerDistribution.saveToLog(
-					entry.getSubtable("PowerDistribution"));
+					entry.GetSubtable("PowerDistribution"));
 		}
 
 		units::millisecond_t autoLogStart = frc::Timer::GetFPGATimestamp();
 		units::millisecond_t alertLogStart = frc::Timer::GetFPGATimestamp();
 
 		units::millisecond_t radioLogStart = frc::Timer::GetFPGATimestamp();
-		if (!hasReplaySource())
-			RadioLogger::periodic(entry.getSubtable("RadioStatus"));
+		if (!HasReplaySource())
+			RadioLogger::periodic(entry.GetSubtable("RadioStatus"));
 
 		units::millisecond_t consoleCaptureStart =
 				frc::Timer::GetFPGATimestamp();
@@ -181,26 +181,26 @@ void Logger::periodicAfterUser(units::millisecond_t userCodeLength,
 			std::string consoleData = console->getNewData();
 			consoleData += extraConsoleData;
 			if (!consoleData.empty())
-				recordOutput("Console", consoleData);
+				RecordOutput("Console", consoleData);
 		}
 		units::millisecond_t consoleCaptureEnd = frc::Timer::GetFPGATimestamp();
 
-		recordOutput("Logger/ConduitCaptureMS", dsStart - conduitCaptureStart);
-		if (!hasReplaySource())
-			recordOutput("Logger/DriverStationMS", conduitSaveStart - dsStart);
-		recordOutput("Logger/ConduitSaveMS", autoLogStart - conduitSaveStart);
-		recordOutput("Logger/AutoLogMS", alertLogStart - autoLogStart);
-		recordOutput("Logger/AlertLogMS", radioLogStart - alertLogStart);
-		recordOutput("Logger/RadioLogMS", consoleCaptureStart - radioLogStart);
-		recordOutput("Logger/ConsoleMS",
+		RecordOutput("Logger/ConduitCaptureMS", dsStart - conduitCaptureStart);
+		if (!HasReplaySource())
+			RecordOutput("Logger/DriverStationMS", conduitSaveStart - dsStart);
+		RecordOutput("Logger/ConduitSaveMS", autoLogStart - conduitSaveStart);
+		RecordOutput("Logger/AutoLogMS", alertLogStart - autoLogStart);
+		RecordOutput("Logger/AlertLogMS", radioLogStart - alertLogStart);
+		RecordOutput("Logger/RadioLogMS", consoleCaptureStart - radioLogStart);
+		RecordOutput("Logger/ConsoleMS",
 				consoleCaptureEnd - consoleCaptureStart);
 		units::millisecond_t periodicAfterLength = consoleCaptureEnd
 				- conduitCaptureStart;
-		recordOutput("LoggedRobot/LogPeriodicMS",
+		RecordOutput("LoggedRobot/LogPeriodicMS",
 				periodicBeforeLength + periodicAfterLength);
-		recordOutput("LoggedRobot/FullCycleMS",
+		RecordOutput("LoggedRobot/FullCycleMS",
 				periodicBeforeLength + userCodeLength + periodicAfterLength);
-		recordOutput("Logger/QueuedCycles", receiverQueue.size_approx());
+		RecordOutput("Logger/QueuedCycles", receiverQueue.size_approx());
 
 		receiverQueueFault = !receiverQueue.try_enqueue(entry);
 		if (receiverQueueFault)
@@ -209,23 +209,23 @@ void Logger::periodicAfterUser(units::millisecond_t userCodeLength,
 	}
 }
 
-units::second_t Logger::getTimestamp() {
+units::second_t Logger::GetTimestamp() {
 	if (!running)
 		return frc::Timer::GetFPGATimestamp();
 	std::lock_guard lock { entryMutex };
-	return entry.getTimestamp();
+	return entry.GetTimestamp();
 }
 
-void Logger::runEveryN(size_t n, std::function<void()> function) {
+void Logger::RunEveryN(size_t n, std::function<void()> function) {
 	if (cycleCount % n == 0)
 		function();
 }
 
-void Logger::processInputs(std::string key, inputs::LoggableInputs &inputs) {
+void Logger::ProcessInputs(std::string key, inputs::LoggableInputs &inputs) {
 	if (running) {
 		if (!replaySource)
-			inputs.toLog(entry.getSubtable(key));
+			inputs.toLog(entry.GetSubtable(key));
 		else
-			inputs.fromLog(entry.getSubtable(key));
+			inputs.fromLog(entry.GetSubtable(key));
 	}
 }

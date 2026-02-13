@@ -12,15 +12,15 @@ namespace akit {
 
 class LogFileUtil {
 public:
-	static std::string addPathSuffix(std::string path, std::string suffix);
+	static std::string AddPathSuffix(std::string path, std::string suffix);
 
-	static std::string findReplayLog();
+	static std::string FindReplayLog();
 
-	static std::string findReplayLogEnvVar();
+	static std::string FindReplayLogEnvVar();
 
-	static std::string findReplayLogAdvantageScope();
+	static std::string FindReplayLogAdvantageScope();
 
-	static std::string findReplayLogUser();
+	static std::string FindReplayLogUser();
 
 private:
 	static constexpr std::string_view ENVIRONMENT_VARIABLE = "AKIT_LOG_PATH";

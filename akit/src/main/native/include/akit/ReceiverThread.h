@@ -15,13 +15,13 @@ namespace akit {
 
 class ReceiverThread {
 public:
-	void addDataReceiver(std::unique_ptr<LogDataReceiver> receiver);
+	void AddDataReceiver(std::unique_ptr<LogDataReceiver> receiver);
 	ReceiverThread(moodycamel::BlockingConcurrentQueue<LogTable> &queue);
 
 private:
-	void run();
+	void Run();
 
-	std::thread thread { &ReceiverThread::run, this };
+	std::thread thread { &ReceiverThread::Run, this };
 	moodycamel::BlockingConcurrentQueue<LogTable> &queue;
 	std::vector<std::unique_ptr<LogDataReceiver>> dataReceivers;
 };
