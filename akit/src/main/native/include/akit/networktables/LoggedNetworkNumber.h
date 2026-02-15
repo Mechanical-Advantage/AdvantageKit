@@ -23,17 +23,17 @@ public:
 
 	LoggedNetworkNumber(std::string key, double defaultValue);
 
-	void setDefault(double defaultValue);
+	void SetDefault(double defaultValue);
 
-	void set(double value);
+	void Set(double value);
 
-	double get();
+	double Get();
 
-	void toLog(LogTable &&table);
+	void ToLog(LogTable &&table);
 
-	void fromLog(LogTable &&table);
+	void FromLog(LogTable &&table);
 
-	void periodic() override;
+	void Periodic() override;
 
 private:
 	std::string key;

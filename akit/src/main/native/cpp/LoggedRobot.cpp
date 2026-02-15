@@ -32,7 +32,7 @@ void LoggedRobot::StartCompetition() {
 
 	units::millisecond_t initEnd = frc::Timer::GetFPGATimestamp();
 
-	Logger::periodicAfterUser(initEnd, 0_s);
+	Logger::PeriodicAfterUser(initEnd, 0_s);
 
 	std::puts("\n********** Robot program startup complete **********");
 	HAL_ObserveUserProgramStarting();
@@ -46,7 +46,7 @@ void LoggedRobot::StartCompetition() {
 				HAL_UpdateNotifierAlarm(notifier, units::microsecond_t {
 						nextCycleUs }.value(), nullptr);
 				if (HAL_WaitForNotifierAlarm(notifier, nullptr) == 0) {
-					Logger::end();
+					Logger::End();
 					break;
 				}
 			}
@@ -55,12 +55,12 @@ void LoggedRobot::StartCompetition() {
 
 		units::millisecond_t periodicBeforeStart =
 				frc::Timer::GetFPGATimestamp();
-		Logger::periodicBeforeUser();
+		Logger::PeriodicBeforeUser();
 		units::millisecond_t userCodeStart = frc::Timer::GetFPGATimestamp();
 		LoopFunc();
 		units::second_t userCodeEnd = frc::Timer::GetFPGATimestamp();
 
-		Logger::periodicAfterUser(userCodeEnd - userCodeStart,
+		Logger::PeriodicAfterUser(userCodeEnd - userCodeStart,
 				userCodeStart - periodicBeforeStart);
 	}
 }

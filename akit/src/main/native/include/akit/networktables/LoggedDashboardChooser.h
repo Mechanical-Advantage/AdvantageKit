@@ -21,49 +21,49 @@ template<typename T>
 class LoggedDashboardChooser: public LoggedNetworkInput,
 		public inputs::LoggableInputs {
 public:
-	void toLog(LogTable table) {
-		table.put(key, selectedValue);
+	void ToLog(LogTable table) {
+		table.Put(key, selectedValue);
 	}
 
-	void fromLog(LogTable table) {
-		selectedValue = table.get(key, selectedValue);
+	void FromLog(LogTable table) {
+		selectedValue = table.Get(key, selectedValue);
 	}
 
 	LoggedDashboardChooser(std::string key) : key { key } {
 		frc::SmartDashboard::PutData(key, &sendableChooser);
-		periodic();
-		Logger::registerDashboardInput(*this);
+		Periodic();
+		Logger::RegisterDashboardInput(*this);
 	}
 
-	void addOption(std::string key, T value) {
+	void AddOption(std::string key, T value) {
 		sendableChooser.AddOption(key, key);
 		options.emplace(key, value);
 	}
 
-	void addDefaultOption(std::string key, T value) {
+	void AddDefaultOption(std::string key, T value) {
 		sendableChooser.SetDefaultOption(key, key)
 		options.emplace(key, value);
 	}
 
-	T get() {
+	T Get() {
 		return options.at(selectedValue);
 	}
 
-	void onChange(std::function<T()> listener) {
+	void OnChange(std::function<T()> listener) {
 		this->listener = listener;
 	}
 
-	frc::SendableChooser<std::string> getSendableChooser() {
+	frc::SendableChooser<std::string> GetSendableChooser() {
 		return sendableChooser;
 	}
 
-	void periodic() override {
-		if (!Logger::hasReplaySource())
+	void Periodic() override {
+		if (!Logger::HasReplaySource())
 			selectedValue = sendableChooser.GetSelected();
-		Logger::processInputs(prefix + "/SmartDashboard", *this);
+		Logger::ProcessInputs(prefix + "/SmartDashboard", *this);
 		if (previousValue != selectedValue) {
 			if (listener)
-				listener(get());
+				listener(Get());
 			previousValue = selectedValue;
 		}
 	}

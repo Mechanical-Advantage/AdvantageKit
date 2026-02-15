@@ -9,48 +9,48 @@
 
 using namespace akit::mech;
 
-LoggedMechanismObject2d* LoggedMechanismObject2d::append(
+LoggedMechanismObject2d* LoggedMechanismObject2d::Append(
 		std::unique_ptr<LoggedMechanismObject2d> object) {
 	std::lock_guard lock { mutex };
-	if (objects.contains(object->getName()))
+	if (objects.contains(object->GetName()))
 		throw std::runtime_error { "Mechanism object names must be unique!" };
 
 	auto obj = object.get();
-	objects[object->getName()] = std::move(object);
+	objects[object->GetName()] = std::move(object);
 
 	if (table)
-		obj->update(table->GetSubTable(obj->getName()));
+		obj->Update(table->GetSubTable(obj->GetName()));
 	return obj;
 }
 
-void LoggedMechanismObject2d::update(std::shared_ptr<nt::NetworkTable> table) {
+void LoggedMechanismObject2d::Update(std::shared_ptr<nt::NetworkTable> table) {
 	std::lock_guard lock { mutex };
 	this->table = table;
-	updateEntries(this->table);
+	UpdateEntries(this->table);
 	for (auto &obj : objects)
-		obj.second->update(table->GetSubTable(obj.second->name));
+		obj.second->Update(table->GetSubTable(obj.second->name));
 }
 
-void LoggedMechanismObject2d::logOutput(LogTable &&table) {
+void LoggedMechanismObject2d::LogOutput(LogTable &&table) {
 	std::lock_guard lock { mutex };
 	for (auto &obj : objects)
-		obj.second->logOutput(table.getSubtable(obj.second->name));
+		obj.second->LogOutput(table.GetSubtable(obj.second->name));
 }
 
-std::vector<frc::Pose3d> LoggedMechanismObject2d::generate3dMechanism(
+std::vector<frc::Pose3d> LoggedMechanismObject2d::Generate3dMechanism(
 		frc::Pose3d seed) {
 	std::vector < frc::Pose3d > poses;
 
 	for (auto &obj : objects) {
-		frc::Rotation3d newRotation { 0_deg, -obj.second->getAngle(), 0_deg };
+		frc::Rotation3d newRotation { 0_deg, -obj.second->GetAngle(), 0_deg };
 		newRotation = seed.Rotation() + newRotation;
 		frc::Pose3d newPose { seed.Translation(), newRotation };
 		poses.push_back(newPose);
 
 		frc::Pose3d nextPose = newPose
-				+ frc::Transform3d { obj.second->getObject2dRange(), 0_m, 0_m,
+				+ frc::Transform3d { obj.second->GetObject2dRange(), 0_m, 0_m,
 						{ } };
-		std::vector < frc::Pose3d > morePoses = obj.second->generate3dMechanism(
+		std::vector < frc::Pose3d > morePoses = obj.second->Generate3dMechanism(
 				nextPose);
 		poses.insert(poses.end(), morePoses.begin(), morePoses.end());
 	}

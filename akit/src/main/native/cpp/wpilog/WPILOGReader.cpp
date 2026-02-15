@@ -11,7 +11,7 @@
 
 using namespace akit::wpilog;
 
-void WPILOGReader::start() {
+void WPILOGReader::Start() {
 	reader = wpi::log::DataLogReader {
 			wpi::MemoryBuffer::GetFile(filename).value() };
 	if (!reader->IsValid()) {
@@ -28,12 +28,12 @@ void WPILOGReader::start() {
 	iterator = reader->begin();
 }
 
-bool WPILOGReader::updateTable(LogTable &table) {
+bool WPILOGReader::UpdateTable(LogTable &table) {
 	if (!isValid)
 		return false;
 
 	if (timestamp)
-		table.setTimestamp(*timestamp);
+		table.SetTimestamp(*timestamp);
 
 	bool readError = false;
 	for (; *iterator < reader->end(); (*iterator)++) {
@@ -64,7 +64,7 @@ bool WPILOGReader::updateTable(LogTable &table) {
 					timestamp =
 							units::microsecond_t { static_cast<double>(time) };
 					if (firstTimestamp)
-						table.setTimestamp(*timestamp);
+						table.SetTimestamp(*timestamp);
 					else
 						break;
 				} else if (timestamp
@@ -79,7 +79,7 @@ bool WPILOGReader::updateTable(LogTable &table) {
 					case LogTable::LoggableType::Raw: {
 						auto value = record.GetRaw();
 						auto bytes = std::as_bytes(value);
-						table.put(entry->second,
+						table.Put(entry->second,
 								LogTable::LogValue { std::vector<std::byte> {
 										bytes.begin(), bytes.end() }, customType });
 						break;
@@ -87,42 +87,42 @@ bool WPILOGReader::updateTable(LogTable &table) {
 					case LogTable::LoggableType::Boolean: {
 						bool value;
 						record.GetBoolean(&value);
-						table.put(entry->second, LogTable::LogValue { value,
+						table.Put(entry->second, LogTable::LogValue { value,
 								customType });
 						break;
 					}
 					case LogTable::LoggableType::Integer: {
 						int64_t value;
 						record.GetInteger(&value);
-						table.put(entry->second, LogTable::LogValue {
+						table.Put(entry->second, LogTable::LogValue {
 								static_cast<long>(value), customType });
 						break;
 					}
 					case LogTable::LoggableType::Float: {
 						float value;
 						record.GetFloat(&value);
-						table.put(entry->second, LogTable::LogValue { value,
+						table.Put(entry->second, LogTable::LogValue { value,
 								customType });
 						break;
 					}
 					case LogTable::LoggableType::Double: {
 						double value;
 						record.GetDouble(&value);
-						table.put(entry->second, LogTable::LogValue { value,
+						table.Put(entry->second, LogTable::LogValue { value,
 								customType });
 						break;
 					}
 					case LogTable::LoggableType::String: {
 						std::string_view value;
 						record.GetString(&value);
-						table.put(entry->second, LogTable::LogValue {
+						table.Put(entry->second, LogTable::LogValue {
 								std::string { value }, customType });
 						break;
 					}
 					case LogTable::LoggableType::BooleanArray: {
 						std::vector<int> value;
 						record.GetBooleanArray(&value);
-						table.put(entry->second,
+						table.Put(entry->second,
 								LogTable::LogValue { std::vector<bool> {
 										value.begin(), value.end() }, customType });
 						break;
@@ -130,7 +130,7 @@ bool WPILOGReader::updateTable(LogTable &table) {
 					case LogTable::LoggableType::IntegerArray: {
 						std::vector < int64_t > value;
 						record.GetIntegerArray(&value);
-						table.put(entry->second,
+						table.Put(entry->second,
 								LogTable::LogValue { std::vector<long> {
 										value.begin(), value.end() }, customType });
 						break;
@@ -138,21 +138,21 @@ bool WPILOGReader::updateTable(LogTable &table) {
 					case LogTable::LoggableType::FloatArray: {
 						std::vector<float> value;
 						record.GetFloatArray(&value);
-						table.put(entry->second, LogTable::LogValue { value,
+						table.Put(entry->second, LogTable::LogValue { value,
 								customType });
 						break;
 					}
 					case LogTable::LoggableType::DoubleArray: {
 						std::vector<double> value;
 						record.GetDoubleArray(&value);
-						table.put(entry->second, LogTable::LogValue { value,
+						table.Put(entry->second, LogTable::LogValue { value,
 								customType });
 						break;
 					}
 					case LogTable::LoggableType::StringArray: {
 						std::vector < std::string_view > value;
 						record.GetStringArray(&value);
-						table.put(entry->second,
+						table.Put(entry->second,
 								LogTable::LogValue { std::vector<std::string> {
 										value.begin(), value.end() }, customType });
 						break;

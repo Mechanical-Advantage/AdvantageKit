@@ -15,8 +15,8 @@ namespace inputs {
 
 class LoggableInputs {
 public:
-	virtual void toLog(LogTable&&) = 0;
-	virtual void fromLog(LogTable&&) = 0;
+	virtual void ToLog(LogTable&&) = 0;
+	virtual void FromLog(LogTable&&) = 0;
 };
 
 }

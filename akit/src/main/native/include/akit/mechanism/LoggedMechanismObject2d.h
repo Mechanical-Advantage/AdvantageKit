@@ -16,28 +16,28 @@ namespace mech {
 
 class LoggedMechanismObject2d {
 public:
-	virtual units::meter_t getObject2dRange() = 0;
+	virtual units::meter_t GetObject2dRange() = 0;
 
-	virtual units::degree_t getAngle() = 0;
+	virtual units::degree_t GetAngle() = 0;
 
-	std::vector<frc::Pose3d> generate3dMechanism(frc::Pose3d seed);
+	std::vector<frc::Pose3d> Generate3dMechanism(frc::Pose3d seed);
 
-	std::string getName() {
+	std::string GetName() {
 		return name;
 	}
 
-	void update(std::shared_ptr<::nt::NetworkTable> table);
+	void Update(std::shared_ptr<::nt::NetworkTable> table);
 
-	virtual void logOutput(LogTable &&table);
+	virtual void LogOutput(LogTable &&table);
 
 protected:
 	LoggedMechanismObject2d(std::string name) : name { name } {
 	}
 
-	LoggedMechanismObject2d* append(
+	LoggedMechanismObject2d* Append(
 			std::unique_ptr<LoggedMechanismObject2d> object);
 
-	virtual void updateEntries(std::shared_ptr<::nt::NetworkTable> table) = 0;
+	virtual void UpdateEntries(std::shared_ptr<::nt::NetworkTable> table) = 0;
 
 private:
 	std::string name;

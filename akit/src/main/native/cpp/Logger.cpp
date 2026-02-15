@@ -127,13 +127,13 @@ void Logger::PeriodicBeforeUser() {
 
 		units::millisecond_t dsStart = frc::Timer::GetFPGATimestamp();
 		if (HasReplaySource())
-			LoggedDriverStation::replayFromLog(
+			LoggedDriverStation::ReplayFromLog(
 					entry.GetSubtable("DriverStation"));
 
 		units::millisecond_t dashboardInputsStart =
 				frc::Timer::GetFPGATimestamp();
 		for (auto &input : dashboardInputs)
-			input->periodic();
+			input->Periodic();
 		units::millisecond_t dashboardInputsEnd =
 				frc::Timer::GetFPGATimestamp();
 
@@ -157,14 +157,14 @@ void Logger::PeriodicAfterUser(units::millisecond_t userCodeLength,
 
 		units::millisecond_t dsStart = frc::Timer::GetFPGATimestamp();
 		if (!HasReplaySource())
-			LoggedDriverStation::saveToLog(entry.GetSubtable("DriverStation"));
+			LoggedDriverStation::SaveToLog(entry.GetSubtable("DriverStation"));
 
 		units::millisecond_t conduitSaveStart = frc::Timer::GetFPGATimestamp();
 		if (!HasReplaySource()) {
-			LoggedSystemStats::saveToLog(entry.GetSubtable("SystemStats"));
+			LoggedSystemStats::SaveToLog(entry.GetSubtable("SystemStats"));
 			LoggedPowerDistribution &loggedPowerDistribution =
-					LoggedPowerDistribution::getInstance();
-			loggedPowerDistribution.saveToLog(
+					LoggedPowerDistribution::GetInstance();
+			loggedPowerDistribution.SaveToLog(
 					entry.GetSubtable("PowerDistribution"));
 		}
 
@@ -173,12 +173,12 @@ void Logger::PeriodicAfterUser(units::millisecond_t userCodeLength,
 
 		units::millisecond_t radioLogStart = frc::Timer::GetFPGATimestamp();
 		if (!HasReplaySource())
-			RadioLogger::periodic(entry.GetSubtable("RadioStatus"));
+			RadioLogger::Periodic(entry.GetSubtable("RadioStatus"));
 
 		units::millisecond_t consoleCaptureStart =
 				frc::Timer::GetFPGATimestamp();
 		if (enableConsole) {
-			std::string consoleData = console->getNewData();
+			std::string consoleData = console->GetNewData();
 			consoleData += extraConsoleData;
 			if (!consoleData.empty())
 				RecordOutput("Console", consoleData);
@@ -224,8 +224,8 @@ void Logger::RunEveryN(size_t n, std::function<void()> function) {
 void Logger::ProcessInputs(std::string key, inputs::LoggableInputs &inputs) {
 	if (running) {
 		if (!replaySource)
-			inputs.toLog(entry.GetSubtable(key));
+			inputs.ToLog(entry.GetSubtable(key));
 		else
-			inputs.fromLog(entry.GetSubtable(key));
+			inputs.FromLog(entry.GetSubtable(key));
 	}
 }

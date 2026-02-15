@@ -40,7 +40,7 @@ WPILOGWriter::WPILOGWriter(std::string path,
 	}
 }
 
-void WPILOGWriter::start() {
+void WPILOGWriter::Start() {
 	fs::path logFolder { folder };
 	if (!fs::exists(logFolder))
 		fs::create_directories(logFolder);
@@ -62,7 +62,7 @@ void WPILOGWriter::start() {
 	lastTable = LogTable { 0_s };
 }
 
-void WPILOGWriter::end() {
+void WPILOGWriter::End() {
 	log.release();
 
 	bool shouldOpen = false;
@@ -72,7 +72,7 @@ void WPILOGWriter::end() {
 		break;
 	case AdvantageScopeOpenBehavior::AUTO:
 		shouldOpen = frc::RobotBase::IsSimulation()
-				&& Logger::hasReplaySource();
+				&& Logger::HasReplaySource();
 		break;
 	default:
 		break;
@@ -88,15 +88,15 @@ void WPILOGWriter::end() {
 	}
 }
 
-void WPILOGWriter::putTable(LogTable &table) {
+void WPILOGWriter::PutTable(LogTable &table) {
 	if (!isOpen)
 		return;
 
 	if (autoRename) {
 		// Update timestamp
 		if (!logDate) {
-			if ((table.get("DriverStation/DSAttached", false)
-					&& table.get("SystemStats/SystemTimeValid", false))
+			if ((table.Get("DriverStation/DSAttached", false)
+					&& table.Get("SystemStats/SystemTimeValid", false))
 					|| frc::RobotBase::IsSimulation()) {
 				if (!dsAttachedTime)
 					dsAttachedTime = frc::RobotController::GetFPGATime()
@@ -110,7 +110,7 @@ void WPILOGWriter::putTable(LogTable &table) {
 		}
 
 		frc::DriverStation::MatchType matchType = frc::DriverStation::kNone;
-		switch (table.get("DriverStation/MatchType", 0)) {
+		switch (table.Get("DriverStation/MatchType", 0)) {
 		case 1:
 			matchType = frc::DriverStation::kPractice;
 			break;
@@ -137,10 +137,10 @@ void WPILOGWriter::putTable(LogTable &table) {
 				break;
 			}
 			logMatchText += std::to_string(
-					table.get("DriverStation/MatchNumber", 0));
+					table.Get("DriverStation/MatchNumber", 0));
 		}
 
-		std::string eventName = table.get("DriverStation/EventName",
+		std::string eventName = table.Get("DriverStation/EventName",
 				std::string { "" });
 		std::transform(eventName.begin(), eventName.end(), eventName.begin(),
 				::tolower);

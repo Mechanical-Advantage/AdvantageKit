@@ -26,34 +26,34 @@ public:
 			angle, 10, frc::Color8Bit { 235, 137, 52 } } {
 	}
 
-	void setAngle(units::degree_t angle);
+	void SetAngle(units::degree_t angle);
 
-	void setAngle(frc::Rotation2d angle) {
-		setAngle(angle.Degrees());
+	void SetAngle(frc::Rotation2d angle) {
+		SetAngle(angle.Degrees());
 	}
 
-	units::degree_t getAngle() override;
+	units::degree_t GetAngle() override;
 
-	void setLength(units::meter_t);
+	void SetLength(units::meter_t);
 
-	units::meter_t getLength();
+	units::meter_t GetLength();
 
-	void setColor(frc::Color8Bit color);
+	void SetColor(frc::Color8Bit color);
 
-	frc::Color8Bit getColor();
+	frc::Color8Bit GetColor();
 
-	void setLineWeight(double weight);
+	void SetLineWeight(double weight);
 
-	double getLineWeight();
+	double GetLineWeight();
 
 protected:
-	void updateEntries(std::shared_ptr<nt::NetworkTable> table) override;
+	void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;
 
 private:
-	void logOutput(LogTable &&table) override;
+	void LogOutput(LogTable &&table) override;
 
-	units::meter_t getObject2dRange() override {
-		return getLength();
+	units::meter_t GetObject2dRange() override {
+		return GetLength();
 	}
 
 	nt::StringPublisher typePub;
