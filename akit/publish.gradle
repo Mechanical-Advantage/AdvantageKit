@@ -24,6 +24,34 @@ def artifactGroupId = 'org.littletonrobotics.akit'
 def javaArtifactId = 'akit-java'
 def wpilibioArtifactId = 'akit-wpilibio'
 def wpilibioZipBaseName = "_GROUP_${artifactGroupId.replace('.', '_')}_ID_${wpilibioArtifactId}_CLS"
+def akitCppArtifactId = 'akit-cpp'
+def akitCppZipBaseName = "_GROUP_${artifactGroupId.replace('.', '_')}_ID_${akitCppArtifactId}_CLS"
+
+task akitCppHeadersZip(type: Zip) {
+    archiveBaseName = akitCppZipBaseName
+    archiveClassifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
+}
+
+task akitCppSourceZip(type: Zip) {
+    archiveBaseName = akitCppZipBaseName
+    archiveClassifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/cpp') {
+        into '/'
+    }
+}
 
 artifacts {
     archives sourcesJar
@@ -66,6 +94,7 @@ task vendordep(type: Copy) {
             "groupId": artifactGroupId,
             "javaArtifactId": javaArtifactId,
             "jniArtifactId": wpilibioArtifactId,
+            "akitCppArtifactId": akitCppArtifactId,
             "frcYear": frcYear)
 }
 
@@ -76,6 +105,7 @@ publish.dependsOn build
 model {
     publishing {
         def wpilibioTaskList = createComponentZipTasks($.components, ['wpilibio'], wpilibioZipBaseName, Zip, project, includeStandardZipFormat)
+        def akitCppTaskList = createComponentZipTasks($.components, ['akit'], akitCppZipBaseName, Zip, project, includeStandardZipFormat)
         def skipJava = project.hasProperty("skipJava")
         publications {
             wpilibio(MavenPublication) {
@@ -84,6 +114,18 @@ model {
                 }
 
                 artifactId = wpilibioArtifactId
+                groupId artifactGroupId
+                version pubVersion
+            }
+
+            akitCpp(MavenPublication) {
+                akitCppTaskList.each {
+                    artifact it
+                }
+                artifact akitCppHeadersZip
+                artifact akitCppSourceZip
+
+                artifactId = akitCppArtifactId
                 groupId artifactGroupId
                 version pubVersion
             }
