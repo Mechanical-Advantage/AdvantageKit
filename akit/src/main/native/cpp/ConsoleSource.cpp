@@ -48,13 +48,15 @@ RoboRIOConsoleSource::~RoboRIOConsoleSource() {
 }
 
 std::string RoboRIOConsoleSource::GetNewData() {
-	std::string lines[100];
-	size_t numLines = queue.try_dequeue_bulk(lines, 100);
+	std::vector<std::string> lines;
+	std::string line;
+	while (queue.try_dequeue(line))
+		lines.push_back(line);
 
 	std::ostringstream out;
-	for (size_t i = 0; i < numLines; i++) {
+	for (size_t i = 0; i < lines.size(); i++) {
 		out << lines[i];
-		if (i + 1 < numLines)
+		if (i + 1 < lines.size())
 			out << '\n';
 	}
 	return out.str();
@@ -75,6 +77,7 @@ void RoboRIOConsoleSource::Run() {
 	while (running) {
 		while (std::getline(file, line)) {
 			std::lock_guard < std::mutex > lock { mutex };
+			queue.
 			if (queue.size() >= 100)
 				queue.pop();
 			queue.push(line);
