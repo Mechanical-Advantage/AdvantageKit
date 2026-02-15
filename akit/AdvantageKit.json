@@ -31,5 +31,22 @@
       ]
     }
   ],
-  "cppDependencies": []
+  "cppDependencies": [
+    {
+      "groupId": "${groupId}",
+      "artifactId": "${akitCppArtifactId}",
+      "version": "${version}",
+      "headerClassifier": "headers",
+      "libName": "akit",
+      "sharedLibrary": true,
+      "skipInvalidPlatforms": false,
+      "binaryPlatforms": [
+        "linuxathena",
+        "linuxx86-64",
+        "linuxarm64",
+        "osxuniversal",
+        "windowsx86-64"
+      ]
+    }
+  ]
 }
