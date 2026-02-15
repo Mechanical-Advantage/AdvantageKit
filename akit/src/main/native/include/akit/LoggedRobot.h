@@ -18,6 +18,10 @@ public:
 	// Consistency with TimedRobot::kDefaultPeriod
 	static constexpr units::second_t kDefaultPeriod = 20_ms;
 
+	void StartCompetition() override;
+
+	void EndCompetition() override;
+
 protected:
 	LoggedRobot() : LoggedRobot { kDefaultPeriod } {
 	}
@@ -25,10 +29,6 @@ protected:
 	LoggedRobot(units::second_t period);
 
 	~LoggedRobot() override;
-
-	void StartCompetition() override;
-
-	void EndCompetition() override;
 
 	void SetUseTiming(bool useTiming) {
 		this->useTiming = useTiming;
