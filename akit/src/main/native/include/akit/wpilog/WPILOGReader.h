@@ -18,8 +18,8 @@ public:
 	WPILOGReader(std::string filename) : filename { filename } {
 	}
 
-	void start() override;
-	bool updateTable(LogTable &table);
+	void Start() override;
+	bool UpdateTable(LogTable &table);
 
 private:
 	std::string filename;

@@ -25,17 +25,17 @@ public:
 	LoggedMechanism2d(units::meter_t width, units::meter_t height,
 			frc::Color8Bit backgroundColor) : dims { width.value(),
 			height.value() } {
-		setBackgroundColor(backgroundColor);
+		SetBackgroundColor(backgroundColor);
 	}
 
-	LoggedMechanismRoot2d& getRoot(std::string name, units::meter_t x,
+	LoggedMechanismRoot2d& GetRoot(std::string name, units::meter_t x,
 			units::meter_t y);
 
-	void setBackgroundColor(frc::Color8Bit color);
+	void SetBackgroundColor(frc::Color8Bit color);
 
-	void logOutput(LogTable &&table);
+	void LogOutput(LogTable &&table);
 
-	std::vector<frc::Pose3d> generate3dMechanism();
+	std::vector<frc::Pose3d> Generate3dMechanism();
 
 	void InitSendable(::nt::NTSendableBuilder &builder) override;
 

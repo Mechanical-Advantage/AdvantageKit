@@ -9,65 +9,65 @@
 
 using namespace akit::mech;
 
-LoggedMechanismObject2d* LoggedMechanismRoot2d::append(
+LoggedMechanismObject2d* LoggedMechanismRoot2d::Append(
 		std::unique_ptr<LoggedMechanismObject2d> object) {
 	std::lock_guard lock { mutex };
-	if (objects.contains(object->getName()))
+	if (objects.contains(object->GetName()))
 		throw std::runtime_error { "Mechanism object names must be unique!" };
 
 	auto obj = object.get();
-	objects[object->getName()] = std::move(object);
+	objects[object->GetName()] = std::move(object);
 
 	if (table)
-		obj->update(table->GetSubTable(obj->getName()));
+		obj->Update(table->GetSubTable(obj->GetName()));
 	return obj;
 }
 
-void LoggedMechanismRoot2d::setPosition(units::meter_t x, units::meter_t y) {
+void LoggedMechanismRoot2d::SetPosition(units::meter_t x, units::meter_t y) {
 	std::lock_guard lock { mutex };
 	this->x = x;
 	this->y = y;
-	flush();
+	Flush();
 }
 
-void LoggedMechanismRoot2d::update(std::shared_ptr<nt::NetworkTable> table) {
+void LoggedMechanismRoot2d::Update(std::shared_ptr<nt::NetworkTable> table) {
 	std::lock_guard lock { mutex };
 	this->table = table;
 
 	xPub = this->table->GetDoubleTopic("x").Publish();
 	yPub = this->table->GetDoubleTopic("y").Publish();
-	flush();
+	Flush();
 	for (auto &obj : objects)
-		obj.second->update(this->table->GetSubTable(obj.second->getName()));
+		obj.second->Update(this->table->GetSubTable(obj.second->GetName()));
 }
 
-void LoggedMechanismRoot2d::flush() {
+void LoggedMechanismRoot2d::Flush() {
 	xPub.Set(x.value());
 	yPub.Set(y.value());
 }
 
-void LoggedMechanismRoot2d::logOutput(LogTable &&table) {
+void LoggedMechanismRoot2d::LogOutput(LogTable &&table) {
 	std::lock_guard lock { mutex };
-	table.put("x", x);
-	table.put("y", y);
+	table.Put("x", x);
+	table.Put("y", y);
 	for (auto &obj : objects)
-		obj.second->logOutput(table.getSubtable(obj.second->getName()));
+		obj.second->LogOutput(table.GetSubtable(obj.second->GetName()));
 }
 
-std::vector<frc::Pose3d> LoggedMechanismRoot2d::generate3dMechanism() {
+std::vector<frc::Pose3d> LoggedMechanismRoot2d::Generate3dMechanism() {
 	std::vector < frc::Pose3d > poses;
 
 	frc::Pose3d initialPose { x, 0_m, y, { } };
 	for (auto &obj : objects) {
-		frc::Rotation3d newRotation { 0_deg, -obj.second->getAngle(), 0_deg };
+		frc::Rotation3d newRotation { 0_deg, -obj.second->GetAngle(), 0_deg };
 
 		frc::Pose3d newPose { initialPose.Translation(), newRotation };
 		poses.push_back(newPose);
 
 		frc::Pose3d nextPose = newPose
-				+ frc::Transform3d { obj.second->getObject2dRange(), 0_m, 0_m,
+				+ frc::Transform3d { obj.second->GetObject2dRange(), 0_m, 0_m,
 						{ } };
-		std::vector < frc::Pose3d > morePoses = obj.second->generate3dMechanism(
+		std::vector < frc::Pose3d > morePoses = obj.second->Generate3dMechanism(
 				nextPose);
 		poses.insert(poses.begin(), morePoses.begin(), morePoses.end());
 	}

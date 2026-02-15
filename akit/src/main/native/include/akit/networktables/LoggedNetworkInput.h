@@ -14,12 +14,12 @@ namespace nt {
 
 class LoggedNetworkInput {
 public:
-	virtual void periodic() = 0;
+	virtual void Periodic() = 0;
 
 protected:
 	static constexpr std::string_view PREFIX = "NetworkInputs";
 
-	static std::string removeSlash(std::string key);
+	static std::string RemoveSlash(std::string key);
 };
 
 }

@@ -23,17 +23,17 @@ public:
 
 	LoggedNetworkBoolean(std::string key, bool defaultValue);
 
-	void setDefault(bool defaultValue);
+	void SetDefault(bool defaultValue);
 
-	void set(bool value);
+	void Set(bool value);
 
-	bool get();
+	bool Get();
 
-	void toLog(LogTable &&table) override;
+	void ToLog(LogTable &&table) override;
 
-	void fromLog(LogTable &&table) override;
+	void FromLog(LogTable &&table) override;
 
-	void periodic() override;
+	void Periodic() override;
 
 private:
 	std::string key;

@@ -23,17 +23,17 @@ public:
 
 	LoggedNetworkString(std::string key, std::string defaultValue);
 
-	void setDefault(std::string defaultValue);
+	void SetDefault(std::string defaultValue);
 
-	void set(std::string value);
+	void Set(std::string value);
 
-	std::string get();
+	std::string Get();
 
-	void toLog(LogTable &&table) override;
+	void ToLog(LogTable &&table) override;
 
-	void fromLog(LogTable &&table) override;
+	void FromLog(LogTable &&table) override;
 
-	void periodic() override;
+	void Periodic() override;
 
 private:
 	std::string key;

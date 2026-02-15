@@ -39,11 +39,11 @@ public:
 			AdvantageScopeOpenBehavior::AUTO } {
 	}
 
-	void start() override;
+	void Start() override;
 
-	void end() override;
+	void End() override;
 
-	void putTable(LogTable &table) override;
+	void PutTable(LogTable &table) override;
 
 private:
 	static constexpr double TIMESTAMP_UPDATE_DELAY = 5;

@@ -21,13 +21,13 @@ void ReceiverThread::AddDataReceiver(
 
 void ReceiverThread::Run() {
 	for (auto &receiver : dataReceivers)
-		receiver->start();
+		receiver->Start();
 
 	while (true) {
 		std::optional < LogTable > entry;
 		queue.wait_dequeue(entry);
 
 		for (auto &receiver : dataReceivers)
-			receiver->putTable(*entry);
+			receiver->PutTable(*entry);
 	}
 }

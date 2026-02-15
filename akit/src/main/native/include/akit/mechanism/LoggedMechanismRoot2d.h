@@ -19,23 +19,23 @@ public:
 			name }, x { x }, y { y } {
 	}
 
-	LoggedMechanismObject2d* append(
+	LoggedMechanismObject2d* Append(
 			std::unique_ptr<LoggedMechanismObject2d> object);
 
-	void setPosition(units::meter_t x, units::meter_t y);
+	void SetPosition(units::meter_t x, units::meter_t y);
 
-	std::string getName() {
+	std::string GetName() {
 		return name;
 	}
 
-	std::vector<frc::Pose3d> generate3dMechanism();
+	std::vector<frc::Pose3d> Generate3dMechanism();
 
-	void update(std::shared_ptr<::nt::NetworkTable> table);
+	void Update(std::shared_ptr<::nt::NetworkTable> table);
 
-	void logOutput(LogTable &&table);
+	void LogOutput(LogTable &&table);
 
 private:
-	void flush();
+	void Flush();
 
 	std::string name;
 	std::shared_ptr<::nt::NetworkTable> table;

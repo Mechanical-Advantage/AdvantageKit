@@ -13,38 +13,38 @@ using namespace akit::nt;
 LoggedNetworkNumber::LoggedNetworkNumber(std::string key) : key { key }, entry {
 		::nt::NetworkTableInstance::GetDefault().GetDoubleTopic(key).GetEntry(0) }, value {
 		defaultValue } {
-	Logger::registerDashboardInput(*this);
+	Logger::RegisterDashboardInput(*this);
 }
 
 LoggedNetworkNumber::LoggedNetworkNumber(std::string key, double defaultValue) : LoggedNetworkNumber {
 		key } {
-	setDefault(defaultValue);
+	SetDefault(defaultValue);
 	value = defaultValue;
 }
 
-void LoggedNetworkNumber::setDefault(double defaultValue) {
+void LoggedNetworkNumber::SetDefault(double defaultValue) {
 	this->defaultValue = defaultValue;
 	entry.Set(entry.Get(defaultValue));
 }
 
-void LoggedNetworkNumber::set(double value) {
+void LoggedNetworkNumber::Set(double value) {
 	entry.Set(value);
 }
 
-double LoggedNetworkNumber::get() {
+double LoggedNetworkNumber::Get() {
 	return entry.Get();
 }
 
-void LoggedNetworkNumber::toLog(LogTable &&table) {
-	table.put(removeSlash(key), value);
+void LoggedNetworkNumber::ToLog(LogTable &&table) {
+	table.Put(RemoveSlash(key), value);
 }
 
-void LoggedNetworkNumber::fromLog(LogTable &&table) {
-	value = table.get(removeSlash(key), defaultValue);
+void LoggedNetworkNumber::FromLog(LogTable &&table) {
+	value = table.Get(RemoveSlash(key), defaultValue);
 }
 
-void LoggedNetworkNumber::periodic() {
-	if (!Logger::hasReplaySource())
+void LoggedNetworkNumber::Periodic() {
+	if (!Logger::HasReplaySource())
 		value = entry.Get(defaultValue);
-	Logger::processInputs(std::string { PREFIX }, *this);
+	Logger::ProcessInputs(std::string { PREFIX }, *this);
 }
