@@ -186,7 +186,7 @@ public:
 					prefix, key);
 			return;
 		}
-		value.toLog(GetSubtable(key));
+		value.ToLog(GetSubtable(key));
 	}
 
 	template <typename T>

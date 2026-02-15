@@ -73,7 +73,7 @@ private:
 	std::atomic<bool> running = true;
 	std::thread thread { &RoboRIOConsoleSource::Run, this };
 	std::mutex mutex;
-	moodycamel::BlockingReaderWriterCircularBuffer<std::string> queue{100};
+	moodycamel::BlockingReaderWriterCircularBuffer<std::string> queue { 100 };
 };
 
 }
