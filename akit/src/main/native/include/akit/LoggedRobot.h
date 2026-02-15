@@ -35,6 +35,10 @@ protected:
 	}
 
 private:
+	// So that Logger can access isLoggedRobot but user cannot modify
+	friend class Logger;
+	static bool isLoggedRobot;
+
 	HAL_NotifierHandle notifier { HAL_InitializeNotifier(nullptr) };
 	bool useTiming = true;
 	units::second_t nextCycleUs;

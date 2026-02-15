@@ -14,6 +14,7 @@
 #include "akit/LoggedPowerDistribution.h"
 #include "akit/RadioLogger.h"
 #include "akit/conduit/ConduitApi.h"
+#include "akit/LoggedRobot.h"
 
 using namespace akit;
 
@@ -57,8 +58,10 @@ void Logger::Start() {
 	if (!running) {
 		running = true;
 
-		if (checkRobotBase) {
-			// TODO
+		if (checkRobotBase && !LoggedRobot::isLoggedRobot) {
+			FRC_ReportError(frc::err::Error,
+					"The main robot class must inherit from LoggedRobot when using AdvantageKit. For more details, check the AdvantageKit installation documentation: https://docs.advantagekit.org/getting-started/installation\n\n*** EXITING DUE TO INVALID ADVANTAGEKIT INSTALLATION, SEE ABOVE. ***");
+			std::exit(1);
 		}
 
 		if (replaySource) {
