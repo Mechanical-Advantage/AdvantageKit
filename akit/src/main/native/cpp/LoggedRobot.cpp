@@ -11,8 +11,11 @@
 
 using namespace akit;
 
+bool LoggedRobot::isLoggedRobot = false;
+
 LoggedRobot::LoggedRobot(units::second_t period) : frc::IterativeRobotBase {
 		period } {
+	isLoggedRobot = true;
 	HAL_SetNotifierName(notifier, "LoggedRobot", nullptr);
 	HAL_Report(HALUsageReporting::kResourceType_Framework,
 			HALUsageReporting::kFramework_AdvantageKit);
