@@ -182,6 +182,10 @@ nativeUtils {
             exportsFile = project.file("src/main/native/symbols.txt")
         }
     }
+
+    exportsConfigs {
+        akit {}
+    }
 }
 
 model {
