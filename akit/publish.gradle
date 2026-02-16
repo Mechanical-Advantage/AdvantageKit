@@ -38,6 +38,25 @@ task akitCppHeadersZip(type: Zip) {
     from('src/main/native/include') {
         into '/'
     }
+
+    from('readerwriterqueue') {
+        into '/'
+        include '*.h'
+    }
+
+    from('concurrentqueue') {
+        into '/'
+        include '*.h'
+    }
+
+    from('magic_enum/include') {
+        into '/'
+    }
+
+    from('httplib') {
+        into '/'
+        include '*.h'
+    }
 }
 
 task akitCppSourceZip(type: Zip) {
