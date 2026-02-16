@@ -6,6 +6,7 @@
 // at the root directory of this project.
 
 #include "akit/conduit/ConduitApi.h"
+#include "conduit/wpilibio.h"
 
 using namespace akit::conduit;
 
@@ -14,9 +15,17 @@ ConduitApi& ConduitApi::getInstance() {
 	return instance;
 }
 
+void ConduitApi::captureData() {
+	wpilibio::capture_data();
+}
+
 org::littletonrobotics::conduit::schema::CoreInputs& ConduitApi::getCoreInputs() {
 	wpilibio::start();
 	if (wpilibio::shared_buf == 0)
 		wpilibio::make_buffer();
 	return *static_cast<org::littletonrobotics::conduit::schema::CoreInputs*>(wpilibio::shared_buf);
+}
+
+void ConduitApi::configurePowerDistribution(int moduleID,
+		HAL_PowerDistributionType moduleType) {
 }
