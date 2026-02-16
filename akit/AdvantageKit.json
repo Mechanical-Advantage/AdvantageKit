@@ -37,6 +37,7 @@
       "artifactId": "${akitCppArtifactId}",
       "version": "${version}",
       "headerClassifier": "headers",
+      "sourcesClassifier": "sources",
       "libName": "akit",
       "sharedLibrary": true,
       "skipInvalidPlatforms": false,
