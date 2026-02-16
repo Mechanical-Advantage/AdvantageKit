@@ -6,6 +6,7 @@
 // at the root directory of this project.
 
 #pragma once
+#include "akit/SymbolExports.h"
 #include "akit/LogTable.h"
 #include "akit/ConsoleSource.h"
 #include "akit/networktables/LoggedNetworkInput.h"
@@ -15,7 +16,7 @@
 
 namespace akit {
 
-class Logger {
+class WPILIB_DLLEXPORT Logger {
 public:
 	static void SetReplaySource(std::unique_ptr<LogReplaySource> replaySource);
 	static void AddDataReceiver(std::unique_ptr<LogDataReceiver> dataReceiver);
@@ -65,7 +66,7 @@ public:
 	template<typename T>
 	inline static void RecordOutput(std::string key, T value) {
 		if (running)
-			outputTable->Put(key, value);
+		outputTable->Put(key, value);
 	}
 	template<typename T>
 	inline static void RecordOutput(std::string key, std::function<T()> value) {
