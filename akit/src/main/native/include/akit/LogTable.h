@@ -106,8 +106,17 @@ public:
 	};
 
 	LogTable(units::second_t timestamp) : LogTable { "/", 0, std::make_shared
-			< units::second_t > (0), { } } {
+			< units::second_t > (0), std::make_shared<
+			std::unordered_map<std::string, LogValue>>() } {
 	}
+
+	explicit LogTable(const LogTable &table) : LogTable { table.prefix,
+			table.depth, std::make_shared < units::second_t
+					> (*table.timestamp), std::make_shared<
+					std::unordered_map<std::string, LogValue>>(*table.data) } {
+	}
+
+	LogTable& operator=(const LogTable&) = default;
 
 	inline void SetTimestamp(units::second_t timestamp) {
 		*this->timestamp = timestamp;
@@ -214,13 +223,13 @@ public:
 	}
 
 	inline LogValue Get(std::string key) {
-		return data.at(prefix + key);
+		return data->at(prefix + key);
 	}
 
 	template<typename T>
 	std::vector<std::vector<T>> Get(std::string key,
 			std::vector<std::vector<T>> defaultValue) {
-		if (data.contains(prefix + key + "/length")) {
+		if (data->contains(prefix + key + "/length")) {
 			std::vector < std::vector
 					< T
 							>> value { static_cast<size_t>(Get(key + "/length",
@@ -236,7 +245,7 @@ public:
 	template <typename T>
 	requires std::is_integral_v<T>
 	T Get(std::string key, T defaultValue) {
-		if (data.contains(prefix + key))
+		if (data->contains(prefix + key))
 			return static_cast<T>(Get(key).GetInteger(defaultValue));
 		else
 			return defaultValue;
@@ -245,7 +254,7 @@ public:
 	template <typename T>
 	requires std::is_integral_v<T>
 	std::vector<T> Get(std::string key, std::vector<T> defaultValue) {
-		if (data.contains(prefix + key)) {
+		if (data->contains(prefix + key)) {
 			std::vector<long> value = Get(key).GetIntegerArray(
 					{ defaultValue.begin(), defaultValue.end() });
 			return {value.begin(), value.end()};
@@ -272,7 +281,7 @@ public:
 	template <typename T>
 	requires std::is_enum_v<T>
 	T Get(std::string key, T defaultValue) {
-		if (data.contains(prefix + key))
+		if (data->contains(prefix + key))
 			return magic_enum::enum_cast(
 					Get(key).GetString(magic_enum::enum_name(defaultValue)));
 		else
@@ -282,7 +291,7 @@ public:
 	template <typename T>
 	requires std::is_enum_v<T>
 	std::vector<T> Get(std::string key, std::vector<T> defaultValue) {
-		if (data.contains(prefix + key)) {
+		if (data->contains(prefix + key)) {
 			std::vector < std::string > names = Get(key).GetStringArray( { });
 			std::vector < T > enums;
 			for (const auto &name : names)
@@ -296,7 +305,7 @@ public:
 	requires units::traits::is_unit_t_v<U>
 	U Get(std::string key, U defaultValue) {
 		using BaseUnit = units::unit<std::ratio<1>, units::traits::base_unit_of<typename U::unit_type>>;
-		if (data.contains(prefix + key)) {
+		if (data->contains(prefix + key)) {
 			auto converted = defaultValue.template convert<BaseUnit>();
 			return BaseUnit { Get(key).GetDouble(converted.value()) };
 		} else
@@ -311,7 +320,7 @@ public:
 	template <typename T>
 	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
 	T Get(std::string key, T defaultValue) {
-		if (data.contains(prefix + key))
+		if (data->contains(prefix + key))
 		return wpi::UnpackStruct<T>(Get(key).GetRaw());
 		else return defaultValue;
 	}
@@ -319,7 +328,7 @@ public:
 	template <typename T>
 	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
 	std::vector<T> Get(std::string key, std::vector<T> defaultValue) {
-		if (data.contains(prefix + key)) {
+		if (data->contains(prefix + key)) {
 			std::vector<std::byte> buffer = Get(key).GetRaw();
 			std::vector<T> structs {buffer.size() / wpi::GetStructSize<T>()};
 			for (int i = 0; i < structs.size(); i++)
@@ -331,8 +340,8 @@ public:
 private:
 	LogTable(std::string prefix, int depth,
 			std::shared_ptr<units::second_t> timestamp,
-			std::unordered_map<std::string, LogValue> data) : prefix { prefix }, depth {
-			depth }, timestamp { timestamp }, data { data } {
+			std::shared_ptr<std::unordered_map<std::string, LogValue>> data) : prefix {
+			prefix }, depth { depth }, timestamp { timestamp }, data { data } {
 	}
 
 	LogTable(std::string prefix, const LogTable &parent) : LogTable { prefix,
@@ -348,12 +357,12 @@ private:
 		std::string typeString = wpi::GetStructTypeString<T>();
 		std::string key = "/.schema/" + typeString;
 
-		if (data.contains(key))
+		if (data->contains(key))
 		return;
 		std::unordered_set < std::string > seen;
 		seen.insert(typeString);
 
-		data.emplace(key, LogValue {wpi::GetStructSchemaBytes<T>(),
+		data->emplace(key, LogValue {wpi::GetStructSchemaBytes<T>(),
 					"structschema"});
 		wpi::ForEachStructSchema([&](std::string_view typeString, std::string_view schema) {AddStructSchema(std::string {typeString}, std::string {schema}, seen);});
 	}
@@ -364,7 +373,7 @@ private:
 	std::string prefix;
 	int depth;
 	std::shared_ptr<units::second_t> timestamp;
-	std::unordered_map<std::string, LogValue> data;
+	std::shared_ptr<std::unordered_map<std::string, LogValue>> data;
 };
 
 }

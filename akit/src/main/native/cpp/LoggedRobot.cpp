@@ -14,7 +14,7 @@ using namespace akit;
 bool LoggedRobot::isLoggedRobot = false;
 
 LoggedRobot::LoggedRobot(units::second_t period) : frc::IterativeRobotBase {
-		period } {
+		period }, period { period } {
 	isLoggedRobot = true;
 	HAL_SetNotifierName(notifier, "LoggedRobot", nullptr);
 	HAL_Report(HALUsageReporting::kResourceType_Framework,
@@ -42,18 +42,18 @@ void LoggedRobot::StartCompetition() {
 
 	while (true) {
 		if (useTiming) {
-			units::second_t currentTimeUs = frc::Timer::GetFPGATimestamp();
-			if (nextCycleUs < currentTimeUs)
-				nextCycleUs = currentTimeUs;
+			units::second_t currentTime = frc::Timer::GetFPGATimestamp();
+			if (nextCycle < currentTime)
+				nextCycle = currentTime;
 			else {
 				HAL_UpdateNotifierAlarm(notifier, units::microsecond_t {
-						nextCycleUs }.value(), nullptr);
+						nextCycle }.value(), nullptr);
 				if (HAL_WaitForNotifierAlarm(notifier, nullptr) == 0) {
 					Logger::End();
 					break;
 				}
 			}
-			nextCycleUs += periodUs;
+			nextCycle += period;
 		}
 
 		units::millisecond_t periodicBeforeStart =

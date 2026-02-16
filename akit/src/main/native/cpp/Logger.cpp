@@ -31,7 +31,7 @@ bool Logger::checkRobotBase = true;
 std::unique_ptr<LogReplaySource> Logger::replaySource;
 moodycamel::BlockingConcurrentQueue<LogTable> Logger::receiverQueue {
 		Logger::RECEIVER_QUEUE_CAPACITY };
-std::unique_ptr<ReceiverThread> Logger::receiverThread;
+ReceiverThread Logger::receiverThread { receiverQueue };
 bool Logger::receiverQueueFault = false;
 
 void Logger::SetReplaySource(std::unique_ptr<LogReplaySource> replaySource) {
@@ -41,7 +41,7 @@ void Logger::SetReplaySource(std::unique_ptr<LogReplaySource> replaySource) {
 
 void Logger::AddDataReceiver(std::unique_ptr<LogDataReceiver> dataReceiver) {
 	if (!running)
-		receiverThread->AddDataReceiver(std::move(dataReceiver));
+		receiverThread.AddDataReceiver(std::move(dataReceiver));
 }
 
 void Logger::RegisterDashboardInput(
@@ -93,7 +93,7 @@ void Logger::Start() {
 		for (auto &entry : metadata)
 			metadataTable.Put(entry.first, entry.second);
 
-		receiverThread = std::make_unique < ReceiverThread > (receiverQueue);
+		receiverThread.Start();
 
 		frc::RobotController::SetTimeSource([] {
 			return units::microsecond_t { GetTimestamp() }.value();
@@ -109,7 +109,7 @@ void Logger::End() {
 		console.release();
 
 		replaySource.release();
-		receiverThread.release();
+		receiverThread.End();
 		frc::RobotController::SetTimeSource(frc::RobotController::GetFPGATime);
 	}
 }

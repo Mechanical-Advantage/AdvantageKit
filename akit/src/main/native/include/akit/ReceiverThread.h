@@ -17,11 +17,14 @@ class ReceiverThread {
 public:
 	void AddDataReceiver(std::unique_ptr<LogDataReceiver> receiver);
 	ReceiverThread(moodycamel::BlockingConcurrentQueue<LogTable> &queue);
+	void Start();
+	void End();
 
 private:
 	void Run();
 
-	std::thread thread { &ReceiverThread::Run, this };
+	std::atomic<bool> running = true;
+	std::unique_ptr<std::thread> thread;
 	moodycamel::BlockingConcurrentQueue<LogTable> &queue;
 	std::vector<std::unique_ptr<LogDataReceiver>> dataReceivers;
 };

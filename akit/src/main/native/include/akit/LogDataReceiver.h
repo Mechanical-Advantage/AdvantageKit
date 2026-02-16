@@ -15,8 +15,10 @@ class LogDataReceiver {
 public:
 	static constexpr std::string_view TIMESTAMP_KEY = "/Timestamp";
 
-	virtual void Start() = 0;
-	virtual void End() = 0;
+	virtual void Start() {
+	}
+	virtual void End() {
+	}
 	virtual void PutTable(LogTable &table) = 0;
 };
 
