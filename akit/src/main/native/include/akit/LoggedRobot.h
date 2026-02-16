@@ -41,8 +41,8 @@ private:
 
 	HAL_NotifierHandle notifier { HAL_InitializeNotifier(nullptr) };
 	bool useTiming = true;
-	units::second_t nextCycleUs;
-	units::second_t periodUs;
+	units::second_t nextCycle;
+	units::second_t period;
 };
 
 }

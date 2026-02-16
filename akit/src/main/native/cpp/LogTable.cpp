@@ -10,7 +10,7 @@
 using namespace akit;
 
 LogTable::LogValue::LogValue(std::vector<std::byte> value, std::string typeStr) : type {
-		LoggableType::String }, customTypeStr { typeStr }, value { value } {
+		LoggableType::Raw }, customTypeStr { typeStr }, value { value } {
 }
 LogTable::LogValue::LogValue(bool value, std::string typeStr) : type {
 		LoggableType::Boolean }, customTypeStr { typeStr }, value { value } {
@@ -156,19 +156,19 @@ std::unordered_map<std::string, LogTable::LogValue> LogTable::GetAll(
 		bool subtableOnly) {
 	if (subtableOnly) {
 		std::unordered_map < std::string, LogValue > result;
-		for (const auto &field : data) {
+		for (const auto &field : *data) {
 			if (field.first.starts_with(prefix))
 				result.emplace(field.first.substr(prefix.size()), field.second);
 		}
 		return result;
 	} else
-		return data;
+		return *data;
 }
 
 bool LogTable::WriteAllowed(std::string key, LoggableType type,
 		std::string customTypeStr) {
-	auto currentValue = data.find(prefix + key);
-	if (currentValue == data.end())
+	auto currentValue = data->find(prefix + key);
+	if (currentValue == data->end())
 		return true;
 	if (currentValue->second.type != type) {
 		FRC_ReportWarning(
@@ -188,18 +188,18 @@ bool LogTable::WriteAllowed(std::string key, LoggableType type,
 
 void LogTable::Put(std::string key, LogTable::LogValue value) {
 	if (WriteAllowed(key, value.type, value.customTypeStr))
-		data.emplace(prefix + key, value);
+		data->emplace(prefix + key, value);
 }
 
 void LogTable::AddStructSchema(std::string typeString, std::string schema,
 		std::unordered_set<std::string> &seen) {
 	std::string key = "/.schema/" + typeString;
 
-	if (data.contains(key))
+	if (data->contains(key))
 		return;
 	seen.insert(typeString);
 
-	data.emplace(key,
+	data->emplace(key,
 			LogValue {
 					std::vector<std::byte> {
 							reinterpret_cast<std::byte*>(schema.data()),
@@ -209,14 +209,14 @@ void LogTable::AddStructSchema(std::string typeString, std::string schema,
 
 std::vector<std::byte> LogTable::Get(std::string key,
 		std::vector<std::byte> defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return Get(key).GetRaw(defaultValue);
 	else
 		return defaultValue;
 }
 
 bool LogTable::Get(std::string key, bool defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return Get(key).GetBoolean(defaultValue);
 	else
 		return defaultValue;
@@ -224,14 +224,14 @@ bool LogTable::Get(std::string key, bool defaultValue) {
 
 std::vector<bool> LogTable::Get(std::string key,
 		std::vector<bool> defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return Get(key).GetBooleanArray(defaultValue);
 	else
 		return defaultValue;
 }
 
 float LogTable::Get(std::string key, float defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return Get(key).GetFloat(defaultValue);
 	else
 		return defaultValue;
@@ -239,14 +239,14 @@ float LogTable::Get(std::string key, float defaultValue) {
 
 std::vector<float> LogTable::Get(std::string key,
 		std::vector<float> defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return Get(key).GetFloatArray(defaultValue);
 	else
 		return defaultValue;
 }
 
 double LogTable::Get(std::string key, double defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return Get(key).GetInteger(defaultValue);
 	else
 		return defaultValue;
@@ -254,14 +254,14 @@ double LogTable::Get(std::string key, double defaultValue) {
 
 std::vector<double> LogTable::Get(std::string key,
 		std::vector<double> defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return Get(key).GetDoubleArray(defaultValue);
 	else
 		return defaultValue;
 }
 
 std::string LogTable::Get(std::string key, std::string defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return Get(key).GetString(defaultValue);
 	else
 		return defaultValue;
@@ -269,14 +269,14 @@ std::string LogTable::Get(std::string key, std::string defaultValue) {
 
 std::vector<std::string> LogTable::Get(std::string key,
 		std::vector<std::string> defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return Get(key).GetStringArray(defaultValue);
 	else
 		return defaultValue;
 }
 
 frc::Color LogTable::Get(std::string key, frc::Color defaultValue) {
-	if (data.contains(prefix + key))
+	if (data->contains(prefix + key))
 		return frc::Color { Get(key).GetString(defaultValue.HexString()) };
 	else
 		return defaultValue;
