@@ -11,7 +11,16 @@ using namespace akit;
 
 ReceiverThread::ReceiverThread(
 		moodycamel::BlockingConcurrentQueue<LogTable> &queue) : queue { queue } {
-	thread.detach();
+}
+
+void ReceiverThread::Start() {
+	thread = std::make_unique < std::thread > (&ReceiverThread::Run, this);
+}
+
+void ReceiverThread::End() {
+	running = false;
+	thread->join();
+	thread.release();
 }
 
 void ReceiverThread::AddDataReceiver(
@@ -23,10 +32,15 @@ void ReceiverThread::Run() {
 	for (auto &receiver : dataReceivers)
 		receiver->Start();
 
-	while (true) {
+	while (running) {
 		std::optional < LogTable > entry;
 		queue.wait_dequeue(entry);
 
+		for (auto &receiver : dataReceivers)
+			receiver->PutTable(*entry);
+	}
+	std::optional < LogTable > entry;
+	while (queue.try_dequeue(entry)) {
 		for (auto &receiver : dataReceivers)
 			receiver->PutTable(*entry);
 	}

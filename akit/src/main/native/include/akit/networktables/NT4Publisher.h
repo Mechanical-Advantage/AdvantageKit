@@ -9,13 +9,14 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/IntegerTopic.h>
+#include <networktables/GenericEntry.h>
 #include "akit/LogDataReceiver.h"
 
 namespace akit {
 
 namespace nt {
 
-class NT4Publisher: LogDataReceiver {
+class NT4Publisher: public LogDataReceiver {
 public:
 	NT4Publisher();
 
