@@ -7,7 +7,6 @@
 
 #pragma once
 #include <hal/PowerDistribution.h>
-#include "conduit/wpilibio.h"
 #include "conduit_schema_generated.h"
 
 namespace akit {
@@ -21,9 +20,7 @@ class ConduitApi {
 
 public:
 	static ConduitApi& getInstance();
-	void captureData() {
-		wpilibio::capture_data();
-	}
+	void captureData();
 
 	long getTimestamp() {
 		return inputs.timestamp();
@@ -275,10 +272,9 @@ public:
 		return inputs.sys().epoch_time();
 	}
 
+	// FIXME: Unimplemented
 	void configurePowerDistribution(int moduleID,
-			HAL_PowerDistributionType type) {
-		// FIXME: Unimplemented
-	}
+			HAL_PowerDistributionType type);
 
 	long getPDPChannelCount() {
 		return inputs.pdp().channel_count();
