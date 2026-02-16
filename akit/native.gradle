@@ -234,6 +234,7 @@ model {
 
             binaries.all {
                 lib project: ':', library: 'wpilibio', linkage: 'static'
+                cppCompiler.args << '-DWPILIB_EXPORTS'
             }
         }
     }
@@ -250,6 +251,7 @@ model {
 
             binaries.all {
                 lib project: ':', library: 'wpilibio', linkage: 'static'
+                cppCompiler.args << '-DWPILIB_EXPORTS'
             }
         }
     }
