@@ -16,7 +16,7 @@ NT4Publisher::NT4Publisher() : akitTable {
 		akitTable->GetIntegerTopic(TIMESTAMP_KEY.substr(1)).Publish( {
 				.sendAll = true }) } {
 }
-#include <wpi/print.h>
+
 void NT4Publisher::PutTable(LogTable &table) {
 	timestampPublisher.Set(
 			units::microsecond_t { table.GetTimestamp() }.value(),
@@ -28,9 +28,9 @@ void NT4Publisher::PutTable(LogTable &table) {
 			lastTable.GetAll(false);
 
 	for (const auto &field : newMap) {
-		// auto oldField = oldMap.find(field.first);
-		// if (oldField != oldMap.end() && field.second == oldField->second)
-		// 	continue;
+		auto oldField = oldMap.find(field.first);
+		if (oldField != oldMap.end() && field.second == oldField->second)
+			continue;
 
 		std::string key = field.first.substr(1);
 		std::string unit = field.second.unitStr;
@@ -109,7 +109,6 @@ void NT4Publisher::PutTable(LogTable &table) {
 			break;
 		}
 	}
-	wpi::println("---");
 
 	lastTable = table;
 }
