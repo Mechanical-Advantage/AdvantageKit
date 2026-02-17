@@ -73,7 +73,7 @@ void Logger::Start() {
 			}
 		}
 
-		if (enableConsole &&console) {
+		if (enableConsole && !console) {
 			if (frc::RobotBase::IsReal())
 				console = std::make_unique<RoboRIOConsoleSource>();
 			else
@@ -148,7 +148,7 @@ void Logger::PeriodicBeforeUser() {
 				dashboardInputsEnd - dashboardInputsStart);
 	}
 }
-#include <wpi/print.h>
+
 void Logger::PeriodicAfterUser(units::millisecond_t userCodeLength,
 		units::millisecond_t periodicBeforeLength,
 		std::string extraConsoleData) {
@@ -204,7 +204,7 @@ void Logger::PeriodicAfterUser(units::millisecond_t userCodeLength,
 		RecordOutput("LoggedRobot/FullCycleMS",
 				periodicBeforeLength + userCodeLength + periodicAfterLength);
 		RecordOutput("Logger/QueuedCycles", receiverQueue.size_approx());
-		wpi::println("{}", periodicBeforeLength + userCodeLength + periodicAfterLength);
+
 		receiverQueueFault = !receiverQueue.try_enqueue(entry.Clone());
 		if (receiverQueueFault)
 			FRC_ReportError(frc::err::Error,

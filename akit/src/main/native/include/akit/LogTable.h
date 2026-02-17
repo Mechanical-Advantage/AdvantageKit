@@ -111,7 +111,9 @@ public:
 	}
 
 	LogTable Clone() {
-		return LogTable{prefix, depth, std::make_shared<units::second_t>(*timestamp), std::make_shared<std::unordered_map<std::string, LogValue>>(*data)};
+		return LogTable { prefix, depth, std::make_shared < units::second_t
+				> (*timestamp), std::make_shared<
+				std::unordered_map<std::string, LogValue>>(*data) };
 	}
 
 	inline void SetTimestamp(units::second_t timestamp) {
