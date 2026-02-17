@@ -148,7 +148,7 @@ void Logger::PeriodicBeforeUser() {
 				dashboardInputsEnd - dashboardInputsStart);
 	}
 }
-
+#include <wpi/print.h>
 void Logger::PeriodicAfterUser(units::millisecond_t userCodeLength,
 		units::millisecond_t periodicBeforeLength,
 		std::string extraConsoleData) {
@@ -204,8 +204,8 @@ void Logger::PeriodicAfterUser(units::millisecond_t userCodeLength,
 		RecordOutput("LoggedRobot/FullCycleMS",
 				periodicBeforeLength + userCodeLength + periodicAfterLength);
 		RecordOutput("Logger/QueuedCycles", receiverQueue.size_approx());
-
-		receiverQueueFault = !receiverQueue.try_enqueue(entry);
+		wpi::println("{}", periodicBeforeLength + userCodeLength + periodicAfterLength);
+		receiverQueueFault = !receiverQueue.try_enqueue(entry.Clone());
 		if (receiverQueueFault)
 			FRC_ReportError(frc::err::Error,
 					"[AdvantageKit] Capacity of receiver queue exceeded, data will NOT be logged");

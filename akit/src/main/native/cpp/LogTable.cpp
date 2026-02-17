@@ -185,10 +185,15 @@ bool LogTable::WriteAllowed(std::string key, LoggableType type,
 	}
 	return true;
 }
-
+#include <wpi/print.h>
 void LogTable::Put(std::string key, LogTable::LogValue value) {
-	if (WriteAllowed(key, value.type, value.customTypeStr))
+	if (WriteAllowed(key, value.type, value.customTypeStr)) {
+		if (key == "LoggedRobot/FullCycleMS")
+			wpi::println("Full Cycle MS - {}", value.GetDouble());
 		data->emplace(prefix + key, value);
+		if (key == "LoggedRobot/FullCycleMS")
+			wpi::println("Full Cycle MS -> {}", data->at("/RealOutputs/LoggedRobot/FullCycleMS").GetDouble());
+	}
 }
 
 void LogTable::AddStructSchema(std::string typeString, std::string schema,

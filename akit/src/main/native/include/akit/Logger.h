@@ -70,7 +70,7 @@ public:
 	}
 	template<typename T>
 	inline static void RecordOutput(std::string key, std::function<T()> value) {
-		recordOutput(value());
+		RecordOutput(key, value());
 	}
 	static void RecordOutput(std::string key, mech::LoggedMechanism2d &value);
 
