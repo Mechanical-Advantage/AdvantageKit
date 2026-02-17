@@ -110,13 +110,11 @@ public:
 			std::unordered_map<std::string, LogValue>>() } {
 	}
 
-	explicit LogTable(const LogTable &table) : LogTable { table.prefix,
-			table.depth, std::make_shared < units::second_t
-					> (*table.timestamp), std::make_shared<
-					std::unordered_map<std::string, LogValue>>(*table.data) } {
+	LogTable Clone() {
+		return LogTable { prefix, depth, std::make_shared < units::second_t
+				> (*timestamp), std::make_shared<
+				std::unordered_map<std::string, LogValue>>(*data) };
 	}
-
-	LogTable& operator=(const LogTable&) = default;
 
 	inline void SetTimestamp(units::second_t timestamp) {
 		*this->timestamp = timestamp;

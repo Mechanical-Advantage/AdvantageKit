@@ -188,7 +188,7 @@ bool LogTable::WriteAllowed(std::string key, LoggableType type,
 
 void LogTable::Put(std::string key, LogTable::LogValue value) {
 	if (WriteAllowed(key, value.type, value.customTypeStr))
-		data->emplace(prefix + key, value);
+		data->insert_or_assign(prefix + key, value);
 }
 
 void LogTable::AddStructSchema(std::string typeString, std::string schema,

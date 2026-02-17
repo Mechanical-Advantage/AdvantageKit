@@ -73,7 +73,7 @@ void Logger::Start() {
 			}
 		}
 
-		if (enableConsole &&console) {
+		if (enableConsole && !console) {
 			if (frc::RobotBase::IsReal())
 				console = std::make_unique<RoboRIOConsoleSource>();
 			else
@@ -205,7 +205,7 @@ void Logger::PeriodicAfterUser(units::millisecond_t userCodeLength,
 				periodicBeforeLength + userCodeLength + periodicAfterLength);
 		RecordOutput("Logger/QueuedCycles", receiverQueue.size_approx());
 
-		receiverQueueFault = !receiverQueue.try_enqueue(entry);
+		receiverQueueFault = !receiverQueue.try_enqueue(entry.Clone());
 		if (receiverQueueFault)
 			FRC_ReportError(frc::err::Error,
 					"[AdvantageKit] Capacity of receiver queue exceeded, data will NOT be logged");
