@@ -82,9 +82,8 @@ public class ConduitApi {
 
   public String getGameSpecificMessage() {
     int i;
-    for (i = 0; i < gameSpecificMessageBytes.length; i++) {
+    for (i = 0; i < getGameSpecificMessageSize(); i++) {
       gameSpecificMessageBytes[i] = (byte) ds.gameSpecificMessage(i);
-      if (gameSpecificMessageBytes[i] == 0) break;
     }
     return new String(gameSpecificMessageBytes, 0, i, utf8Charset);
   }
