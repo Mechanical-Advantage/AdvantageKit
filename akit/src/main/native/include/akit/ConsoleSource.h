@@ -29,28 +29,16 @@ public:
 	std::string GetNewData() override;
 
 private:
-	class SplitBuffer: public std::streambuf {
-	public:
-		SplitBuffer(std::streambuf *original, std::ostringstream &capture) : original {
-				original }, capture { capture } {
-		}
+	void Run();
 
-	protected:
-		int overflow(int c) override;
+	std::atomic<bool> running = true;
+	std::thread thread{&SimulatorConsoleSource::Run, this};
 
-	private:
-		std::streambuf *original;
-		std::ostringstream &capture;
-	};
+	int stdoutPipe[2];
+	int stderrPipe[2];
 
-	std::streambuf *originalCout;
-	std::streambuf *originalCerr;
-
-	std::ostringstream capturedCout;
-	std::ostringstream capturedCerr;
-
-	SplitBuffer splitCout { originalCout, capturedCout };
-	SplitBuffer splitCerr { originalCerr, capturedCerr };
+	int originalCout;
+	int originalCerr;
 
 	size_t coutPos = 0;
 	size_t cerrPos = 0;
