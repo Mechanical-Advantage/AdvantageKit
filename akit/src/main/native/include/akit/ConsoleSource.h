@@ -32,7 +32,7 @@ private:
 	void Run();
 
 	std::atomic<bool> running = true;
-	std::thread thread{&SimulatorConsoleSource::Run, this};
+	std::thread thread { &SimulatorConsoleSource::Run, this };
 
 	int stdoutPipe[2];
 	int stderrPipe[2];
@@ -40,8 +40,8 @@ private:
 	int originalCout;
 	int originalCerr;
 
-	size_t coutPos = 0;
-	size_t cerrPos = 0;
+	std::mutex mutex;
+	std::string data;
 };
 
 class RoboRIOConsoleSource: public ConsoleSource {
