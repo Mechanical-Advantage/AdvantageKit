@@ -31,8 +31,8 @@ SimulatorConsoleSource::SimulatorConsoleSource() {
 	_close(stdoutPipe[1]);
 	_close(stderrPipe[1]);
 #else
-	pipe(stdoutPipe);
-	pipe(stderrPipe);
+	pipe (stdoutPipe);
+	pipe (stderrPipe);
 	originalCout = dup(STDOUT_FILENO);
 	originalCerr = dup(STDERR_FILENO);
 
@@ -67,8 +67,8 @@ SimulatorConsoleSource::~SimulatorConsoleSource() {
 	dup2(originalCout, STDOUT_FILENO);
 	dup2(originalCerr, STDERR_FILENO);
 
-	close(originalCout);
-	close(originalCerr);
+	close (originalCout);
+	close (originalCerr);
 #endif
 }
 
@@ -80,37 +80,45 @@ void SimulatorConsoleSource::Run() {
 		HANDLE hStdOut = reinterpret_cast<HANDLE>(_get_osfhandle(stdoutPipe[0]));
 		if (PeekNamedPipe(hStdOut, NULL, 0, NULL, &bytesAvailable, NULL) && bytesAvailable > 0) {
 			int count = _read(stdoutPipe[0], buffer, sizeof(buffer));
-			if (count > 0) _write(originalCout, buffer, count);
+			if (count > 0) {
+				_write(originalCout, buffer, count);
+				std::lock_guard<std::mutex> lock{mutex};
+				data.append(buffer, count);
+			}
 		}
 		HANDLE hStdErr = reinterpret_cast<HANDLE>(_get_osfhandle(stderrPipe[0]));
 		if (PeekNamedPipe(hStdErr, NULL, 0, NULL, &bytesAvailable, NULL) && bytesAvailable > 0) {
 			int count = _read(stderrPipe[0], buffer, sizeof(buffer));
-			if (count > 0) _write(originalCerr, buffer, count);
+			if (count > 0) {
+				_write(originalCerr, buffer, count);
+				std::lock_guard<std::mutex> lock{mutex};
+				data.append(buffer, count);
+			}
 		}
 #else
 		ssize_t count = read(stdoutPipe[0], buffer, sizeof(buffer));
-		if (count > 0)
+		if (count > 0) {
 			write(originalCout, buffer, count);
+			std::lock_guard < std::mutex > lock { mutex };
+			data.append(buffer, count);
+		}
 		count = read(stderrPipe[0], buffer, sizeof(buffer));
-		if (count > 0)
+		if (count > 0) {
 			write(originalCerr, buffer, count);
+			std::lock_guard < std::mutex > lock { mutex };
+			data.append(buffer, count);
+		}
 #endif
 
-		std::this_thread::sleep_for(std::chrono::milliseconds{5});
+		std::this_thread::sleep_for(std::chrono::milliseconds { 5 });
 	}
 }
 
 std::string SimulatorConsoleSource::GetNewData() {
-	return "";
-	// std::string fullOut = capturedCout.str();
-	// std::string newOut = fullOut.substr(coutPos);
-	// coutPos = fullOut.size();
-
-	// std::string fullErr = capturedCerr.str();
-	// std::string newErr = fullErr.substr(cerrPos);
-	// cerrPos = fullErr.size();
-
-	// return newOut + newErr;
+	std::lock_guard < std::mutex > lock { mutex };
+	std::string newData = std::move(data);
+	data.clear();
+	return newData;
 }
 
 RoboRIOConsoleSource::~RoboRIOConsoleSource() {
