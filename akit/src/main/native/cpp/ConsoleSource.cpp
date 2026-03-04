@@ -21,10 +21,15 @@ SimulatorConsoleSource::SimulatorConsoleSource() {
 #ifdef _WIN32
 	_pipe(stdoutPipe, 4096, _O_TEXT);
 	_pipe(stderrPipe, 4096, _O_TEXT);
+
 	originalCout = _dup(_fileno(stdout));
 	originalCerr = _dup(_fileno(stderr));
+
 	_dup2(stdoutPipe[1], _fileno(stdout));
 	_dup2(stderrPipe[1], _fileno(stderr));
+
+	_close(stdoutPipe[1]);
+	_close(stderrPipe[1]);
 #else
 	pipe(stdoutPipe);
 	pipe(stderrPipe);
@@ -36,6 +41,12 @@ SimulatorConsoleSource::SimulatorConsoleSource() {
 
 	close(stdoutPipe[1]);
 	close(stderrPipe[1]);
+
+	int flags = fcntl(stdoutPipe[0], F_GETFL, 0);
+	fcntl(stdoutPipe[0], F_SETFL, flags | O_NONBLOCK);
+
+	flags = fcntl(stderrPipe[0], F_GETFL, 0);
+	fcntl(stderrPipe[0], F_SETFL, flags | O_NONBLOCK);
 #endif
 
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -49,6 +60,7 @@ SimulatorConsoleSource::~SimulatorConsoleSource() {
 #ifdef _WIN32
 	_dup2(originalCout, _fileno(stdout));
 	_dup2(originalCerr, _fileno(stderr));
+
 	_close(originalCout);
 	_close(originalCerr);
 #else
@@ -76,15 +88,14 @@ void SimulatorConsoleSource::Run() {
 			if (count > 0) _write(originalCerr, buffer, count);
 		}
 #else
+		ssize_t count = read(stdoutPipe[0], buffer, sizeof(buffer));
+		if (count > 0)
+			write(originalCout, buffer, count);
+		count = read(stderrPipe[0], buffer, sizeof(buffer));
+		if (count > 0)
+			write(originalCerr, buffer, count);
 #endif
 
-		// int count = read(stdoutPipe[0], buffer, sizeof(buffer));
-		// if (count > 0)
-		// 	write(originalCout, buffer, count);
-
-		// count = read(stderrPipe[0], buffer, sizeof(buffer));
-		// if (count > 0)
-		// 	write(originalCerr, buffer, count);
 		std::this_thread::sleep_for(std::chrono::milliseconds{5});
 	}
 }
