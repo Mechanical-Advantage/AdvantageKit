@@ -15,7 +15,7 @@ namespace wpilog {
 class WPILOGConstants {
 public:
 	static constexpr std::string_view EXTRA_HEADER = "AdvantageKit";
-	static constexpr std::string_view EXTRA_METADATA =
+	static constexpr std::string_view ENTRY_METADATA =
 			"{\"source\":\"AdvantageKit\"}";
 	static constexpr std::string_view ENTRY_METADATA_UNITS =
 			"{\"source\":\"AdvantageKit\",\"unit\":\"$UNITSTR\"}";
