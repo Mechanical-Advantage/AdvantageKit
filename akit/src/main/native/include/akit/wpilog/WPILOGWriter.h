@@ -34,7 +34,7 @@ private:
 	static constexpr units::second_t TIMESTAMP_UPDATE_DELAY = 5_s;
 	static constexpr std::string_view DEFAULT_PATH =
 			frc::RobotBase::IsSimulation() ? "logs" : "/U/logs";
-	static constexpr std::string_view TIME_FORMATTER = "{:%y-%m-%d_%H-%M-%S}";
+	static constexpr std::string_view TIME_FORMATTER = "%y-%m-%d_%H-%M-%S";
 	static constexpr std::string_view ADVANTAGESCOPE_FILENAME =
 			"ascope-log-path.txt";
 
@@ -53,7 +53,7 @@ private:
 	std::unordered_map<std::string, int> entryIDs;
 	std::unordered_map<std::string, LogTable::LoggableType> entryTypes;
 	std::unordered_map<std::string, std::string> entryUnits;
-	std::optional<std::chrono::local_time<std::chrono::system_clock::duration>> logDate;
+	std::optional<std::tm> logDate;
 	std::optional<units::millisecond_t> dsAttachedTime;
 };
 
