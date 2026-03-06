@@ -6,6 +6,7 @@
 // at the root directory of this project.
 
 #pragma once
+#include <filesystem>
 #include <wpi/DataLogWriter.h>
 #include <frc/RobotBase.h>
 #include "akit/LogDataReceiver.h"

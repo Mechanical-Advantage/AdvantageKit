@@ -13,7 +13,7 @@ namespace akit {
 
 namespace wpilog {
 
-class WPILOGReader: LogReplaySource {
+class WPILOGReader: public LogReplaySource {
 public:
 	WPILOGReader(std::string filename) : filename { filename } {
 	}
