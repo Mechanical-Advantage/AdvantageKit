@@ -75,6 +75,8 @@ void WPILOGWriter::End() {
 		shouldOpen = frc::RobotBase::IsSimulation()
 				&& Logger::HasReplaySource();
 		break;
+	default:
+		break;
 	}
 
 	if (shouldOpen) {
@@ -97,9 +99,11 @@ void WPILOGWriter::PutTable(LogTable &table) {
 					|| frc::RobotBase::IsSimulation())
 				dsAttachedTime = frc::Timer::GetFPGATimestamp();
 			else if (frc::Timer::GetFPGATimestamp() - *dsAttachedTime
-					> TIMESTAMP_UPDATE_DELAY || frc::RobotBase::IsSimulation())
-				logDate = std::chrono::current_zone()->to_local(
-						std::chrono::system_clock::now());
+					> TIMESTAMP_UPDATE_DELAY
+					|| frc::RobotBase::IsSimulation()) {
+				std::time_t now = std::time(nullptr);
+				logDate = *std::localtime(&now);
+			}
 		} else
 			dsAttachedTime.reset();
 
@@ -115,7 +119,6 @@ void WPILOGWriter::PutTable(LogTable &table) {
 			matchType = frc::DriverStation::kElimination;
 			break;
 		}
-		;
 
 		if (logMatchText.empty() && matchType != frc::DriverStation::kNone) {
 			switch (matchType) {
@@ -128,6 +131,8 @@ void WPILOGWriter::PutTable(LogTable &table) {
 			case frc::DriverStation::kElimination:
 				logMatchText = "e";
 				break;
+			default:
+				break;
 			}
 			logMatchText += std::to_string(
 					table.Get("DriverStation/MatchNumber", 0));
@@ -138,7 +143,8 @@ void WPILOGWriter::PutTable(LogTable &table) {
 		if (!logDate)
 			newFilenameBuilder << randomIdentifier;
 		else
-			newFilenameBuilder << std::format(TIME_FORMATTER, *logDate);
+			newFilenameBuilder
+					<< std::put_time(&(*logDate), TIME_FORMATTER.data());
 
 		std::string eventName = table.Get("DriverStation/EventName",
 				std::string { "" });
@@ -184,7 +190,7 @@ void WPILOGWriter::PutTable(LogTable &table) {
 			if (!unit.empty())
 				entryUnits[field.first] = unit;
 			appendData = true;
-		} else if (field.second != oldMap[field.first])
+		} else if (field.second != oldMap.at(field.first))
 			appendData = true;
 
 		if (appendData) {
@@ -201,9 +207,12 @@ void WPILOGWriter::PutTable(LogTable &table) {
 			switch (field.second.type) {
 			case LogTable::LoggableType::Raw: {
 				auto raw = field.second.GetRaw();
-				log->AppendRaw(id,
-						std::vector<uint8_t> { raw.begin(), raw.end() },
-						timestamp);
+				std::vector < uint8_t > data;
+				std::transform(raw.begin(), raw.end(), data.begin(),
+						[](std::byte b) {
+							return static_cast<unsigned char>(b);
+						});
+				log->AppendRaw(id, data, timestamp);
 				break;
 			}
 			case LogTable::LoggableType::Boolean:
