@@ -100,7 +100,9 @@ public class LogFileUtil {
         Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
     String advantageScopeLogPath = null;
     try (Scanner fileScanner = new Scanner(advantageScopeTempPath)) {
-      advantageScopeLogPath = fileScanner.nextLine();
+      if (fileScanner.hasNextLine()) {
+        advantageScopeLogPath = fileScanner.nextLine();
+      }
     } catch (IOException e) {
     }
     return advantageScopeLogPath;
