@@ -96,6 +96,63 @@ public class AutoLogOutputManagerTest {
     @AutoLogOutput int counter = 7;
   }
 
+  enum TestDirection {
+    NORTH,
+    SOUTH
+  }
+
+  /** Object with annotated fields of every primitive and array type registered by registerField(). */
+  static class AllTypesObject {
+    @AutoLogOutput int intVal = 1;
+    @AutoLogOutput long longVal = 2L;
+    @AutoLogOutput float floatVal = 3.0f;
+    @AutoLogOutput double doubleVal = 4.0;
+    @AutoLogOutput String strVal = "hello";
+    @AutoLogOutput boolean boolVal = true;
+    @AutoLogOutput byte[] byteArr = {1, 2};
+    @AutoLogOutput boolean[] boolArr = {true};
+    @AutoLogOutput int[] intArr = {1, 2, 3};
+    @AutoLogOutput long[] longArr = {1L};
+    @AutoLogOutput float[] floatArr = {1.0f};
+    @AutoLogOutput double[] doubleArr = {1.0, 2.0};
+    @AutoLogOutput String[] strArr = {"a", "b"};
+    @AutoLogOutput TestDirection enumVal = TestDirection.NORTH;
+    @AutoLogOutput TestDirection[] enumArr = {TestDirection.NORTH, TestDirection.SOUTH};
+  }
+
+  /** Method whose return type is void — must be skipped by the scanner. */
+  static class VoidReturnMethodObject {
+    @AutoLogOutput
+    public void doNothing() {}
+  }
+
+  /** Method that declares a checked exception — must be skipped (getExceptionTypes().length > 0). */
+  static class CheckedExceptionMethodObject {
+    @AutoLogOutput
+    public int getValue() throws Exception {
+      return 42;
+    }
+  }
+
+  /** Object used to test auto-generated key format: ClassName/FieldName. */
+  static class KeyAutoGenObject {
+    @AutoLogOutput double speed = 1.5;
+  }
+
+  /** Object used to test custom key override in annotation. */
+  static class CustomKeyObject {
+    @AutoLogOutput(key = "Custom/MySpeed")
+    double speed = 2.5;
+  }
+
+  /** Object used to test {fieldName} interpolation in key. */
+  static class KeyInterpolationObject {
+    String name = "arm";
+
+    @AutoLogOutput(key = "Mechanisms/{name}/position")
+    double position = 1.0;
+  }
+
   // ─── addPackage ─────────────────────────────────────────────────────────────
 
   @Test
@@ -251,5 +308,80 @@ public class AutoLogOutputManagerTest {
     AutoLogOutputManager.addObject(obj);
     // Run the callback — must not throw even though field is null
     assertDoesNotThrow(AutoLogOutputManager::periodic);
+  }
+
+  // ─── All field types register callbacks ─────────────────────────────────────
+
+  @Test
+  void allPrimitiveAndArrayFieldTypesRegisterCallbacks() throws Exception {
+    AllTypesObject obj = new AllTypesObject();
+    AutoLogOutputManager.addObject(obj);
+    assertEquals(15, callbacks().size(), "Every annotated field must register exactly one callback");
+  }
+
+  @Test
+  void periodicDoesNotThrowForAllFieldTypes() throws Exception {
+    AllTypesObject obj = new AllTypesObject();
+    AutoLogOutputManager.addObject(obj);
+    // Logger.recordOutput() is a no-op when Logger is not started — must not throw
+    assertDoesNotThrow(AutoLogOutputManager::periodic);
+  }
+
+  // ─── Void-return method is skipped ──────────────────────────────────────────
+
+  @Test
+  void voidReturnMethodIsSkipped() throws Exception {
+    VoidReturnMethodObject obj = new VoidReturnMethodObject();
+    AutoLogOutputManager.addObject(obj);
+    assertEquals(0, callbacks().size(), "Methods returning void must not be registered");
+  }
+
+  // ─── Checked-exception method is skipped ────────────────────────────────────
+
+  @Test
+  void methodWithCheckedExceptionIsSkipped() throws Exception {
+    CheckedExceptionMethodObject obj = new CheckedExceptionMethodObject();
+    AutoLogOutputManager.addObject(obj);
+    assertEquals(0, callbacks().size(), "Methods declaring checked exceptions must not be registered");
+  }
+
+  // ─── Key auto-generation ────────────────────────────────────────────────────
+
+  @Test
+  void addObjectRegistersExpectedNumberOfCallbacksForAutoKeyObject() throws Exception {
+    KeyAutoGenObject obj = new KeyAutoGenObject();
+    AutoLogOutputManager.addObject(obj);
+    assertEquals(1, callbacks().size(), "One annotated field must produce one callback");
+  }
+
+  // ─── Custom key annotation ──────────────────────────────────────────────────
+
+  @Test
+  void customKeyObjectRegistersOneCallback() throws Exception {
+    CustomKeyObject obj = new CustomKeyObject();
+    AutoLogOutputManager.addObject(obj);
+    assertEquals(1, callbacks().size(), "Custom-key annotated field must register one callback");
+  }
+
+  // ─── Key interpolation ──────────────────────────────────────────────────────
+
+  @Test
+  void keyInterpolationObjectRegistersOneCallback() throws Exception {
+    KeyInterpolationObject obj = new KeyInterpolationObject();
+    AutoLogOutputManager.addObject(obj);
+    assertEquals(1, callbacks().size(), "Interpolated-key annotated field must register one callback");
+    assertDoesNotThrow(AutoLogOutputManager::periodic, "periodic() with interpolated key must not throw");
+  }
+
+  // ─── Array root recursion ────────────────────────────────────────────────────
+
+  @Test
+  void addObjectWithNullFieldDoesNotThrow() throws Exception {
+    // Object with an unannotated null field should not cause NPE during recursive scan
+    class NullUnannotatedFieldObject {
+      @SuppressWarnings("unused")
+      Object nested = null;
+    }
+    assertDoesNotThrow(() -> AutoLogOutputManager.addObject(new NullUnannotatedFieldObject()));
   }
 }

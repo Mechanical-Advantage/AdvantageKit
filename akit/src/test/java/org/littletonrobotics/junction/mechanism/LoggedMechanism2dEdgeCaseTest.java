@@ -12,11 +12,14 @@ import static edu.wpi.first.units.Units.Meters;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
+import org.littletonrobotics.junction.LogTable;
 
 /**
  * Edge-case tests for LoggedMechanism2d forward kinematics: non-zero root offsets, zero-length
@@ -264,5 +267,236 @@ public class LoggedMechanism2dEdgeCaseTest {
         after.get(0).transformBy(new Transform3d(seg.getLength(), 0, 0, Rotation3d.kZero));
     assertEquals(0.0, endAfter.getTranslation().getX(), DELTA);
     assertEquals(1.0, endAfter.getTranslation().getZ(), DELTA);
+  }
+
+  // ─── logOutput() serializes to LogTable ─────────────────────────────────────
+
+  @Test
+  void logOutputWritesTypeAndControllable() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(3.0, 2.0);
+    LogTable table = new LogTable(0);
+    mech.logOutput(table);
+
+    assertEquals("Mechanism2d", table.get(".type", ""));
+    assertFalse(table.get(".controllable", true));
+  }
+
+  @Test
+  void logOutputWritesDimensions() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(4.0, 3.0);
+    LogTable table = new LogTable(0);
+    mech.logOutput(table);
+
+    double[] dims = table.get("dims", new double[0]);
+    assertEquals(2, dims.length);
+    assertEquals(4.0, dims[0], DELTA);
+    assertEquals(3.0, dims[1], DELTA);
+  }
+
+  @Test
+  void logOutputWritesRootPositionAndLigamentData() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(3.0, 2.0);
+    LoggedMechanismRoot2d root = mech.getRoot("arm", 0.5, 1.0);
+    root.append(new LoggedMechanismLigament2d("seg", 1.0, 45.0));
+
+    LogTable table = new LogTable(0);
+    mech.logOutput(table);
+
+    // Root position
+    LogTable rootTable = table.getSubtable("arm");
+    assertEquals(0.5, rootTable.get("x", 0.0), DELTA);
+    assertEquals(1.0, rootTable.get("y", 0.0), DELTA);
+
+    // Ligament data
+    LogTable ligTable = rootTable.getSubtable("seg");
+    assertEquals(45.0, ligTable.get("angle", 0.0), DELTA);
+    assertEquals(1.0, ligTable.get("length", 0.0), DELTA);
+    assertEquals("line", ligTable.get(".type", ""));
+  }
+
+  // ─── setBackgroundColor() ───────────────────────────────────────────────────
+
+  @Test
+  void setBackgroundColorChangesBackgroundInLogOutput() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(1.0, 1.0, new Color8Bit(0, 0, 32));
+    mech.setBackgroundColor(new Color8Bit(255, 0, 0));
+
+    LogTable table = new LogTable(0);
+    mech.logOutput(table);
+
+    assertEquals("#FF0000", table.get("backgroundColor", ""));
+  }
+
+  // ─── getRoot() returns existing root ────────────────────────────────────────
+
+  @Test
+  void getExistingRootReturnsTheSameObject() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(3.0, 2.0);
+    LoggedMechanismRoot2d first = mech.getRoot("arm", 0.0, 0.0);
+    LoggedMechanismRoot2d second = mech.getRoot("arm", 9.0, 9.0); // different coords, same name
+    assertSame(first, second, "getRoot() with an existing name must return the same object");
+  }
+
+  // ─── Ligament getters / setters ─────────────────────────────────────────────
+
+  @Test
+  void ligamentGetAngleReturnsSetAngle() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("l", 1.0, 45.0);
+    assertEquals(45.0, lig.getAngle(), DELTA);
+  }
+
+  @Test
+  void ligamentGetLengthReturnsSetLength() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("l", 2.5, 0.0);
+    assertEquals(2.5, lig.getLength(), DELTA);
+  }
+
+  @Test
+  void ligamentSetAngleUpdatesAngle() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("l", 1.0, 0.0);
+    lig.setAngle(90.0);
+    assertEquals(90.0, lig.getAngle(), DELTA);
+  }
+
+  @Test
+  void ligamentSetLengthUpdatesLength() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("l", 1.0, 0.0);
+    lig.setLength(3.0);
+    assertEquals(3.0, lig.getLength(), DELTA);
+  }
+
+  @Test
+  void ligamentSetAngleWithRotation2d() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("l", 1.0, 0.0);
+    lig.setAngle(Rotation2d.fromDegrees(30.0));
+    assertEquals(30.0, lig.getAngle(), DELTA);
+  }
+
+  @Test
+  void ligamentSetAngleWithAngleUnit() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("l", 1.0, 0.0);
+    lig.setAngle(Degrees.of(60.0));
+    assertEquals(60.0, lig.getAngle(), DELTA);
+  }
+
+  @Test
+  void ligamentSetLengthWithDistanceUnit() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("l", 1.0, 0.0);
+    lig.setLength(Meters.of(2.0));
+    assertEquals(2.0, lig.getLength(), DELTA);
+  }
+
+  @Test
+  void ligamentGetColorRoundTrip() {
+    Color8Bit color = new Color8Bit(100, 150, 200);
+    LoggedMechanismLigament2d lig =
+        new LoggedMechanismLigament2d("l", 1.0, 0.0, 10, color);
+    Color8Bit got = lig.getColor();
+    assertEquals(100, got.red);
+    assertEquals(150, got.green);
+    assertEquals(200, got.blue);
+  }
+
+  @Test
+  void ligamentSetColorUpdatesColor() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("l", 1.0, 0.0);
+    lig.setColor(new Color8Bit(10, 20, 30));
+    Color8Bit got = lig.getColor();
+    assertEquals(10, got.red);
+    assertEquals(20, got.green);
+    assertEquals(30, got.blue);
+  }
+
+  @Test
+  void ligamentGetLineWeightReturnsSetWeight() {
+    LoggedMechanismLigament2d lig =
+        new LoggedMechanismLigament2d("l", 1.0, 0.0, 8.0, new Color8Bit(0, 0, 0));
+    assertEquals(8.0, lig.getLineWeight(), DELTA);
+  }
+
+  @Test
+  void ligamentSetLineWeightUpdatesWeight() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("l", 1.0, 0.0);
+    lig.setLineWeight(5.0);
+    assertEquals(5.0, lig.getLineWeight(), DELTA);
+  }
+
+  // ─── getName() ──────────────────────────────────────────────────────────────
+
+  @Test
+  void ligamentGetNameReturnsCorrectName() {
+    LoggedMechanismLigament2d lig = new LoggedMechanismLigament2d("myArm", 1.0, 0.0);
+    assertEquals("myArm", lig.getName());
+  }
+
+  // ─── Duplicate child name throws ────────────────────────────────────────────
+
+  @Test
+  void appendingDuplicateNameThrows() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(3.0, 2.0);
+    LoggedMechanismRoot2d root = mech.getRoot("root", 0, 0);
+    root.append(new LoggedMechanismLigament2d("seg", 1.0, 0.0));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> root.append(new LoggedMechanismLigament2d("seg", 2.0, 90.0)),
+        "Appending two children with the same name must throw");
+  }
+
+  // ─── setPosition() on root ──────────────────────────────────────────────────
+
+  @Test
+  void rootSetPositionUpdatesCoordinates() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(3.0, 2.0);
+    LoggedMechanismRoot2d root = mech.getRoot("root", 0.0, 0.0);
+    root.setPosition(1.5, 2.5);
+
+    LogTable table = new LogTable(0);
+    mech.logOutput(table);
+    LogTable rootTable = table.getSubtable("root");
+    assertEquals(1.5, rootTable.get("x", 0.0), DELTA);
+    assertEquals(2.5, rootTable.get("y", 0.0), DELTA);
+  }
+
+  // ─── Ligament logOutput() ───────────────────────────────────────────────────
+
+  @Test
+  void ligamentLogOutputWritesAllFields() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(3.0, 2.0);
+    LoggedMechanismRoot2d root = mech.getRoot("root", 0.0, 0.0);
+    root.append(
+        new LoggedMechanismLigament2d("seg", 2.0, 30.0, 6.0, new Color8Bit(255, 128, 0)));
+
+    LogTable table = new LogTable(0);
+    mech.logOutput(table);
+    LogTable ligTable = table.getSubtable("root").getSubtable("seg");
+
+    assertEquals("line", ligTable.get(".type", ""));
+    assertEquals(30.0, ligTable.get("angle", 0.0), DELTA);
+    assertEquals(2.0, ligTable.get("length", 0.0), DELTA);
+    assertEquals(6.0, ligTable.get("weight", 0.0), DELTA);
+    assertEquals("#FF8000", ligTable.get("color", ""));
+  }
+
+  // ─── Chain of ligaments produces correct pose count ─────────────────────────
+
+  @Test
+  void threeChainedLigamentsProduceThreePoses() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(3.0, 2.0);
+    LoggedMechanismRoot2d root = mech.getRoot("root", 0, 0);
+    LoggedMechanismLigament2d a = root.append(new LoggedMechanismLigament2d("a", 1.0, 0.0));
+    LoggedMechanismLigament2d b = a.append(new LoggedMechanismLigament2d("b", 1.0, 90.0));
+    b.append(new LoggedMechanismLigament2d("c", 1.0, -45.0));
+
+    ArrayList<Pose3d> poses = mech.generate3dMechanism();
+    assertEquals(3, poses.size(), "A 3-segment chain must produce exactly 3 poses");
   }
 }

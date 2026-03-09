@@ -655,6 +655,201 @@ public class LogTableDataTest {
     assertEquals(10L, sub2.get("val", 0L));
   }
 
+  // ─── Float with unit ────────────────────────────────────────────────────────
+
+  @Test
+  void floatWithUnitRoundTrip() {
+    table.put("key", 1.5f, "meters");
+    assertEquals(1.5f, table.get("key", 0.0f));
+  }
+
+  // ─── Double with unit ───────────────────────────────────────────────────────
+
+  @Test
+  void doubleWithUnitRoundTrip() {
+    table.put("key", 2.5, "radians");
+    assertEquals(2.5, table.get("key", 0.0));
+  }
+
+  // ─── 2D int array ───────────────────────────────────────────────────────────
+
+  @Test
+  void int2DArrayRoundTrip() {
+    int[][] value = {{1, 2, 3}, {4, 5}};
+    table.put("key", value);
+    int[][] result = table.get("key", new int[0][]);
+    assertEquals(2, result.length);
+    assertArrayEquals(new int[]{1, 2, 3}, result[0]);
+    assertArrayEquals(new int[]{4, 5}, result[1]);
+  }
+
+  @Test
+  void nullInt2DArrayIsIgnored() {
+    table.put("key", (int[][]) null);
+    assertEquals(0, table.get("key", new int[0][]).length);
+  }
+
+  // ─── 2D float array ─────────────────────────────────────────────────────────
+
+  @Test
+  void float2DArrayRoundTrip() {
+    float[][] value = {{1.0f, 2.0f}, {3.0f}};
+    table.put("key", value);
+    float[][] result = table.get("key", new float[0][]);
+    assertEquals(2, result.length);
+    assertArrayEquals(new float[]{1.0f, 2.0f}, result[0]);
+    assertArrayEquals(new float[]{3.0f}, result[1]);
+  }
+
+  @Test
+  void nullFloat2DArrayIsIgnored() {
+    table.put("key", (float[][]) null);
+    assertEquals(0, table.get("key", new float[0][]).length);
+  }
+
+  // ─── 2D boolean array (null guard) ──────────────────────────────────────────
+
+  @Test
+  void nullBoolean2DArrayIsIgnored() {
+    table.put("key", (boolean[][]) null);
+    assertEquals(0, table.get("key", new boolean[0][]).length);
+  }
+
+  // ─── 2D long array (null guard) ─────────────────────────────────────────────
+
+  @Test
+  void nullLong2DArrayIsIgnored() {
+    table.put("key", (long[][]) null);
+    assertEquals(0, table.get("key", new long[0][]).length);
+  }
+
+  // ─── 2D double array (null guard) ───────────────────────────────────────────
+
+  @Test
+  void nullDouble2DArrayIsIgnored() {
+    table.put("key", (double[][]) null);
+    assertEquals(0, table.get("key", new double[0][]).length);
+  }
+
+  // ─── 2D string array (null guard) ───────────────────────────────────────────
+
+  @Test
+  void nullString2DArrayIsIgnored() {
+    table.put("key", (String[][]) null);
+    assertEquals(0, table.get("key", new String[0][]).length);
+  }
+
+  // ─── Enum array (null guard + defensive copy) ───────────────────────────────
+
+  @Test
+  void nullEnumArrayIsIgnored() {
+    TestEnum[] def = {TestEnum.FIRST};
+    table.put("key", (TestEnum[]) null);
+    assertArrayEquals(def, table.get("key", def));
+  }
+
+  @Test
+  void enumArrayReturnedValueMutationDoesNotAffectStoredData() {
+    TestEnum[] value = {TestEnum.FIRST, TestEnum.SECOND};
+    table.put("key", value);
+    TestEnum[] returned = table.get("key", new TestEnum[0]);
+    returned[0] = TestEnum.THIRD;
+    TestEnum[] secondRead = table.get("key", new TestEnum[0]);
+    assertEquals(TestEnum.FIRST, secondRead[0], "Mutation of returned enum array must not affect stored data");
+  }
+
+  // ─── LogValue direct put ─────────────────────────────────────────────────────
+
+  @Test
+  void directLogValuePutAndRetrieve() {
+    LogValue logValue = new LogValue(42.0, null);
+    table.put("key", logValue);
+    assertEquals(42.0, table.get("key", 0.0));
+  }
+
+  @Test
+  void directNullLogValueIsIgnored() {
+    table.put("key", (LogValue) null);
+    assertEquals(0.0, table.get("key", 0.0));
+  }
+
+  // ─── int[] null guard ────────────────────────────────────────────────────────
+
+  @Test
+  void nullIntArrayIsIgnored() {
+    table.put("key", (int[]) null);
+    assertArrayEquals(new int[]{99}, table.get("key", new int[]{99}));
+  }
+
+  // ─── float[] null guard ──────────────────────────────────────────────────────
+
+  @Test
+  void nullFloatArrayIsIgnored() {
+    table.put("key", (float[]) null);
+    assertArrayEquals(new float[]{9.9f}, table.get("key", new float[]{9.9f}));
+  }
+
+  // ─── long[] null guard ───────────────────────────────────────────────────────
+
+  @Test
+  void nullLongArrayIsIgnored() {
+    table.put("key", (long[]) null);
+    assertArrayEquals(new long[]{99L}, table.get("key", new long[]{99L}));
+  }
+
+  // ─── get with missing key returns default (additional types) ─────────────────
+
+  @Test
+  void intMissingKeyReturnsDefault() {
+    assertEquals(7, table.get("missing", 7));
+  }
+
+  @Test
+  void floatMissingKeyReturnsDefault() {
+    assertEquals(3.0f, table.get("missing", 3.0f));
+  }
+
+  @Test
+  void longMissingKeyReturnsDefault() {
+    assertEquals(77L, table.get("missing", 77L));
+  }
+
+  @Test
+  void byteArrayMissingKeyReturnsDefault() {
+    byte[] def = {1, 2};
+    assertArrayEquals(def, table.get("missing", def));
+  }
+
+  @Test
+  void booleanArrayMissingKeyReturnsDefault() {
+    boolean[] def = {true, false};
+    assertArrayEquals(def, table.get("missing", def));
+  }
+
+  @Test
+  void intArrayMissingKeyReturnsDefault() {
+    int[] def = {5, 6};
+    assertArrayEquals(def, table.get("missing", def));
+  }
+
+  @Test
+  void longArrayMissingKeyReturnsDefault() {
+    long[] def = {5L, 6L};
+    assertArrayEquals(def, table.get("missing", def));
+  }
+
+  @Test
+  void floatArrayMissingKeyReturnsDefault() {
+    float[] def = {1.0f, 2.0f};
+    assertArrayEquals(def, table.get("missing", def));
+  }
+
+  @Test
+  void stringArrayMissingKeyReturnsDefault() {
+    String[] def = {"a", "b"};
+    assertArrayEquals(def, table.get("missing", def));
+  }
+
   // ─── LoggableInputs ─────────────────────────────────────────────────────────
 
   private static class TestInputs implements LoggableInputs {
