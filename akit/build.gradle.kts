@@ -3,6 +3,7 @@ import org.gradle.external.javadoc.StandardJavadocDocletOptions
 plugins {
     id("cpp")
     id("java")
+    id("jacoco")
     id("google-test")
     id("edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin") version "2025.0"
     id("edu.wpi.first.NativeUtils") version "2026.0.1"
@@ -58,6 +59,16 @@ tasks.withType<Javadoc> {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+    finalizedBy(tasks.named("jacocoTestReport"))
+}
+
+tasks.named<JacocoReport>("jacocoTestReport") {
+    dependsOn(tasks.named("test"))
+    reports {
+        xml.required.set(false)
+        html.required.set(true)
+        csv.required.set(true)
+    }
 }
 
 java {
