@@ -13,6 +13,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.util.Color;
+import org.littletonrobotics.junction.ConsoleSource;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import java.lang.reflect.Field;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -82,6 +84,14 @@ public class LoggerTest {
   }
 
   @Test
+  @Order(2)
+  void getTimestampBeforeStartReturnsFPGATime() {
+    // Before start, getTimestamp() returns RobotController.getFPGATime() (requires HAL)
+    long ts = Logger.getTimestamp();
+    assertTrue(ts >= 0, "getTimestamp() before start must return a non-negative FPGA time");
+  }
+
+  @Test
   @Order(3)
   void recordMetadataBeforeStartDoesNotThrow() {
     assertDoesNotThrow(() -> Logger.recordMetadata("BuildDate", "2026-01-01"));
@@ -134,6 +144,9 @@ public class LoggerTest {
           Logger.recordOutput("NotRunningMeasure", Units.Meters.of(1.0));
           Logger.recordOutput("NotRunningFloatUnit", 1.0f, Units.Meters);
           Logger.recordOutput("NotRunningDoubleUnit", 1.0, Units.Meters);
+          Logger.recordOutput("NotRunningFloatStr", 1.0f, "meters");
+          Logger.recordOutput("NotRunningDoubleStr", 1.0, "meters");
+          Logger.recordOutput("NotRunningMech2d", new LoggedMechanism2d(1.0, 1.0));
         });
   }
 
@@ -182,11 +195,44 @@ public class LoggerTest {
   }
 
   @Test
+  @Order(8)
+  void addDataReceiverBeforeStartDoesNotThrow() {
+    // addDataReceiver is gated by !running — must not throw and must reach receiverThread
+    assertDoesNotThrow(
+        () ->
+            Logger.addDataReceiver(
+                new LogDataReceiver() {
+                  @Override
+                  public void putTable(LogTable table) {}
+                }));
+  }
+
+  @Test
   @Order(9)
   void registerURCLDoesNotThrow() {
     assertDoesNotThrow(() -> Logger.registerURCL(() -> new java.nio.ByteBuffer[0]));
     // Reset to avoid influencing the lifecycle test
     Logger.registerURCL(null);
+  }
+
+  @Test
+  @Order(9)
+  void setConsoleSourceDoesNotThrow() {
+    // setConsoleSource just assigns a static field; must not throw
+    assertDoesNotThrow(
+        () ->
+            Logger.AdvancedHooks.setConsoleSource(
+                new ConsoleSource() {
+                  @Override
+                  public String getNewData() {
+                    return "";
+                  }
+
+                  @Override
+                  public void close() {}
+                }));
+    // Reset to null
+    Logger.AdvancedHooks.setConsoleSource(null);
   }
 
   // ── Full lifecycle ─────────────────────────────────────────────────────────
@@ -275,6 +321,9 @@ public class LoggerTest {
     Logger.recordOutput("MeasureOut", Units.Meters.of(3.5));
     Logger.recordOutput("FloatUnitOut", 2.5f, Units.Meters);
     Logger.recordOutput("DoubleUnitOut", 4.5, Units.Meters);
+    Logger.recordOutput("FloatStrUnit", 3.5f, "meters");
+    Logger.recordOutput("DoubleStrUnit", 6.5, "meters");
+    Logger.recordOutput("Mech2dOut", new LoggedMechanism2d(2.0, 1.0));
 
     // --- lambda suppliers ---
     Logger.recordOutput("LambdaBool", (java.util.function.BooleanSupplier) () -> true);
