@@ -9,24 +9,24 @@ package org.littletonrobotics.junction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.util.Color;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-/**
- * Comprehensive tests for LogTable primitive storage and retrieval.
- *
- * <p>Note: tests that trigger {@code DriverStation.reportWarning()} (i.e., writing a key with a
- * mismatched type) require HAL initialization which crashes the JVM on macOS in a test
- * environment. Those scenarios are tested via the <em>get</em>-side only: put the key once, then
- * read it back with the wrong default type to confirm the stored value is not corrupted.
- */
+/** Comprehensive tests for LogTable primitive storage and retrieval. */
 public class LogTableDataTest {
 
   private LogTable table;
+
+  @BeforeAll
+  static void initHAL() {
+    assertTrue(HAL.initialize(500, 0), "HAL initialization must succeed");
+  }
 
   @BeforeEach
   void setUp() {
@@ -527,6 +527,43 @@ public class LogTableDataTest {
     table.put("key", Math.PI);
     assertEquals(
         -1L, table.get("key", -1L), "Reading a Double key as long must return the long default");
+  }
+
+  // ─── Type mismatch (write-side) ─────────────────────────────────────────────
+  //
+  // Writing a key that already exists with a DIFFERENT type triggers
+  // DriverStation.reportWarning() and the write is silently dropped.
+  // HAL must be initialized (see @BeforeAll) for reportWarning() to work.
+
+  @Test
+  void typeMismatchWriteBooleanThenDoublePreservesBoolean() {
+    table.put("key", true);
+    table.put("key", 99.0); // type mismatch — write should be dropped
+    assertTrue(table.get("key", false), "Original boolean value must be preserved after mismatch");
+  }
+
+  @Test
+  void typeMismatchWriteStringThenLongPreservesString() {
+    table.put("key", "original");
+    table.put("key", 42L); // type mismatch
+    assertEquals("original", table.get("key", ""), "Original string must be preserved");
+  }
+
+  @Test
+  void typeMismatchWriteLongThenBooleanPreservesLong() {
+    table.put("key", 7L);
+    table.put("key", false); // type mismatch
+    assertEquals(7L, table.get("key", 0L), "Original long value must be preserved");
+  }
+
+  @Test
+  void typeMismatchWriteDoubleArrayThenStringPreservesArray() {
+    table.put("key", new double[] {1.0, 2.0});
+    table.put("key", "oops"); // type mismatch
+    assertArrayEquals(
+        new double[] {1.0, 2.0},
+        table.get("key", new double[0]),
+        "Original double[] must be preserved after mismatch");
   }
 
   // ─── Timestamp ──────────────────────────────────────────────────────────────

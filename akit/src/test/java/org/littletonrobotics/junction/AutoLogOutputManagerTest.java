@@ -9,11 +9,19 @@ package org.littletonrobotics.junction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.util.Color;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 
 /**
  * Tests for AutoLogOutputManager scanning, package filtering, deduplication, and key generation.
@@ -22,6 +30,11 @@ import org.junit.jupiter.api.Test;
  * before running.
  */
 public class AutoLogOutputManagerTest {
+
+  @BeforeAll
+  static void initHAL() {
+    assertTrue(HAL.initialize(500, 0), "HAL initialization must succeed");
+  }
 
   // ─── Static-state reset ─────────────────────────────────────────────────────
 
@@ -383,5 +396,178 @@ public class AutoLogOutputManagerTest {
       Object nested = null;
     }
     assertDoesNotThrow(() -> AutoLogOutputManager.addObject(new NullUnannotatedFieldObject()));
+  }
+
+  // ─── Supplier field types ────────────────────────────────────────────────────
+
+  static class SupplierTypesObject {
+    @AutoLogOutput BooleanSupplier boolSup = () -> true;
+    @AutoLogOutput IntSupplier intSup = () -> 5;
+    @AutoLogOutput LongSupplier longSup = () -> 10L;
+    @AutoLogOutput DoubleSupplier doubleSup = () -> 3.14;
+  }
+
+  @Test
+  void supplierTypeFieldsRegisterFourCallbacks() throws Exception {
+    AutoLogOutputManager.addObject(new SupplierTypesObject());
+    assertEquals(4, callbacks().size(), "BooleanSupplier/IntSupplier/LongSupplier/DoubleSupplier fields must each register one callback");
+  }
+
+  @Test
+  void periodicDoesNotThrowForSupplierTypeFields() throws Exception {
+    AutoLogOutputManager.addObject(new SupplierTypesObject());
+    assertDoesNotThrow(AutoLogOutputManager::periodic);
+  }
+
+  // ─── Color and LoggedMechanism2d field types ─────────────────────────────────
+
+  static class ColorAndMechObject {
+    @AutoLogOutput Color color = Color.kRed;
+    @AutoLogOutput LoggedMechanism2d mech = new LoggedMechanism2d(100, 100);
+  }
+
+  @Test
+  void colorAndMechFieldsRegisterTwoCallbacks() throws Exception {
+    AutoLogOutputManager.addObject(new ColorAndMechObject());
+    assertEquals(2, callbacks().size(), "Color and LoggedMechanism2d fields must each register one callback");
+  }
+
+  @Test
+  void periodicDoesNotThrowForColorAndMechFields() throws Exception {
+    AutoLogOutputManager.addObject(new ColorAndMechObject());
+    assertDoesNotThrow(AutoLogOutputManager::periodic);
+  }
+
+  // ─── 2D array field types ────────────────────────────────────────────────────
+
+  static class TwoDArraysObject {
+    @AutoLogOutput byte[][] byte2d = {{1, 2}, {3}};
+    @AutoLogOutput boolean[][] bool2d = {{true}, {false, true}};
+    @AutoLogOutput int[][] int2d = {{1, 2}, {3}};
+    @AutoLogOutput long[][] long2d = {{1L, 2L}};
+    @AutoLogOutput float[][] float2d = {{1.0f}};
+    @AutoLogOutput double[][] double2d = {{1.0, 2.0}};
+    @AutoLogOutput String[][] str2d = {{"a", "b"}, {"c"}};
+    @AutoLogOutput TestDirection[][] enum2d = {{TestDirection.NORTH}, {TestDirection.SOUTH}};
+  }
+
+  @Test
+  void twoDimensionalArrayFieldsRegisterCallbacks() throws Exception {
+    AutoLogOutputManager.addObject(new TwoDArraysObject());
+    assertEquals(8, callbacks().size(), "Each 2D array field must register exactly one callback");
+  }
+
+  @Test
+  void periodicDoesNotThrowForTwoDimensionalArrayFields() throws Exception {
+    AutoLogOutputManager.addObject(new TwoDArraysObject());
+    assertDoesNotThrow(AutoLogOutputManager::periodic);
+  }
+
+  // ─── forceSerializable = true ────────────────────────────────────────────────
+
+  static class ForceSerializableObject {
+    // String is not WPISerializable — periodic() will catch ClassCastException and
+    // call DriverStation.reportError (requires HAL to be initialized, see @BeforeAll).
+    @AutoLogOutput(forceSerializable = true)
+    String nonSerializable = "test";
+  }
+
+  @Test
+  void forceSerializableRegistersCallback() throws Exception {
+    // Verifies the forceSerializable=true code path registers exactly one callback.
+    // periodic() is NOT called here: running it would trigger DriverStation.reportError()
+    // (because String is not WPISerializable), which produces noisy console output.
+    AutoLogOutputManager.addObject(new ForceSerializableObject());
+    assertEquals(1, callbacks().size(), "forceSerializable field must register exactly one callback");
+  }
+
+  // ─── Superclass field lookup in key interpolation ────────────────────────────
+
+  static class InterpolationBase {
+    protected String subsystem = "arm";
+  }
+
+  static class InheritedKeyInterpolationObject extends InterpolationBase {
+    @AutoLogOutput(key = "Mechanisms/{subsystem}/Position")
+    double position = 2.0;
+  }
+
+  @Test
+  void keyInterpolationReadsFieldFromSuperclass() throws Exception {
+    AutoLogOutputManager.addObject(new InheritedKeyInterpolationObject());
+    assertEquals(1, callbacks().size(), "Inherited-interpolation field must register one callback");
+    assertDoesNotThrow(AutoLogOutputManager::periodic);
+  }
+
+  // ─── float/double with unit ──────────────────────────────────────────────────
+
+  static class UnitAnnotatedObject {
+    @AutoLogOutput(unit = "meters")
+    float distanceMeters = 1.5f;
+
+    @AutoLogOutput(unit = "radians")
+    double angleRadians = 0.5;
+  }
+
+  @Test
+  void floatAndDoubleWithUnitRegisterTwoCallbacks() throws Exception {
+    AutoLogOutputManager.addObject(new UnitAnnotatedObject());
+    assertEquals(2, callbacks().size(), "float(unit) and double(unit) fields must each register one callback");
+  }
+
+  @Test
+  void periodicDoesNotThrowForUnitAnnotatedFields() throws Exception {
+    AutoLogOutputManager.addObject(new UnitAnnotatedObject());
+    assertDoesNotThrow(AutoLogOutputManager::periodic);
+  }
+
+  // ─── Java record field types ─────────────────────────────────────────────────
+
+  record TestPoint(double x, double y) {}
+
+  static class RecordTypesObject {
+    @AutoLogOutput TestPoint rec = new TestPoint(1.0, 2.0);
+    @AutoLogOutput TestPoint[] recArr = {new TestPoint(1.0, 2.0), new TestPoint(3.0, 4.0)};
+    @AutoLogOutput TestPoint[][] rec2d = {{new TestPoint(1.0, 2.0)}};
+  }
+
+  @Test
+  void recordFieldTypesRegisterThreeCallbacks() throws Exception {
+    AutoLogOutputManager.addObject(new RecordTypesObject());
+    assertEquals(3, callbacks().size(), "Record, Record[], and Record[][] fields must each register one callback");
+  }
+
+  @Test
+  void periodicDoesNotThrowForRecordFieldTypes() throws Exception {
+    AutoLogOutputManager.addObject(new RecordTypesObject());
+    // Logger is not running so recordOutput is a no-op; casts to Record succeed since
+    // TestPoint extends java.lang.Record
+    assertDoesNotThrow(AutoLogOutputManager::periodic);
+  }
+
+  // ─── WPISerializable / StructSerializable fallback paths ─────────────────────
+
+  /** A type that is not in any of the known type handlers — triggers WPISerializable cast path. */
+  static class UnknownFieldType {}
+
+  static class FallbackTypesObject {
+    // Single unknown type → WPISerializable fallback (ClassCastException caught, reportError called)
+    @AutoLogOutput UnknownFieldType unknown = new UnknownFieldType();
+
+    // Array of unknown type → StructSerializable[] fallback
+    @AutoLogOutput UnknownFieldType[] unknownArr = {new UnknownFieldType()};
+
+    // 2D array of unknown type → StructSerializable[][] fallback
+    @AutoLogOutput UnknownFieldType[][] unknown2d = {{new UnknownFieldType()}};
+  }
+
+  @Test
+  void fallbackTypeFieldsRegisterThreeCallbacks() throws Exception {
+    // Verifies that unknown types (single, 1D array, 2D array) still register fallback callbacks.
+    // periodic() is NOT called here: running it would trigger DriverStation.reportError()
+    // for each field (because UnknownFieldType is not WPISerializable/StructSerializable),
+    // which produces noisy console output.
+    AutoLogOutputManager.addObject(new FallbackTypesObject());
+    assertEquals(3, callbacks().size(), "Unknown type fields must still register fallback callbacks");
   }
 }
