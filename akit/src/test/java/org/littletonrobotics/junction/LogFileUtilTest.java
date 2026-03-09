@@ -9,6 +9,8 @@ package org.littletonrobotics.junction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
@@ -185,6 +187,54 @@ public class LogFileUtilTest {
       assertEquals("", result);
     } finally {
       System.setProperty("java.io.tmpdir", originalTmpDir);
+    }
+  }
+
+  // ─── findReplayLog (orchestrator) ────────────────────────────────────────────
+
+  @Test
+  void findReplayLogReturnsAdvantageScopePathWhenEnvVarAbsent(@TempDir Path tmpDir)
+      throws Exception {
+    // Only run when the env var is NOT set (otherwise findReplayLog returns early via env-var path)
+    if (System.getenv(LogFileUtil.environmentVariable) != null) {
+      return;
+    }
+
+    Path akitFile = tmpDir.resolve("akit-log-path.txt");
+    Files.writeString(akitFile, "/fake/log.wpilog");
+
+    String originalTmpDir = System.getProperty("java.io.tmpdir");
+    System.setProperty("java.io.tmpdir", tmpDir.toString());
+    try {
+      assertEquals("/fake/log.wpilog", LogFileUtil.findReplayLog());
+    } finally {
+      System.setProperty("java.io.tmpdir", originalTmpDir);
+    }
+  }
+
+  // ─── findReplayLogUser (stdin) ────────────────────────────────────────────────
+
+  @Test
+  void findReplayLogUserReadsLineFromStdin() {
+    InputStream original = System.in;
+    System.setIn(new ByteArrayInputStream("/path/to/log.wpilog\n".getBytes()));
+    try {
+      assertEquals("/path/to/log.wpilog", LogFileUtil.findReplayLogUser());
+    } finally {
+      System.setIn(original);
+    }
+  }
+
+  @Test
+  void findReplayLogUserStripsLeadingQuote() {
+    // findReplayLog() strips wrapping quotes; findReplayLogUser reads raw line.
+    InputStream original = System.in;
+    System.setIn(new ByteArrayInputStream("/path/to/log.wpilog\n".getBytes()));
+    try {
+      String result = LogFileUtil.findReplayLogUser();
+      assertEquals("/path/to/log.wpilog", result);
+    } finally {
+      System.setIn(original);
     }
   }
 }
