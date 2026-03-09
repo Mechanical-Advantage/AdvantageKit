@@ -258,6 +258,36 @@ public class ReceiverThreadTest {
         "Receiver after the throwing one must still receive the table for that cycle");
   }
 
+  // ─── InterruptedException during drain is swallowed ─────────────────────────
+
+  @Test
+  void interruptExceptionDuringDrainIsSwallowedNotPropagated() throws InterruptedException {
+    // Fill the queue so the drain loop runs items; the receiver throws IE during drain.
+    // The inner catch in the drain loop must swallow it without propagating.
+    BlockingQueue<LogTable> queue = new ArrayBlockingQueue<>(20);
+    ReceiverThread thread = new ReceiverThread(queue);
+
+    // Receiver that always throws IE (exercises both the main-loop catch AND the drain catch)
+    InterruptThrowingReceiver bad = new InterruptThrowingReceiver();
+    CapturingReceiver good = new CapturingReceiver();
+    thread.addDataReceiver(bad);
+    thread.addDataReceiver(good);
+
+    // Pre-fill the queue with items so the drain loop has work to do
+    for (int i = 0; i < 3; i++) {
+      queue.put(new LogTable((long) i));
+    }
+
+    thread.start();
+    // Wait until the thread starts, then immediately interrupt
+    awaitCondition(500, () -> good.started);
+    thread.interrupt();
+    thread.join(2000);
+
+    // Thread must have terminated cleanly
+    assertFalse(thread.isAlive(), "Thread must terminate after interrupt even with throwing receiver");
+  }
+
   // ─── Default start/end lifecycle methods ────────────────────────────────────
 
   @Test
