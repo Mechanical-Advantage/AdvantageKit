@@ -28,6 +28,7 @@ public class LogFileUtil {
    * @return The new path.
    */
   public static String addPathSuffix(String path, String suffix) {
+    if (suffix.isEmpty()) return path;
     int dotIndex = path.lastIndexOf(".");
     if (dotIndex == -1) {
       return path;

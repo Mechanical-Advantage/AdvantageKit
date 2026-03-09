@@ -81,15 +81,9 @@ public class LogFileUtilTest {
   }
 
   @Test
-  void addEmptySuffixRevealsAlwaysTrueEndsWithBug() {
-    // BUG: String.endsWith("") is always true, so adding an empty suffix
-    // produces "basename_2.ext" instead of leaving the path unchanged.
-    String result = LogFileUtil.addPathSuffix("test.wpilog", "");
-    // One might reasonably expect "test.wpilog", but the implementation returns "test_2.wpilog".
-    assertEquals(
-        "test_2.wpilog",
-        result,
-        "BUG: addPathSuffix(\"\") returns _2 variant because endsWith(\"\") is always true");
+  void addEmptySuffixReturnPathUnchanged() {
+    // An empty suffix means "no suffix to add" — the path must be returned as-is.
+    assertEquals("test.wpilog", LogFileUtil.addPathSuffix("test.wpilog", ""));
   }
 
   // ─── findReplayLogEnvVar ─────────────────────────────────────────────────────

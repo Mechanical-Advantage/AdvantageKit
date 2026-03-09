@@ -1226,6 +1226,19 @@ public class LogTableDataTest {
   }
 
   @Test
+  void logValueEqualsStructValuesWithNonInternedCustomTypeStr() {
+    // struct.getTypeString() returns "struct:" + typeName which is a freshly concatenated (non-
+    // interned) String. Two independent put() calls produce equal-content but distinct String
+    // references, so equals() must use Objects.equals() rather than == for customTypeStr.
+    LogTable t1 = new LogTable(0);
+    LogTable t2 = new LogTable(0);
+    Translation2d val = new Translation2d(3.0, 4.0);
+    t1.put("pos", Translation2d.struct, val);
+    t2.put("pos", Translation2d.struct, val);
+    assertEquals(t1.get("pos"), t2.get("pos"), "LogValues with equal struct customTypeStr must be equal");
+  }
+
+  @Test
   void logValueHashCodeConsistentWithEquals() {
     table.put("k", 42L);
     LogValue v = table.get("k");
