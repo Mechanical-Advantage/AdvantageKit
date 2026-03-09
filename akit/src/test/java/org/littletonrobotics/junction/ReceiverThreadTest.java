@@ -43,6 +43,19 @@ public class ReceiverThreadTest {
   }
 
   /**
+   * Uses only the default start() and end() no-op implementations from LogDataReceiver.
+   * Exercises the default interface methods.
+   */
+  private static class DefaultLifecycleReceiver implements LogDataReceiver {
+    final List<LogTable> received = new ArrayList<>();
+
+    @Override
+    public void putTable(LogTable table) {
+      received.add(table);
+    }
+  }
+
+  /**
    * Throws {@link InterruptedException} from {@link #putTable} to simulate a receiver that treats
    * the call as an interrupt signal.
    */
@@ -243,5 +256,27 @@ public class ReceiverThreadTest {
         1,
         good.received.size(),
         "Receiver after the throwing one must still receive the table for that cycle");
+  }
+
+  // ─── Default start/end lifecycle methods ────────────────────────────────────
+
+  @Test
+  void defaultStartAndEndAreNoOpsAndDoNotThrow() throws InterruptedException {
+    // DefaultLifecycleReceiver uses the default start() and end() from the interface.
+    // This ensures the default method implementations are covered by JaCoCo.
+    BlockingQueue<LogTable> queue = new ArrayBlockingQueue<>(10);
+    ReceiverThread thread = new ReceiverThread(queue);
+    DefaultLifecycleReceiver receiver = new DefaultLifecycleReceiver();
+    thread.addDataReceiver(receiver);
+    thread.start();
+
+    LogTable entry = new LogTable(42L);
+    queue.put(entry);
+    awaitCondition(1000, () -> !receiver.received.isEmpty());
+    assertEquals(1, receiver.received.size());
+
+    thread.interrupt();
+    thread.join(2000);
+    assertFalse(thread.isAlive(), "Thread must terminate after interrupt");
   }
 }

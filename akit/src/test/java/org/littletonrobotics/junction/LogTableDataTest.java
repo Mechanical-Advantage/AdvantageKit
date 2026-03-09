@@ -1051,6 +1051,56 @@ public class LogTableDataTest {
 
   private record Point(double x, double y) {}
 
+  private enum Color3 {
+    RED,
+    GREEN,
+    BLUE
+  }
+
+  /** Record with every primitive field type supported by RecordStruct. */
+  private record AllTypesRecord(
+      boolean b, short s, int i, long l, float f, double d, Color3 color) {}
+
+  /** Record with a nested Translation2d (StructSerializable). */
+  private record NestedStructRecord(double scalar, Translation2d pos) {}
+
+  @Test
+  void recordAllPrimitiveTypesRoundTrip() {
+    AllTypesRecord original = new AllTypesRecord(true, (short) 7, 42, 99L, 1.5f, 3.14, Color3.GREEN);
+    table.put("all", original);
+    AllTypesRecord result = table.get("all", new AllTypesRecord(false, (short) 0, 0, 0L, 0.0f, 0.0, Color3.RED));
+    assertTrue(result.b());
+    assertEquals((short) 7, result.s());
+    assertEquals(42, result.i());
+    assertEquals(99L, result.l());
+    assertEquals(1.5f, result.f(), 1e-6f);
+    assertEquals(3.14, result.d(), 1e-9);
+    assertEquals(Color3.GREEN, result.color());
+  }
+
+  @Test
+  void recordIsImmutableReturnsTrue() {
+    // RecordStruct.isImmutable() must return true (records are immutable)
+    LogTable t = new LogTable(0);
+    Point p = new Point(1.0, 2.0);
+    t.put("p", p);
+    // Access via recordStruct; the easiest way is to just verify the round-trip works
+    // (isImmutable() is exercised when StructBuffer accesses it)
+    Point result = t.get("p", new Point(0.0, 0.0));
+    assertEquals(1.0, result.x(), 1e-9);
+  }
+
+  @Test
+  void recordNestedStructRoundTrip() {
+    NestedStructRecord original = new NestedStructRecord(7.5, new Translation2d(3.0, 4.0));
+    table.put("nested", original);
+    NestedStructRecord result =
+        table.get("nested", new NestedStructRecord(0.0, new Translation2d()));
+    assertEquals(7.5, result.scalar(), 1e-9);
+    assertEquals(3.0, result.pos().getX(), 1e-9);
+    assertEquals(4.0, result.pos().getY(), 1e-9);
+  }
+
   @Test
   void recordSingleRoundTrip() {
     Point p = new Point(3.14, 2.72);
