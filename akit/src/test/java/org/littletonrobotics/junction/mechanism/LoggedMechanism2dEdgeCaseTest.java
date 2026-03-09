@@ -499,4 +499,144 @@ public class LoggedMechanism2dEdgeCaseTest {
     ArrayList<Pose3d> poses = mech.generate3dMechanism();
     assertEquals(3, poses.size(), "A 3-segment chain must produce exactly 3 poses");
   }
+
+  // ─── Distance constructors ───────────────────────────────────────────────────
+
+  @Test
+  void mechanism2dDistanceConstructorUsesMeters() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(Meters.of(3.0), Meters.of(2.0));
+    LogTable table = new LogTable(0);
+    mech.logOutput(table);
+    double[] dims = table.get("dims", new double[0]);
+    assertEquals(3.0, dims[0], DELTA);
+    assertEquals(2.0, dims[1], DELTA);
+  }
+
+  @Test
+  void mechanism2dDistanceConstructorWithColorUsesMeters() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech =
+        new LoggedMechanism2d(Meters.of(4.0), Meters.of(1.0), new Color8Bit(0, 128, 0));
+    LogTable table = new LogTable(0);
+    mech.logOutput(table);
+    double[] dims = table.get("dims", new double[0]);
+    assertEquals(4.0, dims[0], DELTA);
+    assertEquals(1.0, dims[1], DELTA);
+  }
+
+  @Test
+  void ligament2dDistanceAngleConstructorUsesUnits() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(0, 0);
+    LoggedMechanismRoot2d root = mech.getRoot("root", 0, 0);
+    LoggedMechanismLigament2d lig =
+        root.append(new LoggedMechanismLigament2d("seg", Meters.of(2.0), Degrees.of(45.0)));
+    assertEquals(2.0, lig.getLength(), DELTA);
+    assertEquals(45.0, lig.getAngle(), DELTA);
+  }
+
+  @Test
+  void ligament2dDistanceAngleWithColorConstructorUsesUnits() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(0, 0);
+    LoggedMechanismRoot2d root = mech.getRoot("root", 0, 0);
+    LoggedMechanismLigament2d lig =
+        root.append(
+            new LoggedMechanismLigament2d(
+                "seg", Meters.of(1.5), Degrees.of(30.0), 8.0, new Color8Bit(255, 0, 0)));
+    assertEquals(1.5, lig.getLength(), DELTA);
+    assertEquals(30.0, lig.getAngle(), DELTA);
+  }
+
+  // ─── close() ───────────────────────────────────────────────────────────────
+
+  @Test
+  void closeDoesNotThrowWhenPublishersAreNull() {
+    // Publishers are only initialized after initSendable(); before that, close() must be safe.
+    LoggedMechanism2d mech = new LoggedMechanism2d(3.0, 2.0);
+    LoggedMechanismRoot2d root = mech.getRoot("root", 0, 0);
+    root.append(new LoggedMechanismLigament2d("seg", 1.0, 45.0));
+    assertDoesNotThrow(mech::close);
+  }
+
+  @Test
+  void closeIsIdempotentForEmptyMechanism() {
+    LoggedMechanism2d mech = new LoggedMechanism2d(1.0, 1.0);
+    assertDoesNotThrow(mech::close);
+    assertDoesNotThrow(mech::close); // second call must also be safe
+  }
+
+  // ─── Root Distance constructor ───────────────────────────────────────────────
+
+  @Test
+  void rootDistance2dConstructorUsesMeters() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(0, 0);
+    // LoggedMechanismRoot2d's Distance constructor delegates to the double one
+    // We can exercise it via a wrapping helper since root constructors are package-private.
+    // Use Ligament2d Distance constructor to hit the same Units path.
+    LoggedMechanismRoot2d root = mech.getRoot("root", Meters.of(1.0).in(Meters), Meters.of(2.0).in(Meters));
+    LogTable table = new LogTable(0);
+    mech.logOutput(table);
+    assertEquals(1.0, table.getSubtable("root").get("x", 0.0), DELTA);
+    assertEquals(2.0, table.getSubtable("root").get("y", 0.0), DELTA);
+  }
+
+  // ─── Root Distance constructor (package-private) ─────────────────────────────
+
+  @Test
+  void rootDistanceConstructorDirectlyDelegatesToDouble() {
+    // LoggedMechanismRoot2d(String, Distance, Distance) is package-private; accessible here.
+    LoggedMechanismRoot2d root = new LoggedMechanismRoot2d("r", Meters.of(2.5), Meters.of(1.5));
+    assertEquals("r", root.getName());
+    LogTable table = new LogTable(0);
+    root.logOutput(table);
+    assertEquals(2.5, table.get("x", 0.0), DELTA);
+    assertEquals(1.5, table.get("y", 0.0), DELTA);
+  }
+
+  // ─── getName ─────────────────────────────────────────────────────────────────
+
+  @Test
+  void getRootNameReturnsConstructorName() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(10, 10);
+    LoggedMechanismRoot2d root = mech.getRoot("myRoot", 0, 0);
+    assertEquals("myRoot", root.getName());
+  }
+
+  // ─── getRoot returns existing root when name already used ────────────────────
+
+  @Test
+  void getRootReturnsSameInstanceWhenNameAlreadyExists() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(10, 10);
+    LoggedMechanismRoot2d first = mech.getRoot("dup", 1.0, 2.0);
+    LoggedMechanismRoot2d second = mech.getRoot("dup", 3.0, 4.0);
+    assertSame(first, second, "getRoot must return the same instance for a duplicate name");
+  }
+
+  // ─── append duplicate name throws ────────────────────────────────────────────
+
+  @Test
+  void appendDuplicateLigamentNameThrows() {
+    @SuppressWarnings("resource")
+    LoggedMechanism2d mech = new LoggedMechanism2d(10, 10);
+    LoggedMechanismRoot2d root = mech.getRoot("root", 0, 0);
+    root.append(new LoggedMechanismLigament2d("seg", 1.0, 0.0));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> root.append(new LoggedMechanismLigament2d("seg", 2.0, 90.0)));
+  }
+
+  // ─── setBackgroundColor (no-pub branch) ──────────────────────────────────────
+
+  @Test
+  void setBackgroundColorBeforeInitSendableDoesNotThrow() {
+    LoggedMechanism2d mech = new LoggedMechanism2d(5, 5);
+    // Without initSendable(), m_colorPub is null — must not throw.
+    assertDoesNotThrow(() -> mech.setBackgroundColor(new Color8Bit(255, 0, 0)));
+    mech.close();
+  }
 }

@@ -10,6 +10,9 @@ package org.littletonrobotics.junction;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.util.Color;
 import java.lang.reflect.Field;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -32,6 +35,15 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LoggerTest {
+
+  private enum TestDirection {
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST
+  }
+
+  private record TestPoint(double x, double y) {}
 
   // Simple LoggableInputs used across tests
   private static class DoubleInputs implements LoggableInputs {
@@ -99,6 +111,29 @@ public class LoggerTest {
               "NotRunningBoolLambda", (java.util.function.BooleanSupplier) () -> false);
           Logger.recordOutput(
               "NotRunningDoubleLambda", (java.util.function.DoubleSupplier) () -> 0.0);
+          Logger.recordOutput("NotRunningFloat2d", new float[][] {{1.0f}});
+          Logger.recordOutput("NotRunningString2d", new String[][] {{"a"}});
+          Logger.recordOutput("NotRunningColor", new Color(0.5, 0.5, 0.5));
+          Logger.recordOutput("NotRunningEnum", TestDirection.NORTH);
+          Logger.recordOutput("NotRunningEnumArr", new TestDirection[] {TestDirection.SOUTH});
+          Logger.recordOutput(
+              "NotRunningEnumArr2d", new TestDirection[][] {{TestDirection.EAST}});
+          Logger.recordOutput("NotRunningRecord", new TestPoint(1.0, 2.0));
+          Logger.recordOutput("NotRunningRecordArr", new TestPoint[] {new TestPoint(0.0, 0.0)});
+          Logger.recordOutput(
+              "NotRunningRecord2d", new TestPoint[][] {{new TestPoint(0.0, 0.0)}});
+          Logger.recordOutput("NotRunningWPISerial", new Translation2d(1.0, 2.0));
+          Logger.recordOutput(
+              "NotRunningStruct", Translation2d.struct, new Translation2d(0.0, 0.0));
+          Logger.recordOutput(
+              "NotRunningStructArr", Translation2d.struct, new Translation2d[0]);
+          Logger.recordOutput(
+              "NotRunningStructArr2d",
+              Translation2d.struct,
+              new Translation2d[0][]);
+          Logger.recordOutput("NotRunningMeasure", Units.Meters.of(1.0));
+          Logger.recordOutput("NotRunningFloatUnit", 1.0f, Units.Meters);
+          Logger.recordOutput("NotRunningDoubleUnit", 1.0, Units.Meters);
         });
   }
 
@@ -210,6 +245,36 @@ public class LoggerTest {
     Logger.recordOutput("Long2dOut", new long[][] {{10L, 20L}});
     Logger.recordOutput("Double2dOut", new double[][] {{1.0, 2.0}});
     Logger.recordOutput("Byte2dOut", new byte[][] {{0x01}, {0x02}});
+    Logger.recordOutput("Float2dOut", new float[][] {{1.5f, 2.5f}});
+    Logger.recordOutput("String2dOut", new String[][] {{"x", "y"}});
+
+    // --- enum types ---
+    Logger.recordOutput("EnumOut", TestDirection.NORTH);
+    Logger.recordOutput("EnumArrOut", new TestDirection[] {TestDirection.SOUTH, TestDirection.EAST});
+    Logger.recordOutput("EnumArr2dOut", new TestDirection[][] {{TestDirection.WEST}});
+
+    // --- Color ---
+    Logger.recordOutput("ColorOut", new Color(1.0, 0.0, 0.0));
+
+    // --- Record types ---
+    Logger.recordOutput("RecordOut", new TestPoint(1.0, 2.0));
+    Logger.recordOutput("RecordArrOut", new TestPoint[] {new TestPoint(3.0, 4.0)});
+    Logger.recordOutput("RecordArr2dOut", new TestPoint[][] {{new TestPoint(5.0, 6.0)}});
+
+    // --- WPISerializable and struct ---
+    Logger.recordOutput("WPISerialOut", new Translation2d(7.0, 8.0));
+    Logger.recordOutput("StructOut", Translation2d.struct, new Translation2d(9.0, 10.0));
+    Logger.recordOutput(
+        "StructArrOut", Translation2d.struct, new Translation2d[] {new Translation2d(1.0, 0.0)});
+    Logger.recordOutput(
+        "StructArr2dOut",
+        Translation2d.struct,
+        new Translation2d[][] {{new Translation2d(0.0, 1.0)}});
+
+    // --- Measure with unit ---
+    Logger.recordOutput("MeasureOut", Units.Meters.of(3.5));
+    Logger.recordOutput("FloatUnitOut", 2.5f, Units.Meters);
+    Logger.recordOutput("DoubleUnitOut", 4.5, Units.Meters);
 
     // --- lambda suppliers ---
     Logger.recordOutput("LambdaBool", (java.util.function.BooleanSupplier) () -> true);

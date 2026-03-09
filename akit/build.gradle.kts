@@ -1,4 +1,5 @@
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id("cpp")
@@ -57,9 +58,49 @@ tasks.withType<Javadoc> {
     }
 }
 
+// Determine the NativeUtils platform classifier for the current OS/arch so we
+// can locate the WPI native libraries that were extracted by the C++ build.
+val wpilibNativePlatform: String by lazy {
+    val os = OperatingSystem.current()
+    when {
+        os.isMacOsX -> "osxuniversal"
+        os.isLinux -> {
+            val arch = System.getProperty("os.arch") ?: "amd64"
+            if (arch.contains("aarch64") || arch.contains("arm64")) "linuxarm64"
+            else if (arch.contains("arm")) "linuxarm32"
+            else "linuxx86-64"
+        }
+        os.isWindows -> "windowsx86-64"
+        else -> throw GradleException("Unsupported platform for WPI native library detection")
+    }
+}
+
 tasks.named<Test>("test") {
     useJUnitPlatform()
     finalizedBy(tasks.named("jacocoTestReport"))
+
+    // The C++ install task extracts all WPI shared libraries (libwpiHaljni, libwpiutil, etc.)
+    // into build/install/wpilibioTest/<platform>/release/lib/. Depend on that task so the
+    // libraries exist before the JVM test process starts, then add the directory to
+    // java.library.path so RuntimeLoader can find them without extracting from JARs.
+    //
+    // NativeUtils creates the install tasks via the old Gradle software model, so they are
+    // not available via tasks.named() at configuration time. Use tasks.matching() instead
+    // (which is lazy and resolves after the model is realised).
+    val installTaskName =
+        "installWpilibioTest${wpilibNativePlatform.replaceFirstChar { it.uppercaseChar() }}ReleaseGoogleTestExe"
+    dependsOn(tasks.matching { it.name == installTaskName })
+
+    val wpiNativeLibDir =
+        layout.buildDirectory.dir("install/wpilibioTest/$wpilibNativePlatform/release/lib")
+    val wpilibioSharedLibDir =
+        layout.buildDirectory.dir("libs/wpilibio/shared/$wpilibNativePlatform/release")
+
+    doFirst {
+        jvmArgs(
+            "-Djava.library.path=${wpiNativeLibDir.get().asFile.absolutePath}${File.pathSeparator}${wpilibioSharedLibDir.get().asFile.absolutePath}"
+        )
+    }
 }
 
 tasks.named<JacocoReport>("jacocoTestReport") {

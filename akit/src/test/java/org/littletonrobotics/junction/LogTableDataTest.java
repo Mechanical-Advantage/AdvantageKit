@@ -10,6 +10,8 @@ package org.littletonrobotics.junction;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
@@ -933,5 +935,422 @@ public class LogTableDataTest {
     // fromLog will read missing sub-keys and return defaults from the subtable
     assertEquals(0.0, defaults.value);
     assertFalse(defaults.flag);
+  }
+
+  // ─── Enum 2D array ──────────────────────────────────────────────────────────
+
+  private enum Direction {
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST
+  }
+
+  @Test
+  void enum2dArrayRoundTrip() {
+    Direction[][] value = {{Direction.NORTH, Direction.SOUTH}, {Direction.EAST}};
+    table.put("dirs", value);
+    Direction[][] result = table.get("dirs", new Direction[0][]);
+    assertEquals(2, result.length);
+    assertArrayEquals(new Direction[] {Direction.NORTH, Direction.SOUTH}, result[0]);
+    assertArrayEquals(new Direction[] {Direction.EAST}, result[1]);
+  }
+
+  @Test
+  void enum2dArrayMissingKeyReturnsDefault() {
+    Direction[][] def = {{Direction.WEST}};
+    Direction[][] result = table.get("missing2d", def);
+    assertSame(def, result);
+  }
+
+  // ─── Struct (explicit Struct<T>) ─────────────────────────────────────────────
+
+  @Test
+  void structSingleRoundTrip() {
+    Translation2d original = new Translation2d(1.5, 2.5);
+    table.put("t2d", Translation2d.struct, original);
+    Translation2d result = table.get("t2d", Translation2d.struct, new Translation2d());
+    assertEquals(1.5, result.getX(), 1e-9);
+    assertEquals(2.5, result.getY(), 1e-9);
+  }
+
+  @Test
+  void structSingleMissingKeyReturnsDefault() {
+    Translation2d def = new Translation2d(9.0, 9.0);
+    Translation2d result = table.get("missing", Translation2d.struct, def);
+    assertSame(def, result);
+  }
+
+  @Test
+  void structArrayRoundTrip() {
+    Translation2d[] arr = {new Translation2d(1.0, 2.0), new Translation2d(3.0, 4.0)};
+    table.put("arr", Translation2d.struct, arr);
+    Translation2d[] result = table.get("arr", Translation2d.struct, new Translation2d[0]);
+    assertEquals(2, result.length);
+    assertEquals(1.0, result[0].getX(), 1e-9);
+    assertEquals(3.0, result[1].getX(), 1e-9);
+  }
+
+  @Test
+  void structArrayMissingKeyReturnsDefault() {
+    Translation2d[] def = new Translation2d[0];
+    assertSame(def, table.get("missing", Translation2d.struct, def));
+  }
+
+  @Test
+  void struct2dArrayRoundTrip() {
+    Translation2d[][] arr = {
+      {new Translation2d(1.0, 2.0)}, {new Translation2d(3.0, 4.0), new Translation2d(5.0, 6.0)}
+    };
+    table.put("arr2d", Translation2d.struct, arr);
+    Translation2d[][] result = table.get("arr2d", Translation2d.struct, new Translation2d[0][]);
+    assertEquals(2, result.length);
+    assertEquals(1, result[0].length);
+    assertEquals(2, result[1].length);
+    assertEquals(3.0, result[1][0].getX(), 1e-9);
+  }
+
+  @Test
+  void struct2dArrayMissingKeyReturnsDefault() {
+    Translation2d[][] def = new Translation2d[0][];
+    assertSame(def, table.get("missing2d", Translation2d.struct, def));
+  }
+
+  // ─── WPISerializable (auto struct detection) ─────────────────────────────────
+
+  @Test
+  void wpiSerializableRoundTrip() {
+    Translation2d original = new Translation2d(7.0, 3.0);
+    table.put("auto", original);
+    Translation2d result = table.get("auto", new Translation2d());
+    assertEquals(7.0, result.getX(), 1e-9);
+    assertEquals(3.0, result.getY(), 1e-9);
+  }
+
+  @Test
+  void wpiSerializableArrayRoundTrip() {
+    Translation2d[] arr = {new Translation2d(1.0, 0.0), new Translation2d(0.0, 1.0)};
+    table.put("autoArr", arr);
+    Translation2d[] result = table.get("autoArr", new Translation2d[0]);
+    assertEquals(2, result.length);
+    assertEquals(1.0, result[0].getX(), 1e-9);
+    assertEquals(1.0, result[1].getY(), 1e-9);
+  }
+
+  @Test
+  void wpiSerializable2dArrayRoundTrip() {
+    Translation2d[][] arr = {{new Translation2d(1.0, 2.0)}, {new Translation2d(3.0, 4.0)}};
+    table.put("auto2d", arr);
+    Translation2d[][] result = table.get("auto2d", new Translation2d[0][]);
+    assertEquals(2, result.length);
+    assertEquals(1.0, result[0][0].getX(), 1e-9);
+    assertEquals(3.0, result[1][0].getX(), 1e-9);
+  }
+
+  // ─── Record put/get ──────────────────────────────────────────────────────────
+
+  private record Point(double x, double y) {}
+
+  @Test
+  void recordSingleRoundTrip() {
+    Point p = new Point(3.14, 2.72);
+    table.put("pt", p);
+    Point result = table.get("pt", new Point(0.0, 0.0));
+    assertEquals(3.14, result.x(), 1e-9);
+    assertEquals(2.72, result.y(), 1e-9);
+  }
+
+  @Test
+  void recordSingleMissingKeyReturnsDefault() {
+    Point def = new Point(1.0, 2.0);
+    assertSame(def, table.get("missing", def));
+  }
+
+  @Test
+  void recordArrayRoundTrip() {
+    Point[] pts = {new Point(1.0, 2.0), new Point(3.0, 4.0)};
+    table.put("pts", pts);
+    Point[] result = table.get("pts", new Point[0]);
+    assertEquals(2, result.length);
+    assertEquals(1.0, result[0].x(), 1e-9);
+    assertEquals(3.0, result[1].x(), 1e-9);
+  }
+
+  @Test
+  void recordArrayMissingKeyReturnsDefault() {
+    Point[] def = new Point[0];
+    assertSame(def, table.get("missing", def));
+  }
+
+  @Test
+  void record2dArrayRoundTrip() {
+    Point[][] pts = {{new Point(1.0, 2.0)}, {new Point(3.0, 4.0)}};
+    table.put("pts2d", pts);
+    Point[][] result = table.get("pts2d", new Point[0][]);
+    assertEquals(2, result.length);
+    assertEquals(1.0, result[0][0].x(), 1e-9);
+    assertEquals(3.0, result[1][0].x(), 1e-9);
+  }
+
+  @Test
+  void record2dArrayMissingKeyReturnsDefault() {
+    Point[][] def = new Point[0][];
+    assertSame(def, table.get("missing", def));
+  }
+
+  // ─── Protobuf ────────────────────────────────────────────────────────────────
+
+  @Test
+  void protobufRoundTrip() {
+    Translation2d original = new Translation2d(4.0, 5.0);
+    table.put("proto", Translation2d.proto, original);
+    Translation2d result = table.get("proto", Translation2d.proto, new Translation2d());
+    assertEquals(4.0, result.getX(), 1e-6);
+    assertEquals(5.0, result.getY(), 1e-6);
+  }
+
+  @Test
+  void protobufMissingKeyReturnsDefault() {
+    Translation2d def = new Translation2d(1.0, 2.0);
+    Translation2d result = table.get("missing", Translation2d.proto, def);
+    assertSame(def, result);
+  }
+
+  // ─── LogValue equals / hashCode / getWPILOGType / getNT4Type ───────────────
+
+  @Test
+  void logValueEqualsIdentical() {
+    table.put("k", true);
+    LogValue v1 = table.get("k");
+    LogValue v2 = table.get("k");
+    assertEquals(v1, v2);
+  }
+
+  @Test
+  void logValueEqualsDifferentTypesReturnFalse() {
+    table.put("a", true);
+    table.put("b", 1L);
+    assertNotEquals(table.get("a"), table.get("b"));
+  }
+
+  @Test
+  void logValueEqualsNonLogValueReturnsFalse() {
+    table.put("k", true);
+    assertNotEquals(table.get("k"), "notALogValue");
+  }
+
+  @Test
+  void logValueEqualsAllPrimitiveTypes() {
+    LogTable t1 = new LogTable(0);
+    LogTable t2 = new LogTable(0);
+    t1.put("raw", new byte[] {1, 2});
+    t2.put("raw", new byte[] {1, 2});
+    assertEquals(t1.get("raw"), t2.get("raw"));
+    t1.put("i", 42L);
+    t2.put("i", 42L);
+    assertEquals(t1.get("i"), t2.get("i"));
+    t1.put("f", 1.5f);
+    t2.put("f", 1.5f);
+    assertEquals(t1.get("f"), t2.get("f"));
+    t1.put("d", 3.14);
+    t2.put("d", 3.14);
+    assertEquals(t1.get("d"), t2.get("d"));
+    t1.put("s", "hi");
+    t2.put("s", "hi");
+    assertEquals(t1.get("s"), t2.get("s"));
+    t1.put("ba", new boolean[] {true});
+    t2.put("ba", new boolean[] {true});
+    assertEquals(t1.get("ba"), t2.get("ba"));
+    t1.put("ia", new long[] {1L});
+    t2.put("ia", new long[] {1L});
+    assertEquals(t1.get("ia"), t2.get("ia"));
+    t1.put("fa", new float[] {1.0f});
+    t2.put("fa", new float[] {1.0f});
+    assertEquals(t1.get("fa"), t2.get("fa"));
+    t1.put("da", new double[] {1.0});
+    t2.put("da", new double[] {1.0});
+    assertEquals(t1.get("da"), t2.get("da"));
+    t1.put("sa", new String[] {"x"});
+    t2.put("sa", new String[] {"x"});
+    assertEquals(t1.get("sa"), t2.get("sa"));
+  }
+
+  @Test
+  void logValueHashCodeConsistentWithEquals() {
+    table.put("k", 42L);
+    LogValue v = table.get("k");
+    assertEquals(v.hashCode(), v.hashCode());
+  }
+
+  @Test
+  void logValueGetWPILOGTypeForPrimitiveBoolean() {
+    table.put("b", true);
+    assertEquals("boolean", table.get("b").getWPILOGType());
+  }
+
+  @Test
+  void logValueGetWPILOGTypeForCustomType() {
+    Translation2d t2d = new Translation2d(1.0, 2.0);
+    table.put("struct", t2d);
+    String wpilogType = table.get("struct").getWPILOGType();
+    assertTrue(wpilogType.startsWith("struct:"), "struct value must return struct: WPILOG type");
+  }
+
+  @Test
+  void logValueGetNT4TypeForPrimitiveDouble() {
+    table.put("d", 3.14);
+    assertEquals("double", table.get("d").getNT4Type());
+  }
+
+  @Test
+  void logValueGetNT4TypeForCustomType() {
+    Translation2d t2d = new Translation2d(0.0, 0.0);
+    table.put("struct", t2d);
+    String nt4Type = table.get("struct").getNT4Type();
+    assertTrue(nt4Type.startsWith("struct:"), "struct value must return struct: NT4 type");
+  }
+
+  // ─── LogValue type-mismatch default returns ───────────────────────────────
+
+  @Test
+  void logValueGetFloatWithDefaultOnTypeMismatch() {
+    table.put("b", true);
+    LogValue v = table.get("b");
+    assertEquals(9.9f, v.getFloat(9.9f), 1e-6f);
+  }
+
+  @Test
+  void logValueGetRawWithDefaultOnTypeMismatch() {
+    table.put("b", true);
+    LogValue v = table.get("b");
+    byte[] def = {42};
+    assertSame(def, v.getRaw(def));
+  }
+
+  @Test
+  void logValueGetBooleanArrayWithDefaultOnTypeMismatch() {
+    table.put("i", 1L);
+    LogValue v = table.get("i");
+    boolean[] def = {true};
+    assertSame(def, v.getBooleanArray(def));
+  }
+
+  @Test
+  void logValueGetIntegerArrayWithDefaultOnTypeMismatch() {
+    table.put("b", true);
+    LogValue v = table.get("b");
+    long[] def = {1L};
+    assertSame(def, v.getIntegerArray(def));
+  }
+
+  @Test
+  void logValueGetFloatArrayWithDefaultOnTypeMismatch() {
+    table.put("b", true);
+    LogValue v = table.get("b");
+    float[] def = {1.0f};
+    assertSame(def, v.getFloatArray(def));
+  }
+
+  @Test
+  void logValueGetDoubleArrayWithDefaultOnTypeMismatch() {
+    table.put("b", true);
+    LogValue v = table.get("b");
+    double[] def = {1.0};
+    assertSame(def, v.getDoubleArray(def));
+  }
+
+  @Test
+  void logValueGetStringArrayWithDefaultOnTypeMismatch() {
+    table.put("b", true);
+    LogValue v = table.get("b");
+    String[] def = {"x"};
+    assertSame(def, v.getStringArray(def));
+  }
+
+  // ─── LoggableType WPILOG/NT4 type strings ────────────────────────────────────
+
+  @Test
+  void loggableTypeFromWPILOGTypeRoundTrip() {
+    for (LogTable.LoggableType t : LogTable.LoggableType.values()) {
+      String wpilog = t.getWPILOGType();
+      assertEquals(t, LogTable.LoggableType.fromWPILOGType(wpilog));
+    }
+  }
+
+  @Test
+  void loggableTypeFromWPILOGTypeJsonReturnsString() {
+    assertEquals(LogTable.LoggableType.String, LogTable.LoggableType.fromWPILOGType("json"));
+  }
+
+  @Test
+  void loggableTypeFromWPILOGTypeUnknownReturnsRaw() {
+    assertEquals(
+        LogTable.LoggableType.Raw, LogTable.LoggableType.fromWPILOGType("unknown_type_xyz"));
+  }
+
+  @Test
+  void loggableTypeFromNT4TypeRoundTrip() {
+    for (LogTable.LoggableType t : LogTable.LoggableType.values()) {
+      String nt4 = t.getNT4Type();
+      assertEquals(t, LogTable.LoggableType.fromNT4Type(nt4));
+    }
+  }
+
+  @Test
+  void loggableTypeFromNT4TypeJsonReturnsString() {
+    assertEquals(LogTable.LoggableType.String, LogTable.LoggableType.fromNT4Type("json"));
+  }
+
+  @Test
+  void loggableTypeFromNT4TypeUnknownReturnsRaw() {
+    assertEquals(
+        LogTable.LoggableType.Raw, LogTable.LoggableType.fromNT4Type("unknown_nt4_type"));
+  }
+
+  // ─── toString ────────────────────────────────────────────────────────────────
+
+  @Test
+  void toStringContainsTimestampAndBooleanValue() {
+    LogTable t = new LogTable(1000L);
+    t.put("flag", true);
+    String s = t.toString();
+    assertTrue(s.contains("Timestamp=1000"));
+    assertTrue(s.contains("flag"));
+    assertTrue(s.contains("true"));
+  }
+
+  @Test
+  void toStringContainsAllScalarTypes() {
+    table.put("b", true);
+    table.put("i", 42L);
+    table.put("f", 1.5f);
+    table.put("d", 2.5);
+    table.put("s", "hello");
+    String str = table.toString();
+    assertTrue(str.contains("true"));
+    assertTrue(str.contains("42"));
+    assertTrue(str.contains("1.5"));
+    assertTrue(str.contains("2.5"));
+    assertTrue(str.contains("hello"));
+  }
+
+  @Test
+  void toStringContainsArrayTypes() {
+    table.put("ba", new boolean[] {true, false});
+    table.put("ia", new long[] {1L, 2L});
+    table.put("fa", new float[] {1.1f});
+    table.put("da", new double[] {3.14});
+    table.put("sa", new String[] {"x", "y"});
+    table.put("raw", new byte[] {0x01});
+    String str = table.toString();
+    assertNotNull(str);
+    assertTrue(str.length() > 0);
+  }
+
+  @Test
+  void toStringOnEmptyTableContainsBraces() {
+    String s = table.toString();
+    assertTrue(s.contains("{"));
+    assertTrue(s.contains("}"));
   }
 }
