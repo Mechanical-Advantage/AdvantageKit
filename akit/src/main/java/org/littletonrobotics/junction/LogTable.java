@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 import us.hebi.quickbuf.ProtoMessage;
 
@@ -2130,10 +2131,8 @@ public class LogTable {
       if (other instanceof LogValue) {
         LogValue otherValue = (LogValue) other;
         if (otherValue.type.equals(type)
-            && customTypeStr == otherValue.customTypeStr
-            && unitStr == otherValue.unitStr
-            && (customTypeStr == null || otherValue.customTypeStr.equals(customTypeStr))
-            && (unitStr == null || otherValue.unitStr.equals(unitStr))) {
+            && Objects.equals(customTypeStr, otherValue.customTypeStr)
+            && Objects.equals(unitStr, otherValue.unitStr)) {
           switch (type) {
             case Raw:
               return Arrays.equals(getRaw(), otherValue.getRaw());
