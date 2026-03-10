@@ -182,6 +182,10 @@ nativeUtils {
             exportsFile = project.file("src/main/native/symbols.txt")
         }
     }
+
+    exportsConfigs {
+        akit {}
+    }
 }
 
 model {
@@ -207,6 +211,32 @@ model {
 
             nativeUtils.useRequiredLibrary(it, "driver_shared")
         }
+
+        akit(JniNativeLibrarySpec) {
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
+            // Leave these for future proofing
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/*.cpp'
+                    }
+
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/generated/include', 'src/main/thirdparty/include', 'magic_enum/include', 'httplib', 'concurrentqueue', 'readerwriterqueue'
+                    }
+                }
+            }
+
+            nativeUtils.useRequiredLibrary(it, "wpilib_shared")
+
+            binaries.all {
+                lib project: ':', library: 'wpilibio', linkage: 'static'
+                cppCompiler.args << '-DWPILIB_EXPORTS'
+            }
+        }
     }
     testSuites {
         wpilibioTest {
@@ -218,6 +248,21 @@ model {
             }
 
             nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
+        }
+        akitTest {
+            sources.cpp {
+                source {
+                    srcDir 'src/test/native/cpp'
+                    include '**/*.cpp'
+                }
+            }
+
+            nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
+
+            binaries.all {
+                lib project: ':', library: 'wpilibio', linkage: 'static'
+                cppCompiler.args << '-DWPILIB_EXPORTS'
+            }
         }
     }
 }
