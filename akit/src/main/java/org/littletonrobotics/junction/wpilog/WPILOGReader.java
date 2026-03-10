@@ -32,6 +32,7 @@ public class WPILOGReader implements LogReplaySource {
   private Map<Integer, String> entryIDs;
   private Map<Integer, LoggableType> entryTypes;
   private Map<Integer, String> entryCustomTypes;
+  private Map<Integer, String> entryUnits;
 
   /**
    * Creates a new WPILOGReader.
@@ -68,6 +69,19 @@ public class WPILOGReader implements LogReplaySource {
     entryIDs = new HashMap<>();
     entryTypes = new HashMap<>();
     entryCustomTypes = new HashMap<>();
+    entryUnits = new HashMap<>();
+  }
+
+  private String parseUnit(String metadata) {
+    if (metadata == null || !metadata.contains("\"unit\":\"")) {
+      return null;
+    }
+    int startIndex = metadata.indexOf("\"unit\":\"") + 8;
+    int endIndex = metadata.indexOf("\"", startIndex);
+    if (endIndex != -1) {
+      return metadata.substring(startIndex, endIndex);
+    }
+    return null;
   }
 
   public boolean updateTable(LogTable table) {
@@ -92,7 +106,7 @@ public class WPILOGReader implements LogReplaySource {
       }
 
       if (record.isControl()) {
-        if (record.isStart()) { // Ignore other control records
+        if (record.isStart()) {
           entryIDs.put(record.getStartData().entry, record.getStartData().name);
           String typeStr = record.getStartData().type;
           var loggableType = LoggableType.fromWPILOGType(typeStr);
@@ -101,8 +115,21 @@ public class WPILOGReader implements LogReplaySource {
               || typeStr.equals("json")) {
             entryCustomTypes.put(record.getStartData().entry, typeStr);
           }
-        }
 
+          // Parse and store the unit from the start record
+          String unit = parseUnit(record.getStartData().metadata);
+          if (unit != null) {
+            entryUnits.put(record.getStartData().entry, unit);
+          }
+        } else if (record.isSetMetadata()) {
+          // Handle metadata updates dynamically
+          String unit = parseUnit(record.getSetMetadataData().metadata);
+          if (unit != null) {
+            entryUnits.put(record.getSetMetadataData().entry, unit);
+          } else {
+            entryUnits.remove(record.getSetMetadataData().entry);
+          }
+        }
       } else {
         String entry = entryIDs.get(record.getEntry());
         if (entry != null) {
@@ -122,6 +149,8 @@ public class WPILOGReader implements LogReplaySource {
               continue;
             }
             String customType = entryCustomTypes.get(record.getEntry());
+            String unit = entryUnits.get(record.getEntry()); // NEW: Get the unit
+
             switch (entryTypes.get(record.getEntry())) {
               case Raw:
                 table.put(entry, new LogValue(record.getRaw(), customType));
@@ -133,10 +162,18 @@ public class WPILOGReader implements LogReplaySource {
                 table.put(entry, new LogValue(record.getInteger(), customType));
                 break;
               case Float:
-                table.put(entry, new LogValue(record.getFloat(), customType));
+                if (unit != null) {
+                  table.put(entry, new LogValue(record.getFloat(), customType, unit));
+                } else {
+                  table.put(entry, new LogValue(record.getFloat(), customType));
+                }
                 break;
               case Double:
-                table.put(entry, new LogValue(record.getDouble(), customType));
+                if (unit != null) {
+                  table.put(entry, new LogValue(record.getDouble(), customType, unit));
+                } else {
+                  table.put(entry, new LogValue(record.getDouble(), customType));
+                }
                 break;
               case String:
                 table.put(entry, new LogValue(record.getString(), customType));
