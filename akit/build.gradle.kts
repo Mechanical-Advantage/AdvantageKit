@@ -33,6 +33,8 @@ dependencies {
     implementation("edu.wpi.first.wpiunits:wpiunits-java:$wpilibVersion")
     implementation("edu.wpi.first.hal:hal-java:$wpilibVersion")
     implementation("org.ejml:ejml-simple:0.43.1")
+    implementation("org.reflections:reflections:0.9.12")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.0")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")

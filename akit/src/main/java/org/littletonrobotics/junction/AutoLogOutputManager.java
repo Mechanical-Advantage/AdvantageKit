@@ -26,6 +26,8 @@ import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
 
 /**
  * Manages objects and packages for annotation logging of outputs with {@link
@@ -60,13 +62,34 @@ public class AutoLogOutputManager {
   }
 
   /**
-   * Registers a root object, scanning for loggable fields recursively.
+   * Adds Kotlin classes from the package of the given root object. This method scans the package of
+   * the root object to identify all Kotlin classes and adds them to the appropriate collection. For
+   * Kotlin object classes, it calls the {@link #addObject(Object)} method, while for other Kotlin
+   * classes (such as Kotlin files), it calls the {@link #addKotlinFile(Object)} method.
    *
-   * @param root The object to scan recursively.
+   * @param root The root object from which the package will be scanned for Kotlin classes.
    */
-  public static void addObject(Object root) {
+  public static void addKotlinPackage(Object root) {
+    Set<Class<?>> kotlinClasses = getAllKotlinClassesInPackage(root.getClass().getPackageName());
+    for (Class<?> clazz : kotlinClasses) {
+      if (isKotlinObjectClass(clazz)) {
+        addObject(clazz);
+      } else {
+        addKotlinFile(clazz);
+      }
+    }
+  }
+
+  /**
+   * Adds a Kotlin file to the collection of allowed packages and registers it by invoking {@link
+   * #addObjectImpl(Object, Class)} with the provided root object and its class. Kotlin's files are
+   * typically represented by classes ending in "Kt" and aren't object classes.
+   *
+   * @param root The Kotlin file to be added.
+   */
+  public static void addKotlinFile(Object root) {
     allowedPackages.add(root.getClass().getPackageName());
-    addObjectImpl(root);
+    addObjectImpl(root, (Class<?>) root);
   }
 
   /**
@@ -74,7 +97,24 @@ public class AutoLogOutputManager {
    *
    * @param root The object to scan recursively.
    */
-  private static void addObjectImpl(Object root) {
+  public static void addObject(Object root) {
+    String packageName = root.getClass().getPackageName();
+    if (!allowedPackages.contains(packageName)) {
+      addKotlinPackage(root);
+      allowedPackages.add(packageName);
+    }
+
+    addObjectImpl(root, root.getClass());
+  }
+
+  /**
+   * Registers a root object, scanning for loggable fields recursively.
+   *
+   * @param root The object to scan recursively.
+   * @param rootClass The class of the root object, used for retrieving methods and fields. When
+   *     called in a Java context, it should be root.getClass().
+   */
+  private static void addObjectImpl(Object root, Class<?> rootClass) {
     // Check if package name is valid
     String packageName = root.getClass().getPackageName();
     boolean packageNameValid = false;
@@ -91,18 +131,18 @@ public class AutoLogOutputManager {
     scannedObjectHashes.add(root.hashCode());
 
     // If array, loop over individual items
-    if (root.getClass().isArray()) {
+    if (rootClass.isArray()) {
       Object[] rootArray = (Object[]) root;
       for (Object item : rootArray) {
         if (item != null) {
-          addObjectImpl(item);
+          addObjectImpl(item, rootClass);
         }
       }
       return;
     }
 
     // Loop over declared methods
-    getAllMethods(root.getClass())
+    getAllMethods(rootClass)
         .forEach(
             (methodAndDeclaringClass) -> {
               Method method = methodAndDeclaringClass.method;
@@ -184,7 +224,7 @@ public class AutoLogOutputManager {
                 return;
               }
               if (fieldValue != null) {
-                addObjectImpl(fieldValue);
+                addObjectImpl(fieldValue, rootClass);
               }
             });
   }
@@ -632,5 +672,43 @@ public class AutoLogOutputManager {
             });
       }
     }
+  }
+
+  /**
+   * Checks if a given class is a Kotlin object class. This method checks if the class has a field
+   * named "INSTANCE", which all objects classes in kotlin have since they are singletons
+   *
+   * @param clazz The class to check.
+   * @return true if the class is a Kotlin object class, false otherwise.
+   */
+  private static boolean isKotlinObjectClass(Class<?> clazz) {
+    try {
+      return clazz.getDeclaredField("INSTANCE") != null;
+    } catch (NoSuchFieldException e) {
+      return false;
+    }
+  }
+
+  /**
+   * Retrieves all Kotlin classes in a specified package.
+   *
+   * @param packageName The name of the package to scan for Kotlin classes.
+   * @return A {@link Set} of {@link Class} objects representing all Kotlin object classes or files
+   *     with top level methods & fields in the specified package.
+   */
+  private static Set<Class<?>> getAllKotlinClassesInPackage(String packageName) {
+    Reflections reflections = new Reflections(packageName, new SubTypesScanner(false));
+
+    Set<Class<?>> allClasses = new HashSet<>(reflections.getSubTypesOf(Object.class));
+    allClasses.addAll(reflections.getSubTypesOf(AutoCloseable.class));
+
+    Set<Class<?>> filteredClasses = new HashSet<>();
+    for (Class<?> clazz : allClasses) {
+      if (clazz.getSimpleName().endsWith("Kt") || isKotlinObjectClass(clazz)) {
+        filteredClasses.add(clazz);
+      }
+    }
+
+    return filteredClasses;
   }
 }
