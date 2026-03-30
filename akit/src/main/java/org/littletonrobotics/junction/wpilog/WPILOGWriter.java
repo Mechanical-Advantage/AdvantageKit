@@ -8,6 +8,8 @@
 package org.littletonrobotics.junction.wpilog;
 
 import edu.wpi.first.util.datalog.DataLogWriter;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -40,6 +42,12 @@ public class WPILOGWriter implements LogDataReceiver {
       DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
   private static final String advantageScopeFileName = "ascope-log-path.txt";
 
+  // Free space thresholds
+  private static final long LOW_SPACE_WARNING_BYTES = 1024L * 1024 * 1024; // 1 GB — warn
+  private static final long MIN_FREE_SPACE_BYTES = 50L * 1024 * 1024; // 50 MB — stop logging
+  // Check free space every N cycles (~10 seconds at 50Hz)
+  private static final int FREE_SPACE_CHECK_CYCLES = 500;
+
   private String folder;
   private String filename;
   private final String randomIdentifier;
@@ -51,6 +59,11 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private DataLogWriter log;
   private boolean isOpen = false;
+  private int cycleCount = 0;
+  private final Alert lowSpaceAlert =
+      new Alert("[AdvantageKit] Low disk space — logging may stop mid-match.", AlertType.kWarning);
+  private final Alert diskFullAlert =
+      new Alert("[AdvantageKit] Disk full — logging stopped to prevent robot loop overruns.", AlertType.kError);
   private final AdvantageScopeOpenBehavior openBehavior;
   private LogTable lastTable;
   private int timestampID;
@@ -140,6 +153,15 @@ public class WPILOGWriter implements LogDataReceiver {
       logFile.delete();
     }
 
+    // Check free space before opening the log
+    long freeSpace = new File(folder).getFreeSpace();
+    if (freeSpace < MIN_FREE_SPACE_BYTES) {
+      diskFullAlert.set(true);
+      return;
+    } else if (freeSpace < LOW_SPACE_WARNING_BYTES) {
+      lowSpaceAlert.set(true);
+    }
+
     // Create new log
     String logPath = Path.of(folder, filename).toString();
     System.out.println("[AdvantageKit] Logging to \"" + logPath + "\"");
@@ -164,6 +186,7 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   public void end() {
+    if (!isOpen) return;
     log.close();
 
     // Send log path to AdvantageScope
@@ -196,6 +219,20 @@ public class WPILOGWriter implements LogDataReceiver {
   public void putTable(LogTable table) {
     // Exit if log not open
     if (!isOpen) return;
+
+    // Periodically check free disk space; stop logging rather than stalling the robot loop
+    if (++cycleCount >= FREE_SPACE_CHECK_CYCLES) {
+      cycleCount = 0;
+      long freeSpace = new File(folder).getFreeSpace();
+      if (freeSpace < MIN_FREE_SPACE_BYTES) {
+        diskFullAlert.set(true);
+        log.close();
+        isOpen = false;
+        return;
+      } else if (freeSpace < LOW_SPACE_WARNING_BYTES) {
+        lowSpaceAlert.set(true);
+      }
+    }
 
     // Auto rename
     if (autoRename) {
