@@ -63,7 +63,9 @@ public class WPILOGWriter implements LogDataReceiver {
   private final Alert lowSpaceAlert =
       new Alert("[AdvantageKit] Low disk space — logging may stop mid-match.", AlertType.kWarning);
   private final Alert diskFullAlert =
-      new Alert("[AdvantageKit] Disk full — logging stopped to prevent robot loop overruns.", AlertType.kError);
+      new Alert(
+          "[AdvantageKit] Disk full — logging stopped to prevent robot loop overruns.",
+          AlertType.kError);
   private final AdvantageScopeOpenBehavior openBehavior;
   private LogTable lastTable;
   private int timestampID;
