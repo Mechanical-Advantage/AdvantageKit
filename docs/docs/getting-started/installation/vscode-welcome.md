@@ -67,6 +67,10 @@ Logger.start(); // Start logging! No more data receivers, replay sources, or met
 By default, the `WPILOGWriter` class writes to a USB stick when running on the roboRIO. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports**.
 :::
 
+:::warning
+`WPILOGWriter` monitors available disk space to protect robot loop timing. If free space drops below **1 GB**, a persistent dashboard warning is raised. If free space drops below **50 MB**, logging stops immediately and a dashboard error is raised — this is preferable to allowing disk I/O to stall the 20ms robot loop. **Clear old logs from `/U/logs` regularly**, especially before events.
+:::
+
 This setup enters replay mode for all simulator runs. If you need to run the simulator without replay (e.g. a physics simulator or Romi), extra constants or selection logic is required. See the template projects for one method of implementing this logic.
 
 :::note
