@@ -155,7 +155,9 @@ public class WPILOGWriter implements LogDataReceiver {
       logFile.delete();
     }
 
-    // Check free space before opening the log
+    // Reset alerts from any previous run, then recompute based on current free space
+    lowSpaceAlert.set(false);
+    diskFullAlert.set(false);
     long freeSpace = new File(folder).getFreeSpace();
     if (freeSpace < MIN_FREE_SPACE_BYTES) {
       diskFullAlert.set(true);
@@ -233,6 +235,8 @@ public class WPILOGWriter implements LogDataReceiver {
         return;
       } else if (freeSpace < LOW_SPACE_WARNING_BYTES) {
         lowSpaceAlert.set(true);
+      } else {
+        lowSpaceAlert.set(false);
       }
     }
 
