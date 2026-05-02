@@ -7,16 +7,20 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.simulation.DriverStationDataJNI;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import org.littletonrobotics.conduit.ConduitApi;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.hardware.hal.AllianceStationID;
+import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.hardware.hal.simulation.DriverStationDataJNI;
+import org.wpilib.simulation.DriverStationSim;
 
-/** Manages logging and replaying data from the driver station (robot state, joysticks, etc.) */
+/**
+ * Manages logging and replaying data from the driver station (robot state,
+ * joysticks, etc.)
+ */
 class LoggedDriverStation {
-  private LoggedDriverStation() {}
+  private LoggedDriverStation() {
+  }
 
   /** Save the current DS state to the log table. */
   public static void saveToLog(LogTable table) {
@@ -65,13 +69,13 @@ class LoggedDriverStation {
   public static void replayFromLog(LogTable table) {
     DriverStationSim.setAllianceStationId(
         switch (table.get("AllianceStation", 0)) {
-          case DriverStationJNI.kRed1AllianceStation -> AllianceStationID.Red1;
-          case DriverStationJNI.kRed2AllianceStation -> AllianceStationID.Red2;
-          case DriverStationJNI.kRed3AllianceStation -> AllianceStationID.Red3;
-          case DriverStationJNI.kBlue1AllianceStation -> AllianceStationID.Blue1;
-          case DriverStationJNI.kBlue2AllianceStation -> AllianceStationID.Blue2;
-          case DriverStationJNI.kBlue3AllianceStation -> AllianceStationID.Blue3;
-          default -> AllianceStationID.Unknown;
+          case DriverStationJNI.ALLIANCE_STATION_RED_1 -> AllianceStationID.RED_1;
+          case DriverStationJNI.ALLIANCE_STATION_RED_2 -> AllianceStationID.RED_2;
+          case DriverStationJNI.ALLIANCE_STATION_RED_3 -> AllianceStationID.RED_3;
+          case DriverStationJNI.ALLIANCE_STATION_BLUE_1 -> AllianceStationID.BLUE_1;
+          case DriverStationJNI.ALLIANCE_STATION_BLUE_2 -> AllianceStationID.BLUE_2;
+          case DriverStationJNI.ALLIANCE_STATION_BLUE_3 -> AllianceStationID.BLUE_3;
+          default -> AllianceStationID.UNKNOWN;
         });
     DriverStationSim.setEventName(table.get("EventName", ""));
     DriverStationSim.setGameSpecificMessage(table.get("GameSpecificMessage", ""));

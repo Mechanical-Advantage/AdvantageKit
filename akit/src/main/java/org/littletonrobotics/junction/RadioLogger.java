@@ -7,8 +7,8 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotBase;
+import org.wpilib.wpilibj.Notifier;
+import org.wpilib.wpilibj.RobotBase;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;

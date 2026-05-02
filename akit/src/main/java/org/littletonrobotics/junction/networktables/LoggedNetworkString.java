@@ -7,9 +7,8 @@
 
 package org.littletonrobotics.junction.networktables;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringEntry;
-import java.util.function.Supplier;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringEntry;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
@@ -22,10 +21,11 @@ public class LoggedNetworkString extends LoggedNetworkInput implements Supplier<
   private String value;
 
   /**
-   * Creates a new LoggedNetworkString, for handling a string input sent via NetworkTables.
+   * Creates a new LoggedNetworkString, for handling a string input sent via
+   * NetworkTables.
    *
    * @param key The key for the number, published to the root table of NT or
-   *     "/DashboardInputs/{key}" when logged.
+   *            "/DashboardInputs/{key}" when logged.
    */
   public LoggedNetworkString(String key) {
     this.key = key;
@@ -35,10 +35,12 @@ public class LoggedNetworkString extends LoggedNetworkInput implements Supplier<
   }
 
   /**
-   * Creates a new LoggedNetworkString, for handling a string input sent via NetworkTables.
+   * Creates a new LoggedNetworkString, for handling a string input sent via
+   * NetworkTables.
    *
-   * @param key The key for the number, published to the root table of NT or
-   *     "/DashboardInputs/{key}" when logged.
+   * @param key          The key for the number, published to the root table of NT
+   *                     or
+   *                     "/DashboardInputs/{key}" when logged.
    * @param defaultValue The default value if no value in NT is found.
    */
   public LoggedNetworkString(String key, String defaultValue) {
@@ -58,7 +60,8 @@ public class LoggedNetworkString extends LoggedNetworkInput implements Supplier<
   }
 
   /**
-   * Publishes a new value. Note that the value will not be returned by {@link #get()} until the
+   * Publishes a new value. Note that the value will not be returned by
+   * {@link #get()} until the
    * next cycle.
    *
    * @param value The new value.
@@ -76,16 +79,15 @@ public class LoggedNetworkString extends LoggedNetworkInput implements Supplier<
     return value;
   }
 
-  private final LoggableInputs inputs =
-      new LoggableInputs() {
-        public void toLog(LogTable table) {
-          table.put(removeSlash(key), value);
-        }
+  private final LoggableInputs inputs = new LoggableInputs() {
+    public void toLog(LogTable table) {
+      table.put(removeSlash(key), value);
+    }
 
-        public void fromLog(LogTable table) {
-          value = table.get(removeSlash(key), defaultValue);
-        }
-      };
+    public void fromLog(LogTable table) {
+      value = table.get(removeSlash(key), defaultValue);
+    }
+  };
 
   public void periodic() {
     if (!Logger.hasReplaySource()) {

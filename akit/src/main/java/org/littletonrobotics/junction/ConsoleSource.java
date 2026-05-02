@@ -7,7 +7,6 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
+import org.wpilib.driverstation.DriverStation;
 
 /** Console logging source. Users should not interact with this class directly. */
 public interface ConsoleSource extends AutoCloseable {
@@ -120,7 +121,7 @@ public interface ConsoleSource extends AutoCloseable {
       try {
         process = Runtime.getRuntime().exec(command);
       } catch (IOException e) {
-        DriverStation.reportError(
+        DriverStationErrors.reportError(
             "[AdvantageKit] Failed to launch console capture process, disabling.", true);
         return;
       }
@@ -138,7 +139,7 @@ public interface ConsoleSource extends AutoCloseable {
         }
       } catch (IOException e) {
         if (!thread.isInterrupted()) {
-          DriverStation.reportError(
+          DriverStationErrors.reportError(
               "[AdvantageKit] Failed to read from console capture process, disabling.", true);
         }
       } finally {

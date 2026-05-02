@@ -9,12 +9,12 @@ package frc.robot.subsystems.drive;
 
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotMotor;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotWheelSize;
+import org.wpilib.math.MathUtil;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.wpilibj.simulation.DifferentialDrivetrainSim;
+import org.wpilib.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
+import org.wpilib.wpilibj.simulation.DifferentialDrivetrainSim.KitbotMotor;
+import org.wpilib.wpilibj.simulation.DifferentialDrivetrainSim.KitbotWheelSize;
 
 public class DriveIOSim implements DriveIO {
   private DifferentialDrivetrainSim sim =

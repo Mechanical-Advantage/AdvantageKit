@@ -7,15 +7,8 @@
 
 package org.littletonrobotics.junction.mechanism;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
-
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.networktables.NetworkTable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import org.wpilib.networktables.NetworkTable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.littletonrobotics.junction.LogTable;
@@ -23,8 +16,11 @@ import org.littletonrobotics.junction.LogTable;
 /**
  * Common base class for all Mechanism2d node types.
  *
- * <p>To append another node, call {@link #append(LoggedMechanismObject2d)}. Objects that aren't
- * appended to a published {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d} container are
+ * <p>
+ * To append another node, call {@link #append(LoggedMechanismObject2d)}.
+ * Objects that aren't
+ * appended to a published
+ * {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d} container are
  * nonfunctional.
  *
  * @see org.littletonrobotics.junction.mechanism.LoggedMechanism2d
@@ -55,11 +51,13 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
   /**
    * Append a Mechanism object that is based on this one.
    *
-   * @param <T> The object type.
+   * @param <T>    The object type.
    * @param object the object to add.
-   * @return the object given as a parameter, useful for variable assignments and call chaining.
-   * @throws UnsupportedOperationException if the object's name is already used - object names must
-   *     be unique.
+   * @return the object given as a parameter, useful for variable assignments and
+   *         call chaining.
+   * @throws UnsupportedOperationException if the object's name is already used -
+   *                                       object names must
+   *                                       be unique.
    */
   public final synchronized <T extends LoggedMechanismObject2d> T append(T object) {
     if (m_objects.containsKey(object.getName())) {
@@ -106,7 +104,8 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
    * Propogates the mechanism2d down the tree structure.
    *
    * @param seed position to start the calculations at
-   * @return array list of all poses generated from this point in a depth-first pattern
+   * @return array list of all poses generated from this point in a depth-first
+   *         pattern
    */
   public ArrayList<Pose3d> generate3dMechanism(Pose3d seed) {
     ArrayList<Pose3d> poses = new ArrayList<>();
@@ -123,9 +122,8 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
       poses.add(new_pose);
 
       // recurse down the length of that ligament
-      var next_pose =
-          new_pose.transformBy(
-              new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
+      var next_pose = new_pose.transformBy(
+          new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
 
       var more_poses = obj.getValue().generate3dMechanism(next_pose);
       poses.addAll(more_poses);
@@ -135,7 +133,8 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
   }
 
   /**
-   * Abstract helper function. A proxy for getLength() with Ligament2d, but would be something else
+   * Abstract helper function. A proxy for getLength() with Ligament2d, but would
+   * be something else
    * like getRadius() for circular parts if they were to be implemented.
    *
    * @return distance in meters
@@ -143,7 +142,8 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
   public abstract double getObject2dRange();
 
   /**
-   * Abstract helper function. Should be common to all 2d parts, and assumes a normal xy or xz
+   * Abstract helper function. Should be common to all 2d parts, and assumes a
+   * normal xy or xz
    * positive direction of left or up, respectively.
    *
    * @return angle in degrees

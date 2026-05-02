@@ -9,11 +9,11 @@ package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.maxSpeedMetersPerSec;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import org.wpilib.math.MathUtil;
+import org.wpilib.wpilibj.Timer;
+import org.wpilib.wpilibj.drive.DifferentialDrive;
+import org.wpilib.wpilibj2.command.Command;
+import org.wpilib.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

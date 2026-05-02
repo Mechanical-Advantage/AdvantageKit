@@ -7,18 +7,9 @@
 
 package org.littletonrobotics.junction.mechanism;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
-
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.units.measure.Distance;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import org.wpilib.networktables.DoublePublisher;
+import org.wpilib.networktables.NetworkTable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.littletonrobotics.junction.LogTable;
@@ -26,12 +17,17 @@ import org.littletonrobotics.junction.LogTable;
 /**
  * Root Mechanism2d node.
  *
- * <p>A root is the anchor point of other nodes (such as ligaments).
+ * <p>
+ * A root is the anchor point of other nodes (such as ligaments).
  *
- * <p>Do not create objects of this class directly! Obtain instances from the {@link
- * edu.wpi.first.wpilibj.smartdashboard.Mechanism2d#getRoot(String, double, double)} factory method.
+ * <p>
+ * Do not create objects of this class directly! Obtain instances from the
+ * {@link
+ * edu.wpi.first.wpilibj.smartdashboard.Mechanism2d#getRoot(String, double, double)}
+ * factory method.
  *
- * <p>Append other nodes by using {@link #append(LoggedMechanismObject2d)}.
+ * <p>
+ * Append other nodes by using {@link #append(LoggedMechanismObject2d)}.
  */
 public final class LoggedMechanismRoot2d implements AutoCloseable {
   private final String m_name;
@@ -46,8 +42,8 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
    * Package-private constructor for roots.
    *
    * @param name name
-   * @param x x coordinate of root (provide only when constructing a root node)
-   * @param y y coordinate of root (provide only when constructing a root node)
+   * @param x    x coordinate of root (provide only when constructing a root node)
+   * @param y    y coordinate of root (provide only when constructing a root node)
    */
   LoggedMechanismRoot2d(String name, double x, double y) {
     m_name = name;
@@ -75,11 +71,13 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
   /**
    * Append a Mechanism object that is based on this one.
    *
-   * @param <T> The object type.
+   * @param <T>    The object type.
    * @param object the object to add.
-   * @return the object given as a parameter, useful for variable assignments and call chaining.
-   * @throws UnsupportedOperationException if the object's name is already used - object names must
-   *     be unique.
+   * @return the object given as a parameter, useful for variable assignments and
+   *         call chaining.
+   * @throws UnsupportedOperationException if the object's name is already used -
+   *                                       object names must
+   *                                       be unique.
    */
   public synchronized <T extends LoggedMechanismObject2d> T append(T object) {
     if (m_objects.containsKey(object.getName())) {
@@ -147,11 +145,15 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
   }
 
   /**
-   * Converts the Mechanism2d into a series of Pose3d objects. Poses are generated with standard
-   * coordinate frame (+x forward, +y left, +z up) and each pivot point is assumed to be at the
+   * Converts the Mechanism2d into a series of Pose3d objects. Poses are generated
+   * with standard
+   * coordinate frame (+x forward, +y left, +z up) and each pivot point is assumed
+   * to be at the
    * origin of the model.
    *
-   * <p>The order of the poses returned is based on the order of insertion. The first root inserted
+   * <p>
+   * The order of the poses returned is based on the order of insertion. The first
+   * root inserted
    * into the Mechanism2d goes first, and processed in a depth-first manner.
    *
    * @return list of poses for starting from the root point
@@ -171,9 +173,8 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
       poses.add(new_pose);
 
       // recurse down the length of that ligament
-      var next_pose =
-          new_pose.transformBy(
-              new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
+      var next_pose = new_pose.transformBy(
+          new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
       var more_poses = obj.getValue().generate3dMechanism(next_pose);
       poses.addAll(more_poses);
     }

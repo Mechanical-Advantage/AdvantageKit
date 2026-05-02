@@ -7,8 +7,8 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.wpilibj.PowerDistribution;
 import org.littletonrobotics.conduit.ConduitApi;
+import org.wpilib.hardware.power.PowerDistribution;
 
 /** Manages logging power distribution data. */
 public class LoggedPowerDistribution {

@@ -7,8 +7,8 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringArraySubscriber;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringArraySubscriber;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;

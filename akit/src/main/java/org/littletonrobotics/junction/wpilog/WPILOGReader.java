@@ -7,18 +7,19 @@
 
 package org.littletonrobotics.junction.wpilog;
 
-import edu.wpi.first.datalog.DataLogIterator;
-import edu.wpi.first.datalog.DataLogReader;
-import edu.wpi.first.datalog.DataLogRecord;
-import edu.wpi.first.wpilibj.DriverStation;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogReplaySource;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
+import org.wpilib.datalog.DataLogIterator;
+import org.wpilib.datalog.DataLogReader;
+import org.wpilib.datalog.DataLogRecord;
+import org.wpilib.driverstation.DriverStation;
 
 /** Replays log values from a WPILOG file. */
 public class WPILOGReader implements LogReplaySource {
@@ -48,15 +49,15 @@ public class WPILOGReader implements LogReplaySource {
     try {
       reader = new DataLogReader(filename);
     } catch (IOException e) {
-      DriverStation.reportError("[AdvantageKit] Failed to open replay log file.", true);
+      DriverStationErrors.reportError("[AdvantageKit] Failed to open replay log file.", true);
     }
 
     // Check validity
     if (!reader.isValid()) {
-      DriverStation.reportError("[AdvantageKit] The replay log is not a valid WPILOG file.", false);
+      DriverStationErrors.reportError("[AdvantageKit] The replay log is not a valid WPILOG file.", false);
       isValid = false;
     } else if (!reader.getExtraHeader().equals(WPILOGConstants.extraHeader)) {
-      DriverStation.reportError(
+      DriverStationErrors.reportError(
           "[AdvantageKit] The replay log was not produced by AdvantageKit.", true);
       isValid = false;
     } else {

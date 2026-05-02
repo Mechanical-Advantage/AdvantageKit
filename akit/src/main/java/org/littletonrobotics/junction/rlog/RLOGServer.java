@@ -7,7 +7,6 @@
 
 package org.littletonrobotics.junction.rlog;
 
-import edu.wpi.first.wpilibj.RobotController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -16,8 +15,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
+import org.wpilib.system.RobotController;
 
 /** Sends log data over a socket connection using the RLOG format. */
 public class RLOGServer implements LogDataReceiver {
@@ -119,7 +120,7 @@ public class RLOGServer implements LogDataReceiver {
           socket.getOutputStream().write(data);
           synchronized (socketsLock) {
             sockets.add(socket);
-            lastHeartbeats.add(RobotController.getFPGATime() / 1000000.0);
+            lastHeartbeats.add(RobotController.getMonotonicTime() / 1000000.0);
           }
           System.out.println(
               "[AdvantageKit] Connected to RLOG client - "
@@ -155,11 +156,11 @@ public class RLOGServer implements LogDataReceiver {
               InputStream inputStream = socket.getInputStream();
               if (inputStream.available() > 0) {
                 inputStream.skip(inputStream.available());
-                lastHeartbeats.set(i, RobotController.getFPGATime() / 1000000.0);
+                lastHeartbeats.set(i, RobotController.getMonotonicTime() / 1000000.0);
               }
 
               // Close connection if socket timed out
-              if (RobotController.getFPGATime() / 1000000.0 - lastHeartbeats.get(i)
+              if (RobotController.getMonotonicTime() / 1000000.0 - lastHeartbeats.get(i)
                   > heartbeatTimeoutSecs) {
                 socket.close();
                 printDisconnectMessage(socket, "timeout");

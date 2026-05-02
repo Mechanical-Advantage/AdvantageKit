@@ -7,11 +7,6 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.util.WPISerializable;
-import edu.wpi.first.util.struct.StructSerializable;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.util.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,7 +20,13 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.units.Measure;
+import org.wpilib.util.WPISerializable;
+import org.wpilib.util.struct.StructSerializable;
 
 /**
  * Manages objects and packages for annotation logging of outputs with {@link
@@ -36,15 +37,20 @@ public class AutoLogOutputManager {
   private static final List<Integer> scannedObjectHashes = new ArrayList<>();
   private static final Set<String> allowedPackages = new HashSet<>();
 
-  private AutoLogOutputManager() {}
+  private AutoLogOutputManager() {
+  }
 
   /**
-   * Adds a new allowed package to use when scanning for annotations. By default, the parent class
-   * where {@code @AutoLogOutput} is used must be within the same package as {@code Robot} (or a
-   * subpackage). Calling this method registers a new allowed package, such as a "lib" package
+   * Adds a new allowed package to use when scanning for annotations. By default,
+   * the parent class
+   * where {@code @AutoLogOutput} is used must be within the same package as
+   * {@code Robot} (or a
+   * subpackage). Calling this method registers a new allowed package, such as a
+   * "lib" package
    * outside of normal robot code.
    *
-   * <p>This method must be called within the constructor of {@code Robot}.
+   * <p>
+   * This method must be called within the constructor of {@code Robot}.
    *
    * @param packageName The new allowed package name (e.g. "frc.lib")
    */
@@ -84,10 +90,12 @@ public class AutoLogOutputManager {
         break;
       }
     }
-    if (!packageNameValid) return;
+    if (!packageNameValid)
+      return;
 
     // Check if object has already been scanned
-    if (scannedObjectHashes.contains(root.hashCode())) return;
+    if (scannedObjectHashes.contains(root.hashCode()))
+      return;
     scannedObjectHashes.add(root.hashCode());
 
     // If array, loop over individual items
@@ -107,7 +115,8 @@ public class AutoLogOutputManager {
             (methodAndDeclaringClass) -> {
               Method method = methodAndDeclaringClass.method;
               Class<?> declaringClass = methodAndDeclaringClass.declaringClass;
-              if (!method.trySetAccessible()) return;
+              if (!method.trySetAccessible())
+                return;
 
               // If annotated, try to add
               if (method.isAnnotationPresent(AutoLogOutput.class)) {
@@ -149,7 +158,8 @@ public class AutoLogOutputManager {
             (fieldAndDeclaringClass) -> {
               Field field = fieldAndDeclaringClass.field;
               Class<?> declaringClass = fieldAndDeclaringClass.declaringClass;
-              if (!field.trySetAccessible()) return;
+              if (!field.trySetAccessible())
+                return;
 
               // If annotated, try to add
               if (field.isAnnotationPresent(AutoLogOutput.class)) {
@@ -189,7 +199,10 @@ public class AutoLogOutputManager {
             });
   }
 
-  /** Returns the set of all methods on the class and its superclasses (public and private). */
+  /**
+   * Returns the set of all methods on the class and its superclasses (public and
+   * private).
+   */
   private static List<MethodAndDeclaringClass> getAllMethods(Class<?> type) {
     List<MethodAndDeclaringClass> methods = new ArrayList<>();
     while (type != null && type != Object.class) {
@@ -209,10 +222,12 @@ public class AutoLogOutputManager {
       this.method = method;
       this.declaringClass = declaringClass;
     }
-  }
-  ;
+  };
 
-  /** Returns the set of all fields in the class and its superclasses (public and private). */
+  /**
+   * Returns the set of all fields in the class and its superclasses (public and
+   * private).
+   */
   private static List<FieldAndDeclaringClass> getAllFields(Class<?> type) {
     List<FieldAndDeclaringClass> fields = new ArrayList<>();
     while (type != null && type != Object.class) {
@@ -235,7 +250,8 @@ public class AutoLogOutputManager {
   }
 
   /**
-   * Finds the field in the provided class and its superclasses (must be public or protected in
+   * Finds the field in the provided class and its superclasses (must be public or
+   * protected in
    * superclasses). Returns null if the field cannot be found.
    */
   private static Field findField(Class<?> type, String fieldName) {
@@ -264,10 +280,10 @@ public class AutoLogOutputManager {
   /**
    * Generates a log key based on the field properties.
    *
-   * @param keyParameter The user-provided key from the annotation
-   * @param valueName The name of the field or method
+   * @param keyParameter   The user-provided key from the annotation
+   * @param valueName      The name of the field or method
    * @param declaringClass The class where this fields or method is declared
-   * @param parent The parent object to read data from
+   * @param parent         The parent object to read data from
    */
   private static String makeKey(
       String keyParameter, String valueName, Class<?> declaringClass, Object parent) {
@@ -285,9 +301,11 @@ public class AutoLogOutputManager {
       while (true) {
         // Find field name
         int openIndex = key.indexOf("{");
-        if (openIndex == -1) break; // No more brackets
+        if (openIndex == -1)
+          break; // No more brackets
         int closeIndex = key.indexOf("}", openIndex);
-        if (closeIndex == -1) break; // No closing bracket
+        if (closeIndex == -1)
+          break; // No closing bracket
         String fieldName = key.substring(openIndex + 1, closeIndex);
 
         // Get field value
@@ -314,11 +332,12 @@ public class AutoLogOutputManager {
   /**
    * Registers the periodic callback for a single field.
    *
-   * @param key The string key to use for logging.
-   * @param type The type of object being logged.
-   * @param supplier A supplier for the field values.
-   * @param forceSerializable Whether or not to always use a serialized data method.
-   * @param unit The unit metadata.
+   * @param key               The string key to use for logging.
+   * @param type              The type of object being logged.
+   * @param supplier          A supplier for the field values.
+   * @param forceSerializable Whether or not to always use a serialized data
+   *                          method.
+   * @param unit              The unit metadata.
    */
   private static void registerField(
       String key, Class<?> type, Supplier<?> supplier, boolean forceSerializable, String unit) {
@@ -330,7 +349,7 @@ public class AutoLogOutputManager {
               try {
                 Logger.recordOutput(key, (WPISerializable) value);
               } catch (ClassCastException e) {
-                DriverStation.reportError(
+                DriverStationErrors.reportError(
                     "[AdvantageKit] Auto serialization is not supported for type "
                         + type.getSimpleName(),
                     false);
@@ -345,32 +364,37 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (boolean) value);
+              if (value != null)
+                Logger.recordOutput(key, (boolean) value);
             });
       } else if (type.equals(int.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (int) value);
+              if (value != null)
+                Logger.recordOutput(key, (int) value);
             });
       } else if (type.equals(long.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (long) value);
+              if (value != null)
+                Logger.recordOutput(key, (long) value);
             });
       } else if (type.equals(float.class)) {
         if (unit.length() > 0) {
           callbacks.add(
               () -> {
                 Object value = supplier.get();
-                if (value != null) Logger.recordOutput(key, (float) value, unit);
+                if (value != null)
+                  Logger.recordOutput(key, (float) value, unit);
               });
         } else {
           callbacks.add(
               () -> {
                 Object value = supplier.get();
-                if (value != null) Logger.recordOutput(key, (float) value);
+                if (value != null)
+                  Logger.recordOutput(key, (float) value);
               });
         }
 
@@ -379,20 +403,23 @@ public class AutoLogOutputManager {
           callbacks.add(
               () -> {
                 Object value = supplier.get();
-                if (value != null) Logger.recordOutput(key, (double) value, unit);
+                if (value != null)
+                  Logger.recordOutput(key, (double) value, unit);
               });
         } else {
           callbacks.add(
               () -> {
                 Object value = supplier.get();
-                if (value != null) Logger.recordOutput(key, (double) value);
+                if (value != null)
+                  Logger.recordOutput(key, (double) value);
               });
         }
       } else if (type.equals(String.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (String) value);
+              if (value != null)
+                Logger.recordOutput(key, (String) value);
             });
       } else if (type.isEnum()) {
         callbacks.add(
@@ -406,49 +433,57 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (BooleanSupplier) value);
+              if (value != null)
+                Logger.recordOutput(key, (BooleanSupplier) value);
             });
       } else if (IntSupplier.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (IntSupplier) value);
+              if (value != null)
+                Logger.recordOutput(key, (IntSupplier) value);
             });
       } else if (LongSupplier.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (LongSupplier) value);
+              if (value != null)
+                Logger.recordOutput(key, (LongSupplier) value);
             });
       } else if (DoubleSupplier.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (DoubleSupplier) value);
+              if (value != null)
+                Logger.recordOutput(key, (DoubleSupplier) value);
             });
       } else if (Measure.class.isAssignableFrom(type)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (Measure<?>) value);
+              if (value != null)
+                Logger.recordOutput(key, (Measure<?>) value);
             });
       } else if (type.equals(LoggedMechanism2d.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (LoggedMechanism2d) value);
+              if (value != null)
+                Logger.recordOutput(key, (LoggedMechanism2d) value);
             });
       } else if (type.equals(Color.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (Color) value);
+              if (value != null)
+                Logger.recordOutput(key, (Color) value);
             });
       } else if (type.isRecord()) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (Record) value);
+              if (value != null)
+                Logger.recordOutput(key, (Record) value);
             });
       } else {
         callbacks.add(
@@ -458,7 +493,7 @@ public class AutoLogOutputManager {
                 try {
                   Logger.recordOutput(key, (WPISerializable) value);
                 } catch (ClassCastException e) {
-                  DriverStation.reportError(
+                  DriverStationErrors.reportError(
                       "[AdvantageKit] Auto serialization is not supported for type "
                           + type.getSimpleName(),
                       false);
@@ -472,43 +507,50 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (byte[]) value);
+              if (value != null)
+                Logger.recordOutput(key, (byte[]) value);
             });
       } else if (componentType.equals(boolean.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (boolean[]) value);
+              if (value != null)
+                Logger.recordOutput(key, (boolean[]) value);
             });
       } else if (componentType.equals(int.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (int[]) value);
+              if (value != null)
+                Logger.recordOutput(key, (int[]) value);
             });
       } else if (componentType.equals(long.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (long[]) value);
+              if (value != null)
+                Logger.recordOutput(key, (long[]) value);
             });
       } else if (componentType.equals(float.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (float[]) value);
+              if (value != null)
+                Logger.recordOutput(key, (float[]) value);
             });
       } else if (componentType.equals(double.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (double[]) value);
+              if (value != null)
+                Logger.recordOutput(key, (double[]) value);
             });
       } else if (componentType.equals(String.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (String[]) value);
+              if (value != null)
+                Logger.recordOutput(key, (String[]) value);
             });
       } else if (componentType.isEnum()) {
         callbacks.add(
@@ -528,7 +570,8 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (Record[]) value);
+              if (value != null)
+                Logger.recordOutput(key, (Record[]) value);
             });
       } else {
         callbacks.add(
@@ -538,7 +581,7 @@ public class AutoLogOutputManager {
                 try {
                   Logger.recordOutput(key, (StructSerializable[]) value);
                 } catch (ClassCastException e) {
-                  DriverStation.reportError(
+                  DriverStationErrors.reportError(
                       "[AdvantageKit] Auto serialization is not supported for array type "
                           + componentType.getSimpleName(),
                       false);
@@ -553,43 +596,50 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (byte[][]) value);
+              if (value != null)
+                Logger.recordOutput(key, (byte[][]) value);
             });
       } else if (componentType.equals(boolean.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (boolean[][]) value);
+              if (value != null)
+                Logger.recordOutput(key, (boolean[][]) value);
             });
       } else if (componentType.equals(int.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (int[][]) value);
+              if (value != null)
+                Logger.recordOutput(key, (int[][]) value);
             });
       } else if (componentType.equals(long.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (long[][]) value);
+              if (value != null)
+                Logger.recordOutput(key, (long[][]) value);
             });
       } else if (componentType.equals(float.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (float[][]) value);
+              if (value != null)
+                Logger.recordOutput(key, (float[][]) value);
             });
       } else if (componentType.equals(double.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (double[][]) value);
+              if (value != null)
+                Logger.recordOutput(key, (double[][]) value);
             });
       } else if (componentType.equals(String.class)) {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (String[][]) value);
+              if (value != null)
+                Logger.recordOutput(key, (String[][]) value);
             });
       } else if (componentType.isEnum()) {
         callbacks.add(
@@ -613,7 +663,8 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (Record[][]) value);
+              if (value != null)
+                Logger.recordOutput(key, (Record[][]) value);
             });
       } else {
         callbacks.add(
@@ -623,7 +674,7 @@ public class AutoLogOutputManager {
                 try {
                   Logger.recordOutput(key, (StructSerializable[][]) value);
                 } catch (ClassCastException e) {
-                  DriverStation.reportError(
+                  DriverStationErrors.reportError(
                       "[AdvantageKit] Auto serialization is not supported for 2D array type "
                           + componentType.getSimpleName(),
                       false);

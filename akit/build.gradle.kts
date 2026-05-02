@@ -4,10 +4,10 @@ plugins {
     id("cpp")
     id("java")
     id("google-test")
-    id("edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin") version "2025.0"
-    id("edu.wpi.first.NativeUtils") version "2025.12.1"
-    id("edu.wpi.first.GradleJni") version "1.1.0"
-    id("edu.wpi.first.GradleVsCode") version "2.1.0"
+    id("org.wpilib.WPILibRepositoriesPlugin") version "2027.0.0"
+    id("org.wpilib.NativeUtils") version "2027.1.1"
+    id("org.wpilib.GradleJni") version "2027.0.0"
+    id("org.wpilib.GradleVsCode") version "2027.0.0"
     id("com.diffplug.spotless") version "6.25.0"
 }
 
@@ -22,18 +22,18 @@ repositories {
 wpilibRepositories.use2027Repos()
 wpilibRepositories.addAllReleaseRepositories(project)
 
-val wpilibVersion = "2027.0.0-alpha-2"
+val wpilibVersion = "2027.0.0-alpha-5"
 
 dependencies {
-    implementation("edu.wpi.first.cscore:cscore-java:$wpilibVersion")
-    implementation("edu.wpi.first.cameraserver:cameraserver-java:$wpilibVersion")
-    implementation("edu.wpi.first.ntcore:ntcore-java:$wpilibVersion")
-    implementation("edu.wpi.first.wpilibj:wpilibj-java:$wpilibVersion")
-    implementation("edu.wpi.first.wpiutil:wpiutil-java:$wpilibVersion")
-    implementation("edu.wpi.first.wpimath:wpimath-java:$wpilibVersion")
-    implementation("edu.wpi.first.wpiunits:wpiunits-java:$wpilibVersion")
-    implementation("edu.wpi.first.datalog:datalog-java:$wpilibVersion")
-    implementation("edu.wpi.first.hal:hal-java:$wpilibVersion")
+    implementation("org.wpilib.cscore:cscore-java:$wpilibVersion")
+    implementation("org.wpilib.cameraserver:cameraserver-java:$wpilibVersion")
+    implementation("org.wpilib.ntcore:ntcore-java:$wpilibVersion")
+    implementation("org.wpilib.wpilibj:wpilibj-java:$wpilibVersion")
+    implementation("org.wpilib.wpiutil:wpiutil-java:$wpilibVersion")
+    implementation("org.wpilib.wpimath:wpimath-java:$wpilibVersion")
+    implementation("org.wpilib.wpiunits:wpiunits-java:$wpilibVersion")
+    implementation("org.wpilib.datalog:datalog-java:$wpilibVersion")
+    implementation("org.wpilib.hal:hal-java:$wpilibVersion")
     implementation("org.ejml:ejml-simple:0.43.1")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")

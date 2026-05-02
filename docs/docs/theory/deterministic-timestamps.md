@@ -16,7 +16,7 @@ Where precise timestamps are required, the best solution is to record measuremen
 
 ### Solution #2
 
-`Timer.getFPGATimestamp()` can always be used to access the "real" FPGA timestamp where necessary, like within IO implementations or for analyzing performance. This method is not affected by log replay (i.e. it will not reflect the accelerated rate of replay). One use case for this method is measuring code execution time, since those values don't need to be recreated during log replay. WPILib classes like `Watchdog` use this method because they use the timestamp for analyzing performance and are not part of the robot's control logic.
+`Timer.getMonotonicTimestamp()` can always be used to access the "real" FPGA timestamp where necessary, like within IO implementations or for analyzing performance. This method is not affected by log replay (i.e. it will not reflect the accelerated rate of replay). One use case for this method is measuring code execution time, since those values don't need to be recreated during log replay. WPILib classes like `Watchdog` use this method because they use the timestamp for analyzing performance and are not part of the robot's control logic.
 
 ### Solution #3
 
@@ -30,6 +30,6 @@ If you need to disable deterministic timestamps globally, add the following line
 
 ```java
 if (!Logger.hasReplaySource()) {
-    RobotController.setTimeSource(RobotController::getFPGATime);
+    RobotController.setTimeSource(RobotController::getMonotonicTime);
 }
 ```

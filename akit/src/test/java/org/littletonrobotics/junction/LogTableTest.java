@@ -10,8 +10,8 @@ package org.littletonrobotics.junction.autolog;
 import static edu.wpi.first.units.Units.Rotations;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.MutAngle;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.MutAngle;
 import org.junit.jupiter.api.Test;
 import org.littletonrobotics.junction.LogTable;
 

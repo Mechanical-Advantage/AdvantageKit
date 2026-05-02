@@ -18,14 +18,15 @@ import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.math.util.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Voltage;
 
 /**
- * This superstructure implementation is for Talon FXs driving motors like the Falon 500, Kraken
+ * This superstructure implementation is for Talon FXs driving motors like the
+ * Falon 500, Kraken
  * X44, or Kraken X60.
  */
 public class SuperstructureIOTalonFX implements SuperstructureIO {
@@ -37,8 +38,7 @@ public class SuperstructureIOTalonFX implements SuperstructureIO {
 
   private final TalonFX intakeLauncher = new TalonFX(intakeLauncherCanId);
   private final StatusSignal<Angle> intakeLauncherPositionRot = intakeLauncher.getPosition();
-  private final StatusSignal<AngularVelocity> intakeLauncherVelocityRotPerSec =
-      intakeLauncher.getVelocity();
+  private final StatusSignal<AngularVelocity> intakeLauncherVelocityRotPerSec = intakeLauncher.getVelocity();
   private final StatusSignal<Voltage> intakeLauncherAppliedVolts = intakeLauncher.getMotorVoltage();
   private final StatusSignal<Current> intakeLauncherCurrentAmps = intakeLauncher.getSupplyCurrent();
 
@@ -84,14 +84,12 @@ public class SuperstructureIOTalonFX implements SuperstructureIO {
         intakeLauncherCurrentAmps);
 
     inputs.feederPositionRad = Units.rotationsToRadians(feederPositionRot.getValueAsDouble());
-    inputs.feederVelocityRadPerSec =
-        Units.rotationsToRadians(feederVelocityRotPerSec.getValueAsDouble());
+    inputs.feederVelocityRadPerSec = Units.rotationsToRadians(feederVelocityRotPerSec.getValueAsDouble());
     inputs.feederAppliedVolts = feederAppliedVolts.getValueAsDouble();
     inputs.feederCurrentAmps = feederCurrentAmps.getValueAsDouble();
-    inputs.intakeLauncherPositionRad =
-        Units.rotationsToRadians(intakeLauncherPositionRot.getValueAsDouble());
-    inputs.intakeLauncherVelocityRadPerSec =
-        Units.rotationsToRadians(intakeLauncherVelocityRotPerSec.getValueAsDouble());
+    inputs.intakeLauncherPositionRad = Units.rotationsToRadians(intakeLauncherPositionRot.getValueAsDouble());
+    inputs.intakeLauncherVelocityRadPerSec = Units
+        .rotationsToRadians(intakeLauncherVelocityRotPerSec.getValueAsDouble());
     inputs.intakeLauncherAppliedVolts = intakeLauncherAppliedVolts.getValueAsDouble();
     inputs.intakeLauncherCurrentAmps = intakeLauncherCurrentAmps.getValueAsDouble();
   }
