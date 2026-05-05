@@ -22,7 +22,6 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.units.Measure;
 import org.wpilib.util.WPISerializable;

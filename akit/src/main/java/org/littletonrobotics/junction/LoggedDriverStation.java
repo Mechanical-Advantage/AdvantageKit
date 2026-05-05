@@ -67,63 +67,63 @@ class LoggedDriverStation {
 
   /** Read the DS state to the log table and publish to the HAL sim. */
   public static void replayFromLog(LogTable table) {
-    DriverStationSim.setAllianceStationId(
-        switch (table.get("AllianceStation", 0)) {
-          case DriverStationJNI.ALLIANCE_STATION_RED_1 -> AllianceStationID.RED_1;
-          case DriverStationJNI.ALLIANCE_STATION_RED_2 -> AllianceStationID.RED_2;
-          case DriverStationJNI.ALLIANCE_STATION_RED_3 -> AllianceStationID.RED_3;
-          case DriverStationJNI.ALLIANCE_STATION_BLUE_1 -> AllianceStationID.BLUE_1;
-          case DriverStationJNI.ALLIANCE_STATION_BLUE_2 -> AllianceStationID.BLUE_2;
-          case DriverStationJNI.ALLIANCE_STATION_BLUE_3 -> AllianceStationID.BLUE_3;
-          default -> AllianceStationID.UNKNOWN;
-        });
-    DriverStationSim.setEventName(table.get("EventName", ""));
-    DriverStationSim.setGameSpecificMessage(table.get("GameSpecificMessage", ""));
-    DriverStationSim.setMatchNumber(table.get("MatchNumber", 0));
-    DriverStationSim.setReplayNumber(table.get("ReplayNumber", 0));
-    DriverStationSim.setMatchType(
-        switch (table.get("MatchType", 0)) {
-          case 1 -> MatchType.Practice;
-          case 2 -> MatchType.Qualification;
-          case 3 -> MatchType.Elimination;
-          default -> MatchType.None;
-        });
-    DriverStationSim.setMatchTime(table.get("MatchTime", -1.0));
+    // DriverStationSim.setAllianceStationId(
+    //     switch (table.get("AllianceStation", 0)) {
+    //       case DriverStationJNI.ALLIANCE_STATION_RED_1 -> AllianceStationID.RED_1;
+    //       case DriverStationJNI.ALLIANCE_STATION_RED_2 -> AllianceStationID.RED_2;
+    //       case DriverStationJNI.ALLIANCE_STATION_RED_3 -> AllianceStationID.RED_3;
+    //       case DriverStationJNI.ALLIANCE_STATION_BLUE_1 -> AllianceStationID.BLUE_1;
+    //       case DriverStationJNI.ALLIANCE_STATION_BLUE_2 -> AllianceStationID.BLUE_2;
+    //       case DriverStationJNI.ALLIANCE_STATION_BLUE_3 -> AllianceStationID.BLUE_3;
+    //       default -> AllianceStationID.UNKNOWN;
+    //     });
+    // DriverStationSim.setEventName(table.get("EventName", ""));
+    // DriverStationSim.setGameSpecificMessage(table.get("GameSpecificMessage", ""));
+    // DriverStationSim.setMatchNumber(table.get("MatchNumber", 0));
+    // DriverStationSim.setReplayNumber(table.get("ReplayNumber", 0));
+    // DriverStationSim.setMatchType(
+    //     switch (table.get("MatchType", 0)) {
+    //       case 1 -> MatchType.Practice;
+    //       case 2 -> MatchType.Qualification;
+    //       case 3 -> MatchType.Elimination;
+    //       default -> MatchType.None;
+    //     });
+    // DriverStationSim.setMatchTime(table.get("MatchTime", -1.0));
 
-    boolean dsAttached = table.get("DSAttached", false);
-    DriverStationSim.setEnabled(table.get("Enabled", false));
-    DriverStationSim.setAutonomous(table.get("Autonomous", false));
-    DriverStationSim.setTest(table.get("Test", false));
-    DriverStationSim.setEStop(table.get("EmergencyStop", false));
-    DriverStationSim.setFmsAttached(table.get("FMSAttached", false));
-    DriverStationSim.setDsAttached(dsAttached);
+    // boolean dsAttached = table.get("DSAttached", false);
+    // DriverStationSim.setEnabled(table.get("Enabled", false));
+    // DriverStationSim.setAutonomous(table.get("Autonomous", false));
+    // DriverStationSim.setTest(table.get("Test", false));
+    // DriverStationSim.setEStop(table.get("EmergencyStop", false));
+    // DriverStationSim.setFmsAttached(table.get("FMSAttached", false));
+    // DriverStationSim.setDsAttached(dsAttached);
 
-    for (int id = 0; id < ConduitApi.NUM_JOYSTICKS; id++) {
-      LogTable joystickTable = table.getSubtable("Joystick" + Integer.toString(id));
-      DriverStationSim.setJoystickName(id, joystickTable.get("Name", ""));
-      DriverStationSim.setJoystickType(id, joystickTable.get("Type", 0));
-      DriverStationSim.setJoystickIsGamepad(id, joystickTable.get("IsGamepad", false));
-      DriverStationSim.setJoystickButtonCount(id, joystickTable.get("ButtonCount", 0));
-      DriverStationSim.setJoystickButtons(id, joystickTable.get("ButtonValues", 0));
+    // for (int id = 0; id < ConduitApi.NUM_JOYSTICKS; id++) {
+    //   LogTable joystickTable = table.getSubtable("Joystick" + Integer.toString(id));
+    //   DriverStationSim.setJoystickName(id, joystickTable.get("Name", ""));
+    //   DriverStationSim.setJoystickType(id, joystickTable.get("Type", 0));
+    //   DriverStationSim.setJoystickIsGamepad(id, joystickTable.get("IsGamepad", false));
+    //   DriverStationSim.setJoystickButtonCount(id, joystickTable.get("ButtonCount", 0));
+    //   DriverStationSim.setJoystickButtons(id, joystickTable.get("ButtonValues", 0));
 
-      int[] povValues = joystickTable.get("POVs", new int[0]);
-      DriverStationSim.setJoystickPOVCount(id, povValues.length);
-      for (int i = 0; i < povValues.length; i++) {
-        DriverStationDataJNI.setJoystickPOV(id, i, (byte) povValues[i]);
-      }
+    //   int[] povValues = joystickTable.get("POVs", new int[0]);
+    //   DriverStationSim.setJoystickPOVCount(id, povValues.length);
+    //   for (int i = 0; i < povValues.length; i++) {
+    //     DriverStationDataJNI.setJoystickPOV(id, i, (byte) povValues[i]);
+    //   }
 
-      float[] axisValues = joystickTable.get("AxisValues", new float[0]);
-      int[] axisTypes = joystickTable.get("AxisTypes", new int[0]);
-      DriverStationSim.setJoystickAxisCount(id, axisValues.length);
-      for (int i = 0; i < axisValues.length; i++) {
-        DriverStationSim.setJoystickAxis(id, i, axisValues[i]);
-        DriverStationSim.setJoystickAxisType(id, i, axisTypes[i]);
-      }
-    }
+    //   float[] axisValues = joystickTable.get("AxisValues", new float[0]);
+    //   int[] axisTypes = joystickTable.get("AxisTypes", new int[0]);
+    //   DriverStationSim.setJoystickAxisCount(id, axisValues.length);
+    //   for (int i = 0; i < axisValues.length; i++) {
+    //     DriverStationSim.setJoystickAxis(id, i, axisValues[i]);
+    //     DriverStationSim.setJoystickAxisType(id, i, axisTypes[i]);
+    //   }
+    // }
 
-    if (dsAttached) {
-      // https://wpilib.slack.com/archives/C05ATJ3A2TC/p1730995258684039
-      DriverStationSim.notifyNewData();
-    }
+    // if (dsAttached) {
+    //   // https://wpilib.slack.com/archives/C05ATJ3A2TC/p1730995258684039
+    //   DriverStationSim.notifyNewData();
+    // }
   }
 }

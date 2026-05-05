@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/DoubleArrayTopic.h>
-#include <networktables/DoubleTopic.h>
-#include <networktables/IntegerTopic.h>
+#include <wpi/networktables/BooleanTopic.h>
+#include <wpi/networktables/DoubleArrayTopic.h>
+#include <wpi/networktables/DoubleTopic.h>
+#include <wpi/networktables/IntegerTopic.h>
 
 #include "conduit_schema_generated.h"
 using namespace org::littletonrobotics::conduit;

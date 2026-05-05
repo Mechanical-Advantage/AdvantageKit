@@ -18,6 +18,7 @@ import org.wpilib.framework.IterativeRobotBase;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
+import org.wpilib.util.WPIUtilJNI;
 
 /**
  * LoggedRobot implements the IterativeRobotBase robot program framework.
@@ -96,9 +97,11 @@ public class LoggedRobot extends IterativeRobotBase {
             // Wait before next cycle
             NotifierJNI.setNotifierAlarm(notifier, nextCycleUs, 0, true, true);
 
-            if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
-              // Break the loop if the notifier was stopped
+            try {
+              WPIUtilJNI.waitForObject(notifier);
+            } catch (InterruptedException ex) {
               Logger.end();
+              Thread.currentThread().interrupt();
               break;
             }
           }

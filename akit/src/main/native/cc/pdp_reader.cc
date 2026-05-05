@@ -7,10 +7,10 @@
 
 #include "conduit/pdp_reader.h"
 
-#include <hal/CANAPI.h>
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
-#include <hal/PowerDistribution.h>
+#include <wpi/hal/CANAPI.h>
+#include <wpi/hal/DriverStation.h>
+#include <wpi/hal/HAL.h>
+#include <wpi/hal/PowerDistribution.h>
 #include <wpi/StackTrace.h>
 #include <wpi/jni_util.h>
 

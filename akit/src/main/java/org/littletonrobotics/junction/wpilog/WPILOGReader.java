@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.LogTable.LoggableType;
 import org.wpilib.datalog.DataLogIterator;
 import org.wpilib.datalog.DataLogReader;
 import org.wpilib.datalog.DataLogRecord;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.DriverStationErrors;
 
 /** Replays log values from a WPILOG file. */
 public class WPILOGReader implements LogReplaySource {

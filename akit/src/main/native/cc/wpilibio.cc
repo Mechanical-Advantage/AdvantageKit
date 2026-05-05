@@ -7,9 +7,9 @@
 
 #include "conduit/wpilibio.h"
 
-#include <hal/DriverStation.h>
-#include <hal/DriverStationTypes.h>
-#include <hal/HALBase.h>
+#include <wpi/hal/DriverStation.h>
+#include <wpi/hal/DriverStationTypes.h>
+#include <wpi/hal/HAL.h>
 #include <jni.h>
 #include <stdlib.h>
 

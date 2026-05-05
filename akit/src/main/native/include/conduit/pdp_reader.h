@@ -10,9 +10,9 @@
 #include "conduit_schema_generated.h"
 using namespace org::littletonrobotics::conduit;
 
-#include <hal/CANAPITypes.h>
-#include <hal/HALBase.h>
-#include <hal/PowerDistribution.h>
+#include <wpi/hal/CANAPITypes.h>
+#include <wpi/hal/HAL.h>
+#include <wpi/hal/PowerDistribution.h>
 #include <jni.h>
 
 #include <atomic>

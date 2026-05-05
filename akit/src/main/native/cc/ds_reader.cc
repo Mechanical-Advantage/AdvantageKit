@@ -7,8 +7,8 @@
 
 #include "conduit/ds_reader.h"
 
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
+#include <wpi/hal/DriverStation.h>
+#include <wpi/hal/HAL.h>
 
 #include <chrono>
 #include <cstdint>

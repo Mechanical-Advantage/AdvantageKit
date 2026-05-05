@@ -7,16 +7,16 @@
 
 #include "conduit/system_reader.h"
 
-#include <hal/CAN.h>
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
-#include <hal/IMU.h>
-#include <hal/IMUTypes.h>
-#include <hal/Ports.h>
-#include <hal/Power.h>
-#include <hal/PowerDistribution.h>
-#include <hal/SystemServer.h>
-#include <networktables/NetworkTableInstance.h>
+#include <wpi/hal/CAN.h>
+#include <wpi/hal/DriverStation.h>
+#include <wpi/hal/HAL.h>
+#include <wpi/hal/IMU.h>
+#include <wpi/hal/IMUTypes.h>
+#include <wpi/hal/Ports.h>
+#include <wpi/hal/Power.h>
+#include <wpi/hal/PowerDistribution.h>
+#include <wpi/hal/SystemServer.h>
+#include <wpi/networktables/NetworkTableInstance.h>
 #include <wpi/StackTrace.h>
 #include <wpi/timestamp.h>
 
