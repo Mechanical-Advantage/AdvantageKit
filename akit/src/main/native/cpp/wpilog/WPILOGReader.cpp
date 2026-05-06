@@ -8,7 +8,6 @@
 #include "akit/wpilog/WPILOGReader.h"
 #include "akit/wpilog/WPILOGConstants.h"
 #include "akit/LogDataReceiver.h"
-
 using namespace akit::wpilog;
 
 void WPILOGReader::Start() {
@@ -18,7 +17,7 @@ void WPILOGReader::Start() {
 		FRC_ReportError(frc::err::Error,
 				"[AdvantageKit] The replay log is not a valid WPILOG file.");
 		isValid = false;
-	} else if (reader->GetExtraHeader() == WPILOGConstants::EXTRA_HEADER) {
+	} else if (reader->GetExtraHeader() != WPILOGConstants::EXTRA_HEADER) {
 		FRC_ReportError(frc::err::Error,
 				"[AdvantageKit] The replay log was not produced by AdvantageKit.");
 		isValid = false;
@@ -71,15 +70,15 @@ bool WPILOGReader::UpdateTable(LogTable &table) {
 						&& units::microsecond_t {
 								static_cast<double>(record.GetTimestamp()) }
 								== timestamp) {
-					entry->second = entry->second.substr(1);
-					if (entry->second.starts_with("ReplayOutputs"))
+					std::string name = entry->second.substr(1);
+					if (name.starts_with("ReplayOutputs"))
 						continue;
 					std::string customType = entryCustomTypes[record.GetEntry()];
 					switch (entryTypes[record.GetEntry()]) {
 					case LogTable::LoggableType::Raw: {
 						auto value = record.GetRaw();
 						auto bytes = std::as_bytes(value);
-						table.Put(entry->second,
+						table.Put(name,
 								LogTable::LogValue { std::vector<std::byte> {
 										bytes.begin(), bytes.end() }, customType });
 						break;
@@ -87,72 +86,70 @@ bool WPILOGReader::UpdateTable(LogTable &table) {
 					case LogTable::LoggableType::Boolean: {
 						bool value;
 						record.GetBoolean(&value);
-						table.Put(entry->second, LogTable::LogValue { value,
-								customType });
+						table.Put(name,
+								LogTable::LogValue { value, customType });
 						break;
 					}
 					case LogTable::LoggableType::Integer: {
 						int64_t value;
 						record.GetInteger(&value);
-						table.Put(entry->second, LogTable::LogValue {
+						table.Put(name, LogTable::LogValue {
 								static_cast<long>(value), customType });
 						break;
 					}
 					case LogTable::LoggableType::Float: {
 						float value;
 						record.GetFloat(&value);
-						table.Put(entry->second, LogTable::LogValue { value,
-								customType });
+						table.Put(name,
+								LogTable::LogValue { value, customType });
 						break;
 					}
 					case LogTable::LoggableType::Double: {
 						double value;
 						record.GetDouble(&value);
-						table.Put(entry->second, LogTable::LogValue { value,
-								customType });
+						table.Put(name,
+								LogTable::LogValue { value, customType });
 						break;
 					}
 					case LogTable::LoggableType::String: {
 						std::string_view value;
 						record.GetString(&value);
-						table.Put(entry->second, LogTable::LogValue {
+						table.Put(name, LogTable::LogValue {
 								std::string { value }, customType });
 						break;
 					}
 					case LogTable::LoggableType::BooleanArray: {
 						std::vector<int> value;
 						record.GetBooleanArray(&value);
-						table.Put(entry->second,
-								LogTable::LogValue { std::vector<bool> {
-										value.begin(), value.end() }, customType });
+						table.Put(name, LogTable::LogValue { std::vector<bool> {
+								value.begin(), value.end() }, customType });
 						break;
 					}
 					case LogTable::LoggableType::IntegerArray: {
 						std::vector < int64_t > value;
 						record.GetIntegerArray(&value);
-						table.Put(entry->second,
-								LogTable::LogValue { std::vector<long> {
-										value.begin(), value.end() }, customType });
+						table.Put(name, LogTable::LogValue { std::vector<long> {
+								value.begin(), value.end() }, customType });
 						break;
 					}
 					case LogTable::LoggableType::FloatArray: {
 						std::vector<float> value;
 						record.GetFloatArray(&value);
-						table.Put(entry->second, LogTable::LogValue { value,
-								customType });
+						table.Put(name,
+								LogTable::LogValue { value, customType });
 						break;
 					}
 					case LogTable::LoggableType::DoubleArray: {
 						std::vector<double> value;
 						record.GetDoubleArray(&value);
-						table.Put(entry->second, LogTable::LogValue { value,
-								customType });
+						table.Put(name,
+								LogTable::LogValue { value, customType });
 						break;
 					}
 					case LogTable::LoggableType::StringArray: {
 						std::vector < std::string_view > value;
 						record.GetStringArray(&value);
-						table.Put(entry->second,
+						table.Put(name,
 								LogTable::LogValue { std::vector<std::string> {
 										value.begin(), value.end() }, customType });
 						break;
