@@ -208,6 +208,7 @@ void WPILOGWriter::PutTable(LogTable &table) {
 			case LogTable::LoggableType::Raw: {
 				auto raw = field.second.GetRaw();
 				std::vector < uint8_t > data;
+				data.resize(raw.size());
 				std::transform(raw.begin(), raw.end(), data.begin(),
 						[](std::byte b) {
 							return static_cast<unsigned char>(b);
