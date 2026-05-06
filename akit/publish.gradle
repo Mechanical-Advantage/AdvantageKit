@@ -44,6 +44,11 @@ task akitCppHeadersZip(type: Zip) {
         include '*.h'
     }
 
+    from('readerwritercircularbuffer') {
+        into '/'
+        include '*.h'
+    }
+
     from('concurrentqueue') {
         into '/'
         include '*.h'
