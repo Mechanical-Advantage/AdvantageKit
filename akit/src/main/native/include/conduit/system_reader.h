@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <wpi/networktables/BooleanTopic.h>
-#include <wpi/networktables/DoubleArrayTopic.h>
-#include <wpi/networktables/DoubleTopic.h>
-#include <wpi/networktables/IntegerTopic.h>
+#include <wpi/nt/BooleanTopic.hpp>
+#include <wpi/nt/DoubleArrayTopic.hpp>
+#include <wpi/nt/DoubleTopic.hpp>
+#include <wpi/nt/IntegerTopic.hpp>
 
 #include "conduit_schema_generated.h"
 using namespace org::littletonrobotics::conduit;
@@ -29,30 +29,26 @@ private:
 			org::littletonrobotics::conduit::schema::NetworkStatus &status,
 			std::vector<double> values);
 
-	nt::BooleanSubscriber watchdog_active_sub;
-	nt::IntegerSubscriber io_frequency_sub;
-	nt::IntegerSubscriber team_number_sub;
-	nt::BooleanSubscriber epoch_time_valid_sub;
+	wpi::nt::BooleanSubscriber watchdog_active_sub;
+	wpi::nt::IntegerSubscriber io_frequency_sub;
+	wpi::nt::IntegerSubscriber team_number_sub;
+	wpi::nt::BooleanSubscriber epoch_time_valid_sub;
 
-	nt::DoubleArraySubscriber network_ethernet_sub;
-	nt::DoubleArraySubscriber network_wifi_sub;
-	nt::DoubleArraySubscriber network_usb0_sub;
-	nt::DoubleArraySubscriber network_usb1_sub;
-	nt::DoubleArraySubscriber network_can_subs[NUM_CAN_BUSES];
-	nt::DoubleArraySubscriber network_can_info_sub;
+	wpi::nt::DoubleArraySubscriber network_ethernet_sub;
+	wpi::nt::DoubleArraySubscriber network_wifi_sub;
+	wpi::nt::DoubleArraySubscriber network_usb0_sub;
+	wpi::nt::DoubleArraySubscriber network_usb1_sub;
+	wpi::nt::DoubleArraySubscriber network_can_subs[NUM_CAN_BUSES];
+	wpi::nt::DoubleArraySubscriber network_can_info_sub;
 
-	nt::DoubleSubscriber cpu_percent_sub;
-	nt::DoubleSubscriber cpu_temp_sub;
+	wpi::nt::DoubleSubscriber cpu_percent_sub;
+	wpi::nt::DoubleSubscriber cpu_temp_sub;
 
-	nt::IntegerSubscriber memory_usage_bytes_sub;
-	nt::IntegerSubscriber memory_total_bytes_sub;
-	nt::DoubleSubscriber memory_percent_sub;
+	wpi::nt::IntegerSubscriber memory_usage_bytes_sub;
+	wpi::nt::IntegerSubscriber memory_total_bytes_sub;
+	wpi::nt::DoubleSubscriber memory_percent_sub;
 
-	nt::IntegerSubscriber storage_usage_bytes_sub;
-	nt::IntegerSubscriber storage_total_bytes_sub;
-	nt::DoubleSubscriber storage_percent_sub;
-
-	nt::DoubleArraySubscriber imu_euler_flat_sub;
-	nt::DoubleArraySubscriber imu_euler_landscape_sub;
-	nt::DoubleArraySubscriber imu_euler_portrait_sub;
+	wpi::nt::IntegerSubscriber storage_usage_bytes_sub;
+	wpi::nt::IntegerSubscriber storage_total_bytes_sub;
+	wpi::nt::DoubleSubscriber storage_percent_sub;
 };

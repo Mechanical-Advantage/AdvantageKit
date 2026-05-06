@@ -11,7 +11,7 @@ spotless {
     java {
         target("sources/**/*.java")
         toggleOffOn()
-        googleJavaFormat()
+        googleJavaFormat("1.25.2")
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()

@@ -23,7 +23,7 @@ import org.littletonrobotics.junction.LogTable;
  * <p>
  * Do not create objects of this class directly! Obtain instances from the
  * {@link
- * edu.wpi.first.wpilibj.smartdashboard.Mechanism2d#getRoot(String, double, double)}
+ * org.wpilib.smartdashboard.Mechanism2d#getRoot(String, double, double)}
  * factory method.
  *
  * <p>

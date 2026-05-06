@@ -16,9 +16,9 @@
 #include <wpi/hal/Power.h>
 #include <wpi/hal/PowerDistribution.h>
 #include <wpi/hal/SystemServer.h>
-#include <wpi/networktables/NetworkTableInstance.h>
-#include <wpi/StackTrace.h>
-#include <wpi/timestamp.h>
+#include <wpi/nt/NetworkTableInstance.hpp>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/timestamp.h>
 
 #include <chrono>
 #include <cstdint>
@@ -29,7 +29,8 @@
 using namespace std::chrono_literals;
 
 void SystemReader::start() {
-	const auto inst = nt::NetworkTableInstance { HAL_GetSystemServerHandle() };
+	const auto inst = wpi::nt::NetworkTableInstance {
+			HAL_GetSystemServerHandle() };
 	const auto netcomm_table = inst.GetTable("Netcomm");
 	const auto sys_table = inst.GetTable("sys");
 	const auto imu_table = inst.GetTable("imu");
@@ -74,15 +75,6 @@ void SystemReader::start() {
 	storage_total_bytes_sub =
 			sys_table->GetIntegerTopic("storagetotal").Subscribe(0);
 	storage_percent_sub = sys_table->GetDoubleTopic("storageutil").Subscribe(0);
-
-	imu_euler_flat_sub = imu_table->GetDoubleArrayTopic("euler_flat").Subscribe(
-			std::vector { 0.0, 0.0, 0.0 });
-	imu_euler_landscape_sub =
-			imu_table->GetDoubleArrayTopic("euler_landscape").Subscribe(
-					std::vector { 0.0, 0.0, 0.0 });
-	imu_euler_portrait_sub =
-			imu_table->GetDoubleArrayTopic("euler_portrait").Subscribe(
-					std::vector { 0.0, 0.0, 0.0 });
 }
 
 void SystemReader::update_network_status(
@@ -108,7 +100,7 @@ void SystemReader::read(schema::SystemData *system_buf) {
 	system_buf->mutate_watchdog_active(watchdog_active_sub.Get());
 	system_buf->mutate_io_frequency(io_frequency_sub.Get());
 	system_buf->mutate_team_number(team_number_sub.Get());
-	system_buf->mutate_epoch_time(wpi::GetSystemTime());
+	system_buf->mutate_epoch_time(WPI_GetSystemTime());
 	system_buf->mutate_epoch_time_valid(epoch_time_valid_sub.Get());
 
 	update_network_status(system_buf->mutable_network_ethernet(),
@@ -159,22 +151,23 @@ void SystemReader::read(schema::SystemData *system_buf) {
 	system_buf->mutable_imu_gyro_rates().mutate_y(gyro_rates.y);
 	system_buf->mutable_imu_gyro_rates().mutate_z(gyro_rates.z);
 
-	// TODO: Read Euler angles from HAL when API is available
+	HAL_EulerAngles3d euler_flat;
+	HAL_GetIMUEulerAnglesFlat(&euler_flat, &status);
+	system_buf->mutable_imu_gyro_euler_flat().mutate_x(euler_flat.x);
+	system_buf->mutable_imu_gyro_euler_flat().mutate_y(euler_flat.y);
+	system_buf->mutable_imu_gyro_euler_flat().mutate_z(euler_flat.z);
 
-	const auto euler_flat = imu_euler_flat_sub.Get();
-	system_buf->mutable_imu_gyro_euler_flat().mutate_x(euler_flat[0]);
-	system_buf->mutable_imu_gyro_euler_flat().mutate_y(euler_flat[1]);
-	system_buf->mutable_imu_gyro_euler_flat().mutate_z(euler_flat[2]);
+	HAL_EulerAngles3d euler_landscape;
+	HAL_GetIMUEulerAnglesLandscape(&euler_landscape, &status);
+	system_buf->mutable_imu_gyro_euler_landscape().mutate_x(euler_landscape.x);
+	system_buf->mutable_imu_gyro_euler_landscape().mutate_y(euler_landscape.y);
+	system_buf->mutable_imu_gyro_euler_landscape().mutate_z(euler_landscape.z);
 
-	const auto euler_landscape = imu_euler_landscape_sub.Get();
-	system_buf->mutable_imu_gyro_euler_landscape().mutate_x(euler_landscape[0]);
-	system_buf->mutable_imu_gyro_euler_landscape().mutate_y(euler_landscape[1]);
-	system_buf->mutable_imu_gyro_euler_landscape().mutate_z(euler_landscape[2]);
-
-	const auto euler_portrait = imu_euler_portrait_sub.Get();
-	system_buf->mutable_imu_gyro_euler_portrait().mutate_x(euler_portrait[0]);
-	system_buf->mutable_imu_gyro_euler_portrait().mutate_y(euler_portrait[1]);
-	system_buf->mutable_imu_gyro_euler_portrait().mutate_z(euler_portrait[2]);
+	HAL_EulerAngles3d euler_portrait;
+	HAL_GetIMUEulerAnglesPortrait(&euler_portrait, &status);
+	system_buf->mutable_imu_gyro_euler_portrait().mutate_x(euler_portrait.x);
+	system_buf->mutable_imu_gyro_euler_portrait().mutate_y(euler_portrait.y);
+	system_buf->mutable_imu_gyro_euler_portrait().mutate_z(euler_portrait.z);
 
 	HAL_Quaternion gyro_quaternion;
 	HAL_GetIMUQuaternion(&gyro_quaternion, &status);

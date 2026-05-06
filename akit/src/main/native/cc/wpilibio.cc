@@ -53,9 +53,7 @@ void make_buffer() {
 }
 
 void capture_data(void) {
-	std::int32_t status;
-
-	corein_view->mutate_timestamp(HAL_GetFPGATime(&status));
+	corein_view->mutate_timestamp(HAL_GetMonotonicTime());
 	ds_reader.read(ds_view);
 	pdp_reader.read(pdp_view);
 	sys_reader.read(sys_view);

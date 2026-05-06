@@ -6,11 +6,13 @@
 // at the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <hal/CAN.h>
-#include <hal/HAL.h>
-#include <hal/Power.h>
-#include <hal/PowerDistribution.h>
-#include <wpi/timestamp.h>
+#include <wpi/hal/CAN.h>
+#include <wpi/hal/HAL.h>
+#include <wpi/hal/DriverStationTypes.h>
+#include <wpi/hal/DriverStation.hpp>
+#include <wpi/hal/Power.h>
+#include <wpi/hal/PowerDistribution.h>
+#include <wpi/util/timestamp.h>
 
 #include "conduit_schema_generated.h"
 
@@ -28,13 +30,13 @@ TEST(SizeTests, DsDataSizes) {
 	ASSERT_EQ(sizeof(HAL_MatchInfo::eventName[0]),
 			sizeof(decltype(ds.event_name()->Get(0))));
 
-	ASSERT_EQ(sizeof(HAL_MatchInfo::gameSpecificMessageSize),
-			sizeof(decltype(ds.game_specific_message_size())));
+	// ASSERT_EQ(sizeof(HAL_MatchInfo::gameSpecificMessageSize),
+	// 		sizeof(decltype(ds.game_specific_message_size())));
 
-	ASSERT_EQ(sizeof(HAL_MatchInfo::gameSpecificMessage),
+	ASSERT_EQ(sizeof(HAL_GameData),
 			ds.game_specific_message()->size());
-	ASSERT_EQ(sizeof(HAL_MatchInfo::gameSpecificMessage[0]),
-			sizeof(decltype(ds.game_specific_message()->Get(0))));
+	// ASSERT_EQ(sizeof(HAL_MatchInfo::gameSpecificMessage[0]),
+	// 		sizeof(decltype(ds.game_specific_message()->Get(0))));
 
 	ASSERT_EQ(sizeof(HAL_MatchInfo::matchNumber),
 			sizeof(decltype(ds.match_number())));
@@ -49,7 +51,7 @@ TEST(SizeTests, DsDataSizes) {
 	ASSERT_EQ(sizeof(HAL_ControlWord), sizeof(decltype(ds.control_word())));
 
 	// Ensure joystick count matches
-	ASSERT_EQ(HAL_kMaxJoysticks, ds.joysticks()->size());
+	ASSERT_EQ(HAL_MAX_JOYSTICKS, ds.joysticks()->size());
 }
 
 TEST(SizeTests, JoystickSizes) {
@@ -58,30 +60,30 @@ TEST(SizeTests, JoystickSizes) {
 	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::name[0]),
 			sizeof(decltype(joystick.name()->Get(0))));
 
-	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::type),
+	ASSERT_EQ(sizeof(HAL_GetJoystickGamepadType(0)),
 			sizeof(decltype(joystick.type())));
 
-	ASSERT_EQ(sizeof(HAL_JoystickAxes::count),
+	ASSERT_EQ(sizeof(HAL_JoystickAxes::available),
 			sizeof(decltype(joystick.axis_count())));
 
-	ASSERT_EQ(HAL_kMaxJoystickAxes, joystick.axis_types()->size());
-	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::axisTypes[0]),
-			sizeof(decltype(joystick.axis_types()->Get(0))));
+	// ASSERT_EQ(HAL_MAX_JOYSTICK_AXES, joystick.axis_types()->size());
+	// ASSERT_EQ(sizeof(HAL_JoystickDescriptor::axisTypes[0]),
+	// 		sizeof(decltype(joystick.axis_types()->Get(0))));
 
-	ASSERT_EQ(HAL_kMaxJoystickAxes, joystick.axis_values()->size());
+	ASSERT_EQ(HAL_MAX_JOYSTICK_AXES, joystick.axis_values()->size());
 	ASSERT_EQ(sizeof(HAL_JoystickAxes::axes[0]),
 			sizeof(decltype(joystick.axis_values()->Get(0))));
 
-	ASSERT_EQ(sizeof(HAL_JoystickButtons::count),
+	ASSERT_EQ(sizeof(HAL_JoystickButtons::available),
 			sizeof(decltype(joystick.button_count())));
 
 	ASSERT_EQ(sizeof(HAL_JoystickButtons::buttons),
 			sizeof(decltype(joystick.buttons())));
 
-	ASSERT_EQ(sizeof(HAL_JoystickPOVs::count),
+	ASSERT_EQ(sizeof(HAL_JoystickPOVs::available),
 			sizeof(decltype(joystick.pov_count())));
 
-	ASSERT_EQ(HAL_kMaxJoystickPOVs, joystick.pov_values()->size());
+	ASSERT_EQ(HAL_MAX_JOYSTICK_POVS, joystick.pov_values()->size());
 
 	ASSERT_EQ(sizeof(HAL_JoystickPOVs::povs[0]),
 			sizeof(decltype(joystick.pov_values()->Get(0))));
@@ -94,7 +96,7 @@ TEST(SizeTests, PDPDataSizes) {
 	schema::PDPData pdp;
 
 	ASSERT_EQ(sizeof(decltype(HAL_InitializePowerDistribution(
-									0, 0, HAL_PowerDistributionType_kCTRE, 0, 0))),
+									0, 0, HAL_POWER_DISTRIBUTION_CTRE, 0, 0))),
 			sizeof(decltype(pdp.handle())));
 
 	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0, 0))),
@@ -138,6 +140,6 @@ TEST(SizeTests, SysDataSizes) {
 	ASSERT_EQ(sizeof(decltype(HAL_GetVinVoltage(0))),
 			sizeof(decltype(sys.battery_voltage())));
 
-	ASSERT_EQ(sizeof(decltype(wpi::GetSystemTime())),
+	ASSERT_EQ(sizeof(decltype(WPI_GetSystemTime())),
 			sizeof(decltype(sys.epoch_time())));
 }

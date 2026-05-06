@@ -19,8 +19,8 @@ import org.littletonrobotics.junction.LogTable;
  * <p>
  * To append another node, call {@link #append(LoggedMechanismObject2d)}.
  * Objects that aren't
- * appended to a published
- * {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d} container are
+ * appended to a published {@link org.wpilib.smartdashboard.Mechanism2d}
+ * container are
  * nonfunctional.
  *
  * @see org.littletonrobotics.junction.mechanism.LoggedMechanism2d
