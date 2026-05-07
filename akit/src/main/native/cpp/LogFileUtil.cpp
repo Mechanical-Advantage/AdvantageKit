@@ -58,7 +58,10 @@ std::string LogFileUtil::FindReplayLog() {
 }
 
 std::string LogFileUtil::FindReplayLogEnvVar() {
-	return std::getenv(ENVIRONMENT_VARIABLE.data());
+	const char *env = std::getenv(ENVIRONMENT_VARIABLE.data());
+	if (env == nullptr)
+		return "";
+	return env;
 }
 
 std::string LogFileUtil::FindReplayLogAdvantageScope() {
