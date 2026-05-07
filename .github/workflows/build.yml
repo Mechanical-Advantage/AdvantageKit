@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: "Setup Java"
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           distribution: "temurin"
           java-version: "17"
@@ -46,7 +46,7 @@ jobs:
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: "Release: Upload vendordep"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -55,7 +55,7 @@ jobs:
           asset_name: AdvantageKit.json
           asset_content_type: application/json
       - name: "Upload local repo"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: maven_linuxathena
           path: akit/build/repos/releases
@@ -65,13 +65,13 @@ jobs:
           chmod +x generate_projects.sh
           ./generate_projects.sh
       - name: "Upload template projects"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: template_projects
           path: template_projects/generated
       - name: "Release: Upload template project (kitbot_2026)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -81,7 +81,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (diff_drive)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -91,7 +91,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (spark_swerve)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -101,7 +101,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (talonfx_swerve)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -111,7 +111,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (vision)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -121,7 +121,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (skeleton)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -155,15 +155,15 @@ jobs:
     container: ${{ matrix.container }}
     steps:
       - name: "Checkout repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: "Setup Java"
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         if: matrix.classifier != 'linuxarm64'
         with:
           distribution: "temurin"
           java-version: "17"
       - name: "Setup Python"
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - name: "Install Python dependencies"
@@ -187,7 +187,7 @@ jobs:
         run: |
           python publish_zip.py --url https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release --group_id org.littletonrobotics.akit --artifact_id akit-wpilibio --version ${{ steps.get_version.outputs.version-without-v }} --classifier ${{ matrix.classifier }} --file_path akit/build/outputs/_M__GROUP_org_littletonrobotics_akit_ID_akit-wpilibio_CLS-${{ matrix.classifier }}.zip --username ${{ secrets.ARTIFACTORY_USERNAME }} --password ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: "Upload local repo"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: maven_${{ matrix.classifier }}
           path: akit/build/repos/releases
@@ -198,27 +198,27 @@ jobs:
     needs: [build-athena, build-desktop]
     steps:
       - name: "Download Athena"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: maven_linuxathena
           path: maven_linuxathena
       - name: "Download Linux (x64)"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: maven_linuxx86-64
           path: maven_linuxx86-64
       - name: "Download Linux (arm64)"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: maven_linuxarm64
           path: maven_linuxarm64
       - name: "Download macOS"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: maven_osxuniversal
           path: maven_osxuniversal
       - name: "Download Windows"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: maven_windowsx86-64
           path: maven_windowsx86-64
@@ -231,7 +231,7 @@ jobs:
           rsync -a maven_windowsx86-64/* maven_offline
           zip -r maven_offline.zip maven_offline
       - name: "Upload artifact"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: maven
           path: maven_offline
@@ -242,7 +242,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: "Release: Upload artifact"
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         if: github.event_name == 'release'
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -257,14 +257,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: "Setup Java"
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           distribution: "temurin"
           java-version: "17"
       - name: "Setup Node.js"
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20.x"
           cache: "npm"
@@ -276,7 +276,7 @@ jobs:
       - name: "Build docs"
         run: cd docs && npm run build
       - name: "Upload artifact"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docs
           path: docs/build/
