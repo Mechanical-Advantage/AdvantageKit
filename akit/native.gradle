@@ -37,6 +37,7 @@ model {
         withType(NativeBinarySpec).all {
             nativeUtils.usePlatformArguments(it)
             if (it.targetPlatform.operatingSystem.macOsX) {
+                it.cppCompiler.args "-Wno-unknown-warning-option"
                 it.cppCompiler.args "-Wno-character-conversion"
             }
         }
