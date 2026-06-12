@@ -911,7 +911,8 @@ public class LogTable {
    */
   public byte[] get(String key, byte[] defaultValue) {
     if (data.containsKey(prefix + key)) {
-      return get(key).getRaw(defaultValue);
+      byte[] stored = get(key).getRaw(defaultValue);
+      return stored == defaultValue ? stored : stored.clone();
     } else {
       return defaultValue;
     }
@@ -960,7 +961,8 @@ public class LogTable {
    */
   public boolean[] get(String key, boolean[] defaultValue) {
     if (data.containsKey(prefix + key)) {
-      return get(key).getBooleanArray(defaultValue);
+      boolean[] stored = get(key).getBooleanArray(defaultValue);
+      return stored == defaultValue ? stored : stored.clone();
     } else {
       return defaultValue;
     }
@@ -1067,7 +1069,8 @@ public class LogTable {
    */
   public long[] get(String key, long[] defaultValue) {
     if (data.containsKey(prefix + key)) {
-      return get(key).getIntegerArray(defaultValue);
+      long[] stored = get(key).getIntegerArray(defaultValue);
+      return stored == defaultValue ? stored : stored.clone();
     } else {
       return defaultValue;
     }
@@ -1116,7 +1119,8 @@ public class LogTable {
    */
   public float[] get(String key, float[] defaultValue) {
     if (data.containsKey(prefix + key)) {
-      return get(key).getFloatArray(defaultValue);
+      float[] stored = get(key).getFloatArray(defaultValue);
+      return stored == defaultValue ? stored : stored.clone();
     } else {
       return defaultValue;
     }
@@ -1165,7 +1169,8 @@ public class LogTable {
    */
   public double[] get(String key, double[] defaultValue) {
     if (data.containsKey(prefix + key)) {
-      return get(key).getDoubleArray(defaultValue);
+      double[] stored = get(key).getDoubleArray(defaultValue);
+      return stored == defaultValue ? stored : stored.clone();
     } else {
       return defaultValue;
     }
@@ -1214,7 +1219,8 @@ public class LogTable {
    */
   public String[] get(String key, String[] defaultValue) {
     if (data.containsKey(prefix + key)) {
-      return get(key).getStringArray(defaultValue);
+      String[] stored = get(key).getStringArray(defaultValue);
+      return stored == defaultValue ? stored : stored.clone();
     } else {
       return defaultValue;
     }
