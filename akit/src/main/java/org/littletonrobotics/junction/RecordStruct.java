@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.util.struct.Struct;
 import org.wpilib.util.struct.StructSerializable;

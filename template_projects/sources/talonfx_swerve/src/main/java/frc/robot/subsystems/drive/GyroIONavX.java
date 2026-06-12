@@ -9,9 +9,9 @@ package frc.robot.subsystems.drive;
 
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
+import java.util.Queue;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.util.Units;
-import java.util.Queue;
 
 /** IO implementation for NavX. */
 public class GyroIONavX implements GyroIO {

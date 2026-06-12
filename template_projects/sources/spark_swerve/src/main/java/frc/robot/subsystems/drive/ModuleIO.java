@@ -7,8 +7,8 @@
 
 package frc.robot.subsystems.drive;
 
-import org.wpilib.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
+import org.wpilib.math.geometry.Rotation2d;
 
 public interface ModuleIO {
   @AutoLog

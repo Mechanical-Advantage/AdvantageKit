@@ -12,7 +12,6 @@ import java.io.StringWriter;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.List;
-
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.IterativeRobotBase;
 import org.wpilib.hardware.hal.HAL;

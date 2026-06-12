@@ -10,7 +10,6 @@ package org.littletonrobotics.conduit;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-
 import org.littletonrobotics.conduit.schema.CANInfo;
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;

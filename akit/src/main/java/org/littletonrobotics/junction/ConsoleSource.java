@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-
 import org.wpilib.driverstation.DriverStationErrors;
 
 /** Console logging source. Users should not interact with this class directly. */

@@ -9,13 +9,13 @@ package frc.robot.subsystems.drive;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
-import org.wpilib.wpilibj.Notifier;
-import org.wpilib.wpilibj.RobotController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.DoubleSupplier;
+import org.wpilib.wpilibj.Notifier;
+import org.wpilib.wpilibj.RobotController;
 
 /**
  * Provides an interface for asynchronously reading high-frequency measurements to a set of queues.

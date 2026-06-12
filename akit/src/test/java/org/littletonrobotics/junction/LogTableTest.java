@@ -7,13 +7,12 @@
 
 package org.littletonrobotics.junction.autolog;
 
-import static edu.wpi.first.units.Units.Rotations;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.units.measure.Angle;
-import org.wpilib.units.measure.MutAngle;
 import org.junit.jupiter.api.Test;
 import org.littletonrobotics.junction.LogTable;
+import org.wpilib.units.Units.Rotations;
+import org.wpilib.units.measure.Angle;
 
 /*
  * Units tests for testing storing/retrieving entries in a log table.
@@ -24,22 +23,10 @@ public class LogTableTest {
     LogTable table = new LogTable(0);
 
     Angle angle = Rotations.of(0.1);
-    table.put("MutableAngle", angle);
+    table.put("Angle", angle);
 
     Angle defaultAngle = Rotations.of(0.2);
-    Angle restoredAngle = table.get("MutableAngle", defaultAngle);
+    Angle restoredAngle = table.get("Angle", defaultAngle);
     assertTrue(restoredAngle.isEquivalent(angle));
-  }
-
-  @Test
-  public void TestMutableMeasure() {
-    LogTable table = new LogTable(0);
-
-    MutAngle mutAngle = Rotations.mutable(0.1);
-    table.put("Angle", mutAngle);
-
-    MutAngle defaultMutAngle = Rotations.mutable(0.2);
-    MutAngle restoredMutAngle = table.get("Angle", defaultMutAngle);
-    assertTrue(restoredMutAngle.isEquivalent(mutAngle));
   }
 }

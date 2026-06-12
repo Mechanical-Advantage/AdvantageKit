@@ -10,7 +10,6 @@ package org.littletonrobotics.junction;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.conduit.schema.CANInfo;
 import org.littletonrobotics.conduit.schema.NetworkDirStatus;

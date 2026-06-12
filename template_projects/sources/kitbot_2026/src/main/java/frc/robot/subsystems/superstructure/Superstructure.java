@@ -13,9 +13,9 @@ import static frc.robot.subsystems.superstructure.SuperstructureConstants.launch
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpFeederVoltage;
 import static frc.robot.subsystems.superstructure.SuperstructureConstants.spinUpSeconds;
 
+import org.littletonrobotics.junction.Logger;
 import org.wpilib.wpilibj2.command.Command;
 import org.wpilib.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
   private final SuperstructureIO io;
@@ -57,14 +57,12 @@ public class Superstructure extends SubsystemBase {
         });
   }
 
-  /**
-   * Set the rollers to the values for launching. Spins up before feeding fuel.
-   */
+  /** Set the rollers to the values for launching. Spins up before feeding fuel. */
   public Command launch() {
     return run(() -> {
-      io.setFeederVoltage(spinUpFeederVoltage);
-      io.setIntakeLauncherVoltage(launchingLauncherVoltage);
-    })
+          io.setFeederVoltage(spinUpFeederVoltage);
+          io.setIntakeLauncherVoltage(launchingLauncherVoltage);
+        })
         .withTimeout(spinUpSeconds)
         .andThen(
             run(

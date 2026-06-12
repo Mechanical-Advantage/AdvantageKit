@@ -15,6 +15,13 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.util.LocalADStarAK;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 import org.wpilib.hal.FRCNetComm.tInstances;
 import org.wpilib.hal.FRCNetComm.tResourceType;
 import org.wpilib.hal.HAL;
@@ -36,13 +43,6 @@ import org.wpilib.wpilibj.DriverStation.Alliance;
 import org.wpilib.wpilibj2.command.Command;
 import org.wpilib.wpilibj2.command.SubsystemBase;
 import org.wpilib.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
-import frc.robot.Constants.Mode;
-import frc.robot.util.LocalADStarAK;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
   static final Lock odometryLock = new ReentrantLock();

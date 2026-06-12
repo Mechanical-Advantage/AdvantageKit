@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems.drive;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.wpilib.math.Matrix;
 import org.wpilib.math.estimator.DifferentialDrivePoseEstimator;
 import org.wpilib.math.geometry.Pose2d;
@@ -20,7 +21,6 @@ import org.wpilib.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
 import org.wpilib.wpilibj.simulation.DifferentialDrivetrainSim.KitbotMotor;
 import org.wpilib.wpilibj.simulation.DifferentialDrivetrainSim.KitbotWheelSize;
 import org.wpilib.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
  * <b>IMPORTANT: This is a simple simulator for a differential drive, and has no support for real

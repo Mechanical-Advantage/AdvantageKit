@@ -9,11 +9,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import org.wpilib.wpilibj.GenericHID;
-import org.wpilib.wpilibj.XboxController;
-import org.wpilib.wpilibj2.command.Command;
-import org.wpilib.wpilibj2.command.button.CommandXboxController;
-import org.wpilib.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
@@ -26,6 +21,11 @@ import frc.robot.subsystems.superstructure.SuperstructureIO;
 import frc.robot.subsystems.superstructure.SuperstructureIOSim;
 import frc.robot.subsystems.superstructure.SuperstructureIOTalonSRX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.wpilib.wpilibj.GenericHID;
+import org.wpilib.wpilibj.XboxController;
+import org.wpilib.wpilibj2.command.Command;
+import org.wpilib.wpilibj2.command.button.CommandXboxController;
+import org.wpilib.wpilibj2.command.sysid.SysIdRoutine;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

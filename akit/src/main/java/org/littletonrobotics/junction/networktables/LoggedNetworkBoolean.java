@@ -7,11 +7,12 @@
 
 package org.littletonrobotics.junction.networktables;
 
-import org.wpilib.networktables.BooleanEntry;
-import org.wpilib.networktables.NetworkTableInstance;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
+import org.wpilib.networktables.BooleanEntry;
+import org.wpilib.networktables.NetworkTableInstance;
 
 /** Manages a boolean value published to the root table of NT. */
 public class LoggedNetworkBoolean extends LoggedNetworkInput implements BooleanSupplier {
@@ -21,11 +22,10 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput implements BooleanS
   private boolean value;
 
   /**
-   * Creates a new LoggedNetworkBoolean, for handling a boolean input sent via
-   * NetworkTables.
+   * Creates a new LoggedNetworkBoolean, for handling a boolean input sent via NetworkTables.
    *
    * @param key The key for the number, published to the root table of NT or
-   *            "/DashboardInputs/{key}" when logged.
+   *     "/DashboardInputs/{key}" when logged.
    */
   public LoggedNetworkBoolean(String key) {
     this.key = key;
@@ -35,12 +35,10 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput implements BooleanS
   }
 
   /**
-   * Creates a new LoggedNetworkBoolean, for handling a boolean input sent via
-   * NetworkTables.
+   * Creates a new LoggedNetworkBoolean, for handling a boolean input sent via NetworkTables.
    *
-   * @param key          The key for the number, published to the root table of NT
-   *                     or
-   *                     "/DashboardInputs/{key}" when logged.
+   * @param key The key for the number, published to the root table of NT or
+   *     "/DashboardInputs/{key}" when logged.
    * @param defaultValue The default value if no value in NT is found.
    */
   public LoggedNetworkBoolean(String key, boolean defaultValue) {
@@ -60,8 +58,7 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput implements BooleanS
   }
 
   /**
-   * Publishes a new value. Note that the value will not be returned by
-   * {@link #get()} until the
+   * Publishes a new value. Note that the value will not be returned by {@link #get()} until the
    * next cycle.
    *
    * @param value The new value.
@@ -79,15 +76,16 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput implements BooleanS
     return value;
   }
 
-  private final LoggableInputs inputs = new LoggableInputs() {
-    public void toLog(LogTable table) {
-      table.put(removeSlash(key), value);
-    }
+  private final LoggableInputs inputs =
+      new LoggableInputs() {
+        public void toLog(LogTable table) {
+          table.put(removeSlash(key), value);
+        }
 
-    public void fromLog(LogTable table) {
-      value = table.get(removeSlash(key), defaultValue);
-    }
-  };
+        public void fromLog(LogTable table) {
+          value = table.get(removeSlash(key), defaultValue);
+        }
+      };
 
   public void periodic() {
     if (!Logger.hasReplaySource()) {

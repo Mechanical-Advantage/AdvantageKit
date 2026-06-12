@@ -13,14 +13,14 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinder;
-import org.wpilib.math.Pair;
-import org.wpilib.math.geometry.Translation2d;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
+import org.wpilib.math.Pair;
+import org.wpilib.math.geometry.Translation2d;
 
 // NOTE: This file is available at
 // https://gist.github.com/mjansen4857/a8024b55eb427184dbd10ae8923bd57d

@@ -138,13 +138,6 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
                             // Need to deep copy arrays
                             cloneBuilder.addCode(
                                 "copy.$L = this.$L.clone();\n", simpleName, simpleName);
-                          } else if (fieldElement
-                              .asType()
-                              .toString()
-                              .startsWith("edu.wpi.first.units.MutableMeasure")) {
-                            // Need to clone mutable measure
-                            cloneBuilder.addCode(
-                                "copy.$L = this.$L.mutableCopy();\n", simpleName, simpleName);
                           } else {
                             cloneBuilder.addCode("copy.$L = this.$L;\n", simpleName, simpleName);
                           }

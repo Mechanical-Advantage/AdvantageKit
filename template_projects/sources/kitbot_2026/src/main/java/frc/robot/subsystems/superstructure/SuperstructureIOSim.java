@@ -15,13 +15,15 @@ import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.wpilibj.simulation.DCMotorSim;
 
 public class SuperstructureIOSim implements SuperstructureIO {
-  private DCMotorSim feederSim = new DCMotorSim(
-      LinearSystemId.createDCMotorSystem(DCMotor.getCIM(1), 0.004, feederMotorReduction),
-      DCMotor.getCIM(1));
-  private DCMotorSim intakeLauncherSim = new DCMotorSim(
-      LinearSystemId.createDCMotorSystem(
-          DCMotor.getCIM(1), 0.004, intakeLauncherMotorReduction),
-      DCMotor.getCIM(1));
+  private DCMotorSim feederSim =
+      new DCMotorSim(
+          LinearSystemId.createDCMotorSystem(DCMotor.getCIM(1), 0.004, feederMotorReduction),
+          DCMotor.getCIM(1));
+  private DCMotorSim intakeLauncherSim =
+      new DCMotorSim(
+          LinearSystemId.createDCMotorSystem(
+              DCMotor.getCIM(1), 0.004, intakeLauncherMotorReduction),
+          DCMotor.getCIM(1));
 
   private double feederAppliedVolts = 0.0;
   private double intakeLauncherAppliedVolts = 0.0;

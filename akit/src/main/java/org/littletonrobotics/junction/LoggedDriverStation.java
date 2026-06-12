@@ -8,19 +8,10 @@
 package org.littletonrobotics.junction;
 
 import org.littletonrobotics.conduit.ConduitApi;
-import org.wpilib.driverstation.MatchType;
-import org.wpilib.hardware.hal.AllianceStationID;
-import org.wpilib.hardware.hal.DriverStationJNI;
-import org.wpilib.hardware.hal.simulation.DriverStationDataJNI;
-import org.wpilib.simulation.DriverStationSim;
 
-/**
- * Manages logging and replaying data from the driver station (robot state,
- * joysticks, etc.)
- */
+/** Manages logging and replaying data from the driver station (robot state, joysticks, etc.) */
 class LoggedDriverStation {
-  private LoggedDriverStation() {
-  }
+  private LoggedDriverStation() {}
 
   /** Save the current DS state to the log table. */
   public static void saveToLog(LogTable table) {

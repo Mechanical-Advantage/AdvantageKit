@@ -9,6 +9,10 @@ package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
+import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import java.util.LinkedList;
+import java.util.List;
+import org.littletonrobotics.junction.Logger;
 import org.wpilib.math.Matrix;
 import org.wpilib.math.VecBuilder;
 import org.wpilib.math.geometry.Pose2d;
@@ -19,10 +23,6 @@ import org.wpilib.math.numbers.N3;
 import org.wpilib.wpilibj.Alert;
 import org.wpilib.wpilibj.Alert.AlertType;
 import org.wpilib.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
-import java.util.LinkedList;
-import java.util.List;
-import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;

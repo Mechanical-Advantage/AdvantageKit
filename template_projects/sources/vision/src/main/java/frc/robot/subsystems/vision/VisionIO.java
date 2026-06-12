@@ -7,9 +7,9 @@
 
 package frc.robot.subsystems.vision;
 
+import org.littletonrobotics.junction.AutoLog;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
   @AutoLog

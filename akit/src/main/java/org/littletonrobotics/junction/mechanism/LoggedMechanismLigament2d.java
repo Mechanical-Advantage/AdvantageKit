@@ -7,17 +7,21 @@
 
 package org.littletonrobotics.junction.mechanism;
 
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Meters;
+
 import org.littletonrobotics.junction.LogTable;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.networktables.DoubleEntry;
 import org.wpilib.networktables.NetworkTable;
 import org.wpilib.networktables.StringEntry;
 import org.wpilib.networktables.StringPublisher;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.Distance;
 import org.wpilib.util.Color8Bit;
 
 /**
- * Ligament node on a Mechanism2d. A ligament can have its length changed (like
- * an elevator) or
+ * Ligament node on a Mechanism2d. A ligament can have its length changed (like an elevator) or
  * angle changed, like an arm.
  *
  * @see org.littletonrobotics.junction.mechanism.LoggedMechanism2d
@@ -36,11 +40,11 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
   /**
    * Create a new ligament.
    *
-   * @param name      The ligament name.
-   * @param length    The ligament length in meters.
-   * @param angle     The ligament angle in degrees.
+   * @param name The ligament name.
+   * @param length The ligament length in meters.
+   * @param angle The ligament angle in degrees.
    * @param lineWidth The ligament's line width.
-   * @param color     The ligament's color.
+   * @param color The ligament's color.
    */
   public LoggedMechanismLigament2d(
       String name, double length, double angle, double lineWidth, Color8Bit color) {
@@ -54,11 +58,11 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
   /**
    * Create a new ligament.
    *
-   * @param name      The ligament name.
-   * @param length    The ligament length.
-   * @param angle     The ligament angle.
+   * @param name The ligament name.
+   * @param length The ligament length.
+   * @param angle The ligament angle.
    * @param lineWidth The ligament's line width.
-   * @param color     The ligament's color.
+   * @param color The ligament's color.
    */
   public LoggedMechanismLigament2d(
       String name, Distance length, Angle angle, double lineWidth, Color8Bit color) {
@@ -68,9 +72,9 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
   /**
    * Create a new ligament with the default color (orange) and thickness (6).
    *
-   * @param name   The ligament's name.
+   * @param name The ligament's name.
    * @param length The ligament's length in meters.
-   * @param angle  The ligament's angle relative to its parent in degrees.
+   * @param angle The ligament's angle relative to its parent in degrees.
    */
   public LoggedMechanismLigament2d(String name, double length, double angle) {
     this(name, length, angle, 10, new Color8Bit(235, 137, 52));
@@ -79,9 +83,9 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
   /**
    * Create a new ligament with the default color (orange) and thickness (6).
    *
-   * @param name   The ligament's name.
+   * @param name The ligament's name.
    * @param length The ligament's length.
-   * @param angle  The ligament's angle relative to its parent.
+   * @param angle The ligament's angle relative to its parent.
    */
   public LoggedMechanismLigament2d(String name, Distance length, Angle angle) {
     this(name, length.in(Meters), angle.in(Degrees));

@@ -7,11 +7,11 @@
 
 package org.littletonrobotics.junction;
 
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.networktables.StringArraySubscriber;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringArraySubscriber;
 
 @SuppressWarnings("unchecked")
 class AlertLogger {

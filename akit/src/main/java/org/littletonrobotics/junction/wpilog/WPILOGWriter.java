@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
@@ -188,7 +187,8 @@ public class WPILOGWriter implements LogDataReceiver {
         writer.close();
         System.out.println("[AdvantageKit] Log sent to AdvantageScope.");
       } catch (Exception e) {
-        DriverStationErrors.reportError("[AdvantageKit] Failed to send log to AdvantageScope.", false);
+        DriverStationErrors.reportError(
+            "[AdvantageKit] Failed to send log to AdvantageScope.", false);
       }
     }
   }

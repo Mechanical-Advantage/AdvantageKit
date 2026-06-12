@@ -10,7 +10,6 @@ package org.littletonrobotics.junction.wpilog;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogReplaySource;
 import org.littletonrobotics.junction.LogTable;
@@ -54,7 +53,8 @@ public class WPILOGReader implements LogReplaySource {
 
     // Check validity
     if (!reader.isValid()) {
-      DriverStationErrors.reportError("[AdvantageKit] The replay log is not a valid WPILOG file.", false);
+      DriverStationErrors.reportError(
+          "[AdvantageKit] The replay log is not a valid WPILOG file.", false);
       isValid = false;
     } else if (!reader.getExtraHeader().equals(WPILOGConstants.extraHeader)) {
       DriverStationErrors.reportError(

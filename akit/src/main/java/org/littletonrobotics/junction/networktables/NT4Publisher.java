@@ -7,12 +7,12 @@
 
 package org.littletonrobotics.junction.networktables;
 
-import org.wpilib.networktables.*;
 import java.util.HashMap;
 import java.util.Map;
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
+import org.wpilib.networktables.*;
 
 /** Publishes log data using NT4. */
 public class NT4Publisher implements LogDataReceiver {

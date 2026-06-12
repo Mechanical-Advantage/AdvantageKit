@@ -8,7 +8,7 @@ plugins {
     id("org.wpilib.NativeUtils") version "2027.1.1"
     id("org.wpilib.GradleJni") version "2027.0.0"
     id("org.wpilib.GradleVsCode") version "2027.0.0"
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.diffplug.spotless") version "8.6.0"
 }
 
 sourceSets["main"].java {
@@ -63,6 +63,9 @@ tasks.named<Test>("test") {
 java {
     withSourcesJar()
     withJavadocJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
 }
 
 // Spotless formatting
