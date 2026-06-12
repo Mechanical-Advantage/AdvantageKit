@@ -177,7 +177,7 @@ public class Logger {
       // Start console capture
       if (enableConsole && console == null) {
         if (RobotBase.isReal()) {
-          console = new ConsoleSource.RoboRIO();
+          console = new ConsoleSource.Systemcore();
         } else {
           console = new ConsoleSource.Simulator();
         }
@@ -346,7 +346,8 @@ public class Logger {
       AlertLogger.periodic();
       long radioLogStart = RobotController.getFPGATime();
       if (!hasReplaySource()) {
-        RadioLogger.periodic(entry.getSubtable("RadioStatus"));
+        RadioLogger.periodic(
+            entry.getSubtable("RadioStatus"), entry.get("SystemStats/TeamNumber", -1));
       }
       long consoleCaptureStart = RobotController.getFPGATime();
       if (enableConsole) {

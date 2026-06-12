@@ -5,7 +5,7 @@ plugins {
     id("java")
     id("google-test")
     id("edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin") version "2025.0"
-    id("edu.wpi.first.NativeUtils") version "2026.0.1"
+    id("edu.wpi.first.NativeUtils") version "2025.12.1"
     id("edu.wpi.first.GradleJni") version "1.1.0"
     id("edu.wpi.first.GradleVsCode") version "2.1.0"
     id("com.diffplug.spotless") version "6.25.0"
@@ -19,9 +19,10 @@ sourceSets["main"].java {
 repositories {
     mavenCentral()
 }
+wpilibRepositories.use2027Repos()
 wpilibRepositories.addAllReleaseRepositories(project)
 
-val wpilibVersion = "2026.2.1"
+val wpilibVersion = "2027.0.0-alpha-2"
 
 dependencies {
     implementation("edu.wpi.first.cscore:cscore-java:$wpilibVersion")
@@ -31,6 +32,7 @@ dependencies {
     implementation("edu.wpi.first.wpiutil:wpiutil-java:$wpilibVersion")
     implementation("edu.wpi.first.wpimath:wpimath-java:$wpilibVersion")
     implementation("edu.wpi.first.wpiunits:wpiunits-java:$wpilibVersion")
+    implementation("edu.wpi.first.datalog:datalog-java:$wpilibVersion")
     implementation("edu.wpi.first.hal:hal-java:$wpilibVersion")
     implementation("org.ejml:ejml-simple:0.43.1")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
@@ -48,11 +50,9 @@ tasks.withType<Javadoc> {
     exclude("com/google/flatbuffers/**", "org/littletonrobotics/conduit/**")
     title = "AdvantageKit API"
     options {
-        (this as StandardJavadocDocletOptions).apply {
-            links("https://docs.oracle.com/en/java/javase/17/docs/api/", "https://github.wpilib.org/allwpilib/docs/release/java/")
-            stylesheetFile = file("javadoc.css")
-            addBooleanOption("Werror", true)
-        }
+        (this as StandardJavadocDocletOptions).links("https://docs.oracle.com/en/java/javase/21/docs/api/", "https://github.wpilib.org/allwpilib/docs/release/java/")
+        (this as StandardJavadocDocletOptions).stylesheetFile = file("javadoc.css")
+        (this as StandardJavadocDocletOptions).addBooleanOption("Werror", true)
     }
 }
 

@@ -9,7 +9,7 @@ package org.littletonrobotics.junction;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import org.littletonrobotics.conduit.ConduitApi;
@@ -38,11 +38,11 @@ class LoggedDriverStation {
     table.put("FMSAttached", (controlWord & 16) != 0);
     table.put("DSAttached", (controlWord & 32) != 0);
 
-    for (int id = 0; id < DriverStation.kJoystickPorts; id++) {
+    for (int id = 0; id < ConduitApi.NUM_JOYSTICKS; id++) {
       LogTable joystickTable = table.getSubtable("Joystick" + Integer.toString(id));
       joystickTable.put("Name", conduit.getJoystickName(id).trim());
       joystickTable.put("Type", conduit.getJoystickType(id));
-      joystickTable.put("Xbox", conduit.isXbox(id));
+      joystickTable.put("IsGamepad", conduit.isGamepad(id));
       joystickTable.put("ButtonCount", conduit.getButtonCount(id));
       joystickTable.put("ButtonValues", conduit.getButtonValues(id));
 
@@ -94,18 +94,18 @@ class LoggedDriverStation {
     DriverStationSim.setFmsAttached(table.get("FMSAttached", false));
     DriverStationSim.setDsAttached(dsAttached);
 
-    for (int id = 0; id < DriverStation.kJoystickPorts; id++) {
+    for (int id = 0; id < ConduitApi.NUM_JOYSTICKS; id++) {
       LogTable joystickTable = table.getSubtable("Joystick" + Integer.toString(id));
       DriverStationSim.setJoystickName(id, joystickTable.get("Name", ""));
       DriverStationSim.setJoystickType(id, joystickTable.get("Type", 0));
-      DriverStationSim.setJoystickIsXbox(id, joystickTable.get("Xbox", false));
+      DriverStationSim.setJoystickIsGamepad(id, joystickTable.get("IsGamepad", false));
       DriverStationSim.setJoystickButtonCount(id, joystickTable.get("ButtonCount", 0));
       DriverStationSim.setJoystickButtons(id, joystickTable.get("ButtonValues", 0));
 
       int[] povValues = joystickTable.get("POVs", new int[0]);
       DriverStationSim.setJoystickPOVCount(id, povValues.length);
       for (int i = 0; i < povValues.length; i++) {
-        DriverStationSim.setJoystickPOV(id, i, povValues[i]);
+        DriverStationDataJNI.setJoystickPOV(id, i, (byte) povValues[i]);
       }
 
       float[] axisValues = joystickTable.get("AxisValues", new float[0]);

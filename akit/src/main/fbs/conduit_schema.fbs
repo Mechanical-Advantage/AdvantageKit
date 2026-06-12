@@ -19,8 +19,8 @@ struct Joystick {
     button_count:uint8;
     buttons:int32;
     pov_count:int16;
-    pov_values:[int16:12];
-    is_xbox:bool;
+    pov_values:[uint8:8];
+    is_gamepad:bool;
 }
 
 struct DSData {
@@ -51,46 +51,73 @@ struct PDPData {
     total_energy:float64;
 }
 
-struct CANStatus {
-    percent_bus_utilization:float32;
-    bus_off_count:uint32;
-    tx_full_count:uint32;
-    receive_error_count:uint32;
-    transmit_error_count:uint32;
+struct NetworkDirStatus {
+    bandwidth_kbps:int64;
+    bytes:int64;
+    dropped:int64;
+    errors:int64;
+    packets:int64;
+}
+
+struct NetworkStatus {
+    rx:NetworkDirStatus;
+    tx:NetworkDirStatus;    
+}
+
+struct CANInfo {
+    max_bandwidth_mbps:float64;
+    is_fd:bool;
+    is_available:bool;
+    is_up:bool;
+}
+
+struct Vector3 {
+    x:float64;
+    y:float64;
+    z:float64;
+}
+
+struct Vector4 {
+    w:float64;
+    x:float64;
+    y:float64;
+    z:float64;
 }
 
 struct SystemData {
-    fpga_version:int32;
-    fpga_revision:int32;
-    serial_number_size:uint16;
-    serial_number:[uint8:8];
-    comments_size:uint16;
-    comments:[uint8:64];
-    team_number:int32;
-    fpga_button:int32;
-    system_active:int32;
-    browned_out:int32;
-    comms_disable_count:int32;
-    rsl_state:int32;
-    system_time_valid:int32;
-    voltage_vin:float64;
-    current_vin:float64;
-    user_voltage_3v3:float64;
-    user_current_3v3:float64;
-    user_active_3v3:int32;
-    user_current_faults_3v3:int32;
-    user_voltage_5v:float64;
-    user_current_5v:float64;
-    user_active_5v:int32;
-    user_current_faults_5v:int32;
-    user_voltage_6v:float64;
-    user_current_6v:float64;
-    user_active_6v:int32;
-    user_current_faults_6v:int32;
-    brownout_voltage:float64;
+    battery_voltage:float64;
+    watchdog_active:bool;
+    io_frequency:int64;
+    team_number:int64;
+    epoch_time:int64;
+    epoch_time_valid:bool;
+
+    network_ethernet:NetworkStatus;
+    network_wifi:NetworkStatus;
+    network_usb_tether:NetworkStatus;
+    network_can:[NetworkStatus:5];
+    network_can_info:[CANInfo:5];
+
+    cpu_percent:float64;
     cpu_temp:float64;
-    can_status:CANStatus;
-    epoch_time:uint64;
+
+    memory_usage_bytes:int64;
+    memory_total_bytes:int64;
+    memory_percent:float64;
+
+    storage_usage_bytes:int64;
+    storage_total_bytes:int64;
+    storage_percent:float64;
+
+    imu_accel_raw:Vector3;
+    imu_gyro_rates:Vector3;
+    imu_gyro_euler_flat:Vector3;
+    imu_gyro_euler_landscape:Vector3;
+    imu_gyro_euler_portrait:Vector3;
+    imu_gyro_quaternion:Vector4;
+    imu_gyro_yaw_flat:float64;
+    imu_gyro_yaw_landscape:float64;
+    imu_gyro_yaw_portrait:float64;
 }
 
 struct CoreInputs {

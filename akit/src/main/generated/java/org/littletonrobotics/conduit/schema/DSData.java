@@ -43,16 +43,16 @@ public final class DSData extends Struct {
   public double matchTime() { return bb.getDouble(bb_pos + 152); }
   public void mutateMatchTime(double match_time) { bb.putDouble(bb_pos + 152, match_time); }
   public org.littletonrobotics.conduit.schema.Joystick joysticks(int j) { return joysticks(new org.littletonrobotics.conduit.schema.Joystick(), j); }
-  public org.littletonrobotics.conduit.schema.Joystick joysticks(org.littletonrobotics.conduit.schema.Joystick obj, int j) { return obj.__assign(bb_pos + 160 + j * 356, bb); }
+  public org.littletonrobotics.conduit.schema.Joystick joysticks(org.littletonrobotics.conduit.schema.Joystick obj, int j) { return obj.__assign(bb_pos + 160 + j * 340, bb); }
 
-  public static int createDSData(FlatBufferBuilder builder, int allianceStation, int[] eventName, int gameSpecificMessageSize, int[] gameSpecificMessage, int matchNumber, int replayNumber, int matchType, int controlWord, double matchTime, int[][] joysticks_name, int[] joysticks_type, short[] joysticks_axisCount, int[][] joysticks_axisTypes, float[][] joysticks_axisValues, int[] joysticks_buttonCount, int[] joysticks_buttons, short[] joysticks_povCount, short[][] joysticks_povValues, boolean[] joysticks_isXbox) {
-    builder.prep(8, 2296);
+  public static int createDSData(FlatBufferBuilder builder, int allianceStation, int[] eventName, int gameSpecificMessageSize, int[] gameSpecificMessage, int matchNumber, int replayNumber, int matchType, int controlWord, double matchTime, int[][] joysticks_name, int[] joysticks_type, short[] joysticks_axisCount, int[][] joysticks_axisTypes, float[][] joysticks_axisValues, int[] joysticks_buttonCount, int[] joysticks_buttons, short[] joysticks_povCount, int[][] joysticks_povValues, boolean[] joysticks_isGamepad) {
+    builder.prep(8, 2200);
     for (int _idx0 = 6; _idx0 > 0; _idx0--) {
-      builder.prep(4, 356);
+      builder.prep(4, 340);
       builder.pad(1);
-      builder.putBoolean(joysticks_isXbox[_idx0-1]);
-      for (int _idx1 = 12; _idx1 > 0; _idx1--) {
-        builder.putShort(joysticks_povValues[_idx0-1][_idx1-1]);
+      builder.putBoolean(joysticks_isGamepad[_idx0-1]);
+      for (int _idx1 = 8; _idx1 > 0; _idx1--) {
+        builder.putByte((byte) joysticks_povValues[_idx0-1][_idx1-1]);
       }
       builder.putShort(joysticks_povCount[_idx0-1]);
       builder.putInt(joysticks_buttons[_idx0-1]);

@@ -7,26 +7,31 @@
 
 package org.littletonrobotics.conduit;
 
+import edu.wpi.first.math.geometry.Quaternion;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import org.littletonrobotics.conduit.schema.CANInfo;
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.Joystick;
+import org.littletonrobotics.conduit.schema.NetworkStatus;
 import org.littletonrobotics.conduit.schema.PDPData;
 import org.littletonrobotics.conduit.schema.SystemData;
+import org.littletonrobotics.conduit.schema.Vector3;
 
 public class ConduitApi {
   // Length constants
-  private static final int NUM_JOYSTICKS = 6;
-  private static final int NUM_JOYSTICK_AXES = 12;
-  private static final int NUM_JOYSTICK_POVS = 12;
+  public static final int NUM_JOYSTICKS = 6;
+  public static final int NUM_JOYSTICK_AXES = 12;
+  public static final int NUM_JOYSTICK_POVS = 12;
+  public static final int NUM_CAN_BUSES = 5;
 
   private static final byte[] eventNameBytes = new byte[64];
   private static final byte[] gameSpecificMessageBytes = new byte[64];
   private static final byte[] joystickNameBytes = new byte[256];
-  private static final byte[] serialNumberBytes = new byte[8];
-  private static final byte[] commentsBytes = new byte[64];
 
   private static ConduitApi instance = null;
 
@@ -166,8 +171,36 @@ public class ConduitApi {
     return ret;
   }
 
-  public boolean isXbox(int joystickId) {
-    return joysticks[joystickId].isXbox();
+  public boolean isGamepad(int joystickId) {
+    return joysticks[joystickId].isGamepad();
+  }
+
+  public void configurePowerDistribution(int busID, int moduleID, int type) {
+    ConduitJni.configurePowerDistribution(busID, moduleID, type);
+  }
+
+  public int getPDPChannelCount() {
+    return pdp.channelCount();
+  }
+
+  public int getPDPHandle() {
+    return pdp.handle();
+  }
+
+  public int getPDPType() {
+    return pdp.type();
+  }
+
+  public int getPDPModuleId() {
+    return pdp.moduleId();
+  }
+
+  public long getPDPFaults() {
+    return pdp.faults();
+  }
+
+  public long getPDPStickyFaults() {
+    return pdp.stickyFaults();
   }
 
   public double getPDPTemperature() {
@@ -194,171 +227,120 @@ public class ConduitApi {
     return pdp.totalEnergy();
   }
 
-  public int getFPGAVersion() {
-    return sys.fpgaVersion();
+  public double getBatteryVoltage() {
+    return sys.batteryVoltage();
   }
 
-  public int getFPGARevision() {
-    return sys.fpgaRevision();
+  public boolean getWatchdogActive() {
+    return sys.watchdogActive();
   }
 
-  public String getSerialNumber() {
-    int i;
-    for (i = 0; i < Math.min(serialNumberBytes.length, sys.serialNumberSize()); i++) {
-      serialNumberBytes[i] = (byte) sys.serialNumber(i);
-    }
-    return new String(serialNumberBytes, 0, i, utf8Charset);
+  public long getIOFrequency() {
+    return sys.ioFrequency();
   }
 
-  public String getComments() {
-    int i;
-    for (i = 0; i < Math.min(commentsBytes.length, sys.commentsSize()); i++) {
-      commentsBytes[i] = (byte) sys.comments(i);
-    }
-    return new String(commentsBytes, 0, i, utf8Charset);
-  }
-
-  public int getTeamNumber() {
+  public long getTeamNumber() {
     return sys.teamNumber();
-  }
-
-  public boolean getFPGAButton() {
-    return sys.fpgaButton() != 0;
-  }
-
-  public boolean getSystemActive() {
-    return sys.systemActive() != 0;
-  }
-
-  public boolean getBrownedOut() {
-    return sys.brownedOut() != 0;
-  }
-
-  public int getCommsDisableCount() {
-    return sys.commsDisableCount();
-  }
-
-  public boolean getRSLState() {
-    return sys.rslState() != 0;
-  }
-
-  public boolean getSystemTimeValid() {
-    return sys.systemTimeValid() != 0;
-  }
-
-  public double getVoltageVin() {
-    return sys.voltageVin();
-  }
-
-  public double getCurrentVin() {
-    return sys.currentVin();
-  }
-
-  public double getUserVoltage3v3() {
-    return sys.userVoltage3v3();
-  }
-
-  public double getUserCurrent3v3() {
-    return sys.userCurrent3v3();
-  }
-
-  public boolean getUserActive3v3() {
-    return sys.userActive3v3() != 0;
-  }
-
-  public int getUserCurrentFaults3v3() {
-    return sys.userCurrentFaults3v3();
-  }
-
-  public double getUserVoltage5v() {
-    return sys.userVoltage5v();
-  }
-
-  public double getUserCurrent5v() {
-    return sys.userCurrent5v();
-  }
-
-  public boolean getUserActive5v() {
-    return sys.userActive5v() != 0;
-  }
-
-  public int getUserCurrentFaults5v() {
-    return sys.userCurrentFaults5v();
-  }
-
-  public double getUserVoltage6v() {
-    return sys.userVoltage6v();
-  }
-
-  public double getUserCurrent6v() {
-    return sys.userCurrent6v();
-  }
-
-  public boolean getUserActive6v() {
-    return sys.userActive6v() != 0;
-  }
-
-  public int getUserCurrentFaults6v() {
-    return sys.userCurrentFaults6v();
-  }
-
-  public double getBrownoutVoltage() {
-    return sys.brownoutVoltage();
-  }
-
-  public double getCPUTemp() {
-    return sys.cpuTemp();
-  }
-
-  public float getCANBusUtilization() {
-    return sys.canStatus().percentBusUtilization();
-  }
-
-  public long getBusOffCount() {
-    return sys.canStatus().busOffCount();
-  }
-
-  public long getTxFullCount() {
-    return sys.canStatus().txFullCount();
-  }
-
-  public long getReceiveErrorCount() {
-    return sys.canStatus().receiveErrorCount();
-  }
-
-  public long getTransmitErrorCount() {
-    return sys.canStatus().transmitErrorCount();
   }
 
   public long getEpochTime() {
     return sys.epochTime();
   }
 
-  public void configurePowerDistribution(int moduleID, int type) {
-    ConduitJni.configurePowerDistribution(moduleID, type);
+  public boolean getEpochTimeValid() {
+    return sys.epochTimeValid();
   }
 
-  public int getPDPChannelCount() {
-    return pdp.channelCount();
+  public NetworkStatus getNetworkEthernet() {
+    return sys.networkEthernet();
   }
 
-  public int getPDPHandle() {
-    return pdp.handle();
+  public NetworkStatus getNetworkWiFi() {
+    return sys.networkWifi();
   }
 
-  public int getPDPType() {
-    return pdp.type();
+  public NetworkStatus getNetworkUSBTether() {
+    return sys.networkUsbTether();
   }
 
-  public int getPDPModuleId() {
-    return pdp.moduleId();
+  public NetworkStatus getNetworkCAN(int bus) {
+    return sys.networkCan(bus);
   }
 
-  public long getPDPFaults() {
-    return pdp.faults();
+  public CANInfo getNetworkCANInfo(int bus) {
+    return sys.networkCanInfo(bus);
   }
 
-  public long getPDPStickyFaults() {
-    return pdp.stickyFaults();
+  public double getCPUPercent() {
+    return sys.cpuPercent();
+  }
+
+  public double getCPUTempCelcius() {
+    return sys.cpuTemp();
+  }
+
+  public long getMemoryUsageBytes() {
+    return sys.memoryUsageBytes();
+  }
+
+  public long getMemoryTotalBytes() {
+    return sys.memoryTotalBytes();
+  }
+
+  public double getMemoryPercent() {
+    return sys.memoryPercent();
+  }
+
+  public long getStorageUsageBytes() {
+    return sys.storageUsageBytes();
+  }
+
+  public long getStorageTotalBytes() {
+    return sys.storageTotalBytes();
+  }
+
+  public double getStoragePercent() {
+    return sys.storagePercent();
+  }
+
+  public Vector3 getIMUAccelRaw() {
+    return sys.imuAccelRaw();
+  }
+
+  public Vector3 getIMUGyroRates() {
+    return sys.imuGyroRates();
+  }
+
+  public Vector3 getIMUGyroEulerFlat() {
+    return sys.imuGyroEulerFlat();
+  }
+
+  public Vector3 getIMUGyroEulerLandscape() {
+    return sys.imuGyroEulerLandscape();
+  }
+
+  public Vector3 getIMUGyroEulerPortrait() {
+    return sys.imuGyroEulerPortrait();
+  }
+
+  public Rotation3d getIMUGyroRotation3d() {
+    return new Rotation3d(
+        new Quaternion(
+            sys.imuGyroQuaternion().w(),
+            sys.imuGyroQuaternion().x(),
+            sys.imuGyroQuaternion().y(),
+            sys.imuGyroQuaternion().z()));
+  }
+
+  public Rotation2d getIMUGyroYawFlat() {
+    return new Rotation2d(sys.imuGyroYawFlat());
+  }
+
+  public Rotation2d getIMUGyroYawLandscape() {
+    return new Rotation2d(sys.imuGyroYawLandscape());
+  }
+
+  public Rotation2d getIMUGyroYawPortrait() {
+    return new Rotation2d(sys.imuGyroYawPortrait());
   }
 }

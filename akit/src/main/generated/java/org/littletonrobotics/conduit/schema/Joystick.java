@@ -40,17 +40,17 @@ public final class Joystick extends Struct {
   public void mutateButtons(int buttons) { bb.putInt(bb_pos + 324, buttons); }
   public short povCount() { return bb.getShort(bb_pos + 328); }
   public void mutatePovCount(short pov_count) { bb.putShort(bb_pos + 328, pov_count); }
-  public short povValues(int j) { return bb.getShort(bb_pos + 330 + j * 2); }
-  public void mutatePovValues(int j, short pov_values) { bb.putShort(bb_pos + 330 + j * 2, pov_values); }
-  public boolean isXbox() { return 0!=bb.get(bb_pos + 354); }
-  public void mutateIsXbox(boolean is_xbox) { bb.put(bb_pos + 354, (byte)(is_xbox ? 1 : 0)); }
+  public int povValues(int j) { return bb.get(bb_pos + 330 + j * 1); }
+  public void mutatePovValues(int j, int pov_values) { bb.put(bb_pos + 330 + j * 1, (byte) pov_values); }
+  public boolean isGamepad() { return 0!=bb.get(bb_pos + 338); }
+  public void mutateIsGamepad(boolean is_gamepad) { bb.put(bb_pos + 338, (byte)(is_gamepad ? 1 : 0)); }
 
-  public static int createJoystick(FlatBufferBuilder builder, int[] name, int type, short axisCount, int[] axisTypes, float[] axisValues, int buttonCount, int buttons, short povCount, short[] povValues, boolean isXbox) {
-    builder.prep(4, 356);
+  public static int createJoystick(FlatBufferBuilder builder, int[] name, int type, short axisCount, int[] axisTypes, float[] axisValues, int buttonCount, int buttons, short povCount, int[] povValues, boolean isGamepad) {
+    builder.prep(4, 340);
     builder.pad(1);
-    builder.putBoolean(isXbox);
-    for (int _idx0 = 12; _idx0 > 0; _idx0--) {
-      builder.putShort(povValues[_idx0-1]);
+    builder.putBoolean(isGamepad);
+    for (int _idx0 = 8; _idx0 > 0; _idx0--) {
+      builder.putByte((byte) povValues[_idx0-1]);
     }
     builder.putShort(povCount);
     builder.putInt(buttons);

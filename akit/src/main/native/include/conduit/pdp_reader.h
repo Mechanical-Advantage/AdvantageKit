@@ -29,14 +29,10 @@ using namespace org::littletonrobotics::conduit;
 class PDPReader {
 public:
 	void read(schema::PDPData *pdp_buf);
-	void configure(JNIEnv *env, jint module, jint type,
+	void configure(JNIEnv *env, jint bus, jint module, jint type,
 			schema::PDPData *pdp_buf);
 
 private:
-	void update_ctre_pdp_data(schema::PDPData *pdp_buf);
-	void update_rev_pdh_data(schema::PDPData *pdp_buf);
-	void update_sim_data(schema::PDPData *pdp_buf);
-
 	HAL_PowerDistributionHandle pd_handle;
 	HAL_CANHandle pd_can_handle;
 	HAL_PowerDistributionType pd_type;

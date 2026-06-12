@@ -23,7 +23,7 @@
       "skipInvalidPlatforms": false,
       "isJar": false,
       "validPlatforms": [
-        "linuxathena",
+        "linuxsystemcore",
         "linuxx86-64",
         "linuxarm64",
         "osxuniversal",

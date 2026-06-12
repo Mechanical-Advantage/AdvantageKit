@@ -10,13 +10,10 @@ package org.littletonrobotics.junction;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -87,26 +84,23 @@ public interface ConsoleSource extends AutoCloseable {
   }
 
   /**
-   * Reads console data on the RIO. Saves stdout and sterr from both Java and native code, including
-   * lines logged before this class was instantiated.
+   * Reads console data on Systemcore. Saves stdout and sterr from both Java and native code,
+   * including lines logged before this class was instantiated.
    */
-  public class RoboRIO implements ConsoleSource {
+  class Systemcore implements ConsoleSource {
+    private static final String[] command =
+        new String[] {
+          "/bin/bash",
+          "-c",
+          "journalctl -f -u robot.service -n all -o cat _SYSTEMD_INVOCATION_ID=$(systemctl show -p InvocationID --value robot.service)"
+        };
     private final Thread thread;
     private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(100);
     private final List<String> lines = new ArrayList<>();
 
-    /**
-     * Returns the file path to use for logging.
-     *
-     * @return The file path
-     */
-    protected String getFilePath() {
-      return "/home/lvuser/FRC_UserProgram.log";
-    }
-
-    /** Create roboRIO console source. */
-    public RoboRIO() {
-      thread = new Thread(this::run, "AdvantageKit_RIOConsoleSource");
+    /** Creates a new Systemcore console source. */
+    public Systemcore() {
+      thread = new Thread(this::run, "AdvantageKit_SystemcoreConsoleSource");
       thread.setDaemon(true);
       thread.start();
     }
@@ -122,83 +116,33 @@ public interface ConsoleSource extends AutoCloseable {
     }
 
     private void run() {
-      // Initialize reader
-      CharBuffer buffer = CharBuffer.allocate(10240);
-      BufferedReader reader;
+      Process process;
       try {
-        reader = new BufferedReader(new FileReader(getFilePath()));
-      } catch (FileNotFoundException e) {
+        process = Runtime.getRuntime().exec(command);
+      } catch (IOException e) {
         DriverStation.reportError(
-            "[AdvantageKit] Failed to open console file \""
-                + getFilePath()
-                + "\", disabling console capture.",
-            true);
+            "[AdvantageKit] Failed to launch console capture process, disabling.", true);
         return;
       }
 
-      while (true) {
-        // Read new data from console
-        while (true) {
-          int nextChar = -1;
+      try (BufferedReader reader =
+          new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
           try {
-            nextChar = reader.read();
-          } catch (IOException e) {
-            DriverStation.reportError(
-                "[AdvantageKit] Failed to read console file \""
-                    + getFilePath()
-                    + "\", disabling console capture.",
-                true);
-            try {
-              reader.close();
-            } catch (IOException io) {
-            }
-            return;
-          }
-          if (nextChar != -1) {
-            try {
-              buffer.put((char) nextChar);
-            } catch (BufferOverflowException e) {
-            }
-          } else {
-            // Break read loop, send complete lines to queue
-            break;
-          }
-        }
-
-        // Read all complete lines
-        String output = null;
-        for (int i = buffer.position(); i > 0; i--) {
-          if (i < buffer.position() && buffer.get(i) == '\n') {
-            int originalPosition = buffer.position();
-            output = new String(buffer.array(), 0, i);
-            buffer.rewind();
-            buffer.put(buffer.array(), i + 1, buffer.limit() - i - 1);
-            buffer.position(originalPosition - i - 1);
-            break;
-          }
-        }
-        if (output != null) {
-          try {
-            queue.put(output);
+            queue.put(line);
           } catch (InterruptedException e) {
-            try {
-              reader.close();
-            } catch (IOException io) {
-            }
-            return;
+            Thread.currentThread().interrupt();
+            break;
           }
         }
-
-        // Sleep to avoid spinning needlessly
-        try {
-          Thread.sleep(20);
-        } catch (InterruptedException e) {
-          try {
-            reader.close();
-          } catch (IOException io) {
-          }
-          return;
+      } catch (IOException e) {
+        if (!thread.isInterrupted()) {
+          DriverStation.reportError(
+              "[AdvantageKit] Failed to read from console capture process, disabling.", true);
         }
+      } finally {
+        process.destroy();
       }
     }
   }

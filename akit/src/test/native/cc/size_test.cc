@@ -86,15 +86,15 @@ TEST(SizeTests, JoystickSizes) {
 	ASSERT_EQ(sizeof(HAL_JoystickPOVs::povs[0]),
 			sizeof(decltype(joystick.pov_values()->Get(0))));
 
-	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::isXbox),
-			sizeof(decltype(joystick.is_xbox())));
+	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::isGamepad),
+			sizeof(decltype(joystick.is_gamepad())));
 }
 
 TEST(SizeTests, PDPDataSizes) {
 	schema::PDPData pdp;
 
 	ASSERT_EQ(sizeof(decltype(HAL_InitializePowerDistribution(
-									0, HAL_PowerDistributionType_kCTRE, 0, 0))),
+									0, 0, HAL_PowerDistributionType_kCTRE, 0, 0))),
 			sizeof(decltype(pdp.handle())));
 
 	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0, 0))),
@@ -136,54 +136,7 @@ TEST(SizeTests, SysDataSizes) {
 	schema::SystemData sys;
 
 	ASSERT_EQ(sizeof(decltype(HAL_GetVinVoltage(0))),
-			sizeof(decltype(sys.voltage_vin())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetVinCurrent(0))),
-			sizeof(decltype(sys.current_vin())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserVoltage3V3(0))),
-			sizeof(decltype(sys.user_voltage_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrent3V3(0))),
-			sizeof(decltype(sys.user_current_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserActive3V3(0))),
-			sizeof(decltype(sys.user_active_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrentFaults3V3(0))),
-			sizeof(decltype(sys.user_current_faults_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserVoltage5V(0))),
-			sizeof(decltype(sys.user_voltage_5v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrent5V(0))),
-			sizeof(decltype(sys.user_current_5v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserActive5V(0))),
-			sizeof(decltype(sys.user_active_5v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrentFaults5V(0))),
-			sizeof(decltype(sys.user_current_faults_5v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserVoltage6V(0))),
-			sizeof(decltype(sys.user_voltage_6v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrent6V(0))),
-			sizeof(decltype(sys.user_current_6v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserActive6V(0))),
-			sizeof(decltype(sys.user_active_6v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrentFaults6V(0))),
-			sizeof(decltype(sys.user_current_faults_6v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetBrownedOut(0))),
-			sizeof(decltype(sys.browned_out())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetSystemActive(0))),
-			sizeof(decltype(sys.system_active())));
-
-	// Not sure how to test size for HAL_CAN_GetCANStatus
+			sizeof(decltype(sys.battery_voltage())));
 
 	ASSERT_EQ(sizeof(decltype(wpi::GetSystemTime())),
 			sizeof(decltype(sys.epoch_time())));

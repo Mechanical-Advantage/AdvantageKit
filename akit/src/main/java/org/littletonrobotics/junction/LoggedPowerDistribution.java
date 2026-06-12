@@ -7,7 +7,6 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.hal.PowerDistributionJNI;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import org.littletonrobotics.conduit.ConduitApi;
 
@@ -15,19 +14,16 @@ import org.littletonrobotics.conduit.ConduitApi;
 public class LoggedPowerDistribution {
   private static LoggedPowerDistribution instance;
 
+  private int busID;
   private int moduleID;
   private int moduleType;
 
-  private LoggedPowerDistribution(int moduleID, PowerDistribution.ModuleType moduleType) {
+  private LoggedPowerDistribution(
+      int busID, int moduleID, PowerDistribution.ModuleType moduleType) {
+    this.busID = busID;
     this.moduleID = moduleID;
     this.moduleType = moduleType.value;
-    ConduitApi.getInstance().configurePowerDistribution(moduleID, this.moduleType);
-  }
-
-  private LoggedPowerDistribution() {
-    moduleID = PowerDistributionJNI.DEFAULT_MODULE;
-    moduleType = PowerDistributionJNI.AUTOMATIC_TYPE;
-    ConduitApi.getInstance().configurePowerDistribution(moduleID, this.moduleType);
+    ConduitApi.getInstance().configurePowerDistribution(busID, moduleID, this.moduleType);
   }
 
   /**
@@ -37,9 +33,6 @@ public class LoggedPowerDistribution {
    * @return The singleton LoggedPowerDistribution instance.
    */
   public static LoggedPowerDistribution getInstance() {
-    if (instance == null) {
-      instance = new LoggedPowerDistribution();
-    }
     return instance;
   }
 
@@ -47,16 +40,19 @@ public class LoggedPowerDistribution {
    * Returns the singleton instance of the power distribution logger, configuring it for the
    * specified module type and ID.
    *
+   * @param busID The CAN bus ID of the power distribution module.
    * @param moduleID The CAN ID of the power distribution module.
    * @param moduleType The type of the power distribution module.
    * @return The singleton LoggedPowerDistribution instance.
    */
   public static LoggedPowerDistribution getInstance(
-      int moduleID, PowerDistribution.ModuleType moduleType) {
+      int busID, int moduleID, PowerDistribution.ModuleType moduleType) {
     if (instance == null) {
-      instance = new LoggedPowerDistribution(moduleID, moduleType);
-    } else if (instance.moduleID != moduleID || instance.moduleType != moduleType.value) {
-      instance = new LoggedPowerDistribution(moduleID, moduleType);
+      instance = new LoggedPowerDistribution(busID, moduleID, moduleType);
+    } else if (instance.busID != busID
+        || instance.moduleID != moduleID
+        || instance.moduleType != moduleType.value) {
+      instance = new LoggedPowerDistribution(busID, moduleID, moduleType);
     }
 
     return instance;

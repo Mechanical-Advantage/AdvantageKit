@@ -29,54 +29,119 @@ public final class CoreInputs extends Struct {
   public org.littletonrobotics.conduit.schema.DSData ds() { return ds(new org.littletonrobotics.conduit.schema.DSData()); }
   public org.littletonrobotics.conduit.schema.DSData ds(org.littletonrobotics.conduit.schema.DSData obj) { return obj.__assign(bb_pos + 8, bb); }
   public org.littletonrobotics.conduit.schema.PDPData pdp() { return pdp(new org.littletonrobotics.conduit.schema.PDPData()); }
-  public org.littletonrobotics.conduit.schema.PDPData pdp(org.littletonrobotics.conduit.schema.PDPData obj) { return obj.__assign(bb_pos + 2304, bb); }
+  public org.littletonrobotics.conduit.schema.PDPData pdp(org.littletonrobotics.conduit.schema.PDPData obj) { return obj.__assign(bb_pos + 2208, bb); }
   public org.littletonrobotics.conduit.schema.SystemData sys() { return sys(new org.littletonrobotics.conduit.schema.SystemData()); }
-  public org.littletonrobotics.conduit.schema.SystemData sys(org.littletonrobotics.conduit.schema.SystemData obj) { return obj.__assign(bb_pos + 2560, bb); }
+  public org.littletonrobotics.conduit.schema.SystemData sys(org.littletonrobotics.conduit.schema.SystemData obj) { return obj.__assign(bb_pos + 2464, bb); }
 
-  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, short[][] ds_joysticks_povValues, boolean[] ds_joysticks_isXbox, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, int sys_fpgaVersion, int sys_fpgaRevision, int sys_serialNumberSize, int[] sys_serialNumber, int sys_commentsSize, int[] sys_comments, int sys_teamNumber, int sys_fpgaButton, int sys_systemActive, int sys_brownedOut, int sys_commsDisableCount, int sys_rslState, int sys_systemTimeValid, double sys_voltageVin, double sys_currentVin, double sys_userVoltage3v3, double sys_userCurrent3v3, int sys_userActive3v3, int sys_userCurrentFaults3v3, double sys_userVoltage5v, double sys_userCurrent5v, int sys_userActive5v, int sys_userCurrentFaults5v, double sys_userVoltage6v, double sys_userCurrent6v, int sys_userActive6v, int sys_userCurrentFaults6v, double sys_brownoutVoltage, double sys_cpuTemp, float sys_can_status_percentBusUtilization, long sys_can_status_busOffCount, long sys_can_status_txFullCount, long sys_can_status_receiveErrorCount, long sys_can_status_transmitErrorCount, long sys_epochTime) {
-    builder.prep(8, 2808);
-    builder.prep(8, 248);
-    builder.putLong(sys_epochTime);
-    builder.pad(4);
-    builder.prep(4, 20);
-    builder.putInt((int) sys_can_status_transmitErrorCount);
-    builder.putInt((int) sys_can_status_receiveErrorCount);
-    builder.putInt((int) sys_can_status_txFullCount);
-    builder.putInt((int) sys_can_status_busOffCount);
-    builder.putFloat(sys_can_status_percentBusUtilization);
+  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, double sys_batteryVoltage, boolean sys_watchdogActive, long sys_ioFrequency, long sys_teamNumber, long sys_epochTime, boolean sys_epochTimeValid, long sys_network_ethernet_rx_bandwidthKbps, long sys_network_ethernet_rx_bytes, long sys_network_ethernet_rx_dropped, long sys_network_ethernet_rx_errors, long sys_network_ethernet_rx_packets, long sys_network_ethernet_tx_bandwidthKbps, long sys_network_ethernet_tx_bytes, long sys_network_ethernet_tx_dropped, long sys_network_ethernet_tx_errors, long sys_network_ethernet_tx_packets, long sys_network_wifi_rx_bandwidthKbps, long sys_network_wifi_rx_bytes, long sys_network_wifi_rx_dropped, long sys_network_wifi_rx_errors, long sys_network_wifi_rx_packets, long sys_network_wifi_tx_bandwidthKbps, long sys_network_wifi_tx_bytes, long sys_network_wifi_tx_dropped, long sys_network_wifi_tx_errors, long sys_network_wifi_tx_packets, long sys_network_usb_tether_rx_bandwidthKbps, long sys_network_usb_tether_rx_bytes, long sys_network_usb_tether_rx_dropped, long sys_network_usb_tether_rx_errors, long sys_network_usb_tether_rx_packets, long sys_network_usb_tether_tx_bandwidthKbps, long sys_network_usb_tether_tx_bytes, long sys_network_usb_tether_tx_dropped, long sys_network_usb_tether_tx_errors, long sys_network_usb_tether_tx_packets, long[] sys_network_can_rx_bandwidthKbps, long[] sys_network_can_rx_bytes, long[] sys_network_can_rx_dropped, long[] sys_network_can_rx_errors, long[] sys_network_can_rx_packets, long[] sys_network_can_tx_bandwidthKbps, long[] sys_network_can_tx_bytes, long[] sys_network_can_tx_dropped, long[] sys_network_can_tx_errors, long[] sys_network_can_tx_packets, double[] sys_network_can_info_maxBandwidthMbps, boolean[] sys_network_can_info_isFd, boolean[] sys_network_can_info_isAvailable, boolean[] sys_network_can_info_isUp, double sys_cpuPercent, double sys_cpuTemp, long sys_memoryUsageBytes, long sys_memoryTotalBytes, double sys_memoryPercent, long sys_storageUsageBytes, long sys_storageTotalBytes, double sys_storagePercent, double sys_imu_accel_raw_x, double sys_imu_accel_raw_y, double sys_imu_accel_raw_z, double sys_imu_gyro_rates_x, double sys_imu_gyro_rates_y, double sys_imu_gyro_rates_z, double sys_imu_gyro_euler_flat_x, double sys_imu_gyro_euler_flat_y, double sys_imu_gyro_euler_flat_z, double sys_imu_gyro_euler_landscape_x, double sys_imu_gyro_euler_landscape_y, double sys_imu_gyro_euler_landscape_z, double sys_imu_gyro_euler_portrait_x, double sys_imu_gyro_euler_portrait_y, double sys_imu_gyro_euler_portrait_z, double sys_imu_gyro_quaternion_w, double sys_imu_gyro_quaternion_x, double sys_imu_gyro_quaternion_y, double sys_imu_gyro_quaternion_z, double sys_imuGyroYawFlat, double sys_imuGyroYawLandscape, double sys_imuGyroYawPortrait) {
+    builder.prep(8, 3472);
+    builder.prep(8, 1008);
+    builder.putDouble(sys_imuGyroYawPortrait);
+    builder.putDouble(sys_imuGyroYawLandscape);
+    builder.putDouble(sys_imuGyroYawFlat);
+    builder.prep(8, 32);
+    builder.putDouble(sys_imu_gyro_quaternion_z);
+    builder.putDouble(sys_imu_gyro_quaternion_y);
+    builder.putDouble(sys_imu_gyro_quaternion_x);
+    builder.putDouble(sys_imu_gyro_quaternion_w);
+    builder.prep(8, 24);
+    builder.putDouble(sys_imu_gyro_euler_portrait_z);
+    builder.putDouble(sys_imu_gyro_euler_portrait_y);
+    builder.putDouble(sys_imu_gyro_euler_portrait_x);
+    builder.prep(8, 24);
+    builder.putDouble(sys_imu_gyro_euler_landscape_z);
+    builder.putDouble(sys_imu_gyro_euler_landscape_y);
+    builder.putDouble(sys_imu_gyro_euler_landscape_x);
+    builder.prep(8, 24);
+    builder.putDouble(sys_imu_gyro_euler_flat_z);
+    builder.putDouble(sys_imu_gyro_euler_flat_y);
+    builder.putDouble(sys_imu_gyro_euler_flat_x);
+    builder.prep(8, 24);
+    builder.putDouble(sys_imu_gyro_rates_z);
+    builder.putDouble(sys_imu_gyro_rates_y);
+    builder.putDouble(sys_imu_gyro_rates_x);
+    builder.prep(8, 24);
+    builder.putDouble(sys_imu_accel_raw_z);
+    builder.putDouble(sys_imu_accel_raw_y);
+    builder.putDouble(sys_imu_accel_raw_x);
+    builder.putDouble(sys_storagePercent);
+    builder.putLong(sys_storageTotalBytes);
+    builder.putLong(sys_storageUsageBytes);
+    builder.putDouble(sys_memoryPercent);
+    builder.putLong(sys_memoryTotalBytes);
+    builder.putLong(sys_memoryUsageBytes);
     builder.putDouble(sys_cpuTemp);
-    builder.putDouble(sys_brownoutVoltage);
-    builder.putInt(sys_userCurrentFaults6v);
-    builder.putInt(sys_userActive6v);
-    builder.putDouble(sys_userCurrent6v);
-    builder.putDouble(sys_userVoltage6v);
-    builder.putInt(sys_userCurrentFaults5v);
-    builder.putInt(sys_userActive5v);
-    builder.putDouble(sys_userCurrent5v);
-    builder.putDouble(sys_userVoltage5v);
-    builder.putInt(sys_userCurrentFaults3v3);
-    builder.putInt(sys_userActive3v3);
-    builder.putDouble(sys_userCurrent3v3);
-    builder.putDouble(sys_userVoltage3v3);
-    builder.putDouble(sys_currentVin);
-    builder.putDouble(sys_voltageVin);
-    builder.putInt(sys_systemTimeValid);
-    builder.putInt(sys_rslState);
-    builder.putInt(sys_commsDisableCount);
-    builder.putInt(sys_brownedOut);
-    builder.putInt(sys_systemActive);
-    builder.putInt(sys_fpgaButton);
-    builder.putInt(sys_teamNumber);
-    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) sys_comments[_idx0-1]);
+    builder.putDouble(sys_cpuPercent);
+    for (int _idx0 = 5; _idx0 > 0; _idx0--) {
+      builder.prep(8, 16);
+      builder.pad(5);
+      builder.putBoolean(sys_network_can_info_isUp[_idx0-1]);
+      builder.putBoolean(sys_network_can_info_isAvailable[_idx0-1]);
+      builder.putBoolean(sys_network_can_info_isFd[_idx0-1]);
+      builder.putDouble(sys_network_can_info_maxBandwidthMbps[_idx0-1]);
     }
-    builder.putShort((short) sys_commentsSize);
-    for (int _idx0 = 8; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) sys_serialNumber[_idx0-1]);
+    for (int _idx0 = 5; _idx0 > 0; _idx0--) {
+      builder.prep(8, 80);
+      builder.prep(8, 40);
+      builder.putLong(sys_network_can_tx_packets[_idx0-1]);
+      builder.putLong(sys_network_can_tx_errors[_idx0-1]);
+      builder.putLong(sys_network_can_tx_dropped[_idx0-1]);
+      builder.putLong(sys_network_can_tx_bytes[_idx0-1]);
+      builder.putLong(sys_network_can_tx_bandwidthKbps[_idx0-1]);
+      builder.prep(8, 40);
+      builder.putLong(sys_network_can_rx_packets[_idx0-1]);
+      builder.putLong(sys_network_can_rx_errors[_idx0-1]);
+      builder.putLong(sys_network_can_rx_dropped[_idx0-1]);
+      builder.putLong(sys_network_can_rx_bytes[_idx0-1]);
+      builder.putLong(sys_network_can_rx_bandwidthKbps[_idx0-1]);
     }
-    builder.putShort((short) sys_serialNumberSize);
-    builder.putInt(sys_fpgaRevision);
-    builder.putInt(sys_fpgaVersion);
+    builder.prep(8, 80);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_usb_tether_tx_packets);
+    builder.putLong(sys_network_usb_tether_tx_errors);
+    builder.putLong(sys_network_usb_tether_tx_dropped);
+    builder.putLong(sys_network_usb_tether_tx_bytes);
+    builder.putLong(sys_network_usb_tether_tx_bandwidthKbps);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_usb_tether_rx_packets);
+    builder.putLong(sys_network_usb_tether_rx_errors);
+    builder.putLong(sys_network_usb_tether_rx_dropped);
+    builder.putLong(sys_network_usb_tether_rx_bytes);
+    builder.putLong(sys_network_usb_tether_rx_bandwidthKbps);
+    builder.prep(8, 80);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_wifi_tx_packets);
+    builder.putLong(sys_network_wifi_tx_errors);
+    builder.putLong(sys_network_wifi_tx_dropped);
+    builder.putLong(sys_network_wifi_tx_bytes);
+    builder.putLong(sys_network_wifi_tx_bandwidthKbps);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_wifi_rx_packets);
+    builder.putLong(sys_network_wifi_rx_errors);
+    builder.putLong(sys_network_wifi_rx_dropped);
+    builder.putLong(sys_network_wifi_rx_bytes);
+    builder.putLong(sys_network_wifi_rx_bandwidthKbps);
+    builder.prep(8, 80);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_ethernet_tx_packets);
+    builder.putLong(sys_network_ethernet_tx_errors);
+    builder.putLong(sys_network_ethernet_tx_dropped);
+    builder.putLong(sys_network_ethernet_tx_bytes);
+    builder.putLong(sys_network_ethernet_tx_bandwidthKbps);
+    builder.prep(8, 40);
+    builder.putLong(sys_network_ethernet_rx_packets);
+    builder.putLong(sys_network_ethernet_rx_errors);
+    builder.putLong(sys_network_ethernet_rx_dropped);
+    builder.putLong(sys_network_ethernet_rx_bytes);
+    builder.putLong(sys_network_ethernet_rx_bandwidthKbps);
+    builder.pad(7);
+    builder.putBoolean(sys_epochTimeValid);
+    builder.putLong(sys_epochTime);
+    builder.putLong(sys_teamNumber);
+    builder.putLong(sys_ioFrequency);
+    builder.pad(7);
+    builder.putBoolean(sys_watchdogActive);
+    builder.putDouble(sys_batteryVoltage);
     builder.prep(8, 256);
     builder.putDouble(pdp_totalEnergy);
     builder.putDouble(pdp_totalPower);
@@ -92,13 +157,13 @@ public final class CoreInputs extends Struct {
     builder.putInt(pdp_type);
     builder.putInt(pdp_channelCount);
     builder.putInt(pdp_handle);
-    builder.prep(8, 2296);
+    builder.prep(8, 2200);
     for (int _idx0 = 6; _idx0 > 0; _idx0--) {
-      builder.prep(4, 356);
+      builder.prep(4, 340);
       builder.pad(1);
-      builder.putBoolean(ds_joysticks_isXbox[_idx0-1]);
-      for (int _idx1 = 12; _idx1 > 0; _idx1--) {
-        builder.putShort(ds_joysticks_povValues[_idx0-1][_idx1-1]);
+      builder.putBoolean(ds_joysticks_isGamepad[_idx0-1]);
+      for (int _idx1 = 8; _idx1 > 0; _idx1--) {
+        builder.putByte((byte) ds_joysticks_povValues[_idx0-1][_idx1-1]);
       }
       builder.putShort(ds_joysticks_povCount[_idx0-1]);
       builder.putInt(ds_joysticks_buttons[_idx0-1]);
