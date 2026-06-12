@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import org.littletonrobotics.conduit.ConduitApi;
 
 /** Manages logging power distribution data. */
-class LoggedPowerDistribution {
+public class LoggedPowerDistribution {
   private static LoggedPowerDistribution instance;
 
   private int busID;
@@ -26,10 +26,25 @@ class LoggedPowerDistribution {
     ConduitApi.getInstance().configurePowerDistribution(busID, moduleID, this.moduleType);
   }
 
+  /**
+   * Returns the singleton instance of the power distribution logger, configuring it for the default
+   * module type and ID.
+   *
+   * @return The singleton LoggedPowerDistribution instance.
+   */
   public static LoggedPowerDistribution getInstance() {
     return instance;
   }
 
+  /**
+   * Returns the singleton instance of the power distribution logger, configuring it for the
+   * specified module type and ID.
+   *
+   * @param busID The CAN bus ID of the power distribution module.
+   * @param moduleID The CAN ID of the power distribution module.
+   * @param moduleType The type of the power distribution module.
+   * @return The singleton LoggedPowerDistribution instance.
+   */
   public static LoggedPowerDistribution getInstance(
       int busID, int moduleID, PowerDistribution.ModuleType moduleType) {
     if (instance == null) {
@@ -43,7 +58,7 @@ class LoggedPowerDistribution {
     return instance;
   }
 
-  public void saveToLog(LogTable table) {
+  void saveToLog(LogTable table) {
     ConduitApi conduit = ConduitApi.getInstance();
     table.put("Temperature", conduit.getPDPTemperature());
     table.put("Voltage", conduit.getPDPVoltage());

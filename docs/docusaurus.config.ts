@@ -13,7 +13,9 @@ const config: Config = {
   baseUrl: "/",
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
+  markdown: {
+    hooks: { onBrokenMarkdownLinks: "throw", onBrokenMarkdownImages: "throw" }
+  },
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -58,6 +60,22 @@ const config: Config = {
           {
             to: "/data-flow/recording-inputs",
             from: "/category/recording-inputs"
+          },
+          {
+            to: "/theory/high-frequency-odometry",
+            from: "/getting-started/template-projects/high-frequency-odometry"
+          },
+          {
+            to: "/theory/log-replay-comparison",
+            from: "/getting-started/what-is-advantagekit/log-replay-comparison"
+          },
+          {
+            to: "/theory/deterministic-timestamps",
+            from: "/data-flow/deterministic-timestamps"
+          },
+          {
+            to: "/getting-started/template-projects/kitbot-template",
+            from: "/getting-started/template-projects/kitbot-2025-template"
           }
         ]
       }
@@ -86,7 +104,7 @@ const config: Config = {
       ]
     },
     footer: {
-      copyright: "Copyright © 2021-2025 Littleton Robotics",
+      copyright: "Copyright © 2021-2026 Littleton Robotics",
       links: [
         {
           label: "Littleton Robotics",

@@ -38,7 +38,7 @@ public class Robot extends LoggedRobot {
 }
 ```
 
-The user program is responsible for configuring and initializing the logging framework. This setup should be placed in the constructor of `Robot` _before any other initialization_. An example configuration is provided below:
+The user program is responsible for configuring and initializing the logging framework. This setup should be placed in the constructor of `Robot` _before any other initialization_. More information on the importance of initializing the robot code in order can be found [here](/getting-started/common-issues/uninitialized-inputs). An example configuration is provided below:
 
 ```java
 Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value

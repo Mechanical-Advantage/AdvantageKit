@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -87,9 +87,8 @@ public class ConduitApi {
 
   public String getGameSpecificMessage() {
     int i;
-    for (i = 0; i < gameSpecificMessageBytes.length; i++) {
+    for (i = 0; i < getGameSpecificMessageSize(); i++) {
       gameSpecificMessageBytes[i] = (byte) ds.gameSpecificMessage(i);
-      if (gameSpecificMessageBytes[i] == 0) break;
     }
     return new String(gameSpecificMessageBytes, 0, i, utf8Charset);
   }

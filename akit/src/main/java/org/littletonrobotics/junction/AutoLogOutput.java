@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -34,4 +34,11 @@ public @interface AutoLogOutput {
    * @return Whether or not to force the Logger to use a serialized data method.
    */
   public boolean forceSerializable() default false;
+
+  /**
+   * The unit to save as metadata, used when visualizing the field in AdvantageScope.
+   *
+   * @return The value of the unit parameter.
+   */
+  public String unit() default "";
 }

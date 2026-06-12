@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -51,14 +51,17 @@ public class DriveConstants {
   public static final int driveMotorCurrentLimit = 50;
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.5);
   public static final double driveMotorReduction =
-      (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth and 22 spur teeth
+      (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth
+  // and 22 spur teeth
   public static final DCMotor driveGearbox = DCMotor.getNeoVortex(1);
 
   // Drive encoder configuration
   public static final double driveEncoderPositionFactor =
-      2 * Math.PI / driveMotorReduction; // Rotor Rotations -> Wheel Radians
+      2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
+  // Wheel Radians
   public static final double driveEncoderVelocityFactor =
-      (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
+      (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM ->
+  // Wheel Rad/Sec
 
   // Drive PID configuration
   public static final double driveKp = 0.0;

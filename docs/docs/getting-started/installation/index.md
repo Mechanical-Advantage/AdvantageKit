@@ -1,13 +1,21 @@
 # 📦 Installation
 
+:::tip
+Looking to install AdvantageKit in a [Python robot project](https://docs.wpilib.org/en/stable/docs/software/python/index.html)? Consider using **[PyKit](https://github.com/1757WestwoodRobotics/PyKit)**, an alternative to AdvantageKit developed by [Team 1757](https://whsrobotics.org) that supports deterministic replay in Python.
+:::
+
 ## New Projects
+
+:::info
+Template projects are not currently available for the 2027 alpha versions of AdvantageKit.
+:::
 
 For new projects, we highly recommend starting with one of the [template projects](/getting-started/template-projects) attached to the [latest release](https://github.com/Mechanical-Advantage/AdvantageKit/releases). These projects include detailed documentation and setup instructions for many common use cases:
 
-- **[2025 KitBot Template](../template-projects/kitbot-2025-template.md)**: For robots based on the 2025 FIRST KitBot.
+- **[2026 KitBot Template](../template-projects/kitbot-template.md)**: For robots based on the 2026 FIRST KitBot.
 - **[Differential Drive Template](../template-projects/diff-drive-template.md)**: For other differential drive (tank) robots.
 - **[Spark Swerve Template](../template-projects/spark-swerve-template.md)**: For swerve drives primarily using the Spark Max and Spark Flex, including NEO, NEO Vortex, or NEO 550 motors.
-- **[TalonFX Swerve Template](../template-projects/talonfx-swerve-template.md)**: For swerve drives primarily using TalonFX-based motors like the Falcon 500, Kraken X60, and Kraken X44.
+- **[TalonFX(S) Swerve Template](../template-projects/talonfx-swerve-template.md)**: For swerve drives primarily using TalonFX(S)-based motors like the Falcon 500, Kraken X60, Kraken X44, and Minion.
 - **[Vision Template](../template-projects/vision-template.md)**: Example code for running simple vision targeting and pose estimation.
 - **[Skeleton Template](../template-projects/skeleton-template.md)**: Simple project with AdvantageKit installed but without subsystems or control logic.
 

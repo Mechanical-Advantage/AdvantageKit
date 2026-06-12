@@ -69,3 +69,7 @@ img {
 .hidden {
   display: none !important;
 }
+
+.small-code {
+  --ifm-code-font-size: 70%;
+}

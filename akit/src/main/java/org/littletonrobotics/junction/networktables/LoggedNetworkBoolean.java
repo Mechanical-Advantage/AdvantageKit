@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -9,12 +9,13 @@ package org.littletonrobotics.junction.networktables;
 
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 /** Manages a boolean value published to the root table of NT. */
-public class LoggedNetworkBoolean extends LoggedNetworkInput {
+public class LoggedNetworkBoolean extends LoggedNetworkInput implements BooleanSupplier {
   private final String key;
   private final BooleanEntry entry;
   private boolean defaultValue = false;
@@ -91,5 +92,10 @@ public class LoggedNetworkBoolean extends LoggedNetworkInput {
       value = entry.get(defaultValue);
     }
     Logger.processInputs(prefix, inputs);
+  }
+
+  @Override
+  public boolean getAsBoolean() {
+    return value;
   }
 }

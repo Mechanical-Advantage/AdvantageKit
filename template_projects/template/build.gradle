@@ -57,7 +57,8 @@ deploy {
 
 def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 
-// Set to true to use debug for JNI.
+// Set to true to use debug for all targets including JNI, which will drastically impact
+// performance.
 wpi.java.debugJni = false
 
 // Set this to true to enable desktop support.
@@ -105,9 +106,8 @@ test {
 // Simulation configuration (e.g. environment variables).
 //
 // The sim GUI is *disabled* by default to support running
-// AdvantageKit log replay from the command line. Set the
-// value to "true" to enable the sim GUI by default (this
-// is the standard WPILib behavior).
+// AdvantageKit log replay, which requires that all HAL
+// sim extensions be disabled.
 wpi.sim.addGui().defaultEnabled = false
 wpi.sim.addDriverstation()
 
@@ -202,7 +202,7 @@ spotless {
     json {
         target fileTree(".") {
             include "**/*.json"
-            exclude "**/build/**", "**/build-*/**"
+            exclude "**/build/**", "**/build-*/**", ".wpilib/**"
         }
         gson().indentWithSpaces(2)
     }

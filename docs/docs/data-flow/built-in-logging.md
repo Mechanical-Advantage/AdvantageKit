@@ -14,7 +14,7 @@ Built-in input values are available during replay with guaranteed accuracy and c
 
 ### Timestamp
 
-AdvantageKit logs and replays the value of `RobotController.getTime()`, `Timer.getTimestamp()`, etc. See [this page](./deterministic-timestamps.md) for more details on timestamps in AdvantageKit.
+AdvantageKit logs and replays the value of `RobotController.getTime()`, `Timer.getTimestamp()`, etc. See [this page](/theory/deterministic-timestamps) for more details on timestamps in AdvantageKit.
 
 :::warning
 The methods `RobotController.getFPGATime()` and `Timer.getFPGATimestamp()` are used for accessing the real (non-deterministic) timestamp, and should only be used within IO implementations or for performance profiling.
@@ -23,6 +23,10 @@ The methods `RobotController.getFPGATime()` and `Timer.getFPGATimestamp()` are u
 ### Driver Station
 
 All values that can be accessed via the `DriverStation` or WPILib HID classes (`Joystick`, `XboxController`, etc) are automatically logged and replayed. These fields are available under the `DriverStation` table.
+
+:::danger
+The [`waitForDsConnection`](<https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/DriverStation.html#waitForDsConnection(double)>) method is not compatible with AdvantageKit.
+:::
 
 ### Dashboard Inputs
 
@@ -57,10 +61,10 @@ Status data from the VH-109 radio is automatically logged every ~5 seconds. This
 The current on each channel, along with other useful stats, are automatically logged by AdvantageKit as outputs under the `PowerDistribution` table. This feature works by default when using the CTRE PDP or REV PDH configured to the default CAN ID (ID 0 for the PDP and ID 1 for the PDH).
 
 :::warning
-This feature is only supported on Power Distribution devices that support current monitoring (the CTRE PDP and REV PDH). The CTRE PDP 2.0 is **not supported**.
+This feature is only supported on Power Distribution devices that support current monitoring (the CTRE PDP and REV PDH). The CTRE PDP 2.0 and AndyMark Power Distribution Board are **not supported**.
 :::
 
-The `LoggedPowerDistribution` class can be used manually configure the power distribution type and CAN ID when not using the default configuration. This can be accomplished by adding the line below to the `Robot` constructor before `Logger.start()`:
+The `LoggedPowerDistribution` class can be used to manually configure the power distribution type and CAN ID when not using the default configuration. This can be accomplished by adding the line below to the `Robot` constructor before `Logger.start()`:
 
 ```java
 LoggedPowerDistribution.getInstance(50, ModuleType.kRev); // Example: PDH on CAN ID 50

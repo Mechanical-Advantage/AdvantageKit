@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -9,12 +9,13 @@ package org.littletonrobotics.junction.networktables;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringEntry;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 /** Manages a String value published to the root table of NT. */
-public class LoggedNetworkString extends LoggedNetworkInput {
+public class LoggedNetworkString extends LoggedNetworkInput implements Supplier<String> {
   private final String key;
   private final StringEntry entry;
   private String defaultValue = "";

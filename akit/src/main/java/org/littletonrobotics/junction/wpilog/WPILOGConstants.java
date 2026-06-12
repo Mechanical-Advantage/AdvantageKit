@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -10,4 +10,6 @@ package org.littletonrobotics.junction.wpilog;
 class WPILOGConstants {
   public static final String extraHeader = "AdvantageKit";
   public static final String entryMetadata = "{\"source\":\"AdvantageKit\"}";
+  public static final String entryMetadataUnits =
+      "{\"source\":\"AdvantageKit\",\"unit\":\"$UNITSTR\"}";
 }

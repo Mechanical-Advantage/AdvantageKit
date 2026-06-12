@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -27,7 +27,7 @@ public class VisionIOPhotonVision implements VisionIO {
    * Creates a new VisionIOPhotonVision.
    *
    * @param name The configured name of the camera.
-   * @param rotationSupplier The 3D position of the camera relative to the robot.
+   * @param robotToCamera The 3D position of the camera relative to the robot.
    */
   public VisionIOPhotonVision(String name, Transform3d robotToCamera) {
     camera = new PhotonCamera(name);

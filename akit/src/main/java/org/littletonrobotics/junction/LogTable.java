@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -10,7 +10,6 @@ package org.littletonrobotics.junction;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
 import edu.wpi.first.util.WPISerializable;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.protobuf.ProtobufBuffer;
@@ -18,6 +17,7 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructBuffer;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.util.Color;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 import us.hebi.quickbuf.ProtoMessage;
 
@@ -387,6 +388,18 @@ public class LogTable {
   }
 
   /**
+   * Writes a new Float value to the table with units. Skipped if the key already exists as a
+   * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
+   * @param unit The unit to save as metadata.
+   */
+  public void put(String key, float value, String unit) {
+    put(key, new LogValue(value, null, unit));
+  }
+
+  /**
    * Writes a new FloatArray value to the table. Skipped if the key already exists as a different
    * type.
    *
@@ -423,6 +436,18 @@ public class LogTable {
    */
   public void put(String key, double value) {
     put(key, new LogValue(value, null));
+  }
+
+  /**
+   * Writes a new Double value to the table with units. Skipped if the key already exists as a
+   * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
+   * @param unit The unit to save as metadata.
+   */
+  public void put(String key, double value, String unit) {
+    put(key, new LogValue(value, null, unit));
   }
 
   /**
@@ -542,13 +567,27 @@ public class LogTable {
   /**
    * Writes a new Measure value to the table. Skipped if the key already exists as a different type.
    *
+   * <p>This overload always records the value in its base unit. Use the double overload with a unit
+   * string to record values with alternative units.
+   *
    * @param <U> The unit type.
    * @param key The field name.
    * @param value The field value.
    */
   public <U extends Unit> void put(String key, Measure<U> value) {
     if (value == null) return;
-    put(key, new LogValue(value.baseUnitMagnitude(), null));
+    put(key, new LogValue(value.baseUnitMagnitude(), null, value.baseUnit().name()));
+  }
+
+  /**
+   * Writes a new Color value to the table. Skipped if the key already exists as a different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
+   */
+  public void put(String key, Color value) {
+    if (value == null) return;
+    put(key, value.toHexString());
   }
 
   /**
@@ -1290,20 +1329,36 @@ public class LogTable {
   /**
    * Reads a MutableMeasure value from the table.
    *
+   * <p>Unlike other "get" methods, this method mutates the provided value instead of returning a
+   * new instance. The object returned from this method is the same instance as the provided value.
+   *
    * @param <U> The unit type.
    * @param <Base> The base unit type
    * @param <M> The measure type.
    * @param key The field name.
+   * @param value The field value, to be mutated.
+   * @return The field value.
+   */
+  public <U extends Unit, Base extends Measure<U>, M extends MutableMeasure<U, Base, M>> M get(
+      String key, M value) {
+    if (data.containsKey(prefix + key)) {
+      double baseValue = get(key).getDouble(value.baseUnitMagnitude());
+      return value.mut_setBaseUnitMagnitude(baseValue);
+    } else {
+      return value;
+    }
+  }
+
+  /**
+   * Reads a Color value from the table.
+   *
+   * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
-  @SuppressWarnings("unchecked")
-  public <U extends Unit, Base extends Measure<U>, M extends MutableMeasure<U, Base, M>> M get(
-      String key, M defaultValue) {
+  public Color get(String key, Color defaultValue) {
     if (data.containsKey(prefix + key)) {
-      double baseValue = get(key).getDouble(defaultValue.baseUnitMagnitude());
-      double relativeValue = defaultValue.unit().fromBaseUnits(baseValue);
-      return (M) new GenericMutableMeasureImpl<>(relativeValue, baseValue, defaultValue.unit());
+      return new Color(get(key).getString(defaultValue.toHexString()));
     } else {
       return defaultValue;
     }
@@ -1578,6 +1633,9 @@ public class LogTable {
       if (field.getValue().customTypeStr != null) {
         output += "," + field.getValue().customTypeStr.toString();
       }
+      if (field.getValue().unitStr != null) {
+        output += "," + field.getValue().unitStr.toString();
+      }
       output += "]=";
       LogValue value = field.getValue();
       switch (value.type) {
@@ -1637,6 +1695,9 @@ public class LogTable {
     /** The custom type string. */
     public final String customTypeStr;
 
+    /** The name of the unit. */
+    public final String unitStr;
+
     /**
      * Creates a new LogValue.
      *
@@ -1646,6 +1707,7 @@ public class LogTable {
     public LogValue(byte[] value, String typeStr) {
       type = LoggableType.Raw;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1658,6 +1720,7 @@ public class LogTable {
     public LogValue(boolean value, String typeStr) {
       type = LoggableType.Boolean;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1670,6 +1733,7 @@ public class LogTable {
     public LogValue(long value, String typeStr) {
       type = LoggableType.Integer;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1682,6 +1746,21 @@ public class LogTable {
     public LogValue(float value, String typeStr) {
       type = LoggableType.Float;
       customTypeStr = typeStr;
+      unitStr = null;
+      this.value = value;
+    }
+
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     * @param unitStr The unit name, or null if unitless.
+     */
+    public LogValue(float value, String typeStr, String unitStr) {
+      type = LoggableType.Float;
+      customTypeStr = typeStr;
+      this.unitStr = unitStr;
       this.value = value;
     }
 
@@ -1694,6 +1773,21 @@ public class LogTable {
     public LogValue(double value, String typeStr) {
       type = LoggableType.Double;
       customTypeStr = typeStr;
+      unitStr = null;
+      this.value = value;
+    }
+
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     * @param unitStr The unit name, or null if unitless.
+     */
+    public LogValue(double value, String typeStr, String unitStr) {
+      type = LoggableType.Double;
+      customTypeStr = typeStr;
+      this.unitStr = unitStr;
       this.value = value;
     }
 
@@ -1706,6 +1800,7 @@ public class LogTable {
     public LogValue(String value, String typeStr) {
       type = LoggableType.String;
       customTypeStr = typeStr;
+      unitStr = null;
       if (value != null) {
         this.value = value;
       } else {
@@ -1722,6 +1817,7 @@ public class LogTable {
     public LogValue(boolean[] value, String typeStr) {
       type = LoggableType.BooleanArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1734,6 +1830,7 @@ public class LogTable {
     public LogValue(long[] value, String typeStr) {
       type = LoggableType.IntegerArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1746,6 +1843,7 @@ public class LogTable {
     public LogValue(float[] value, String typeStr) {
       type = LoggableType.FloatArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1758,6 +1856,7 @@ public class LogTable {
     public LogValue(double[] value, String typeStr) {
       type = LoggableType.DoubleArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -1770,6 +1869,7 @@ public class LogTable {
     public LogValue(String[] value, String typeStr) {
       type = LoggableType.StringArray;
       customTypeStr = typeStr;
+      unitStr = null;
       this.value = value;
     }
 
@@ -2012,7 +2112,9 @@ public class LogTable {
     public boolean equals(Object other) {
       if (other instanceof LogValue) {
         LogValue otherValue = (LogValue) other;
-        if (otherValue.type.equals(type)) {
+        if (otherValue.type.equals(type)
+            && Objects.equals(customTypeStr, otherValue.customTypeStr)
+            && Objects.equals(unitStr, otherValue.unitStr)) {
           switch (type) {
             case Raw:
               return Arrays.equals(getRaw(), otherValue.getRaw());
@@ -2126,6 +2228,8 @@ public class LogTable {
     public static LoggableType fromWPILOGType(String type) {
       if (wpilogTypes.contains(type)) {
         return LoggableType.values()[wpilogTypes.indexOf(type)];
+      } else if (type.equals("json")) {
+        return LoggableType.String;
       } else {
         return LoggableType.Raw;
       }
@@ -2140,6 +2244,8 @@ public class LogTable {
     public static LoggableType fromNT4Type(String type) {
       if (nt4Types.contains(type)) {
         return LoggableType.values()[nt4Types.indexOf(type)];
+      } else if (type.equals("json")) {
+        return LoggableType.String;
       } else {
         return LoggableType.Raw;
       }

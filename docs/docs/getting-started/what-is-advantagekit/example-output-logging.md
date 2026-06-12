@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Replay Example: Output Logging
+# The Basics: Output Logging
 
 Let's look at a concrete example of AdvantageKit in action. Below is a plot from 6328's 2022 robot, based on an AdvantageKit log file. It shows the flywheel's setpoint speed during a match.
 

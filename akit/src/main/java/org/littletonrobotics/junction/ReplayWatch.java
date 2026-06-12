@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -21,8 +21,6 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +31,7 @@ import java.util.Map;
 public class ReplayWatch {
   private static WatchService watcher;
   private static Map<WatchKey, Path> keys;
+  private static long lastReplayEndTime = 0;
 
   private ReplayWatch() {}
 
@@ -60,7 +59,6 @@ public class ReplayWatch {
     }
 
     // Check for spotless
-    System.out.print("[AdvantageKit] Starting...\r");
     boolean hasSpotless = isSpotlessInstalled();
 
     // Run initial replay
@@ -72,18 +70,17 @@ public class ReplayWatch {
     registerAll(Path.of("src").toAbsolutePath());
 
     // Wait for new events
-    long lastReplay = System.currentTimeMillis();
     while (true) {
       // Wait for signal
-      boolean isNewUpdate = false;
       WatchKey key = watcher.poll();
+      boolean isNewUpdate = false;
+
       if (key == null) {
         try {
           key = watcher.take();
         } catch (InterruptedException x) {
           return;
         }
-        isNewUpdate = true;
       }
 
       Path dir = keys.get(key);
@@ -111,6 +108,20 @@ public class ReplayWatch {
           } catch (IOException x) {
           }
         }
+
+        // Filter events based on timestamp
+        try {
+          if (Files.exists(child)) {
+            long fileModTime = Files.getLastModifiedTime(child).toMillis();
+            if (fileModTime > lastReplayEndTime) {
+              isNewUpdate = true;
+            }
+          } else {
+            isNewUpdate = true;
+          }
+        } catch (IOException e) {
+          isNewUpdate = true;
+        }
       }
 
       // Directory not accessible, remove
@@ -125,55 +136,47 @@ public class ReplayWatch {
       }
 
       // New update, run replay
-      if (isNewUpdate && System.currentTimeMillis() - lastReplay > 250) {
+      if (isNewUpdate) {
         launchReplay(inputLog, hasSpotless);
-        lastReplay = System.currentTimeMillis();
       }
     }
   }
 
   private static void launchReplay(String inputLog, boolean hasSpotless)
       throws IOException, InterruptedException {
-    System.out.print("[AdvantageKit] Replay active... (0.0s)\r");
+    System.out.println("[AdvantageKit] Starting replay...");
 
     // Launch Gradle
     boolean isWindows = System.getProperty("os.name").startsWith("Windows");
     var gradleBuilder =
         new ProcessBuilder(
-            hasSpotless
-                ? new String[] {
-                  isWindows ? "gradlew.bat" : "./gradlew",
-                  "simulateJava",
-                  "-x",
-                  "test",
-                  "-x",
-                  "spotlessApply",
-                  "-x",
-                  "spotlessCheck"
-                }
-                : new String[] {
-                  isWindows ? "gradlew.bat" : "./gradlew", "simulateJava", "-x", "test"
-                });
+                hasSpotless
+                    ? new String[] {
+                      isWindows ? "gradlew.bat" : "./gradlew",
+                      "simulateJava",
+                      "-x",
+                      "test",
+                      "-x",
+                      "spotlessApply",
+                      "-x",
+                      "spotlessCheck"
+                    }
+                    : new String[] {
+                      isWindows ? "gradlew.bat" : "./gradlew", "simulateJava", "-x", "test"
+                    })
+            .inheritIO();
     gradleBuilder.environment().put(LogFileUtil.environmentVariable, inputLog);
     var gradle = gradleBuilder.start();
 
-    // Print timer
-    NumberFormat formatter = new DecimalFormat("#0.0");
-    long startTime = System.currentTimeMillis();
-    while (gradle.isAlive()) {
-      Thread.sleep(100);
-      System.out.print(
-          "[AdvantageKit] Replay active... ("
-              + formatter.format((System.currentTimeMillis() - startTime) * 1.0e-3)
-              + "s)\r");
+    // Print result
+    if (gradle.waitFor() == 0) {
+      System.out.println("[AdvantageKit] Replay finished, waiting for changes...");
+    } else {
+      System.out.println("[AdvantageKit] Replay failed, waiting for changes...");
     }
 
-    // Print result
-    if (gradle.exitValue() == 0) {
-      System.out.print("[AdvantageKit] Replay finished          \r");
-    } else {
-      System.out.print("[AdvantageKit] Replay failed             \r");
-    }
+    // Update the timestamp immediately after build finishes
+    lastReplayEndTime = System.currentTimeMillis();
   }
 
   private static boolean isSpotlessInstalled() throws IOException, InterruptedException {
@@ -183,15 +186,20 @@ public class ReplayWatch {
     var gradle = gradleBuilder.start();
 
     // Read Gradle output
-    BufferedReader reader = new BufferedReader(new InputStreamReader(gradle.getInputStream()));
-    StringBuilder builder = new StringBuilder();
-    String line = null;
-    while ((line = reader.readLine()) != null) {
-      builder.append(line);
-      builder.append(System.getProperty("line.separator"));
+    try (BufferedReader reader =
+        new BufferedReader(new InputStreamReader(gradle.getInputStream()))) {
+      StringBuilder builder = new StringBuilder();
+      String line;
+      while ((line = reader.readLine()) != null) {
+        builder.append(line);
+        builder.append(System.getProperty("line.separator"));
+      }
+      String result = builder.toString();
+      gradle.waitFor();
+      return result.contains("spotless");
+    } finally {
+      gradle.destroy();
     }
-    String result = builder.toString();
-    return result.contains("spotless");
   }
 
   /** Register the given directory with the WatchService */

@@ -24,7 +24,7 @@
               "title": "",
               "controller": null,
               "controllerUUID": "grimvlgu9aluj8btvwotco2wpj0pto2h",
-              "renderer": "#/",
+              "renderer": "",
               "controlsHeight": 0
             },
             {
@@ -122,8 +122,7 @@
                     }
                   }
                 ],
-                "game": "2025 Field",
-                "origin": "blue"
+                "game": ""
               },
               "controllerUUID": "psf0y633oclnjyocus23hcnq1d4tpyte",
               "renderer": {
@@ -193,12 +192,12 @@
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "leftFilter": 0,
                 "rightFilter": 0
@@ -258,12 +257,12 @@
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "leftFilter": 0,
                 "rightFilter": 0
@@ -303,12 +302,12 @@
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "leftFilter": 0,
                 "rightFilter": 0
@@ -348,12 +347,12 @@
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "leftFilter": 0,
                 "rightFilter": 0
@@ -393,12 +392,12 @@
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "leftFilter": 0,
                 "rightFilter": 0
@@ -439,12 +438,12 @@
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
+                  "autoTarget": null,
+                  "preset": null
                 },
                 "leftFilter": 0,
                 "rightFilter": 0
@@ -459,5 +458,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.0.0-beta-3"
+  "version": "26.0.0"
 }

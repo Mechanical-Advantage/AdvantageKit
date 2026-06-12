@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -9,12 +9,13 @@ package org.littletonrobotics.junction.networktables;
 
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 /** Manages a number value published to the root table of NT. */
-public class LoggedNetworkNumber extends LoggedNetworkInput {
+public class LoggedNetworkNumber extends LoggedNetworkInput implements DoubleSupplier {
   private final String key;
   private final DoubleEntry entry;
   private double defaultValue = 0.0;
@@ -91,5 +92,10 @@ public class LoggedNetworkNumber extends LoggedNetworkInput {
       value = entry.get(defaultValue);
     }
     Logger.processInputs(prefix, inputs);
+  }
+
+  @Override
+  public double getAsDouble() {
+    return value;
   }
 }

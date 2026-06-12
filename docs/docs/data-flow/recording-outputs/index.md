@@ -20,6 +20,8 @@ Logger.recordOutput("FeederState", FeederState.RUNNING);
 This data is automatically saved to the `RealOutputs` or `ReplayOutputs` table, and it can be divided further into subtables using slashes (as seen above).
 :::
 
+## Structured Types
+
 Logging geometry objects like `Pose2d`, `Trajectory`, etc. is common in robot code. Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). These objects can be logged as single values or arrays:
 
 ```java
@@ -43,4 +45,24 @@ Logger.recordOutput("MyTrajectory", trajectory);
 SwerveModuleState stateA, stateB, stateC, stateD;
 Logger.recordOutput("MySwerveModuleStates", stateA, stateB, stateC, stateD);
 Logger.recordOutput("MySwerveModuleStates", new SwerveModuleState[] { stateA, stateB, stateC, stateD });
+```
+
+## Units
+
+Double or float fields can be logged with unit metadata in multiple ways. This ensures that AdvantageScope will correctly [visualize unit data](https://docs.advantagescope.org/tab-reference/line-graph/units).
+
+```java
+// The unit can be specified as a string (stored as metadata)
+Logger.recordOutput("MyDistance", 3.14, "meters");
+
+// A unit object from the WPILib units library can be used in place of a string
+Logger.recordOutput("MyDistance", 3.14, Meters);
+
+// Measure values will also be saved with unit metadata
+// (The raw value will use the user-specified unit, not the base unit)
+Logger.recordOutput("MyDistance", Meters.of(3.14));
+
+// This works too, but requires adding the unit to the field name
+// (See the AdvantageScope docs linked above for details)
+Logger.recordOutput("MyDistanceMeters", 3.14);
 ```
