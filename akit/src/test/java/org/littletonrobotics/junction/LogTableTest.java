@@ -5,14 +5,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.littletonrobotics.junction.autolog;
+package org.littletonrobotics.junction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.wpilib.units.Units.Rotations;
 
 import org.junit.jupiter.api.Test;
-import org.littletonrobotics.junction.LogTable;
 import org.wpilib.units.measure.Angle;
 
 /*
