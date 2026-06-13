@@ -29,12 +29,12 @@ public final class CoreInputs extends Struct {
   public org.littletonrobotics.conduit.schema.DSData ds() { return ds(new org.littletonrobotics.conduit.schema.DSData()); }
   public org.littletonrobotics.conduit.schema.DSData ds(org.littletonrobotics.conduit.schema.DSData obj) { return obj.__assign(bb_pos + 8, bb); }
   public org.littletonrobotics.conduit.schema.PDPData pdp() { return pdp(new org.littletonrobotics.conduit.schema.PDPData()); }
-  public org.littletonrobotics.conduit.schema.PDPData pdp(org.littletonrobotics.conduit.schema.PDPData obj) { return obj.__assign(bb_pos + 2208, bb); }
+  public org.littletonrobotics.conduit.schema.PDPData pdp(org.littletonrobotics.conduit.schema.PDPData obj) { return obj.__assign(bb_pos + 2928, bb); }
   public org.littletonrobotics.conduit.schema.SystemData sys() { return sys(new org.littletonrobotics.conduit.schema.SystemData()); }
-  public org.littletonrobotics.conduit.schema.SystemData sys(org.littletonrobotics.conduit.schema.SystemData obj) { return obj.__assign(bb_pos + 2464, bb); }
+  public org.littletonrobotics.conduit.schema.SystemData sys(org.littletonrobotics.conduit.schema.SystemData obj) { return obj.__assign(bb_pos + 3184, bb); }
 
-  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int ds_gameSpecificMessageSize, int[] ds_gameSpecificMessage, int ds_matchNumber, int ds_replayNumber, int ds_matchType, int ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, short[] ds_joysticks_axisCount, int[][] ds_joysticks_axisTypes, float[][] ds_joysticks_axisValues, int[] ds_joysticks_buttonCount, int[] ds_joysticks_buttons, short[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, double sys_batteryVoltage, boolean sys_watchdogActive, long sys_ioFrequency, long sys_teamNumber, long sys_epochTime, boolean sys_epochTimeValid, long sys_network_ethernet_rx_bandwidthKbps, long sys_network_ethernet_rx_bytes, long sys_network_ethernet_rx_dropped, long sys_network_ethernet_rx_errors, long sys_network_ethernet_rx_packets, long sys_network_ethernet_tx_bandwidthKbps, long sys_network_ethernet_tx_bytes, long sys_network_ethernet_tx_dropped, long sys_network_ethernet_tx_errors, long sys_network_ethernet_tx_packets, long sys_network_wifi_rx_bandwidthKbps, long sys_network_wifi_rx_bytes, long sys_network_wifi_rx_dropped, long sys_network_wifi_rx_errors, long sys_network_wifi_rx_packets, long sys_network_wifi_tx_bandwidthKbps, long sys_network_wifi_tx_bytes, long sys_network_wifi_tx_dropped, long sys_network_wifi_tx_errors, long sys_network_wifi_tx_packets, long sys_network_usb_tether_rx_bandwidthKbps, long sys_network_usb_tether_rx_bytes, long sys_network_usb_tether_rx_dropped, long sys_network_usb_tether_rx_errors, long sys_network_usb_tether_rx_packets, long sys_network_usb_tether_tx_bandwidthKbps, long sys_network_usb_tether_tx_bytes, long sys_network_usb_tether_tx_dropped, long sys_network_usb_tether_tx_errors, long sys_network_usb_tether_tx_packets, long[] sys_network_can_rx_bandwidthKbps, long[] sys_network_can_rx_bytes, long[] sys_network_can_rx_dropped, long[] sys_network_can_rx_errors, long[] sys_network_can_rx_packets, long[] sys_network_can_tx_bandwidthKbps, long[] sys_network_can_tx_bytes, long[] sys_network_can_tx_dropped, long[] sys_network_can_tx_errors, long[] sys_network_can_tx_packets, double[] sys_network_can_info_maxBandwidthMbps, boolean[] sys_network_can_info_isFd, boolean[] sys_network_can_info_isAvailable, boolean[] sys_network_can_info_isUp, double sys_cpuPercent, double sys_cpuTemp, long sys_memoryUsageBytes, long sys_memoryTotalBytes, double sys_memoryPercent, long sys_storageUsageBytes, long sys_storageTotalBytes, double sys_storagePercent, double sys_imu_accel_raw_x, double sys_imu_accel_raw_y, double sys_imu_accel_raw_z, double sys_imu_gyro_rates_x, double sys_imu_gyro_rates_y, double sys_imu_gyro_rates_z, double sys_imu_gyro_euler_flat_x, double sys_imu_gyro_euler_flat_y, double sys_imu_gyro_euler_flat_z, double sys_imu_gyro_euler_landscape_x, double sys_imu_gyro_euler_landscape_y, double sys_imu_gyro_euler_landscape_z, double sys_imu_gyro_euler_portrait_x, double sys_imu_gyro_euler_portrait_y, double sys_imu_gyro_euler_portrait_z, double sys_imu_gyro_quaternion_w, double sys_imu_gyro_quaternion_x, double sys_imu_gyro_quaternion_y, double sys_imu_gyro_quaternion_z, double sys_imuGyroYawFlat, double sys_imuGyroYawLandscape, double sys_imuGyroYawPortrait) {
-    builder.prep(8, 3472);
+  public static int createCoreInputs(FlatBufferBuilder builder, long timestamp, int ds_allianceStation, int[] ds_eventName, int[] ds_gameData, int ds_matchNumber, int ds_replayNumber, int ds_matchType, long ds_controlWord, double ds_matchTime, int[][] ds_joysticks_name, int[] ds_joysticks_type, int[] ds_joysticks_supportedOutputs, short[] ds_joysticks_axisCount, float[][] ds_joysticks_axisValues, short[][] ds_joysticks_axisRaw, long[] ds_joysticks_buttonsAvailable, long[] ds_joysticks_buttons, int[] ds_joysticks_povCount, int[][] ds_joysticks_povValues, boolean[] ds_joysticks_isGamepad, int[] ds_joysticks_touchpadCount, int[][] ds_joysticks_touchpads_fingerCount, int[][][] ds_joysticks_touchpads_fingers_down, float[][][] ds_joysticks_touchpads_fingers_x, float[][][] ds_joysticks_touchpads_fingers_y, long ds_op_mode_id, int[] ds_op_mode_name, int[] ds_op_mode_group, int[] ds_op_mode_description, int ds_op_mode_textColor, int ds_op_mode_backgroundColor, int pdp_handle, int pdp_channelCount, int pdp_type, int pdp_moduleId, long pdp_faults, long pdp_stickyFaults, double pdp_temperature, double pdp_voltage, double[] pdp_channelCurrent, double pdp_totalCurrent, double pdp_totalPower, double pdp_totalEnergy, double sys_batteryVoltage, boolean sys_watchdogActive, long sys_ioFrequency, long sys_teamNumber, long sys_epochTime, boolean sys_epochTimeValid, long sys_network_ethernet_rx_bandwidthKbps, long sys_network_ethernet_rx_bytes, long sys_network_ethernet_rx_dropped, long sys_network_ethernet_rx_errors, long sys_network_ethernet_rx_packets, long sys_network_ethernet_tx_bandwidthKbps, long sys_network_ethernet_tx_bytes, long sys_network_ethernet_tx_dropped, long sys_network_ethernet_tx_errors, long sys_network_ethernet_tx_packets, long sys_network_wifi_rx_bandwidthKbps, long sys_network_wifi_rx_bytes, long sys_network_wifi_rx_dropped, long sys_network_wifi_rx_errors, long sys_network_wifi_rx_packets, long sys_network_wifi_tx_bandwidthKbps, long sys_network_wifi_tx_bytes, long sys_network_wifi_tx_dropped, long sys_network_wifi_tx_errors, long sys_network_wifi_tx_packets, long sys_network_usb_tether_rx_bandwidthKbps, long sys_network_usb_tether_rx_bytes, long sys_network_usb_tether_rx_dropped, long sys_network_usb_tether_rx_errors, long sys_network_usb_tether_rx_packets, long sys_network_usb_tether_tx_bandwidthKbps, long sys_network_usb_tether_tx_bytes, long sys_network_usb_tether_tx_dropped, long sys_network_usb_tether_tx_errors, long sys_network_usb_tether_tx_packets, long[] sys_network_can_rx_bandwidthKbps, long[] sys_network_can_rx_bytes, long[] sys_network_can_rx_dropped, long[] sys_network_can_rx_errors, long[] sys_network_can_rx_packets, long[] sys_network_can_tx_bandwidthKbps, long[] sys_network_can_tx_bytes, long[] sys_network_can_tx_dropped, long[] sys_network_can_tx_errors, long[] sys_network_can_tx_packets, double[] sys_network_can_info_maxBandwidthMbps, boolean[] sys_network_can_info_isFd, boolean[] sys_network_can_info_isAvailable, boolean[] sys_network_can_info_isUp, double sys_cpuPercent, double sys_cpuTemp, long sys_memoryUsageBytes, long sys_memoryTotalBytes, double sys_memoryPercent, long sys_storageUsageBytes, long sys_storageTotalBytes, double sys_storagePercent, double sys_imu_accel_raw_x, double sys_imu_accel_raw_y, double sys_imu_accel_raw_z, double sys_imu_gyro_rates_x, double sys_imu_gyro_rates_y, double sys_imu_gyro_rates_z, double sys_imu_gyro_euler_flat_x, double sys_imu_gyro_euler_flat_y, double sys_imu_gyro_euler_flat_z, double sys_imu_gyro_euler_landscape_x, double sys_imu_gyro_euler_landscape_y, double sys_imu_gyro_euler_landscape_z, double sys_imu_gyro_euler_portrait_x, double sys_imu_gyro_euler_portrait_y, double sys_imu_gyro_euler_portrait_z, double sys_imu_gyro_quaternion_w, double sys_imu_gyro_quaternion_x, double sys_imu_gyro_quaternion_y, double sys_imu_gyro_quaternion_z, double sys_imuGyroYawFlat, double sys_imuGyroYawLandscape, double sys_imuGyroYawPortrait) {
+    builder.prep(8, 4192);
     builder.prep(8, 1008);
     builder.putDouble(sys_imuGyroYawPortrait);
     builder.putDouble(sys_imuGyroYawLandscape);
@@ -157,42 +157,68 @@ public final class CoreInputs extends Struct {
     builder.putInt(pdp_type);
     builder.putInt(pdp_channelCount);
     builder.putInt(pdp_handle);
-    builder.prep(8, 2200);
+    builder.prep(8, 2920);
+    builder.prep(8, 272);
+    builder.putInt(ds_op_mode_backgroundColor);
+    builder.putInt(ds_op_mode_textColor);
+    for (int _idx0 = 128; _idx0 > 0; _idx0--) {
+      builder.putByte((byte) ds_op_mode_description[_idx0-1]);
+    }
+    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
+      builder.putByte((byte) ds_op_mode_group[_idx0-1]);
+    }
+    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
+      builder.putByte((byte) ds_op_mode_name[_idx0-1]);
+    }
+    builder.putLong(ds_op_mode_id);
     for (int _idx0 = 6; _idx0 > 0; _idx0--) {
-      builder.prep(4, 340);
+      builder.prep(8, 424);
+      builder.pad(4);
+      for (int _idx1 = 2; _idx1 > 0; _idx1--) {
+        builder.prep(4, 28);
+        for (int _idx2 = 2; _idx2 > 0; _idx2--) {
+          builder.prep(4, 12);
+          builder.putFloat(ds_joysticks_touchpads_fingers_y[_idx0-1][_idx1-1][_idx2-1]);
+          builder.putFloat(ds_joysticks_touchpads_fingers_x[_idx0-1][_idx1-1][_idx2-1]);
+          builder.pad(3);
+          builder.putByte((byte) ds_joysticks_touchpads_fingers_down[_idx0-1][_idx1-1][_idx2-1]);
+        }
+        builder.pad(3);
+        builder.putByte((byte) ds_joysticks_touchpads_fingerCount[_idx0-1][_idx1-1]);
+      }
       builder.pad(1);
+      builder.putByte((byte) ds_joysticks_touchpadCount[_idx0-1]);
       builder.putBoolean(ds_joysticks_isGamepad[_idx0-1]);
       for (int _idx1 = 8; _idx1 > 0; _idx1--) {
         builder.putByte((byte) ds_joysticks_povValues[_idx0-1][_idx1-1]);
       }
-      builder.putShort(ds_joysticks_povCount[_idx0-1]);
-      builder.putInt(ds_joysticks_buttons[_idx0-1]);
-      builder.pad(3);
-      builder.putByte((byte) ds_joysticks_buttonCount[_idx0-1]);
+      builder.putByte((byte) ds_joysticks_povCount[_idx0-1]);
+      builder.putLong(ds_joysticks_buttons[_idx0-1]);
+      builder.putLong(ds_joysticks_buttonsAvailable[_idx0-1]);
+      builder.pad(4);
+      for (int _idx1 = 12; _idx1 > 0; _idx1--) {
+        builder.putShort(ds_joysticks_axisRaw[_idx0-1][_idx1-1]);
+      }
       for (int _idx1 = 12; _idx1 > 0; _idx1--) {
         builder.putFloat(ds_joysticks_axisValues[_idx0-1][_idx1-1]);
       }
-      for (int _idx1 = 12; _idx1 > 0; _idx1--) {
-        builder.putByte((byte) ds_joysticks_axisTypes[_idx0-1][_idx1-1]);
-      }
       builder.putShort(ds_joysticks_axisCount[_idx0-1]);
-      builder.pad(1);
+      builder.putByte((byte) ds_joysticks_supportedOutputs[_idx0-1]);
       builder.putByte((byte) ds_joysticks_type[_idx0-1]);
       for (int _idx1 = 256; _idx1 > 0; _idx1--) {
         builder.putByte((byte) ds_joysticks_name[_idx0-1][_idx1-1]);
       }
     }
     builder.putDouble(ds_matchTime);
-    builder.pad(4);
-    builder.putInt(ds_controlWord);
+    builder.putLong(ds_controlWord);
     builder.putInt(ds_matchType);
     builder.pad(3);
     builder.putByte((byte) ds_replayNumber);
     builder.putShort((short) ds_matchNumber);
-    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) ds_gameSpecificMessage[_idx0-1]);
+    builder.pad(1);
+    for (int _idx0 = 9; _idx0 > 0; _idx0--) {
+      builder.putByte((byte) ds_gameData[_idx0-1]);
     }
-    builder.putShort((short) ds_gameSpecificMessageSize);
     for (int _idx0 = 64; _idx0 > 0; _idx0--) {
       builder.putByte((byte) ds_eventName[_idx0-1]);
     }

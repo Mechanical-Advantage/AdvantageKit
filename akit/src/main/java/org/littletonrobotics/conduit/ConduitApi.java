@@ -30,7 +30,7 @@ public class ConduitApi {
   public static final int NUM_CAN_BUSES = 5;
 
   private static final byte[] eventNameBytes = new byte[64];
-  private static final byte[] gameSpecificMessageBytes = new byte[64];
+  private static final byte[] gameDataBytes = new byte[9];
   private static final byte[] joystickNameBytes = new byte[256];
 
   private static ConduitApi instance = null;
@@ -66,6 +66,7 @@ public class ConduitApi {
 
   public void captureData() {
     ConduitJni.capture();
+    populateOpModes();
   }
 
   public long getTimestamp() {
@@ -80,21 +81,22 @@ public class ConduitApi {
     int i;
     for (i = 0; i < eventNameBytes.length; i++) {
       eventNameBytes[i] = (byte) ds.eventName(i);
-      if (eventNameBytes[i] == 0) break;
+      if (eventNameBytes[i] == 0) {
+        break;
+      }
     }
     return new String(eventNameBytes, 0, i, utf8Charset);
   }
 
-  public String getGameSpecificMessage() {
+  public String getGameData() {
     int i;
-    for (i = 0; i < getGameSpecificMessageSize(); i++) {
-      gameSpecificMessageBytes[i] = (byte) ds.gameSpecificMessage(i);
+    for (i = 0; i < gameDataBytes.length; i++) {
+      gameDataBytes[i] = (byte) ds.gameData(i);
+      if (gameDataBytes[i] == 0) {
+        break;
+      }
     }
-    return new String(gameSpecificMessageBytes, 0, i, utf8Charset);
-  }
-
-  public int getGameSpecificMessageSize() {
-    return ds.gameSpecificMessageSize();
+    return new String(gameDataBytes, 0, i, utf8Charset);
   }
 
   public int getMatchNumber() {
@@ -109,7 +111,7 @@ public class ConduitApi {
     return ds.matchType();
   }
 
-  public int getControlWord() {
+  public long getControlWord() {
     return ds.controlWord();
   }
 
@@ -131,11 +133,15 @@ public class ConduitApi {
     return joysticks[joystickId].type();
   }
 
-  public int getButtonCount(int joystickId) {
-    return joysticks[joystickId].buttonCount();
+  public int getJoystickSupportedOutputs(int joystickId) {
+    return joysticks[joystickId].supportedOutputs();
   }
 
-  public int getButtonValues(int joystickId) {
+  public long getButtonsAvailable(int joystickId) {
+    return joysticks[joystickId].buttonsAvailable();
+  }
+
+  public long getButtonValues(int joystickId) {
     return joysticks[joystickId].buttons();
   }
 
@@ -143,18 +149,18 @@ public class ConduitApi {
     return joysticks[joystickId].axisCount();
   }
 
-  public int[] getAxisTypes(int joystickId) {
-    int[] ret = new int[NUM_JOYSTICK_AXES];
-    for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
-      ret[i] = joysticks[joystickId].axisTypes(i);
-    }
-    return ret;
-  }
-
   public float[] getAxisValues(int joystickId) {
     float[] ret = new float[NUM_JOYSTICK_AXES];
     for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
       ret[i] = joysticks[joystickId].axisValues(i);
+    }
+    return ret;
+  }
+
+  public short[] getJoystickAxisRaw(int joystickId) {
+    short[] ret = new short[NUM_JOYSTICK_AXES];
+    for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
+      ret[i] = (short) joysticks[joystickId].axisRaw(i);
     }
     return ret;
   }
@@ -173,6 +179,26 @@ public class ConduitApi {
 
   public boolean isGamepad(int joystickId) {
     return joysticks[joystickId].isGamepad();
+  }
+
+  public int getTouchpadCount(int joystickId) {
+    return joysticks[joystickId].touchpadCount();
+  }
+
+  public int getTouchpadFingerCount(int joystickId, int touchpadId) {
+    return joysticks[joystickId].touchpads(touchpadId).fingerCount();
+  }
+
+  public boolean getTouchpadFingerDown(int joystickId, int touchpadId, int fingerId) {
+    return joysticks[joystickId].touchpads(touchpadId).fingers(fingerId).down() != 0;
+  }
+
+  public float getTouchpadFingerX(int joystickId, int touchpadId, int fingerId) {
+    return joysticks[joystickId].touchpads(touchpadId).fingers(fingerId).x();
+  }
+
+  public float getTouchpadFingerY(int joystickId, int touchpadId, int fingerId) {
+    return joysticks[joystickId].touchpads(touchpadId).fingers(fingerId).y();
   }
 
   public void configurePowerDistribution(int busID, int moduleID, int type) {
@@ -342,5 +368,134 @@ public class ConduitApi {
 
   public Rotation2d getIMUGyroYawPortrait() {
     return new Rotation2d(sys.imuGyroYawPortrait());
+  }
+
+  public long getOpModeId() {
+    return ds.opMode().id();
+  }
+
+  public String getOpModeName() {
+    org.littletonrobotics.conduit.schema.OpMode option = ds.opMode();
+    int i;
+    for (i = 0; i < 64; i++) {
+      joystickNameBytes[i] = (byte) option.name(i);
+      if (joystickNameBytes[i] == 0) break;
+    }
+    return new String(joystickNameBytes, 0, i, utf8Charset);
+  }
+
+  public String getOpModeGroup() {
+    org.littletonrobotics.conduit.schema.OpMode option = ds.opMode();
+    int i;
+    for (i = 0; i < 64; i++) {
+      joystickNameBytes[i] = (byte) option.group(i);
+      if (joystickNameBytes[i] == 0) break;
+    }
+    return new String(joystickNameBytes, 0, i, utf8Charset);
+  }
+
+  public String getOpModeDescription() {
+    org.littletonrobotics.conduit.schema.OpMode option = ds.opMode();
+    int i;
+    for (i = 0; i < 128; i++) {
+      joystickNameBytes[i] = (byte) option.description(i);
+      if (joystickNameBytes[i] == 0) break;
+    }
+    return new String(joystickNameBytes, 0, i, utf8Charset);
+  }
+
+  public int getOpModeTextColor() {
+    return ds.opMode().textColor();
+  }
+
+  public int getOpModeBackgroundColor() {
+    return ds.opMode().backgroundColor();
+  }
+
+  private static java.util.concurrent.locks.ReentrantLock opModesMutex = null;
+  private static java.util.Map<Long, org.wpilib.hardware.hal.OpModeOption> opModesMap = null;
+
+  static {
+    try {
+      Class<?> backendClass =
+          Class.forName("org.wpilib.driverstation.internal.DriverStationBackend");
+      java.lang.reflect.Field fieldMap = backendClass.getDeclaredField("m_opModes");
+      fieldMap.setAccessible(true);
+      opModesMap = (java.util.Map<Long, org.wpilib.hardware.hal.OpModeOption>) fieldMap.get(null);
+      java.lang.reflect.Field fieldMutex = backendClass.getDeclaredField("m_opModesMutex");
+      fieldMutex.setAccessible(true);
+      opModesMutex = (java.util.concurrent.locks.ReentrantLock) fieldMutex.get(null);
+    } catch (Exception e) {
+      // ignore
+    }
+  }
+
+  private void populateOpModes() {
+    long controlWord = ds.controlWord();
+    long selectedId =
+        (controlWord & 0x00FFFFFFFFFFFFFFL) == 0
+            ? 0L
+            : (controlWord & (0x00FFFFFFFFFFFFFFL | 0x0300000000000000L));
+
+    org.wpilib.hardware.hal.OpModeOption selectedOption = null;
+    if (opModesMap != null) {
+      if (opModesMutex != null) {
+        opModesMutex.lock();
+      }
+      try {
+        selectedOption = opModesMap.get(selectedId);
+      } finally {
+        if (opModesMutex != null) {
+          opModesMutex.unlock();
+        }
+      }
+    }
+
+    org.littletonrobotics.conduit.schema.OpMode conduitOption = ds.opMode();
+    if (selectedOption != null) {
+      conduitOption.mutateId(selectedOption.id);
+      conduitOption.mutateTextColor(selectedOption.textColor);
+      conduitOption.mutateBackgroundColor(selectedOption.backgroundColor);
+
+      writeString(conduitOption, selectedOption.name, 64, 0);
+      writeString(conduitOption, selectedOption.group, 64, 1);
+      writeString(conduitOption, selectedOption.description, 128, 2);
+    } else {
+      conduitOption.mutateId(0L);
+      conduitOption.mutateTextColor(0);
+      conduitOption.mutateBackgroundColor(0);
+
+      writeString(conduitOption, "", 64, 0);
+      writeString(conduitOption, "", 64, 1);
+      writeString(conduitOption, "", 128, 2);
+    }
+  }
+
+  private void writeString(
+      org.littletonrobotics.conduit.schema.OpMode conduitOption,
+      String str,
+      int maxLength,
+      int fieldType) {
+    byte[] bytes = str != null ? str.getBytes(utf8Charset) : new byte[0];
+    int length = Math.min(bytes.length, maxLength - 1);
+    for (int i = 0; i < length; i++) {
+      byte val = bytes[i];
+      if (fieldType == 0) {
+        conduitOption.mutateName(i, val);
+      } else if (fieldType == 1) {
+        conduitOption.mutateGroup(i, val);
+      } else {
+        conduitOption.mutateDescription(i, val);
+      }
+    }
+    for (int i = length; i < maxLength; i++) {
+      if (fieldType == 0) {
+        conduitOption.mutateName(i, (byte) 0);
+      } else if (fieldType == 1) {
+        conduitOption.mutateGroup(i, (byte) 0);
+      } else {
+        conduitOption.mutateDescription(i, (byte) 0);
+      }
+    }
   }
 }

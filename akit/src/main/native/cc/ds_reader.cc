@@ -22,8 +22,8 @@ static constexpr int NUM_JOYSTICKS = 6;
 void DsReader::read(schema::DSData *ds_buf) {
 	std::int32_t status;
 
-	int32_t control_word;
-	HAL_GetControlWord((HAL_ControlWord*) &control_word);
+	HAL_ControlWord control_word;
+	HAL_GetControlWord(&control_word);
 
 	uint8_t alliance_station = HAL_GetAllianceStation(&status);
 
@@ -44,9 +44,7 @@ void DsReader::read(schema::DSData *ds_buf) {
 		std::memcpy(stick_buf->mutable_name()->Data(), jd.name,
 				stick_buf->name()->size());
 		stick_buf->mutate_type(jd.gamepadType);
-
-		// std::memcpy(stick_buf->mutable_axis_types()->Data(), jd.axisTypes,
-		// 		stick_buf->mutable_axis_types()->size() * sizeof(uint8_t));
+		stick_buf->mutate_supported_outputs(jd.supportedOutputs);
 		stick_buf->mutate_is_gamepad(jd.isGamepad);
 
 		// Read joystick values
@@ -54,6 +52,8 @@ void DsReader::read(schema::DSData *ds_buf) {
 		HAL_GetJoystickAxes(joystickNum, &axes);
 		std::memcpy(stick_buf->mutable_axis_values()->Data(), axes.axes,
 				stick_buf->axis_values()->size() * sizeof(float));
+		std::memcpy(stick_buf->mutable_axis_raw()->Data(), axes.raw,
+				stick_buf->axis_raw()->size() * sizeof(int16_t));
 		stick_buf->mutate_axis_count(axes.available);
 
 		HAL_JoystickPOVs povs;
@@ -65,11 +65,27 @@ void DsReader::read(schema::DSData *ds_buf) {
 		HAL_JoystickButtons buttons;
 		HAL_GetJoystickButtons(joystickNum, &buttons);
 		stick_buf->mutate_buttons(buttons.buttons);
-		stick_buf->mutate_button_count(buttons.available);
+		stick_buf->mutate_buttons_available(buttons.available);
+
+		HAL_JoystickTouchpads touchpads;
+		HAL_GetJoystickTouchpads(joystickNum, &touchpads);
+		stick_buf->mutate_touchpad_count(touchpads.count);
+		for (int t = 0; t < 2; t++) {
+			auto &dest_touchpad = stick_buf->mutable_touchpads()->data()[t];
+			const auto &src_touchpad = touchpads.touchpads[t];
+			dest_touchpad.mutate_finger_count(src_touchpad.count);
+			for (int f = 0; f < 2; f++) {
+				auto &dest_finger = dest_touchpad.mutable_fingers()->data()[f];
+				const auto &src_finger = src_touchpad.fingers[f];
+				dest_finger.mutate_down(src_finger.down);
+				dest_finger.mutate_x(src_finger.x);
+				dest_finger.mutate_y(src_finger.y);
+			}
+		}
 	}
 
 	// Copy all data into the internal buffer
-	ds_buf->mutate_control_word(control_word);
+	ds_buf->mutate_control_word(control_word.value);
 	ds_buf->mutate_alliance_station(alliance_station);
 	ds_buf->mutate_match_number(match_info.matchNumber);
 	ds_buf->mutate_replay_number(match_info.replayNumber);
@@ -78,11 +94,8 @@ void DsReader::read(schema::DSData *ds_buf) {
 
 	HAL_GameData game_data;
 	HAL_GetGameData(&game_data);
-	size_t msg_size = std::strlen(game_data.gameData);
-
-	ds_buf->mutate_game_specific_message_size(static_cast<uint8_t>(msg_size));
-	std::memcpy(ds_buf->mutable_game_specific_message()->Data(),
-			game_data.gameData, msg_size);
+	std::memcpy(ds_buf->mutable_game_data()->Data(), game_data.gameData,
+			ds_buf->game_data()->size());
 
 	std::memcpy(ds_buf->mutable_event_name()->Data(), match_info.eventName,
 			ds_buf->event_name()->size());

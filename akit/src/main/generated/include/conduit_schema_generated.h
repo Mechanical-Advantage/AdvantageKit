@@ -18,7 +18,13 @@ namespace littletonrobotics {
 namespace conduit {
 namespace schema {
 
+struct JoystickTouchpadFinger;
+
+struct JoystickTouchpad;
+
 struct Joystick;
+
+struct OpMode;
 
 struct DSData;
 
@@ -38,7 +44,13 @@ struct SystemData;
 
 struct CoreInputs;
 
+inline const ::flatbuffers::TypeTable *JoystickTouchpadFingerTypeTable();
+
+inline const ::flatbuffers::TypeTable *JoystickTouchpadTypeTable();
+
 inline const ::flatbuffers::TypeTable *JoystickTypeTable();
+
+inline const ::flatbuffers::TypeTable *OpModeTypeTable();
 
 inline const ::flatbuffers::TypeTable *DSDataTypeTable();
 
@@ -58,21 +70,146 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable();
 
 inline const ::flatbuffers::TypeTable *CoreInputsTypeTable();
 
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) JoystickTouchpadFinger FLATBUFFERS_FINAL_CLASS {
+ private:
+  uint8_t down_;
+  int8_t padding0__;  int16_t padding1__;
+  float x_;
+  float y_;
+
+ public:
+  static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
+    return JoystickTouchpadFingerTypeTable();
+  }
+  JoystickTouchpadFinger()
+      : down_(0),
+        padding0__(0),
+        padding1__(0),
+        x_(0),
+        y_(0) {
+    (void)padding0__;
+    (void)padding1__;
+  }
+  JoystickTouchpadFinger(uint8_t _down, float _x, float _y)
+      : down_(::flatbuffers::EndianScalar(_down)),
+        padding0__(0),
+        padding1__(0),
+        x_(::flatbuffers::EndianScalar(_x)),
+        y_(::flatbuffers::EndianScalar(_y)) {
+    (void)padding0__;
+    (void)padding1__;
+  }
+  uint8_t down() const {
+    return ::flatbuffers::EndianScalar(down_);
+  }
+  void mutate_down(uint8_t _down) {
+    ::flatbuffers::WriteScalar(&down_, _down);
+  }
+  float x() const {
+    return ::flatbuffers::EndianScalar(x_);
+  }
+  void mutate_x(float _x) {
+    ::flatbuffers::WriteScalar(&x_, _x);
+  }
+  float y() const {
+    return ::flatbuffers::EndianScalar(y_);
+  }
+  void mutate_y(float _y) {
+    ::flatbuffers::WriteScalar(&y_, _y);
+  }
+};
+FLATBUFFERS_STRUCT_END(JoystickTouchpadFinger, 12);
+
+inline bool operator==(const JoystickTouchpadFinger &lhs, const JoystickTouchpadFinger &rhs) {
+  return
+      (lhs.down() == rhs.down()) &&
+      (lhs.x() == rhs.x()) &&
+      (lhs.y() == rhs.y());
+}
+
+inline bool operator!=(const JoystickTouchpadFinger &lhs, const JoystickTouchpadFinger &rhs) {
+    return !(lhs == rhs);
+}
+
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) JoystickTouchpad FLATBUFFERS_FINAL_CLASS {
+ private:
+  uint8_t finger_count_;
+  int8_t padding0__;  int16_t padding1__;
+  org::littletonrobotics::conduit::schema::JoystickTouchpadFinger fingers_[2];
+
+ public:
+  static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
+    return JoystickTouchpadTypeTable();
+  }
+  JoystickTouchpad()
+      : finger_count_(0),
+        padding0__(0),
+        padding1__(0),
+        fingers_() {
+    (void)padding0__;
+    (void)padding1__;
+  }
+  JoystickTouchpad(uint8_t _finger_count)
+      : finger_count_(::flatbuffers::EndianScalar(_finger_count)),
+        padding0__(0),
+        padding1__(0),
+        fingers_() {
+    (void)padding0__;
+    (void)padding1__;
+  }
+  JoystickTouchpad(uint8_t _finger_count, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::JoystickTouchpadFinger, 2> _fingers)
+      : finger_count_(::flatbuffers::EndianScalar(_finger_count)),
+        padding0__(0),
+        padding1__(0) {
+    (void)padding0__;
+    (void)padding1__;
+    ::flatbuffers::CastToArray(fingers_).CopyFromSpan(_fingers);
+  }
+  uint8_t finger_count() const {
+    return ::flatbuffers::EndianScalar(finger_count_);
+  }
+  void mutate_finger_count(uint8_t _finger_count) {
+    ::flatbuffers::WriteScalar(&finger_count_, _finger_count);
+  }
+  const ::flatbuffers::Array<org::littletonrobotics::conduit::schema::JoystickTouchpadFinger, 2> *fingers() const {
+    return &::flatbuffers::CastToArray(fingers_);
+  }
+  ::flatbuffers::Array<org::littletonrobotics::conduit::schema::JoystickTouchpadFinger, 2> *mutable_fingers() {
+    return &::flatbuffers::CastToArray(fingers_);
+  }
+};
+FLATBUFFERS_STRUCT_END(JoystickTouchpad, 28);
+
+inline bool operator==(const JoystickTouchpad &lhs, const JoystickTouchpad &rhs) {
+  return
+      (lhs.finger_count() == rhs.finger_count()) &&
+      (*lhs.fingers() == *rhs.fingers());
+}
+
+inline bool operator!=(const JoystickTouchpad &lhs, const JoystickTouchpad &rhs) {
+    return !(lhs == rhs);
+}
+
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Joystick FLATBUFFERS_FINAL_CLASS {
  private:
   uint8_t name_[256];
   uint8_t type_;
-  int8_t padding0__;
+  uint8_t supported_outputs_;
   int16_t axis_count_;
-  uint8_t axis_types_[12];
   float axis_values_[12];
-  uint8_t button_count_;
-  int8_t padding1__;  int16_t padding2__;
-  int32_t buttons_;
-  int16_t pov_count_;
+  int16_t axis_raw_[12];
+  int32_t padding0__;
+  uint64_t buttons_available_;
+  uint64_t buttons_;
+  uint8_t pov_count_;
   uint8_t pov_values_[8];
   uint8_t is_gamepad_;
-  int8_t padding3__;
+  uint8_t touchpad_count_;
+  int8_t padding1__;
+  org::littletonrobotics::conduit::schema::JoystickTouchpad touchpads_[2];
+  int32_t padding2__;
 
  public:
   static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
@@ -81,62 +218,65 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
   Joystick()
       : name_(),
         type_(0),
-        padding0__(0),
+        supported_outputs_(0),
         axis_count_(0),
-        axis_types_(),
         axis_values_(),
-        button_count_(0),
-        padding1__(0),
-        padding2__(0),
+        axis_raw_(),
+        padding0__(0),
+        buttons_available_(0),
         buttons_(0),
         pov_count_(0),
         pov_values_(),
         is_gamepad_(0),
-        padding3__(0) {
+        touchpad_count_(0),
+        padding1__(0),
+        touchpads_(),
+        padding2__(0) {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
-    (void)padding3__;
   }
-  Joystick(uint8_t _type, int16_t _axis_count, uint8_t _button_count, int32_t _buttons, int16_t _pov_count, bool _is_gamepad)
+  Joystick(uint8_t _type, uint8_t _supported_outputs, int16_t _axis_count, uint64_t _buttons_available, uint64_t _buttons, uint8_t _pov_count, bool _is_gamepad, uint8_t _touchpad_count)
       : name_(),
         type_(::flatbuffers::EndianScalar(_type)),
-        padding0__(0),
+        supported_outputs_(::flatbuffers::EndianScalar(_supported_outputs)),
         axis_count_(::flatbuffers::EndianScalar(_axis_count)),
-        axis_types_(),
         axis_values_(),
-        button_count_(::flatbuffers::EndianScalar(_button_count)),
-        padding1__(0),
-        padding2__(0),
+        axis_raw_(),
+        padding0__(0),
+        buttons_available_(::flatbuffers::EndianScalar(_buttons_available)),
         buttons_(::flatbuffers::EndianScalar(_buttons)),
         pov_count_(::flatbuffers::EndianScalar(_pov_count)),
         pov_values_(),
         is_gamepad_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_gamepad))),
-        padding3__(0) {
+        touchpad_count_(::flatbuffers::EndianScalar(_touchpad_count)),
+        padding1__(0),
+        touchpads_(),
+        padding2__(0) {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
-    (void)padding3__;
   }
-  Joystick(::flatbuffers::span<const uint8_t, 256> _name, uint8_t _type, int16_t _axis_count, ::flatbuffers::span<const uint8_t, 12> _axis_types, ::flatbuffers::span<const float, 12> _axis_values, uint8_t _button_count, int32_t _buttons, int16_t _pov_count, ::flatbuffers::span<const uint8_t, 8> _pov_values, bool _is_gamepad)
+  Joystick(::flatbuffers::span<const uint8_t, 256> _name, uint8_t _type, uint8_t _supported_outputs, int16_t _axis_count, ::flatbuffers::span<const float, 12> _axis_values, ::flatbuffers::span<const int16_t, 12> _axis_raw, uint64_t _buttons_available, uint64_t _buttons, uint8_t _pov_count, ::flatbuffers::span<const uint8_t, 8> _pov_values, bool _is_gamepad, uint8_t _touchpad_count, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::JoystickTouchpad, 2> _touchpads)
       : type_(::flatbuffers::EndianScalar(_type)),
-        padding0__(0),
+        supported_outputs_(::flatbuffers::EndianScalar(_supported_outputs)),
         axis_count_(::flatbuffers::EndianScalar(_axis_count)),
-        button_count_(::flatbuffers::EndianScalar(_button_count)),
-        padding1__(0),
-        padding2__(0),
+        padding0__(0),
+        buttons_available_(::flatbuffers::EndianScalar(_buttons_available)),
         buttons_(::flatbuffers::EndianScalar(_buttons)),
         pov_count_(::flatbuffers::EndianScalar(_pov_count)),
         is_gamepad_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_gamepad))),
-        padding3__(0) {
+        touchpad_count_(::flatbuffers::EndianScalar(_touchpad_count)),
+        padding1__(0),
+        padding2__(0) {
     ::flatbuffers::CastToArray(name_).CopyFromSpan(_name);
-    (void)padding0__;
-    ::flatbuffers::CastToArray(axis_types_).CopyFromSpan(_axis_types);
     ::flatbuffers::CastToArray(axis_values_).CopyFromSpan(_axis_values);
-    (void)padding1__;
-    (void)padding2__;
+    ::flatbuffers::CastToArray(axis_raw_).CopyFromSpan(_axis_raw);
+    (void)padding0__;
     ::flatbuffers::CastToArray(pov_values_).CopyFromSpan(_pov_values);
-    (void)padding3__;
+    (void)padding1__;
+    ::flatbuffers::CastToArray(touchpads_).CopyFromSpan(_touchpads);
+    (void)padding2__;
   }
   const ::flatbuffers::Array<uint8_t, 256> *name() const {
     return &::flatbuffers::CastToArray(name_);
@@ -150,17 +290,17 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
   void mutate_type(uint8_t _type) {
     ::flatbuffers::WriteScalar(&type_, _type);
   }
+  uint8_t supported_outputs() const {
+    return ::flatbuffers::EndianScalar(supported_outputs_);
+  }
+  void mutate_supported_outputs(uint8_t _supported_outputs) {
+    ::flatbuffers::WriteScalar(&supported_outputs_, _supported_outputs);
+  }
   int16_t axis_count() const {
     return ::flatbuffers::EndianScalar(axis_count_);
   }
   void mutate_axis_count(int16_t _axis_count) {
     ::flatbuffers::WriteScalar(&axis_count_, _axis_count);
-  }
-  const ::flatbuffers::Array<uint8_t, 12> *axis_types() const {
-    return &::flatbuffers::CastToArray(axis_types_);
-  }
-  ::flatbuffers::Array<uint8_t, 12> *mutable_axis_types() {
-    return &::flatbuffers::CastToArray(axis_types_);
   }
   const ::flatbuffers::Array<float, 12> *axis_values() const {
     return &::flatbuffers::CastToArray(axis_values_);
@@ -168,22 +308,28 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
   ::flatbuffers::Array<float, 12> *mutable_axis_values() {
     return &::flatbuffers::CastToArray(axis_values_);
   }
-  uint8_t button_count() const {
-    return ::flatbuffers::EndianScalar(button_count_);
+  const ::flatbuffers::Array<int16_t, 12> *axis_raw() const {
+    return &::flatbuffers::CastToArray(axis_raw_);
   }
-  void mutate_button_count(uint8_t _button_count) {
-    ::flatbuffers::WriteScalar(&button_count_, _button_count);
+  ::flatbuffers::Array<int16_t, 12> *mutable_axis_raw() {
+    return &::flatbuffers::CastToArray(axis_raw_);
   }
-  int32_t buttons() const {
+  uint64_t buttons_available() const {
+    return ::flatbuffers::EndianScalar(buttons_available_);
+  }
+  void mutate_buttons_available(uint64_t _buttons_available) {
+    ::flatbuffers::WriteScalar(&buttons_available_, _buttons_available);
+  }
+  uint64_t buttons() const {
     return ::flatbuffers::EndianScalar(buttons_);
   }
-  void mutate_buttons(int32_t _buttons) {
+  void mutate_buttons(uint64_t _buttons) {
     ::flatbuffers::WriteScalar(&buttons_, _buttons);
   }
-  int16_t pov_count() const {
+  uint8_t pov_count() const {
     return ::flatbuffers::EndianScalar(pov_count_);
   }
-  void mutate_pov_count(int16_t _pov_count) {
+  void mutate_pov_count(uint8_t _pov_count) {
     ::flatbuffers::WriteScalar(&pov_count_, _pov_count);
   }
   const ::flatbuffers::Array<uint8_t, 8> *pov_values() const {
@@ -198,24 +344,130 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Joystick FLATBUFFERS_FINAL_CLASS {
   void mutate_is_gamepad(bool _is_gamepad) {
     ::flatbuffers::WriteScalar(&is_gamepad_, static_cast<uint8_t>(_is_gamepad));
   }
+  uint8_t touchpad_count() const {
+    return ::flatbuffers::EndianScalar(touchpad_count_);
+  }
+  void mutate_touchpad_count(uint8_t _touchpad_count) {
+    ::flatbuffers::WriteScalar(&touchpad_count_, _touchpad_count);
+  }
+  const ::flatbuffers::Array<org::littletonrobotics::conduit::schema::JoystickTouchpad, 2> *touchpads() const {
+    return &::flatbuffers::CastToArray(touchpads_);
+  }
+  ::flatbuffers::Array<org::littletonrobotics::conduit::schema::JoystickTouchpad, 2> *mutable_touchpads() {
+    return &::flatbuffers::CastToArray(touchpads_);
+  }
 };
-FLATBUFFERS_STRUCT_END(Joystick, 340);
+FLATBUFFERS_STRUCT_END(Joystick, 424);
 
 inline bool operator==(const Joystick &lhs, const Joystick &rhs) {
   return
       (*lhs.name() == *rhs.name()) &&
       (lhs.type() == rhs.type()) &&
+      (lhs.supported_outputs() == rhs.supported_outputs()) &&
       (lhs.axis_count() == rhs.axis_count()) &&
-      (*lhs.axis_types() == *rhs.axis_types()) &&
       (*lhs.axis_values() == *rhs.axis_values()) &&
-      (lhs.button_count() == rhs.button_count()) &&
+      (*lhs.axis_raw() == *rhs.axis_raw()) &&
+      (lhs.buttons_available() == rhs.buttons_available()) &&
       (lhs.buttons() == rhs.buttons()) &&
       (lhs.pov_count() == rhs.pov_count()) &&
       (*lhs.pov_values() == *rhs.pov_values()) &&
-      (lhs.is_gamepad() == rhs.is_gamepad());
+      (lhs.is_gamepad() == rhs.is_gamepad()) &&
+      (lhs.touchpad_count() == rhs.touchpad_count()) &&
+      (*lhs.touchpads() == *rhs.touchpads());
 }
 
 inline bool operator!=(const Joystick &lhs, const Joystick &rhs) {
+    return !(lhs == rhs);
+}
+
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) OpMode FLATBUFFERS_FINAL_CLASS {
+ private:
+  int64_t id_;
+  uint8_t name_[64];
+  uint8_t group_[64];
+  uint8_t description_[128];
+  int32_t text_color_;
+  int32_t background_color_;
+
+ public:
+  static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
+    return OpModeTypeTable();
+  }
+  OpMode()
+      : id_(0),
+        name_(),
+        group_(),
+        description_(),
+        text_color_(0),
+        background_color_(0) {
+  }
+  OpMode(int64_t _id, int32_t _text_color, int32_t _background_color)
+      : id_(::flatbuffers::EndianScalar(_id)),
+        name_(),
+        group_(),
+        description_(),
+        text_color_(::flatbuffers::EndianScalar(_text_color)),
+        background_color_(::flatbuffers::EndianScalar(_background_color)) {
+  }
+  OpMode(int64_t _id, ::flatbuffers::span<const uint8_t, 64> _name, ::flatbuffers::span<const uint8_t, 64> _group, ::flatbuffers::span<const uint8_t, 128> _description, int32_t _text_color, int32_t _background_color)
+      : id_(::flatbuffers::EndianScalar(_id)),
+        text_color_(::flatbuffers::EndianScalar(_text_color)),
+        background_color_(::flatbuffers::EndianScalar(_background_color)) {
+    ::flatbuffers::CastToArray(name_).CopyFromSpan(_name);
+    ::flatbuffers::CastToArray(group_).CopyFromSpan(_group);
+    ::flatbuffers::CastToArray(description_).CopyFromSpan(_description);
+  }
+  int64_t id() const {
+    return ::flatbuffers::EndianScalar(id_);
+  }
+  void mutate_id(int64_t _id) {
+    ::flatbuffers::WriteScalar(&id_, _id);
+  }
+  const ::flatbuffers::Array<uint8_t, 64> *name() const {
+    return &::flatbuffers::CastToArray(name_);
+  }
+  ::flatbuffers::Array<uint8_t, 64> *mutable_name() {
+    return &::flatbuffers::CastToArray(name_);
+  }
+  const ::flatbuffers::Array<uint8_t, 64> *group() const {
+    return &::flatbuffers::CastToArray(group_);
+  }
+  ::flatbuffers::Array<uint8_t, 64> *mutable_group() {
+    return &::flatbuffers::CastToArray(group_);
+  }
+  const ::flatbuffers::Array<uint8_t, 128> *description() const {
+    return &::flatbuffers::CastToArray(description_);
+  }
+  ::flatbuffers::Array<uint8_t, 128> *mutable_description() {
+    return &::flatbuffers::CastToArray(description_);
+  }
+  int32_t text_color() const {
+    return ::flatbuffers::EndianScalar(text_color_);
+  }
+  void mutate_text_color(int32_t _text_color) {
+    ::flatbuffers::WriteScalar(&text_color_, _text_color);
+  }
+  int32_t background_color() const {
+    return ::flatbuffers::EndianScalar(background_color_);
+  }
+  void mutate_background_color(int32_t _background_color) {
+    ::flatbuffers::WriteScalar(&background_color_, _background_color);
+  }
+};
+FLATBUFFERS_STRUCT_END(OpMode, 272);
+
+inline bool operator==(const OpMode &lhs, const OpMode &rhs) {
+  return
+      (lhs.id() == rhs.id()) &&
+      (*lhs.name() == *rhs.name()) &&
+      (*lhs.group() == *rhs.group()) &&
+      (*lhs.description() == *rhs.description()) &&
+      (lhs.text_color() == rhs.text_color()) &&
+      (lhs.background_color() == rhs.background_color());
+}
+
+inline bool operator!=(const OpMode &lhs, const OpMode &rhs) {
     return !(lhs == rhs);
 }
 
@@ -224,16 +476,16 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
  private:
   int32_t alliance_station_;
   uint8_t event_name_[64];
-  uint16_t game_specific_message_size_;
-  uint8_t game_specific_message_[64];
+  uint8_t game_data_[9];
+  int8_t padding0__;
   uint16_t match_number_;
   uint8_t replay_number_;
-  int8_t padding0__;  int16_t padding1__;
+  int8_t padding1__;  int16_t padding2__;
   int32_t match_type_;
-  int32_t control_word_;
-  int32_t padding2__;
+  int64_t control_word_;
   double match_time_;
   org::littletonrobotics::conduit::schema::Joystick joysticks_[6];
+  org::littletonrobotics::conduit::schema::OpMode op_mode_;
 
  public:
   static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
@@ -242,52 +494,52 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
   DSData()
       : alliance_station_(0),
         event_name_(),
-        game_specific_message_size_(0),
-        game_specific_message_(),
+        game_data_(),
+        padding0__(0),
         match_number_(0),
         replay_number_(0),
-        padding0__(0),
         padding1__(0),
+        padding2__(0),
         match_type_(0),
         control_word_(0),
-        padding2__(0),
         match_time_(0),
-        joysticks_() {
+        joysticks_(),
+        op_mode_() {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
   }
-  DSData(int32_t _alliance_station, uint16_t _game_specific_message_size, uint16_t _match_number, uint8_t _replay_number, int32_t _match_type, int32_t _control_word, double _match_time)
+  DSData(int32_t _alliance_station, uint16_t _match_number, uint8_t _replay_number, int32_t _match_type, int64_t _control_word, double _match_time, const org::littletonrobotics::conduit::schema::OpMode &_op_mode)
       : alliance_station_(::flatbuffers::EndianScalar(_alliance_station)),
         event_name_(),
-        game_specific_message_size_(::flatbuffers::EndianScalar(_game_specific_message_size)),
-        game_specific_message_(),
+        game_data_(),
+        padding0__(0),
         match_number_(::flatbuffers::EndianScalar(_match_number)),
         replay_number_(::flatbuffers::EndianScalar(_replay_number)),
-        padding0__(0),
         padding1__(0),
+        padding2__(0),
         match_type_(::flatbuffers::EndianScalar(_match_type)),
         control_word_(::flatbuffers::EndianScalar(_control_word)),
-        padding2__(0),
         match_time_(::flatbuffers::EndianScalar(_match_time)),
-        joysticks_() {
+        joysticks_(),
+        op_mode_(_op_mode) {
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
   }
-  DSData(int32_t _alliance_station, ::flatbuffers::span<const uint8_t, 64> _event_name, uint16_t _game_specific_message_size, ::flatbuffers::span<const uint8_t, 64> _game_specific_message, uint16_t _match_number, uint8_t _replay_number, int32_t _match_type, int32_t _control_word, double _match_time, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::Joystick, 6> _joysticks)
+  DSData(int32_t _alliance_station, ::flatbuffers::span<const uint8_t, 64> _event_name, ::flatbuffers::span<const uint8_t, 9> _game_data, uint16_t _match_number, uint8_t _replay_number, int32_t _match_type, int64_t _control_word, double _match_time, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::Joystick, 6> _joysticks, const org::littletonrobotics::conduit::schema::OpMode &_op_mode)
       : alliance_station_(::flatbuffers::EndianScalar(_alliance_station)),
-        game_specific_message_size_(::flatbuffers::EndianScalar(_game_specific_message_size)),
+        padding0__(0),
         match_number_(::flatbuffers::EndianScalar(_match_number)),
         replay_number_(::flatbuffers::EndianScalar(_replay_number)),
-        padding0__(0),
         padding1__(0),
+        padding2__(0),
         match_type_(::flatbuffers::EndianScalar(_match_type)),
         control_word_(::flatbuffers::EndianScalar(_control_word)),
-        padding2__(0),
-        match_time_(::flatbuffers::EndianScalar(_match_time)) {
+        match_time_(::flatbuffers::EndianScalar(_match_time)),
+        op_mode_(_op_mode) {
     ::flatbuffers::CastToArray(event_name_).CopyFromSpan(_event_name);
-    ::flatbuffers::CastToArray(game_specific_message_).CopyFromSpan(_game_specific_message);
+    ::flatbuffers::CastToArray(game_data_).CopyFromSpan(_game_data);
     (void)padding0__;
     (void)padding1__;
     (void)padding2__;
@@ -305,17 +557,11 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
   ::flatbuffers::Array<uint8_t, 64> *mutable_event_name() {
     return &::flatbuffers::CastToArray(event_name_);
   }
-  uint16_t game_specific_message_size() const {
-    return ::flatbuffers::EndianScalar(game_specific_message_size_);
+  const ::flatbuffers::Array<uint8_t, 9> *game_data() const {
+    return &::flatbuffers::CastToArray(game_data_);
   }
-  void mutate_game_specific_message_size(uint16_t _game_specific_message_size) {
-    ::flatbuffers::WriteScalar(&game_specific_message_size_, _game_specific_message_size);
-  }
-  const ::flatbuffers::Array<uint8_t, 64> *game_specific_message() const {
-    return &::flatbuffers::CastToArray(game_specific_message_);
-  }
-  ::flatbuffers::Array<uint8_t, 64> *mutable_game_specific_message() {
-    return &::flatbuffers::CastToArray(game_specific_message_);
+  ::flatbuffers::Array<uint8_t, 9> *mutable_game_data() {
+    return &::flatbuffers::CastToArray(game_data_);
   }
   uint16_t match_number() const {
     return ::flatbuffers::EndianScalar(match_number_);
@@ -335,10 +581,10 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
   void mutate_match_type(int32_t _match_type) {
     ::flatbuffers::WriteScalar(&match_type_, _match_type);
   }
-  int32_t control_word() const {
+  int64_t control_word() const {
     return ::flatbuffers::EndianScalar(control_word_);
   }
-  void mutate_control_word(int32_t _control_word) {
+  void mutate_control_word(int64_t _control_word) {
     ::flatbuffers::WriteScalar(&control_word_, _control_word);
   }
   double match_time() const {
@@ -353,21 +599,27 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
   ::flatbuffers::Array<org::littletonrobotics::conduit::schema::Joystick, 6> *mutable_joysticks() {
     return &::flatbuffers::CastToArray(joysticks_);
   }
+  const org::littletonrobotics::conduit::schema::OpMode &op_mode() const {
+    return op_mode_;
+  }
+  org::littletonrobotics::conduit::schema::OpMode &mutable_op_mode() {
+    return op_mode_;
+  }
 };
-FLATBUFFERS_STRUCT_END(DSData, 2200);
+FLATBUFFERS_STRUCT_END(DSData, 2920);
 
 inline bool operator==(const DSData &lhs, const DSData &rhs) {
   return
       (lhs.alliance_station() == rhs.alliance_station()) &&
       (*lhs.event_name() == *rhs.event_name()) &&
-      (lhs.game_specific_message_size() == rhs.game_specific_message_size()) &&
-      (*lhs.game_specific_message() == *rhs.game_specific_message()) &&
+      (*lhs.game_data() == *rhs.game_data()) &&
       (lhs.match_number() == rhs.match_number()) &&
       (lhs.replay_number() == rhs.replay_number()) &&
       (lhs.match_type() == rhs.match_type()) &&
       (lhs.control_word() == rhs.control_word()) &&
       (lhs.match_time() == rhs.match_time()) &&
-      (*lhs.joysticks() == *rhs.joysticks());
+      (*lhs.joysticks() == *rhs.joysticks()) &&
+      (lhs.op_mode() == rhs.op_mode());
 }
 
 inline bool operator!=(const DSData &lhs, const DSData &rhs) {
@@ -1255,7 +1507,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CoreInputs FLATBUFFERS_FINAL_CLASS {
     return sys_;
   }
 };
-FLATBUFFERS_STRUCT_END(CoreInputs, 3472);
+FLATBUFFERS_STRUCT_END(CoreInputs, 4192);
 
 inline bool operator==(const CoreInputs &lhs, const CoreInputs &rhs) {
   return
@@ -1270,35 +1522,107 @@ inline bool operator!=(const CoreInputs &lhs, const CoreInputs &rhs) {
 }
 
 
+inline const ::flatbuffers::TypeTable *JoystickTouchpadFingerTypeTable() {
+  static const ::flatbuffers::TypeCode type_codes[] = {
+    { ::flatbuffers::ET_UCHAR, 0, -1 },
+    { ::flatbuffers::ET_FLOAT, 0, -1 },
+    { ::flatbuffers::ET_FLOAT, 0, -1 }
+  };
+  static const int64_t values[] = { 0, 4, 8, 12 };
+  static const char * const names[] = {
+    "down",
+    "x",
+    "y"
+  };
+  static const ::flatbuffers::TypeTable tt = {
+    ::flatbuffers::ST_STRUCT, 3, type_codes, nullptr, nullptr, values, names
+  };
+  return &tt;
+}
+
+inline const ::flatbuffers::TypeTable *JoystickTouchpadTypeTable() {
+  static const ::flatbuffers::TypeCode type_codes[] = {
+    { ::flatbuffers::ET_UCHAR, 0, -1 },
+    { ::flatbuffers::ET_SEQUENCE, 1, 0 }
+  };
+  static const ::flatbuffers::TypeFunction type_refs[] = {
+    org::littletonrobotics::conduit::schema::JoystickTouchpadFingerTypeTable
+  };
+  static const int16_t array_sizes[] = { 2,  };
+  static const int64_t values[] = { 0, 4, 28 };
+  static const char * const names[] = {
+    "finger_count",
+    "fingers"
+  };
+  static const ::flatbuffers::TypeTable tt = {
+    ::flatbuffers::ST_STRUCT, 2, type_codes, type_refs, array_sizes, values, names
+  };
+  return &tt;
+}
+
 inline const ::flatbuffers::TypeTable *JoystickTypeTable() {
   static const ::flatbuffers::TypeCode type_codes[] = {
     { ::flatbuffers::ET_UCHAR, 1, -1 },
     { ::flatbuffers::ET_UCHAR, 0, -1 },
-    { ::flatbuffers::ET_SHORT, 0, -1 },
-    { ::flatbuffers::ET_UCHAR, 1, -1 },
-    { ::flatbuffers::ET_FLOAT, 1, -1 },
     { ::flatbuffers::ET_UCHAR, 0, -1 },
-    { ::flatbuffers::ET_INT, 0, -1 },
     { ::flatbuffers::ET_SHORT, 0, -1 },
+    { ::flatbuffers::ET_FLOAT, 1, -1 },
+    { ::flatbuffers::ET_SHORT, 1, -1 },
+    { ::flatbuffers::ET_ULONG, 0, -1 },
+    { ::flatbuffers::ET_ULONG, 0, -1 },
+    { ::flatbuffers::ET_UCHAR, 0, -1 },
     { ::flatbuffers::ET_UCHAR, 1, -1 },
-    { ::flatbuffers::ET_BOOL, 0, -1 }
+    { ::flatbuffers::ET_BOOL, 0, -1 },
+    { ::flatbuffers::ET_UCHAR, 0, -1 },
+    { ::flatbuffers::ET_SEQUENCE, 1, 0 }
   };
-  static const int16_t array_sizes[] = { 256, 12, 12, 8,  };
-  static const int64_t values[] = { 0, 256, 258, 260, 272, 320, 324, 328, 330, 338, 340 };
+  static const ::flatbuffers::TypeFunction type_refs[] = {
+    org::littletonrobotics::conduit::schema::JoystickTouchpadTypeTable
+  };
+  static const int16_t array_sizes[] = { 256, 12, 12, 8, 2,  };
+  static const int64_t values[] = { 0, 256, 257, 258, 260, 308, 336, 344, 352, 353, 361, 362, 364, 424 };
   static const char * const names[] = {
     "name",
     "type",
+    "supported_outputs",
     "axis_count",
-    "axis_types",
     "axis_values",
-    "button_count",
+    "axis_raw",
+    "buttons_available",
     "buttons",
     "pov_count",
     "pov_values",
-    "is_gamepad"
+    "is_gamepad",
+    "touchpad_count",
+    "touchpads"
   };
   static const ::flatbuffers::TypeTable tt = {
-    ::flatbuffers::ST_STRUCT, 10, type_codes, nullptr, array_sizes, values, names
+    ::flatbuffers::ST_STRUCT, 13, type_codes, type_refs, array_sizes, values, names
+  };
+  return &tt;
+}
+
+inline const ::flatbuffers::TypeTable *OpModeTypeTable() {
+  static const ::flatbuffers::TypeCode type_codes[] = {
+    { ::flatbuffers::ET_LONG, 0, -1 },
+    { ::flatbuffers::ET_UCHAR, 1, -1 },
+    { ::flatbuffers::ET_UCHAR, 1, -1 },
+    { ::flatbuffers::ET_UCHAR, 1, -1 },
+    { ::flatbuffers::ET_INT, 0, -1 },
+    { ::flatbuffers::ET_INT, 0, -1 }
+  };
+  static const int16_t array_sizes[] = { 64, 64, 128,  };
+  static const int64_t values[] = { 0, 8, 72, 136, 264, 268, 272 };
+  static const char * const names[] = {
+    "id",
+    "name",
+    "group",
+    "description",
+    "text_color",
+    "background_color"
+  };
+  static const ::flatbuffers::TypeTable tt = {
+    ::flatbuffers::ST_STRUCT, 6, type_codes, nullptr, array_sizes, values, names
   };
   return &tt;
 }
@@ -1307,31 +1631,32 @@ inline const ::flatbuffers::TypeTable *DSDataTypeTable() {
   static const ::flatbuffers::TypeCode type_codes[] = {
     { ::flatbuffers::ET_INT, 0, -1 },
     { ::flatbuffers::ET_UCHAR, 1, -1 },
-    { ::flatbuffers::ET_USHORT, 0, -1 },
     { ::flatbuffers::ET_UCHAR, 1, -1 },
     { ::flatbuffers::ET_USHORT, 0, -1 },
     { ::flatbuffers::ET_UCHAR, 0, -1 },
     { ::flatbuffers::ET_INT, 0, -1 },
-    { ::flatbuffers::ET_INT, 0, -1 },
+    { ::flatbuffers::ET_LONG, 0, -1 },
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
-    { ::flatbuffers::ET_SEQUENCE, 1, 0 }
+    { ::flatbuffers::ET_SEQUENCE, 1, 0 },
+    { ::flatbuffers::ET_SEQUENCE, 0, 1 }
   };
   static const ::flatbuffers::TypeFunction type_refs[] = {
-    org::littletonrobotics::conduit::schema::JoystickTypeTable
+    org::littletonrobotics::conduit::schema::JoystickTypeTable,
+    org::littletonrobotics::conduit::schema::OpModeTypeTable
   };
-  static const int16_t array_sizes[] = { 64, 64, 6,  };
-  static const int64_t values[] = { 0, 4, 68, 70, 134, 136, 140, 144, 152, 160, 2200 };
+  static const int16_t array_sizes[] = { 64, 9, 6,  };
+  static const int64_t values[] = { 0, 4, 68, 78, 80, 84, 88, 96, 104, 2648, 2920 };
   static const char * const names[] = {
     "alliance_station",
     "event_name",
-    "game_specific_message_size",
-    "game_specific_message",
+    "game_data",
     "match_number",
     "replay_number",
     "match_type",
     "control_word",
     "match_time",
-    "joysticks"
+    "joysticks",
+    "op_mode"
   };
   static const ::flatbuffers::TypeTable tt = {
     ::flatbuffers::ST_STRUCT, 10, type_codes, type_refs, array_sizes, values, names
@@ -1562,7 +1887,7 @@ inline const ::flatbuffers::TypeTable *CoreInputsTypeTable() {
     org::littletonrobotics::conduit::schema::PDPDataTypeTable,
     org::littletonrobotics::conduit::schema::SystemDataTypeTable
   };
-  static const int64_t values[] = { 0, 8, 2208, 2464, 3472 };
+  static const int64_t values[] = { 0, 8, 2928, 3184, 4192 };
   static const char * const names[] = {
     "timestamp",
     "ds",

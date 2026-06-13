@@ -43,7 +43,7 @@ void start() {
 
 void make_buffer() {
 	// Allocate shared buffer
-	shared_buf = malloc(BUF_SIZE);
+	shared_buf = calloc(1, BUF_SIZE);
 
 	// Point view pointers at the buffer at the right offset
 	corein_view = reinterpret_cast<schema::CoreInputs*>(shared_buf);

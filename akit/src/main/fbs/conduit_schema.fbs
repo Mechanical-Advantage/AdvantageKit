@@ -6,34 +6,57 @@ namespace org.littletonrobotics.conduit.schema;
 // 12 POVs per joystick
 // Joystick name: 256 chars
 // Event name: 64 chars
-// Game specific message: 64 chars
+// Game specific message: 9 chars
 
 // If you change any of these numbers, you MUST update the corresponding constants in api and io implementations!
+
+struct JoystickTouchpadFinger {
+    down:uint8;
+    x:float32;
+    y:float32;
+}
+
+struct JoystickTouchpad {
+    finger_count:uint8;
+    fingers:[JoystickTouchpadFinger:2];
+}
 
 struct Joystick {
     name:[uint8:256];
     type:uint8;
+    supported_outputs:uint8;
     axis_count:int16;
-    axis_types:[uint8:12];
     axis_values:[float32:12];
-    button_count:uint8;
-    buttons:int32;
-    pov_count:int16;
+    axis_raw:[int16:12];
+    buttons_available:uint64;
+    buttons:uint64;
+    pov_count:uint8;
     pov_values:[uint8:8];
     is_gamepad:bool;
+    touchpad_count:uint8;
+    touchpads:[JoystickTouchpad:2];
+}
+
+struct OpMode {
+    id:int64;
+    name:[uint8:64];
+    group:[uint8:64];
+    description:[uint8:128];
+    text_color:int32;
+    background_color:int32;
 }
 
 struct DSData {
     alliance_station:int32;
     event_name:[uint8:64];
-    game_specific_message_size:uint16;
-    game_specific_message:[uint8:64];
+    game_data:[uint8:9];
     match_number:uint16;
     replay_number:uint8;
     match_type:int32;
-    control_word:int32;
+    control_word:int64;
     match_time:float64;
     joysticks:[Joystick:6];
+    op_mode:OpMode;
 }
 
 struct PDPData {
