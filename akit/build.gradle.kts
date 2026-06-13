@@ -5,7 +5,7 @@ plugins {
     id("java")
     id("google-test")
     id("org.wpilib.WPILibRepositoriesPlugin") version "2027.0.0"
-    id("org.wpilib.NativeUtils") version "2027.1.1"
+    id("org.wpilib.NativeUtils") version "2027.7.1"
     id("org.wpilib.GradleJni") version "2027.0.0"
     id("org.wpilib.GradleVsCode") version "2027.0.0"
     id("com.diffplug.spotless") version "8.6.0"
@@ -22,7 +22,7 @@ repositories {
 wpilibRepositories.use2027Repos()
 wpilibRepositories.addAllReleaseRepositories(project)
 
-val wpilibVersion = "2027.0.0-alpha-5"
+val wpilibVersion = "2027.0.0-alpha-6"
 
 dependencies {
     implementation("org.wpilib.cscore:cscore-java:$wpilibVersion")
@@ -34,13 +34,13 @@ dependencies {
     implementation("org.wpilib.wpiunits:wpiunits-java:$wpilibVersion")
     implementation("org.wpilib.datalog:datalog-java:$wpilibVersion")
     implementation("org.wpilib.hal:hal-java:$wpilibVersion")
-    implementation("org.ejml:ejml-simple:0.43.1")
+    implementation("org.ejml:ejml-simple:0.44.0")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-    implementation("edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3")
-    implementation("us.hebi.quickbuf:quickbuf-runtime:1.3.3")
-
+    implementation("org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-3")
+    implementation("us.hebi.quickbuf:quickbuf-runtime:1.4")
+    implementation("io.avaje:avaje-jsonb:3.11")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
