@@ -60,7 +60,7 @@ Logger.recordOutput("MyDistance", 3.14, Meters);
 
 // Measure values will also be saved with unit metadata
 // (The raw value will use the user-specified unit, not the base unit)
-Logger.recordOutput("MyDistance", Meters.of(3.14));
+Logger.recordOutputMeasure("MyDistance", Meters.of(3.14));
 
 // This works too, but requires adding the unit to the field name
 // (See the AdvantageScope docs linked above for details)

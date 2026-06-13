@@ -1132,7 +1132,7 @@ public class Logger {
    *     "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public static <U extends Unit> void recordOutput(String key, Measure<U> value) {
+  public static <U extends Unit> void recordOutputMeasure(String key, Measure<U> value) {
     if (running && value != null) {
       // The measure overload of LogTable is intended primarily for input logging and
       // always uses the base unit. Calling the double overload ensures that the
@@ -1326,7 +1326,12 @@ public class Logger {
    *     "/ReplayOutputs"
    * @param value The value of the field.
    */
+  @SuppressWarnings("unchecked")
   public static <R extends Record> void recordOutput(String key, R value) {
+    if (value instanceof Measure<?> measure) {
+      recordOutputMeasure(key, (Measure<Unit>) measure);
+      return;
+    }
     if (running) {
       outputTable.put(key, value);
     }

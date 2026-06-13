@@ -573,7 +573,7 @@ public class LogTable {
    * @param key The field name.
    * @param value The field value.
    */
-  public <U extends Unit> void put(String key, Measure<U> value) {
+  public <U extends Unit> void putMeasure(String key, Measure<U> value) {
     if (value == null) return;
     put(key, new LogValue(value.baseUnitMagnitude(), null, value.baseUnit().name()));
   }
@@ -850,6 +850,10 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> void put(String key, R value) {
+    if (value instanceof Measure<?> measure) {
+      putMeasure(key, (Measure<Unit>) measure);
+      return;
+    }
     if (value == null) return;
     Struct<R> struct = (Struct<R>) findRecordStructType(value.getClass());
     if (struct != null) {
@@ -1316,7 +1320,7 @@ public class LogTable {
    * @return The field value.
    */
   @SuppressWarnings("unchecked")
-  public <U extends Unit, M extends Measure<U>> M get(String key, M defaultValue) {
+  public <U extends Unit, M extends Measure<U>> M getMeasure(String key, M defaultValue) {
     if (data.containsKey(prefix + key)) {
       double value = get(key).getDouble(defaultValue.baseUnitMagnitude());
       return (M) defaultValue.unit().ofBaseUnits(value);
@@ -1539,6 +1543,9 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> R get(String key, R defaultValue) {
+    if (defaultValue instanceof Measure<?> measure) {
+      return (R) getMeasure(key, (Measure<?>) measure);
+    }
     if (data.containsKey(prefix + key)) {
       String typeString = data.get(prefix + key).customTypeStr;
       if (typeString.startsWith("struct:")) {

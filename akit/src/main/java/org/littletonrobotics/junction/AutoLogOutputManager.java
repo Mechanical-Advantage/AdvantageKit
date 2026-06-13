@@ -430,7 +430,7 @@ public class AutoLogOutputManager {
         callbacks.add(
             () -> {
               Object value = supplier.get();
-              if (value != null) Logger.recordOutput(key, (Measure<?>) value);
+              if (value != null) Logger.recordOutputMeasure(key, (Measure<?>) value);
             });
       } else if (type.equals(LoggedMechanism2d.class)) {
         callbacks.add(

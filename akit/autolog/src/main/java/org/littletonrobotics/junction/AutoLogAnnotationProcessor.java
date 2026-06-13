@@ -89,6 +89,10 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
                       .returns(ClassName.get(autologgedPackage, autologgedClassName));
 
               Types util = processingEnv.getTypeUtils();
+              TypeElement measureElement =
+                  processingEnv.getElementUtils().getTypeElement("org.wpilib.units.Measure");
+              TypeMirror measureType =
+                  measureElement != null ? util.erasure(measureElement.asType()) : null;
               TypeElement typeElement = (TypeElement) classElement;
               boolean isSuperclass = false;
               while (typeElement != null) {
@@ -130,10 +134,31 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
                                     + ")");
                           }
 
+                          boolean isMeasure = false;
+                          if (measureType != null) {
+                            try {
+                              isMeasure =
+                                  util.isAssignable(
+                                      util.erasure(fieldElement.asType()), measureType);
+                            } catch (IllegalArgumentException e) {
+                              // Ignore
+                            }
+                          }
+
                           // Log data (might be serialized)
-                          toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
-                          fromLogBuilder.addCode(
-                              "$L = table.get($S, $L);\n", simpleName, logName, simpleName);
+                          if (isMeasure) {
+                            toLogBuilder.addCode(
+                                "table.putMeasure($S, $L);\n", logName, simpleName);
+                            fromLogBuilder.addCode(
+                                "$L = table.getMeasure($S, $L);\n",
+                                simpleName,
+                                logName,
+                                simpleName);
+                          } else {
+                            toLogBuilder.addCode("table.put($S, $L);\n", logName, simpleName);
+                            fromLogBuilder.addCode(
+                                "$L = table.get($S, $L);\n", simpleName, logName, simpleName);
+                          }
                           if (fieldElement.asType().getKind().equals(TypeKind.ARRAY)) {
                             // Need to deep copy arrays
                             cloneBuilder.addCode(
