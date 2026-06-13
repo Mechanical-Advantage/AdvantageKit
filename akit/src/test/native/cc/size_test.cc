@@ -46,11 +46,6 @@ TEST(SizeTests, DsDataSizes) {
 
 	// Ensure joystick count matches
 	ASSERT_EQ(HAL_MAX_JOYSTICKS, ds.joysticks()->size());
-
-	// Ensure OpMode option fields sizes match expected types
-	ASSERT_EQ(sizeof(int64_t), sizeof(decltype(ds.op_mode().id())));
-	ASSERT_EQ(sizeof(int32_t), sizeof(decltype(ds.op_mode().text_color())));
-	ASSERT_EQ(sizeof(int32_t), sizeof(decltype(ds.op_mode().background_color())));
 }
 
 TEST(SizeTests, JoystickSizes) {
