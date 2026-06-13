@@ -37,15 +37,6 @@ struct Joystick {
     touchpads:[JoystickTouchpad:2];
 }
 
-struct OpMode {
-    id:int64;
-    name:[uint8:64];
-    group:[uint8:64];
-    description:[uint8:128];
-    text_color:int32;
-    background_color:int32;
-}
-
 struct DSData {
     alliance_station:int32;
     event_name:[uint8:64];
@@ -56,7 +47,6 @@ struct DSData {
     control_word:int64;
     match_time:float64;
     joysticks:[Joystick:6];
-    op_mode:OpMode;
 }
 
 struct PDPData {

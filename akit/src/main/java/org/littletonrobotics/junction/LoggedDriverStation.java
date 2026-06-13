@@ -9,6 +9,7 @@ package org.littletonrobotics.junction;
 
 import org.littletonrobotics.conduit.ConduitApi;
 import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.hardware.hal.simulation.DriverStationDataJNI;
@@ -31,14 +32,14 @@ class LoggedDriverStation {
     table.put("MatchTime", conduit.getMatchTime());
 
     long controlWord = conduit.getControlWord();
+    long opModeId =
+        (controlWord & 0x00FFFFFFFFFFFFFFL) == 0
+            ? 0L
+            : (controlWord & (0x00FFFFFFFFFFFFFFL | 0x0300000000000000L));
     table.put("Enabled", (controlWord & (1L << 58)) != 0);
     table.put("RobotMode", RobotMode.fromInt((int) (controlWord >> 56) & 3));
-    table.put("OpMode/Id", conduit.getOpModeId());
-    table.put("OpMode/Name", conduit.getOpModeName());
-    table.put("OpMode/Group", conduit.getOpModeGroup());
-    table.put("OpMode/Description", conduit.getOpModeDescription());
-    table.put("OpMode/TextColor", conduit.getOpModeTextColor());
-    table.put("OpMode/BackgroundColor", conduit.getOpModeBackgroundColor());
+    table.put("OpModeId", opModeId);
+    table.put("OpMode", DriverStationBackend.getOpMode()); // Not replayed
     table.put("EmergencyStop", (controlWord & (1L << 59)) != 0);
     table.put("FMSAttached", (controlWord & (1L << 60)) != 0);
     table.put("DSAttached", (controlWord & (1L << 61)) != 0);
@@ -113,7 +114,7 @@ class LoggedDriverStation {
     boolean dsAttached = table.get("DSAttached", false);
     DriverStationSim.setEnabled(table.get("Enabled", false));
     DriverStationSim.setRobotMode(table.get("RobotMode", RobotMode.UNKNOWN));
-    DriverStationSim.setOpMode(table.get("OpMode/Id", 0L));
+    DriverStationSim.setOpMode(table.get("OpModeId", 0L));
     DriverStationSim.setEStop(table.get("EmergencyStop", false));
     DriverStationSim.setFmsAttached(table.get("FMSAttached", false));
     DriverStationSim.setDsAttached(dsAttached);

@@ -42,24 +42,9 @@ public final class DSData extends Struct {
   public void mutateMatchTime(double match_time) { bb.putDouble(bb_pos + 96, match_time); }
   public org.littletonrobotics.conduit.schema.Joystick joysticks(int j) { return joysticks(new org.littletonrobotics.conduit.schema.Joystick(), j); }
   public org.littletonrobotics.conduit.schema.Joystick joysticks(org.littletonrobotics.conduit.schema.Joystick obj, int j) { return obj.__assign(bb_pos + 104 + j * 424, bb); }
-  public org.littletonrobotics.conduit.schema.OpMode opMode() { return opMode(new org.littletonrobotics.conduit.schema.OpMode()); }
-  public org.littletonrobotics.conduit.schema.OpMode opMode(org.littletonrobotics.conduit.schema.OpMode obj) { return obj.__assign(bb_pos + 2648, bb); }
 
-  public static int createDSData(FlatBufferBuilder builder, int allianceStation, int[] eventName, int[] gameData, int matchNumber, int replayNumber, int matchType, long controlWord, double matchTime, int[][] joysticks_name, int[] joysticks_type, int[] joysticks_supportedOutputs, short[] joysticks_axisCount, float[][] joysticks_axisValues, short[][] joysticks_axisRaw, long[] joysticks_buttonsAvailable, long[] joysticks_buttons, int[] joysticks_povCount, int[][] joysticks_povValues, boolean[] joysticks_isGamepad, int[] joysticks_touchpadCount, int[][] joysticks_touchpads_fingerCount, int[][][] joysticks_touchpads_fingers_down, float[][][] joysticks_touchpads_fingers_x, float[][][] joysticks_touchpads_fingers_y, long op_mode_id, int[] op_mode_name, int[] op_mode_group, int[] op_mode_description, int op_mode_textColor, int op_mode_backgroundColor) {
-    builder.prep(8, 2920);
-    builder.prep(8, 272);
-    builder.putInt(op_mode_backgroundColor);
-    builder.putInt(op_mode_textColor);
-    for (int _idx0 = 128; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) op_mode_description[_idx0-1]);
-    }
-    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) op_mode_group[_idx0-1]);
-    }
-    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) op_mode_name[_idx0-1]);
-    }
-    builder.putLong(op_mode_id);
+  public static int createDSData(FlatBufferBuilder builder, int allianceStation, int[] eventName, int[] gameData, int matchNumber, int replayNumber, int matchType, long controlWord, double matchTime, int[][] joysticks_name, int[] joysticks_type, int[] joysticks_supportedOutputs, short[] joysticks_axisCount, float[][] joysticks_axisValues, short[][] joysticks_axisRaw, long[] joysticks_buttonsAvailable, long[] joysticks_buttons, int[] joysticks_povCount, int[][] joysticks_povValues, boolean[] joysticks_isGamepad, int[] joysticks_touchpadCount, int[][] joysticks_touchpads_fingerCount, int[][][] joysticks_touchpads_fingers_down, float[][][] joysticks_touchpads_fingers_x, float[][][] joysticks_touchpads_fingers_y) {
+    builder.prep(8, 2648);
     for (int _idx0 = 6; _idx0 > 0; _idx0--) {
       builder.prep(8, 424);
       builder.pad(4);
