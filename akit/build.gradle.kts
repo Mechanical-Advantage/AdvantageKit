@@ -77,7 +77,7 @@ spotless {
         licenseHeader("// Copyright (c) 2021-2026 Littleton Robotics\n// http://github.com/Mechanical-Advantage\n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n\n")
     }
     cpp {
-        target("src/main/native/**/*.cc", "src/main/native/**/*.h", "src/test/native/**/*.cc", "src/test/native/**/*.h")
+        target("src/main/native/**/*.cc", "src/main/native/**/*.cpp", "src/main/native/**/*.h", "src/test/native/**/*.cc", "src/test/native/**/*.cpp", "src/test/native/**/*.h")
         toggleOffOn()
         eclipseCdt()
         trimTrailingWhitespace()
