@@ -52,7 +52,7 @@ AdvantageKit includes extensive support for unit-safe logging, including compati
 - Output annotation logging ([link](/data-flow/recording-outputs/annotation-logging#unit))
 
 :::info
-In WPILib, measure implementations (like `Angle`, `Distance`, etc.) are defined as Java records. These record-based measures can be passed to the generic `put()`, `get()`, or `recordOutput()` methods. If a variable is declared using the interface type directly (e.g. `Measure<Angle>`), you must use the explicit measure-specific methods: `putMeasure()`, `getMeasure()`, and `recordOutputMeasure()`.
+In WPILib, measure implementations (like `Angle`, `Distance`, etc.) are defined as Java records. These record-based measures can be passed to the generic `put()`, `get()`, or `recordOutput()` methods. If a variable is declared using the interface type directly (e.g. `Measure<AngleUnit>`), you must use the explicit measure-specific methods: `putMeasure()`, `getMeasure()`, and `recordOutputMeasure()`.
 :::
 
 ### Colors
