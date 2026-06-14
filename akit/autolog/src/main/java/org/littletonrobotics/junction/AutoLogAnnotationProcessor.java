@@ -141,7 +141,11 @@ public class AutoLogAnnotationProcessor extends AbstractProcessor {
                           } else if (fieldElement
                               .asType()
                               .toString()
-                              .startsWith("edu.wpi.first.units.MutableMeasure")) {
+                              .startsWith("edu.wpi.first.units.MutableMeasure") 
+                              || fieldElement
+                                .asType()
+                                .toString()
+                                .startsWith("edu.wpi.first.units.measure.Mut")) {
                             // Need to clone mutable measure
                             cloneBuilder.addCode(
                                 "copy.$L = this.$L.mutableCopy();\n", simpleName, simpleName);
