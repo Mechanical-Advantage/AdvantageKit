@@ -25,8 +25,6 @@ import org.wpilib.math.geometry.Rotation3d;
 public class ConduitApi {
   // Length constants
   public static final int NUM_JOYSTICKS = 6;
-  public static final int NUM_JOYSTICK_AXES = 12;
-  public static final int NUM_JOYSTICK_POVS = 12;
   public static final int NUM_CAN_BUSES = 5;
 
   private static final byte[] eventNameBytes = new byte[64];
@@ -144,33 +142,36 @@ public class ConduitApi {
     return joysticks[joystickId].buttons();
   }
 
-  public int getAxisCount(int joystickId) {
-    return joysticks[joystickId].axisCount();
+  public int getAxesAvailable(int joystickId) {
+    return joysticks[joystickId].axesAvailable();
   }
 
   public float[] getAxisValues(int joystickId) {
-    float[] ret = new float[NUM_JOYSTICK_AXES];
-    for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
+    int count = availableToCount(getAxesAvailable(joystickId));
+    float[] ret = new float[count];
+    for (int i = 0; i < count; i++) {
       ret[i] = joysticks[joystickId].axisValues(i);
     }
     return ret;
   }
 
-  public short[] getJoystickAxisRaw(int joystickId) {
-    short[] ret = new short[NUM_JOYSTICK_AXES];
-    for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
-      ret[i] = (short) joysticks[joystickId].axisRaw(i);
+  public int[] getAxisValuesRaw(int joystickId) {
+    int count = availableToCount(getAxesAvailable(joystickId));
+    int[] ret = new int[count];
+    for (int i = 0; i < count; i++) {
+      ret[i] = (int) joysticks[joystickId].axisRaw(i);
     }
     return ret;
   }
 
-  public int getPovCount(int joystickId) {
-    return joysticks[joystickId].povCount();
+  public int getPovsAvailable(int joystickId) {
+    return joysticks[joystickId].povsAvailable();
   }
 
   public int[] getPovValues(int joystickId) {
-    int[] ret = new int[NUM_JOYSTICK_POVS];
-    for (int i = 0; i < NUM_JOYSTICK_POVS; i++) {
+    int count = availableToCount(getPovsAvailable(joystickId));
+    int[] ret = new int[count];
+    for (int i = 0; i < count; i++) {
       ret[i] = joysticks[joystickId].povValues(i);
     }
     return ret;
@@ -367,5 +368,21 @@ public class ConduitApi {
 
   public Rotation2d getIMUGyroYawPortrait() {
     return new Rotation2d(sys.imuGyroYawPortrait());
+  }
+
+  private static int availableToCount(long available) {
+    // Top bit has to be set
+    if (available < 0) {
+      return 64;
+    }
+
+    int count = 0;
+
+    // Top bit not set, we will eventually get a 0 bit
+    while ((available & 0x1) != 0) {
+      count++;
+      available >>= 1;
+    }
+    return count;
   }
 }

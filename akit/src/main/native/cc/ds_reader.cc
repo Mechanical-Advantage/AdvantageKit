@@ -50,22 +50,22 @@ void DsReader::read(schema::DSData *ds_buf) {
 		// Read joystick values
 		HAL_JoystickAxes axes;
 		HAL_GetJoystickAxes(joystickNum, &axes);
+		stick_buf->mutate_axes_available(axes.available);
 		std::memcpy(stick_buf->mutable_axis_values()->Data(), axes.axes,
 				stick_buf->axis_values()->size() * sizeof(float));
 		std::memcpy(stick_buf->mutable_axis_raw()->Data(), axes.raw,
 				stick_buf->axis_raw()->size() * sizeof(int16_t));
-		stick_buf->mutate_axis_count(axes.available);
 
 		HAL_JoystickPOVs povs;
 		HAL_GetJoystickPOVs(joystickNum, &povs);
+		stick_buf->mutate_povs_available(povs.available);
 		std::memcpy(stick_buf->mutable_pov_values()->Data(), povs.povs,
 				stick_buf->pov_values()->size() * sizeof(uint8_t));
-		stick_buf->mutate_pov_count(povs.available);
 
 		HAL_JoystickButtons buttons;
 		HAL_GetJoystickButtons(joystickNum, &buttons);
-		stick_buf->mutate_buttons(buttons.buttons);
 		stick_buf->mutate_buttons_available(buttons.available);
+		stick_buf->mutate_buttons(buttons.buttons);
 
 		HAL_JoystickTouchpads touchpads;
 		HAL_GetJoystickTouchpads(joystickNum, &touchpads);

@@ -43,7 +43,7 @@ public final class DSData extends Struct {
   public org.littletonrobotics.conduit.schema.Joystick joysticks(int j) { return joysticks(new org.littletonrobotics.conduit.schema.Joystick(), j); }
   public org.littletonrobotics.conduit.schema.Joystick joysticks(org.littletonrobotics.conduit.schema.Joystick obj, int j) { return obj.__assign(bb_pos + 104 + j * 424, bb); }
 
-  public static int createDSData(FlatBufferBuilder builder, int allianceStation, int[] eventName, int[] gameData, int matchNumber, int replayNumber, int matchType, long controlWord, double matchTime, int[][] joysticks_name, int[] joysticks_type, int[] joysticks_supportedOutputs, short[] joysticks_axisCount, float[][] joysticks_axisValues, short[][] joysticks_axisRaw, long[] joysticks_buttonsAvailable, long[] joysticks_buttons, int[] joysticks_povCount, int[][] joysticks_povValues, boolean[] joysticks_isGamepad, int[] joysticks_touchpadCount, int[][] joysticks_touchpads_fingerCount, int[][][] joysticks_touchpads_fingers_down, float[][][] joysticks_touchpads_fingers_x, float[][][] joysticks_touchpads_fingers_y) {
+  public static int createDSData(FlatBufferBuilder builder, int allianceStation, int[] eventName, int[] gameData, int matchNumber, int replayNumber, int matchType, long controlWord, double matchTime, int[][] joysticks_name, int[] joysticks_type, int[] joysticks_supportedOutputs, short[] joysticks_axesAvailable, float[][] joysticks_axisValues, short[][] joysticks_axisRaw, long[] joysticks_buttonsAvailable, long[] joysticks_buttons, int[] joysticks_povsAvailable, int[][] joysticks_povValues, boolean[] joysticks_isGamepad, int[] joysticks_touchpadCount, int[][] joysticks_touchpads_fingerCount, int[][][] joysticks_touchpads_fingers_down, float[][][] joysticks_touchpads_fingers_x, float[][][] joysticks_touchpads_fingers_y) {
     builder.prep(8, 2648);
     for (int _idx0 = 6; _idx0 > 0; _idx0--) {
       builder.prep(8, 424);
@@ -66,7 +66,7 @@ public final class DSData extends Struct {
       for (int _idx1 = 8; _idx1 > 0; _idx1--) {
         builder.putByte((byte) joysticks_povValues[_idx0-1][_idx1-1]);
       }
-      builder.putByte((byte) joysticks_povCount[_idx0-1]);
+      builder.putByte((byte) joysticks_povsAvailable[_idx0-1]);
       builder.putLong(joysticks_buttons[_idx0-1]);
       builder.putLong(joysticks_buttonsAvailable[_idx0-1]);
       builder.pad(4);
@@ -76,7 +76,7 @@ public final class DSData extends Struct {
       for (int _idx1 = 12; _idx1 > 0; _idx1--) {
         builder.putFloat(joysticks_axisValues[_idx0-1][_idx1-1]);
       }
-      builder.putShort(joysticks_axisCount[_idx0-1]);
+      builder.putShort(joysticks_axesAvailable[_idx0-1]);
       builder.putByte((byte) joysticks_supportedOutputs[_idx0-1]);
       builder.putByte((byte) joysticks_type[_idx0-1]);
       for (int _idx1 = 256; _idx1 > 0; _idx1--) {

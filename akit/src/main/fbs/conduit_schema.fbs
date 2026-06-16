@@ -25,12 +25,12 @@ struct Joystick {
     name:[uint8:256];
     type:uint8;
     supported_outputs:uint8;
-    axis_count:int16;
-    axis_values:[float32:12];
-    axis_raw:[int16:12];
+    axes_available:uint16;
+    axis_values:[float32:16];
+    axis_raw:[int16:16];
     buttons_available:uint64;
     buttons:uint64;
-    pov_count:uint8;
+    povs_available:uint8;
     pov_values:[uint8:8];
     is_gamepad:bool;
     touchpad_count:uint8;

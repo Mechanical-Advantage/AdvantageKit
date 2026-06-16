@@ -50,24 +50,14 @@ class LoggedDriverStation {
       joystickTable.put("Type", conduit.getJoystickType(id));
       joystickTable.put("IsGamepad", conduit.isGamepad(id));
       joystickTable.put("SupportedOutputs", conduit.getJoystickSupportedOutputs(id));
+
       joystickTable.put("ButtonsAvailable", conduit.getButtonsAvailable(id));
       joystickTable.put("ButtonValues", conduit.getButtonValues(id));
-
-      int povCount = conduit.getPovCount(id);
-      int[] povValues = new int[povCount];
-      System.arraycopy(conduit.getPovValues(id), 0, povValues, 0, povCount);
-      joystickTable.put("POVs", povValues);
-
-      int axisCount = conduit.getAxisCount(id);
-      float[] axisValues = new float[axisCount];
-      int[] axisRawValues = new int[axisCount];
-      System.arraycopy(conduit.getAxisValues(id), 0, axisValues, 0, axisCount);
-      short[] rawFromConduit = conduit.getJoystickAxisRaw(id);
-      for (int i = 0; i < axisCount; i++) {
-        axisRawValues[i] = rawFromConduit[i];
-      }
-      joystickTable.put("AxisValues", axisValues);
-      joystickTable.put("AxisRawValues", axisRawValues);
+      joystickTable.put("POVsAvailable", conduit.getPovsAvailable(id));
+      joystickTable.put("POVValues", conduit.getPovValues(id));
+      joystickTable.put("AxesAvailable", conduit.getAxesAvailable(id));
+      joystickTable.put("AxisValues", conduit.getAxisValues(id));
+      joystickTable.put("AxisRawValues", conduit.getAxisValuesRaw(id));
 
       int touchpadCount = conduit.getTouchpadCount(id);
       joystickTable.put("TouchpadCount", touchpadCount);
@@ -125,18 +115,18 @@ class LoggedDriverStation {
       DriverStationSim.setJoystickGamepadType(id, joystickTable.get("Type", 0));
       DriverStationSim.setJoystickIsGamepad(id, joystickTable.get("IsGamepad", false));
       DriverStationSim.setJoystickSupportedOutputs(id, joystickTable.get("SupportedOutputs", 0));
-      DriverStationSim.setJoystickButtonsAvailable(
-          id, joystickTable.get("ButtonsAvailable", joystickTable.get("ButtonCount", 0L)));
+
+      DriverStationSim.setJoystickButtonsAvailable(id, joystickTable.get("ButtonsAvailable", 0L));
       DriverStationDataJNI.setJoystickButtonsValue(id, joystickTable.get("ButtonValues", 0L));
 
-      int[] povValues = joystickTable.get("POVs", new int[0]);
-      DriverStationSim.setJoystickPOVsAvailable(id, povValues.length);
+      DriverStationSim.setJoystickPOVsAvailable(id, joystickTable.get("POVsAvailable", 0));
+      int[] povValues = joystickTable.get("POVValues", new int[0]);
       for (int i = 0; i < povValues.length; i++) {
         DriverStationDataJNI.setJoystickPOV(id, i, (byte) povValues[i]);
       }
 
+      DriverStationSim.setJoystickAxesAvailable(id, joystickTable.get("AxesAvailable", 0));
       float[] axisValues = joystickTable.get("AxisValues", new float[0]);
-      DriverStationSim.setJoystickAxesAvailable(id, axisValues.length);
       for (int i = 0; i < axisValues.length; i++) {
         DriverStationSim.setJoystickAxis(id, i, axisValues[i]);
       }

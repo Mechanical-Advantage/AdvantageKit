@@ -193,13 +193,13 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Joystick FLATBUFFERS_FINAL_CLASS {
   uint8_t name_[256];
   uint8_t type_;
   uint8_t supported_outputs_;
-  int16_t axis_count_;
+  int16_t axes_available_;
   float axis_values_[12];
   int16_t axis_raw_[12];
   int32_t padding0__;
   uint64_t buttons_available_;
   uint64_t buttons_;
-  uint8_t pov_count_;
+  uint8_t povs_available_;
   uint8_t pov_values_[8];
   uint8_t is_gamepad_;
   uint8_t touchpad_count_;
@@ -215,13 +215,13 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Joystick FLATBUFFERS_FINAL_CLASS {
       : name_(),
         type_(0),
         supported_outputs_(0),
-        axis_count_(0),
+        axes_available_(0),
         axis_values_(),
         axis_raw_(),
         padding0__(0),
         buttons_available_(0),
         buttons_(0),
-        pov_count_(0),
+        povs_available_(0),
         pov_values_(),
         is_gamepad_(0),
         touchpad_count_(0),
@@ -232,17 +232,17 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Joystick FLATBUFFERS_FINAL_CLASS {
     (void)padding1__;
     (void)padding2__;
   }
-  Joystick(uint8_t _type, uint8_t _supported_outputs, int16_t _axis_count, uint64_t _buttons_available, uint64_t _buttons, uint8_t _pov_count, bool _is_gamepad, uint8_t _touchpad_count)
+  Joystick(uint8_t _type, uint8_t _supported_outputs, int16_t _axes_available, uint64_t _buttons_available, uint64_t _buttons, uint8_t _povs_available, bool _is_gamepad, uint8_t _touchpad_count)
       : name_(),
         type_(::flatbuffers::EndianScalar(_type)),
         supported_outputs_(::flatbuffers::EndianScalar(_supported_outputs)),
-        axis_count_(::flatbuffers::EndianScalar(_axis_count)),
+        axes_available_(::flatbuffers::EndianScalar(_axes_available)),
         axis_values_(),
         axis_raw_(),
         padding0__(0),
         buttons_available_(::flatbuffers::EndianScalar(_buttons_available)),
         buttons_(::flatbuffers::EndianScalar(_buttons)),
-        pov_count_(::flatbuffers::EndianScalar(_pov_count)),
+        povs_available_(::flatbuffers::EndianScalar(_povs_available)),
         pov_values_(),
         is_gamepad_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_gamepad))),
         touchpad_count_(::flatbuffers::EndianScalar(_touchpad_count)),
@@ -253,14 +253,14 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Joystick FLATBUFFERS_FINAL_CLASS {
     (void)padding1__;
     (void)padding2__;
   }
-  Joystick(::flatbuffers::span<const uint8_t, 256> _name, uint8_t _type, uint8_t _supported_outputs, int16_t _axis_count, ::flatbuffers::span<const float, 12> _axis_values, ::flatbuffers::span<const int16_t, 12> _axis_raw, uint64_t _buttons_available, uint64_t _buttons, uint8_t _pov_count, ::flatbuffers::span<const uint8_t, 8> _pov_values, bool _is_gamepad, uint8_t _touchpad_count, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::JoystickTouchpad, 2> _touchpads)
+  Joystick(::flatbuffers::span<const uint8_t, 256> _name, uint8_t _type, uint8_t _supported_outputs, int16_t _axes_available, ::flatbuffers::span<const float, 12> _axis_values, ::flatbuffers::span<const int16_t, 12> _axis_raw, uint64_t _buttons_available, uint64_t _buttons, uint8_t _povs_available, ::flatbuffers::span<const uint8_t, 8> _pov_values, bool _is_gamepad, uint8_t _touchpad_count, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::JoystickTouchpad, 2> _touchpads)
       : type_(::flatbuffers::EndianScalar(_type)),
         supported_outputs_(::flatbuffers::EndianScalar(_supported_outputs)),
-        axis_count_(::flatbuffers::EndianScalar(_axis_count)),
+        axes_available_(::flatbuffers::EndianScalar(_axes_available)),
         padding0__(0),
         buttons_available_(::flatbuffers::EndianScalar(_buttons_available)),
         buttons_(::flatbuffers::EndianScalar(_buttons)),
-        pov_count_(::flatbuffers::EndianScalar(_pov_count)),
+        povs_available_(::flatbuffers::EndianScalar(_povs_available)),
         is_gamepad_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_gamepad))),
         touchpad_count_(::flatbuffers::EndianScalar(_touchpad_count)),
         padding1__(0),
@@ -292,11 +292,11 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Joystick FLATBUFFERS_FINAL_CLASS {
   void mutate_supported_outputs(uint8_t _supported_outputs) {
     ::flatbuffers::WriteScalar(&supported_outputs_, _supported_outputs);
   }
-  int16_t axis_count() const {
-    return ::flatbuffers::EndianScalar(axis_count_);
+  int16_t axes_available() const {
+    return ::flatbuffers::EndianScalar(axes_available_);
   }
-  void mutate_axis_count(int16_t _axis_count) {
-    ::flatbuffers::WriteScalar(&axis_count_, _axis_count);
+  void mutate_axes_available(int16_t _axes_available) {
+    ::flatbuffers::WriteScalar(&axes_available_, _axes_available);
   }
   const ::flatbuffers::Array<float, 12> *axis_values() const {
     return &::flatbuffers::CastToArray(axis_values_);
@@ -322,11 +322,11 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) Joystick FLATBUFFERS_FINAL_CLASS {
   void mutate_buttons(uint64_t _buttons) {
     ::flatbuffers::WriteScalar(&buttons_, _buttons);
   }
-  uint8_t pov_count() const {
-    return ::flatbuffers::EndianScalar(pov_count_);
+  uint8_t povs_available() const {
+    return ::flatbuffers::EndianScalar(povs_available_);
   }
-  void mutate_pov_count(uint8_t _pov_count) {
-    ::flatbuffers::WriteScalar(&pov_count_, _pov_count);
+  void mutate_povs_available(uint8_t _povs_available) {
+    ::flatbuffers::WriteScalar(&povs_available_, _povs_available);
   }
   const ::flatbuffers::Array<uint8_t, 8> *pov_values() const {
     return &::flatbuffers::CastToArray(pov_values_);
@@ -360,12 +360,12 @@ inline bool operator==(const Joystick &lhs, const Joystick &rhs) {
       (*lhs.name() == *rhs.name()) &&
       (lhs.type() == rhs.type()) &&
       (lhs.supported_outputs() == rhs.supported_outputs()) &&
-      (lhs.axis_count() == rhs.axis_count()) &&
+      (lhs.axes_available() == rhs.axes_available()) &&
       (*lhs.axis_values() == *rhs.axis_values()) &&
       (*lhs.axis_raw() == *rhs.axis_raw()) &&
       (lhs.buttons_available() == rhs.buttons_available()) &&
       (lhs.buttons() == rhs.buttons()) &&
-      (lhs.pov_count() == rhs.pov_count()) &&
+      (lhs.povs_available() == rhs.povs_available()) &&
       (*lhs.pov_values() == *rhs.pov_values()) &&
       (lhs.is_gamepad() == rhs.is_gamepad()) &&
       (lhs.touchpad_count() == rhs.touchpad_count()) &&
@@ -1479,12 +1479,12 @@ inline const ::flatbuffers::TypeTable *JoystickTypeTable() {
     "name",
     "type",
     "supported_outputs",
-    "axis_count",
+    "axes_available",
     "axis_values",
     "axis_raw",
     "buttons_available",
     "buttons",
-    "pov_count",
+    "povs_available",
     "pov_values",
     "is_gamepad",
     "touchpad_count",
