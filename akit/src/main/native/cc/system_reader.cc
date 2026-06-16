@@ -16,8 +16,6 @@
 #include <wpi/hal/Power.h>
 #include <wpi/hal/PowerDistribution.h>
 #include <wpi/hal/SystemServer.h>
-#include <wpi/nt/NetworkTableInstance.hpp>
-#include <wpi/util/StackTrace.hpp>
 #include <wpi/util/timestamp.h>
 
 #include <chrono>
@@ -25,6 +23,8 @@
 #include <cstring>
 #include <iostream>
 #include <mutex>
+#include <wpi/nt/NetworkTableInstance.hpp>
+#include <wpi/util/StackTrace.hpp>
 
 using namespace std::chrono_literals;
 
@@ -39,9 +39,39 @@ void SystemReader::start() {
 	watchdog_active_sub = inst.GetBooleanTopic(
 			"/Netcomm/Control/WatchdogActive").Subscribe(false);
 	io_frequency_sub = sys_table->GetIntegerTopic("iofreq").Subscribe(0);
+	io_rx_frequency_sub = sys_table->GetIntegerTopic("iorxfreq").Subscribe(0);
 	team_number_sub = sys_table->GetIntegerTopic("teamnum").Subscribe(-1);
 	epoch_time_valid_sub = netcomm_table->GetBooleanTopic(
 			"Control/HasSetWallClock").Subscribe(false);
+
+	const auto faults_table = sys_table->GetSubTable("faults");
+	fault_brownout_sub = faults_table->GetIntegerTopic("brownout").Subscribe(0);
+	fault_canbus_down_sub =
+			faults_table->GetIntegerTopic("canbus_down").Subscribe(0);
+	fault_canbus_unavail_sub =
+			faults_table->GetIntegerTopic("canbusu_navail").Subscribe(0);
+	fault_display_sub = faults_table->GetIntegerTopic("display").Subscribe(0);
+	fault_imu_sub = faults_table->GetIntegerTopic("imu").Subscribe(0);
+	fault_io_sub = faults_table->GetIntegerTopic("io").Subscribe(0);
+	fault_rsl_sub = faults_table->GetIntegerTopic("rsl").Subscribe(0);
+	fault_usb_sub = faults_table->GetIntegerTopic("usb").Subscribe(0);
+
+	const auto fault_counts_table = sys_table->GetSubTable("faultcounts");
+	fault_count_brownout_sub =
+			fault_counts_table->GetIntegerTopic("brownout").Subscribe(0);
+	fault_count_canbus_down_sub = fault_counts_table->GetIntegerTopic(
+			"canbus_down").Subscribe(0);
+	fault_count_canbus_unavail_sub = fault_counts_table->GetIntegerTopic(
+			"canbusu_navail").Subscribe(0);
+	fault_count_display_sub =
+			fault_counts_table->GetIntegerTopic("display").Subscribe(0);
+	fault_count_imu_sub = fault_counts_table->GetIntegerTopic("imu").Subscribe(
+			0);
+	fault_count_io_sub = fault_counts_table->GetIntegerTopic("io").Subscribe(0);
+	fault_count_rsl_sub = fault_counts_table->GetIntegerTopic("rsl").Subscribe(
+			0);
+	fault_count_usb_sub = fault_counts_table->GetIntegerTopic("usb").Subscribe(
+			0);
 
 	const auto network_default = std::vector<double>(10, 0.0);
 	network_ethernet_sub =
@@ -99,9 +129,31 @@ void SystemReader::read(schema::SystemData *system_buf) {
 	system_buf->mutate_battery_voltage(HAL_GetVinVoltage(&status));
 	system_buf->mutate_watchdog_active(watchdog_active_sub.Get());
 	system_buf->mutate_io_frequency(io_frequency_sub.Get());
+	system_buf->mutate_io_rx_frequency(io_rx_frequency_sub.Get());
 	system_buf->mutate_team_number(team_number_sub.Get());
 	system_buf->mutate_epoch_time(WPI_GetSystemTime());
 	system_buf->mutate_epoch_time_valid(epoch_time_valid_sub.Get());
+
+	system_buf->mutate_fault_brownout(fault_brownout_sub.Get() != 0);
+	system_buf->mutate_fault_canbus_down(fault_canbus_down_sub.Get() != 0);
+	system_buf->mutate_fault_canbus_unavail(
+			fault_canbus_unavail_sub.Get() != 0);
+	system_buf->mutate_fault_display(fault_display_sub.Get() != 0);
+	system_buf->mutate_fault_imu(fault_imu_sub.Get() != 0);
+	system_buf->mutate_fault_io(fault_io_sub.Get() != 0);
+	system_buf->mutate_fault_rsl(fault_rsl_sub.Get() != 0);
+	system_buf->mutate_fault_usb(fault_usb_sub.Get() != 0);
+
+	system_buf->mutate_fault_count_brownout(fault_count_brownout_sub.Get());
+	system_buf->mutate_fault_count_canbus_down(
+			fault_count_canbus_down_sub.Get());
+	system_buf->mutate_fault_count_canbus_unavail(
+			fault_count_canbus_unavail_sub.Get());
+	system_buf->mutate_fault_count_display(fault_count_display_sub.Get());
+	system_buf->mutate_fault_count_imu(fault_count_imu_sub.Get());
+	system_buf->mutate_fault_count_io(fault_count_io_sub.Get());
+	system_buf->mutate_fault_count_rsl(fault_count_rsl_sub.Get());
+	system_buf->mutate_fault_count_usb(fault_count_usb_sub.Get());
 
 	update_network_status(system_buf->mutable_network_ethernet(),
 			network_ethernet_sub.Get());

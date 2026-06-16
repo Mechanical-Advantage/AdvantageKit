@@ -32,9 +32,28 @@ class LoggedSystemStats {
     table.put("BatteryVoltage", conduit.getBatteryVoltage());
     table.put("WatchdogActive", conduit.getWatchdogActive());
     table.put("IOFrequency", conduit.getIOFrequency());
+    table.put("IORXFrequency", conduit.getIORXFrequency());
     table.put("TeamNumber", conduit.getTeamNumber());
     table.put("EpochTimeMicros", conduit.getEpochTime());
     table.put("EpochTimeValid", conduit.getEpochTimeValid());
+
+    table.put("Faults/Brownout", conduit.getFaultBrownout());
+    table.put("Faults/CANBusDown", conduit.getFaultCanbusDown());
+    table.put("Faults/CANBusUnavail", conduit.getFaultCanbusUnavail());
+    table.put("Faults/Display", conduit.getFaultDisplay());
+    table.put("Faults/IMU", conduit.getFaultIMU());
+    table.put("Faults/IO", conduit.getFaultIO());
+    table.put("Faults/RSL", conduit.getFaultRSL());
+    table.put("Faults/USB", conduit.getFaultUSB());
+
+    table.put("FaultCounts/Brownout", conduit.getFaultCountBrownout());
+    table.put("FaultCounts/CANBusDown", conduit.getFaultCountCanbusDown());
+    table.put("FaultCounts/CANBusUnavail", conduit.getFaultCountCanbusUnavail());
+    table.put("FaultCounts/Display", conduit.getFaultCountDisplay());
+    table.put("FaultCounts/IMU", conduit.getFaultCountIMU());
+    table.put("FaultCounts/IO", conduit.getFaultCountIO());
+    table.put("FaultCounts/RSL", conduit.getFaultCountRSL());
+    table.put("FaultCounts/USB", conduit.getFaultCountUSB());
 
     logNetworkStatus(table.getSubtable("Network/Ethernet"), conduit.getNetworkEthernet());
     logNetworkStatus(table.getSubtable("Network/WiFi"), conduit.getNetworkWiFi());

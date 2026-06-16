@@ -26,8 +26,8 @@ struct Joystick {
     type:uint8;
     supported_outputs:uint8;
     axes_available:uint16;
-    axis_values:[float32:16];
-    axis_raw:[int16:16];
+    axis_values:[float32:12];
+    axis_raw:[int16:12];
     buttons_available:uint64;
     buttons:uint64;
     povs_available:uint8;
@@ -100,10 +100,29 @@ struct Vector4 {
 struct SystemData {
     battery_voltage:float64;
     watchdog_active:bool;
-    io_frequency:int64;
+    io_frequency:int64;    
+    io_rx_frequency:int64;
     team_number:int64;
     epoch_time:int64;
     epoch_time_valid:bool;
+
+    fault_brownout:bool;
+    fault_canbus_down:bool;
+    fault_canbus_unavail:bool;
+    fault_display:bool;
+    fault_imu:bool;
+    fault_io:bool;
+    fault_rsl:bool;
+    fault_usb:bool;
+
+    fault_count_brownout:int64;
+    fault_count_canbus_down:int64;
+    fault_count_canbus_unavail:int64;
+    fault_count_display:int64;
+    fault_count_imu:int64;
+    fault_count_io:int64;
+    fault_count_rsl:int64;
+    fault_count_usb:int64;
 
     network_ethernet:NetworkStatus;
     network_wifi:NetworkStatus;

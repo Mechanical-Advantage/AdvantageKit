@@ -30,8 +30,8 @@ public final class Joystick extends Struct {
   public void mutateType(int type) { bb.put(bb_pos + 256, (byte) type); }
   public int supportedOutputs() { return bb.get(bb_pos + 257) & 0xFF; }
   public void mutateSupportedOutputs(int supported_outputs) { bb.put(bb_pos + 257, (byte) supported_outputs); }
-  public short axesAvailable() { return bb.getShort(bb_pos + 258); }
-  public void mutateAxesAvailable(short axes_available) { bb.putShort(bb_pos + 258, axes_available); }
+  public int axesAvailable() { return bb.getShort(bb_pos + 258) & 0xFFFF; }
+  public void mutateAxesAvailable(int axes_available) { bb.putShort(bb_pos + 258, (short) axes_available); }
   public float axisValues(int j) { return bb.getFloat(bb_pos + 260 + j * 4); }
   public void mutateAxisValues(int j, float axis_values) { bb.putFloat(bb_pos + 260 + j * 4, axis_values); }
   public short axisRaw(int j) { return bb.getShort(bb_pos + 308 + j * 2); }
@@ -51,7 +51,7 @@ public final class Joystick extends Struct {
   public org.littletonrobotics.conduit.schema.JoystickTouchpad touchpads(int j) { return touchpads(new org.littletonrobotics.conduit.schema.JoystickTouchpad(), j); }
   public org.littletonrobotics.conduit.schema.JoystickTouchpad touchpads(org.littletonrobotics.conduit.schema.JoystickTouchpad obj, int j) { return obj.__assign(bb_pos + 364 + j * 28, bb); }
 
-  public static int createJoystick(FlatBufferBuilder builder, int[] name, int type, int supportedOutputs, short axesAvailable, float[] axisValues, short[] axisRaw, long buttonsAvailable, long buttons, int povsAvailable, int[] povValues, boolean isGamepad, int touchpadCount, int[] touchpads_fingerCount, int[][] touchpads_fingers_down, float[][] touchpads_fingers_x, float[][] touchpads_fingers_y) {
+  public static int createJoystick(FlatBufferBuilder builder, int[] name, int type, int supportedOutputs, int axesAvailable, float[] axisValues, short[] axisRaw, long buttonsAvailable, long buttons, int povsAvailable, int[] povValues, boolean isGamepad, int touchpadCount, int[] touchpads_fingerCount, int[][] touchpads_fingers_down, float[][] touchpads_fingers_x, float[][] touchpads_fingers_y) {
     builder.prep(8, 424);
     builder.pad(4);
     for (int _idx0 = 2; _idx0 > 0; _idx0--) {
@@ -82,7 +82,7 @@ public final class Joystick extends Struct {
     for (int _idx0 = 12; _idx0 > 0; _idx0--) {
       builder.putFloat(axisValues[_idx0-1]);
     }
-    builder.putShort(axesAvailable);
+    builder.putShort((short) axesAvailable);
     builder.putByte((byte) supportedOutputs);
     builder.putByte((byte) type);
     for (int _idx0 = 256; _idx0 > 0; _idx0--) {

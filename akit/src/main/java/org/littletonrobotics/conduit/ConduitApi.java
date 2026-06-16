@@ -265,6 +265,10 @@ public class ConduitApi {
     return sys.ioFrequency();
   }
 
+  public long getIORXFrequency() {
+    return sys.ioRxFrequency();
+  }
+
   public long getTeamNumber() {
     return sys.teamNumber();
   }
@@ -275,6 +279,70 @@ public class ConduitApi {
 
   public boolean getEpochTimeValid() {
     return sys.epochTimeValid();
+  }
+
+  public boolean getFaultBrownout() {
+    return sys.faultBrownout();
+  }
+
+  public boolean getFaultCanbusDown() {
+    return sys.faultCanbusDown();
+  }
+
+  public boolean getFaultCanbusUnavail() {
+    return sys.faultCanbusUnavail();
+  }
+
+  public boolean getFaultDisplay() {
+    return sys.faultDisplay();
+  }
+
+  public boolean getFaultIMU() {
+    return sys.faultImu();
+  }
+
+  public boolean getFaultIO() {
+    return sys.faultIo();
+  }
+
+  public boolean getFaultRSL() {
+    return sys.faultRsl();
+  }
+
+  public boolean getFaultUSB() {
+    return sys.faultUsb();
+  }
+
+  public long getFaultCountBrownout() {
+    return sys.faultCountBrownout();
+  }
+
+  public long getFaultCountCanbusDown() {
+    return sys.faultCountCanbusDown();
+  }
+
+  public long getFaultCountCanbusUnavail() {
+    return sys.faultCountCanbusUnavail();
+  }
+
+  public long getFaultCountDisplay() {
+    return sys.faultCountDisplay();
+  }
+
+  public long getFaultCountIMU() {
+    return sys.faultCountImu();
+  }
+
+  public long getFaultCountIO() {
+    return sys.faultCountIo();
+  }
+
+  public long getFaultCountRSL() {
+    return sys.faultCountRsl();
+  }
+
+  public long getFaultCountUSB() {
+    return sys.faultCountUsb();
   }
 
   public NetworkStatus getNetworkEthernet() {

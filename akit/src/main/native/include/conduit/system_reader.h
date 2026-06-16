@@ -31,8 +31,27 @@ private:
 
 	wpi::nt::BooleanSubscriber watchdog_active_sub;
 	wpi::nt::IntegerSubscriber io_frequency_sub;
+	wpi::nt::IntegerSubscriber io_rx_frequency_sub;
 	wpi::nt::IntegerSubscriber team_number_sub;
 	wpi::nt::BooleanSubscriber epoch_time_valid_sub;
+
+	wpi::nt::IntegerSubscriber fault_brownout_sub;
+	wpi::nt::IntegerSubscriber fault_canbus_down_sub;
+	wpi::nt::IntegerSubscriber fault_canbus_unavail_sub;
+	wpi::nt::IntegerSubscriber fault_display_sub;
+	wpi::nt::IntegerSubscriber fault_imu_sub;
+	wpi::nt::IntegerSubscriber fault_io_sub;
+	wpi::nt::IntegerSubscriber fault_rsl_sub;
+	wpi::nt::IntegerSubscriber fault_usb_sub;
+
+	wpi::nt::IntegerSubscriber fault_count_brownout_sub;
+	wpi::nt::IntegerSubscriber fault_count_canbus_down_sub;
+	wpi::nt::IntegerSubscriber fault_count_canbus_unavail_sub;
+	wpi::nt::IntegerSubscriber fault_count_display_sub;
+	wpi::nt::IntegerSubscriber fault_count_imu_sub;
+	wpi::nt::IntegerSubscriber fault_count_io_sub;
+	wpi::nt::IntegerSubscriber fault_count_rsl_sub;
+	wpi::nt::IntegerSubscriber fault_count_usb_sub;
 
 	wpi::nt::DoubleArraySubscriber network_ethernet_sub;
 	wpi::nt::DoubleArraySubscriber network_wifi_sub;
