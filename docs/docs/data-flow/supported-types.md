@@ -51,6 +51,10 @@ AdvantageKit includes extensive support for unit-safe logging, including compati
 - Output logging ([link](/data-flow/recording-outputs/#units))
 - Output annotation logging ([link](/data-flow/recording-outputs/annotation-logging#unit))
 
+:::info
+In WPILib, measure implementations (like `Angle`, `Distance`, etc.) are defined as Java records. These record-based measures can be passed to the generic `put()`, `get()`, or `recordOutput()` methods. If a variable is declared using the interface type directly (e.g. `Measure<AngleUnit>`), you must use the explicit measure-specific methods: `putMeasure()`, `getMeasure()`, and `recordOutputMeasure()`.
+:::
+
 ### Colors
 
 WPILib includes a [color library](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/util/Color.html) that can be used to simplify color operations. These values will be stored in the log as a string formatted in [Hex Triplet](https://en.wikipedia.org/wiki/Web_colors) color notation.

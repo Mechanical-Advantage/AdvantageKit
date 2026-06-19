@@ -7,16 +7,17 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.NotifierJNI;
-import edu.wpi.first.wpilibj.IterativeRobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.List;
+import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.framework.IterativeRobotBase;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.NotifierJNI;
+import org.wpilib.system.RobotController;
+import org.wpilib.util.WPIUtilJNI;
 
 /**
  * LoggedRobot implements the IterativeRobotBase robot program framework.
@@ -30,7 +31,7 @@ public class LoggedRobot extends IterativeRobotBase {
   /** Default loop period. */
   public static final double defaultPeriodSecs = 0.02;
 
-  private final int notifier = NotifierJNI.initializeNotifier();
+  private final int notifier = NotifierJNI.createNotifier();
   private final long periodUs;
   private long nextCycleUs = 0;
   private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
@@ -58,8 +59,7 @@ public class LoggedRobot extends IterativeRobotBase {
 
   @Override
   public void close() {
-    NotifierJNI.stopNotifier(notifier);
-    NotifierJNI.cleanNotifier(notifier);
+    NotifierJNI.destroyNotifier(notifier);
     super.close();
   }
 
@@ -69,12 +69,11 @@ public class LoggedRobot extends IterativeRobotBase {
   public void startCompetition() {
     try {
       // Robot init methods
-      long initStart = RobotController.getFPGATime();
-      robotInit();
+      long initStart = RobotController.getMonotonicTime();
       if (isSimulation()) {
         simulationInit();
       }
-      long initEnd = RobotController.getFPGATime(); // Includes Robot constructor and robotInit
+      long initEnd = RobotController.getMonotonicTime(); // Includes Robot constructor and robotInit
 
       // Register auto logged outputs
       AutoLogOutputManager.addObject(this);
@@ -84,32 +83,35 @@ public class LoggedRobot extends IterativeRobotBase {
 
       // Tell the DS that the robot is ready to be enabled
       System.out.println("********** Robot program startup complete **********");
-      DriverStationJNI.observeUserProgramStarting();
+      DriverStationBackend.observeUserProgramStarting();
 
       // Loop forever, calling the appropriate mode-dependent function
       while (true) {
         if (useTiming) {
-          long currentTimeUs = RobotController.getFPGATime();
+          long currentTimeUs = RobotController.getMonotonicTime();
           if (nextCycleUs < currentTimeUs) {
             // Loop overrun, start next cycle immediately
             nextCycleUs = currentTimeUs;
           } else {
             // Wait before next cycle
-            NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
-            if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
-              // Break the loop if the notifier was stopped
+            NotifierJNI.setNotifierAlarm(notifier, nextCycleUs, 0, true, true);
+
+            try {
+              WPIUtilJNI.waitForObject(notifier);
+            } catch (InterruptedException ex) {
               Logger.end();
+              Thread.currentThread().interrupt();
               break;
             }
           }
           nextCycleUs += periodUs;
         }
 
-        long periodicBeforeStart = RobotController.getFPGATime();
+        long periodicBeforeStart = RobotController.getMonotonicTime();
         Logger.periodicBeforeUser();
-        long userCodeStart = RobotController.getFPGATime();
+        long userCodeStart = RobotController.getMonotonicTime();
         loopFunc();
-        long userCodeEnd = RobotController.getFPGATime();
+        long userCodeEnd = RobotController.getMonotonicTime();
 
         gcStatsCollector.update();
         Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
@@ -127,7 +129,7 @@ public class LoggedRobot extends IterativeRobotBase {
   /** Ends the main loop in startCompetition(). */
   @Override
   public void endCompetition() {
-    NotifierJNI.stopNotifier(notifier);
+    NotifierJNI.destroyNotifier(notifier);
   }
 
   /**

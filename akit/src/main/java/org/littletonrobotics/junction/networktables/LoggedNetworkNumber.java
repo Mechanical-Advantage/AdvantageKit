@@ -7,12 +7,12 @@
 
 package org.littletonrobotics.junction.networktables;
 
-import edu.wpi.first.networktables.DoubleEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
+import org.wpilib.networktables.DoubleEntry;
+import org.wpilib.networktables.NetworkTableInstance;
 
 /** Manages a number value published to the root table of NT. */
 public class LoggedNetworkNumber extends LoggedNetworkInput implements DoubleSupplier {

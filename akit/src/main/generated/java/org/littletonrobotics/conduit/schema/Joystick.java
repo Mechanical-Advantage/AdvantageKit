@@ -28,42 +28,62 @@ public final class Joystick extends Struct {
   public void mutateName(int j, int name) { bb.put(bb_pos + 0 + j * 1, (byte) name); }
   public int type() { return bb.get(bb_pos + 256) & 0xFF; }
   public void mutateType(int type) { bb.put(bb_pos + 256, (byte) type); }
-  public short axisCount() { return bb.getShort(bb_pos + 258); }
-  public void mutateAxisCount(short axis_count) { bb.putShort(bb_pos + 258, axis_count); }
-  public int axisTypes(int j) { return bb.get(bb_pos + 260 + j * 1); }
-  public void mutateAxisTypes(int j, int axis_types) { bb.put(bb_pos + 260 + j * 1, (byte) axis_types); }
-  public float axisValues(int j) { return bb.getFloat(bb_pos + 272 + j * 4); }
-  public void mutateAxisValues(int j, float axis_values) { bb.putFloat(bb_pos + 272 + j * 4, axis_values); }
-  public int buttonCount() { return bb.get(bb_pos + 320) & 0xFF; }
-  public void mutateButtonCount(int button_count) { bb.put(bb_pos + 320, (byte) button_count); }
-  public int buttons() { return bb.getInt(bb_pos + 324); }
-  public void mutateButtons(int buttons) { bb.putInt(bb_pos + 324, buttons); }
-  public short povCount() { return bb.getShort(bb_pos + 328); }
-  public void mutatePovCount(short pov_count) { bb.putShort(bb_pos + 328, pov_count); }
-  public int povValues(int j) { return bb.get(bb_pos + 330 + j * 1); }
-  public void mutatePovValues(int j, int pov_values) { bb.put(bb_pos + 330 + j * 1, (byte) pov_values); }
-  public boolean isGamepad() { return 0!=bb.get(bb_pos + 338); }
-  public void mutateIsGamepad(boolean is_gamepad) { bb.put(bb_pos + 338, (byte)(is_gamepad ? 1 : 0)); }
+  public int supportedOutputs() { return bb.get(bb_pos + 257) & 0xFF; }
+  public void mutateSupportedOutputs(int supported_outputs) { bb.put(bb_pos + 257, (byte) supported_outputs); }
+  public int axesAvailable() { return bb.getShort(bb_pos + 258) & 0xFFFF; }
+  public void mutateAxesAvailable(int axes_available) { bb.putShort(bb_pos + 258, (short) axes_available); }
+  public float axisValues(int j) { return bb.getFloat(bb_pos + 260 + j * 4); }
+  public void mutateAxisValues(int j, float axis_values) { bb.putFloat(bb_pos + 260 + j * 4, axis_values); }
+  public short axisRaw(int j) { return bb.getShort(bb_pos + 308 + j * 2); }
+  public void mutateAxisRaw(int j, short axis_raw) { bb.putShort(bb_pos + 308 + j * 2, axis_raw); }
+  public long buttonsAvailable() { return bb.getLong(bb_pos + 336); }
+  public void mutateButtonsAvailable(long buttons_available) { bb.putLong(bb_pos + 336, buttons_available); }
+  public long buttons() { return bb.getLong(bb_pos + 344); }
+  public void mutateButtons(long buttons) { bb.putLong(bb_pos + 344, buttons); }
+  public int povsAvailable() { return bb.get(bb_pos + 352) & 0xFF; }
+  public void mutatePovsAvailable(int povs_available) { bb.put(bb_pos + 352, (byte) povs_available); }
+  public int povValues(int j) { return bb.get(bb_pos + 353 + j * 1); }
+  public void mutatePovValues(int j, int pov_values) { bb.put(bb_pos + 353 + j * 1, (byte) pov_values); }
+  public boolean isGamepad() { return 0!=bb.get(bb_pos + 361); }
+  public void mutateIsGamepad(boolean is_gamepad) { bb.put(bb_pos + 361, (byte)(is_gamepad ? 1 : 0)); }
+  public int touchpadCount() { return bb.get(bb_pos + 362) & 0xFF; }
+  public void mutateTouchpadCount(int touchpad_count) { bb.put(bb_pos + 362, (byte) touchpad_count); }
+  public org.littletonrobotics.conduit.schema.JoystickTouchpad touchpads(int j) { return touchpads(new org.littletonrobotics.conduit.schema.JoystickTouchpad(), j); }
+  public org.littletonrobotics.conduit.schema.JoystickTouchpad touchpads(org.littletonrobotics.conduit.schema.JoystickTouchpad obj, int j) { return obj.__assign(bb_pos + 364 + j * 28, bb); }
 
-  public static int createJoystick(FlatBufferBuilder builder, int[] name, int type, short axisCount, int[] axisTypes, float[] axisValues, int buttonCount, int buttons, short povCount, int[] povValues, boolean isGamepad) {
-    builder.prep(4, 340);
+  public static int createJoystick(FlatBufferBuilder builder, int[] name, int type, int supportedOutputs, int axesAvailable, float[] axisValues, short[] axisRaw, long buttonsAvailable, long buttons, int povsAvailable, int[] povValues, boolean isGamepad, int touchpadCount, int[] touchpads_fingerCount, int[][] touchpads_fingers_down, float[][] touchpads_fingers_x, float[][] touchpads_fingers_y) {
+    builder.prep(8, 424);
+    builder.pad(4);
+    for (int _idx0 = 2; _idx0 > 0; _idx0--) {
+      builder.prep(4, 28);
+      for (int _idx1 = 2; _idx1 > 0; _idx1--) {
+        builder.prep(4, 12);
+        builder.putFloat(touchpads_fingers_y[_idx0-1][_idx1-1]);
+        builder.putFloat(touchpads_fingers_x[_idx0-1][_idx1-1]);
+        builder.pad(3);
+        builder.putByte((byte) touchpads_fingers_down[_idx0-1][_idx1-1]);
+      }
+      builder.pad(3);
+      builder.putByte((byte) touchpads_fingerCount[_idx0-1]);
+    }
     builder.pad(1);
+    builder.putByte((byte) touchpadCount);
     builder.putBoolean(isGamepad);
     for (int _idx0 = 8; _idx0 > 0; _idx0--) {
       builder.putByte((byte) povValues[_idx0-1]);
     }
-    builder.putShort(povCount);
-    builder.putInt(buttons);
-    builder.pad(3);
-    builder.putByte((byte) buttonCount);
+    builder.putByte((byte) povsAvailable);
+    builder.putLong(buttons);
+    builder.putLong(buttonsAvailable);
+    builder.pad(4);
+    for (int _idx0 = 12; _idx0 > 0; _idx0--) {
+      builder.putShort(axisRaw[_idx0-1]);
+    }
     for (int _idx0 = 12; _idx0 > 0; _idx0--) {
       builder.putFloat(axisValues[_idx0-1]);
     }
-    for (int _idx0 = 12; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) axisTypes[_idx0-1]);
-    }
-    builder.putShort(axisCount);
-    builder.pad(1);
+    builder.putShort((short) axesAvailable);
+    builder.putByte((byte) supportedOutputs);
     builder.putByte((byte) type);
     for (int _idx0 = 256; _idx0 > 0; _idx0--) {
       builder.putByte((byte) name[_idx0-1]);

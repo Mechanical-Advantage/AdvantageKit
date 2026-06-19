@@ -7,9 +7,6 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.struct.StructSerializable;
-import edu.wpi.first.wpilibj.DriverStation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,6 +17,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.util.struct.Struct;
+import org.wpilib.util.struct.StructSerializable;
 
 @SuppressWarnings("rawtypes")
 class RecordStruct implements Struct {
@@ -200,7 +200,7 @@ class RecordStruct implements Struct {
         }
 
         if (struct == null) {
-          DriverStation.reportError(
+          DriverStationErrors.reportError(
               "[AdvantageKit] Failed to load nested struct \""
                   + component.getName()
                   + "\" for record type \""
@@ -231,7 +231,7 @@ class RecordStruct implements Struct {
         }
 
       } else {
-        DriverStation.reportError(
+        DriverStationErrors.reportError(
             "[AdvantageKit] Field \""
                 + component.getName()
                 + "\" for record type \""

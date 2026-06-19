@@ -7,24 +7,24 @@
 
 package org.littletonrobotics.junction.mechanism;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Radians;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.networktables.NetworkTable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.littletonrobotics.junction.LogTable;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.networktables.NetworkTable;
 
 /**
  * Common base class for all Mechanism2d node types.
  *
  * <p>To append another node, call {@link #append(LoggedMechanismObject2d)}. Objects that aren't
- * appended to a published {@link edu.wpi.first.wpilibj.smartdashboard.Mechanism2d} container are
+ * appended to a published {@link org.wpilib.smartdashboard.Mechanism2d} container are
  * nonfunctional.
  *
  * @see org.littletonrobotics.junction.mechanism.LoggedMechanism2d
@@ -116,7 +116,7 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
       // convert mech2d angle to Rotation3d
       // remembering that +rotation in 2d is -pitch in 3d
       var new_rotation = new Rotation3d(0, Degrees.of(-obj.getValue().getAngle()).in(Radians), 0);
-      new_rotation = initial_pose.getRotation().plus(new_rotation);
+      new_rotation = initial_pose.getRotation().rotateBy(new_rotation);
 
       // Generate the pose for the new joint
       var new_pose = new Pose3d(initial_pose.getTranslation(), new_rotation);

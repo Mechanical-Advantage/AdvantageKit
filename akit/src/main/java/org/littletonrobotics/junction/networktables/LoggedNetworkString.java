@@ -7,12 +7,12 @@
 
 package org.littletonrobotics.junction.networktables;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringEntry;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StringEntry;
 
 /** Manages a String value published to the root table of NT. */
 public class LoggedNetworkString extends LoggedNetworkInput implements Supplier<String> {

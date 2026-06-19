@@ -7,18 +7,18 @@
 
 #include "conduit/pdp_reader.h"
 
-#include <hal/CANAPI.h>
-#include <hal/DriverStation.h>
-#include <hal/HALBase.h>
-#include <hal/PowerDistribution.h>
-#include <wpi/StackTrace.h>
-#include <wpi/jni_util.h>
+#include <wpi/hal/CANAPI.h>
+#include <wpi/hal/DriverStation.h>
+#include <wpi/hal/HAL.h>
+#include <wpi/hal/PowerDistribution.h>
 
 #include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <mutex>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/jni_util.hpp>
 
 using namespace std::chrono_literals;
 
@@ -27,7 +27,7 @@ using namespace std::chrono_literals;
 void PDPReader::configure(JNIEnv *env, jint bus, jint module, jint type,
 		schema::PDPData *pdp_buf) {
 	int32_t status = 0;
-	auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+	auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
 	pd_handle = HAL_InitializePowerDistribution(bus, module,
 			static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
 			&status);
@@ -36,13 +36,13 @@ void PDPReader::configure(JNIEnv *env, jint bus, jint module, jint type,
 	pd_type = HAL_GetPowerDistributionType(pd_handle, &status);
 
 	runtime = HAL_GetRuntimeType();
-	if (runtime != HAL_Runtime_Simulation) {
-		if (pd_type == HAL_PowerDistributionType_kCTRE) {
-			pd_can_handle = HAL_InitializeCAN(bus, HAL_CAN_Man_kCTRE,
-					pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
-		} else if (pd_type == HAL_PowerDistributionType_kRev) {
-			pd_can_handle = HAL_InitializeCAN(bus, HAL_CAN_Man_kREV,
-					pd_module_id, HAL_CAN_Dev_kPowerDistribution, &status);
+	if (runtime != HAL_RUNTIME_SIMULATION) {
+		if (pd_type == HAL_POWER_DISTRIBUTION_CTRE) {
+			pd_can_handle = HAL_InitializeCAN(bus, HAL_CAN_MAN_CTRE,
+					pd_module_id, HAL_CAN_DEV_POWER_DISTRIBUTION, &status);
+		} else if (pd_type == HAL_POWER_DISTRIBUTION_REV) {
+			pd_can_handle = HAL_InitializeCAN(bus, HAL_CAN_MAN_REV,
+					pd_module_id, HAL_CAN_DEV_POWER_DISTRIBUTION, &status);
 		}
 	}
 
@@ -50,11 +50,11 @@ void PDPReader::configure(JNIEnv *env, jint bus, jint module, jint type,
 	pdp_buf->mutate_type(pd_type);
 	pdp_buf->mutate_module_id(pd_module_id);
 
-	if (runtime == HAL_Runtime_Simulation) {
+	if (runtime == HAL_RUNTIME_SIMULATION) {
 		pdp_buf->mutate_channel_count(24);
-	} else if (pd_type == HAL_PowerDistributionType_kCTRE) {
+	} else if (pd_type == HAL_POWER_DISTRIBUTION_CTRE) {
 		pdp_buf->mutate_channel_count(16);
-	} else if (pd_type == HAL_PowerDistributionType_kRev) {
+	} else if (pd_type == HAL_POWER_DISTRIBUTION_REV) {
 		pdp_buf->mutate_channel_count(24);
 	}
 }

@@ -7,16 +7,6 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.util.WPISerializable;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.struct.StructSerializable;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.util.Color;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +24,16 @@ import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.system.RobotController;
+import org.wpilib.units.Measure;
+import org.wpilib.units.Unit;
+import org.wpilib.util.Color;
+import org.wpilib.util.WPISerializable;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.struct.Struct;
+import org.wpilib.util.struct.StructSerializable;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** Central class for recording and replaying log data. */
@@ -156,7 +156,7 @@ public class Logger {
           }
         }
         if (!isValid) {
-          DriverStation.reportError(
+          DriverStationErrors.reportError(
               "The main robot class must inherit from LoggedRobot when using AdvantageKit. For more details, check the AdvantageKit installation documentation: https://docs.advantagekit.org/getting-started/installation\n\n*** EXITING DUE TO INVALID ADVANTAGEKIT INSTALLATION, SEE ABOVE. ***",
               false);
           System.exit(1);
@@ -167,7 +167,7 @@ public class Logger {
       if (replaySource != null) {
         String halSimEnv = System.getenv("HALSIM_EXTENSIONS");
         if (halSimEnv != null && halSimEnv.length() > 0) {
-          DriverStation.reportError(
+          DriverStationErrors.reportError(
               "All HAL simulation extensions must be disabled when running AdvantageKit replay, including the simulation GUI and DriverStation connection. Check the configuration in \"build.gradle\" and ensure that all checkboxes are disabled in the VSCode simulation popup.\n\n*** EXITING DUE TO INVALID SIMULATION CONFIGURATION, SEE ABOVE. ***",
               false);
           System.exit(1);
@@ -221,7 +221,7 @@ public class Logger {
         try {
           console.close();
         } catch (Exception e) {
-          DriverStation.reportError("[AdvantageKit] Failed to stop console capture.", true);
+          DriverStationErrors.reportError("[AdvantageKit] Failed to stop console capture.", true);
         }
       }
       if (replaySource != null) {
@@ -233,7 +233,8 @@ public class Logger {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      RobotController.setTimeSource(RobotController::getFPGATime);
+      RobotController.setTimeSource(RobotController::getMonotonicTime);
+      RobotController.getTime();
     }
   }
 
@@ -245,10 +246,10 @@ public class Logger {
     cycleCount++;
     if (running) {
       // Get next entry
-      long entryUpdateStart = RobotController.getFPGATime();
+      long entryUpdateStart = RobotController.getMonotonicTime();
       if (replaySource == null) {
         synchronized (entry) {
-          entry.setTimestamp(RobotController.getFPGATime());
+          entry.setTimestamp(RobotController.getMonotonicTime());
         }
       } else {
         if (!replaySource.updateTable(entry)) {
@@ -258,17 +259,17 @@ public class Logger {
       }
 
       // Update Driver Station
-      long dsStart = RobotController.getFPGATime();
+      long dsStart = RobotController.getMonotonicTime();
       if (hasReplaySource()) {
         LoggedDriverStation.replayFromLog(entry.getSubtable("DriverStation"));
       }
 
       // Update dashboard inputs
-      long dashboardInputsStart = RobotController.getFPGATime();
+      long dashboardInputsStart = RobotController.getMonotonicTime();
       for (int i = 0; i < dashboardInputs.size(); i++) {
         dashboardInputs.get(i).periodic();
       }
-      long dashboardInputsEnd = RobotController.getFPGATime();
+      long dashboardInputsEnd = RobotController.getMonotonicTime();
 
       // Record timing data
       recordOutput("Logger/EntryUpdateMS", (dsStart - entryUpdateStart) / 1000.0);
@@ -299,17 +300,17 @@ public class Logger {
     if (running) {
       // Capture conduit data
       ConduitApi conduit = ConduitApi.getInstance();
-      long conduitCaptureStart = RobotController.getFPGATime();
+      long conduitCaptureStart = RobotController.getMonotonicTime();
       conduit.captureData();
 
       // Update Driver Station
-      long dsStart = RobotController.getFPGATime();
+      long dsStart = RobotController.getMonotonicTime();
       if (!hasReplaySource()) {
         LoggedDriverStation.saveToLog(entry.getSubtable("DriverStation"));
       }
 
       // Save other conduit inputs
-      long conduitSaveStart = RobotController.getFPGATime();
+      long conduitSaveStart = RobotController.getMonotonicTime();
       if (!hasReplaySource()) {
         LoggedSystemStats.saveToLog(entry.getSubtable("SystemStats"));
         LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
@@ -340,16 +341,16 @@ public class Logger {
       }
 
       // Update automatic outputs from user code
-      long autoLogStart = RobotController.getFPGATime();
+      long autoLogStart = RobotController.getMonotonicTime();
       AutoLogOutputManager.periodic();
-      long alertLogStart = RobotController.getFPGATime();
+      long alertLogStart = RobotController.getMonotonicTime();
       AlertLogger.periodic();
-      long radioLogStart = RobotController.getFPGATime();
+      long radioLogStart = RobotController.getMonotonicTime();
       if (!hasReplaySource()) {
         RadioLogger.periodic(
             entry.getSubtable("RadioStatus"), entry.get("SystemStats/TeamNumber", -1));
       }
-      long consoleCaptureStart = RobotController.getFPGATime();
+      long consoleCaptureStart = RobotController.getMonotonicTime();
       if (enableConsole) {
         String consoleData = console.getNewData();
         if (extraConsoleData != null) {
@@ -359,7 +360,7 @@ public class Logger {
           recordOutput("Console", consoleData.trim());
         }
       }
-      long consoleCaptureEnd = RobotController.getFPGATime();
+      long consoleCaptureEnd = RobotController.getMonotonicTime();
 
       // Record timing data
       recordOutput("Logger/ConduitCaptureMS", (dsStart - conduitCaptureStart) / 1000.0);
@@ -387,7 +388,7 @@ public class Logger {
         receiverQueueFault = false;
       } catch (IllegalStateException exception) {
         receiverQueueFault = true;
-        DriverStation.reportError(
+        DriverStationErrors.reportError(
             "[AdvantageKit] Capacity of receiver queue exceeded, data will NOT be logged.", false);
       }
     }
@@ -460,7 +461,7 @@ public class Logger {
   public static long getTimestamp() {
     synchronized (entry) {
       if (!running || entry == null) {
-        return RobotController.getFPGATime();
+        return RobotController.getMonotonicTime();
       } else {
         return entry.getTimestamp();
       }
@@ -1131,7 +1132,7 @@ public class Logger {
    *     "/ReplayOutputs"
    * @param value The value of the field.
    */
-  public static <U extends Unit> void recordOutput(String key, Measure<U> value) {
+  public static <U extends Unit> void recordOutputMeasure(String key, Measure<U> value) {
     if (running && value != null) {
       // The measure overload of LogTable is intended primarily for input logging and
       // always uses the base unit. Calling the double overload ensures that the
@@ -1325,7 +1326,12 @@ public class Logger {
    *     "/ReplayOutputs"
    * @param value The value of the field.
    */
+  @SuppressWarnings("unchecked")
   public static <R extends Record> void recordOutput(String key, R value) {
+    if (value instanceof Measure<?> measure) {
+      recordOutputMeasure(key, (Measure<Unit>) measure);
+      return;
+    }
     if (running) {
       outputTable.put(key, value);
     }

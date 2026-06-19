@@ -7,16 +7,16 @@
 
 package org.littletonrobotics.junction.mechanism;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Translation3d;
 
 public class LoggedMechanism2dTest {
   private double DELTA = 0.001; // 0.1% or 1mm

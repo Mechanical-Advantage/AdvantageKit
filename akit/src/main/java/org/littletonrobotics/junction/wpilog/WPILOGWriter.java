@@ -7,11 +7,6 @@
 
 package org.littletonrobotics.junction.wpilog;
 
-import edu.wpi.first.datalog.DataLogWriter;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,6 +23,11 @@ import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
 import org.littletonrobotics.junction.Logger;
+import org.wpilib.datalog.DataLogWriter;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.system.RobotController;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
@@ -145,7 +145,7 @@ public class WPILOGWriter implements LogDataReceiver {
     try {
       log = new DataLogWriter(logPath, WPILOGConstants.extraHeader);
     } catch (IOException e) {
-      DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
+      DriverStationErrors.reportError("[AdvantageKit] Failed to open output log file.", true);
       return;
     }
     isOpen = true;
@@ -187,7 +187,8 @@ public class WPILOGWriter implements LogDataReceiver {
         writer.close();
         System.out.println("[AdvantageKit] Log sent to AdvantageScope.");
       } catch (Exception e) {
-        DriverStation.reportError("[AdvantageKit] Failed to send log to AdvantageScope.", false);
+        DriverStationErrors.reportError(
+            "[AdvantageKit] Failed to send log to AdvantageScope.", false);
       }
     }
   }
@@ -205,8 +206,8 @@ public class WPILOGWriter implements LogDataReceiver {
                 && table.get("SystemStats/EpochTimeValid", false))
             || RobotBase.isSimulation()) {
           if (dsAttachedTime == null) {
-            dsAttachedTime = RobotController.getFPGATime() / 1000000.0;
-          } else if (RobotController.getFPGATime() / 1000000.0 - dsAttachedTime
+            dsAttachedTime = RobotController.getMonotonicTime() / 1000000.0;
+          } else if (RobotController.getMonotonicTime() / 1000000.0 - dsAttachedTime
                   > timestampUpdateDelay
               || RobotBase.isSimulation()) {
             logDate = LocalDateTime.now();
@@ -220,28 +221,28 @@ public class WPILOGWriter implements LogDataReceiver {
       MatchType matchType;
       switch (table.get("DriverStation/MatchType", 0)) {
         case 1:
-          matchType = MatchType.Practice;
+          matchType = MatchType.PRACTICE;
           break;
         case 2:
-          matchType = MatchType.Qualification;
+          matchType = MatchType.QUALIFICATION;
           break;
         case 3:
-          matchType = MatchType.Elimination;
+          matchType = MatchType.ELIMINATION;
           break;
         default:
-          matchType = MatchType.None;
+          matchType = MatchType.NONE;
           break;
       }
-      if (logMatchText == null && matchType != MatchType.None) {
+      if (logMatchText == null && matchType != MatchType.NONE) {
         logMatchText = "";
         switch (matchType) {
-          case Practice:
+          case PRACTICE:
             logMatchText = "p";
             break;
-          case Qualification:
+          case QUALIFICATION:
             logMatchText = "q";
             break;
-          case Elimination:
+          case ELIMINATION:
             logMatchText = "e";
             break;
           default:

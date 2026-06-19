@@ -28,60 +28,71 @@ public final class DSData extends Struct {
   public void mutateAllianceStation(int alliance_station) { bb.putInt(bb_pos + 0, alliance_station); }
   public int eventName(int j) { return bb.get(bb_pos + 4 + j * 1); }
   public void mutateEventName(int j, int event_name) { bb.put(bb_pos + 4 + j * 1, (byte) event_name); }
-  public int gameSpecificMessageSize() { return bb.getShort(bb_pos + 68) & 0xFFFF; }
-  public void mutateGameSpecificMessageSize(int game_specific_message_size) { bb.putShort(bb_pos + 68, (short) game_specific_message_size); }
-  public int gameSpecificMessage(int j) { return bb.get(bb_pos + 70 + j * 1); }
-  public void mutateGameSpecificMessage(int j, int game_specific_message) { bb.put(bb_pos + 70 + j * 1, (byte) game_specific_message); }
-  public int matchNumber() { return bb.getShort(bb_pos + 134) & 0xFFFF; }
-  public void mutateMatchNumber(int match_number) { bb.putShort(bb_pos + 134, (short) match_number); }
-  public int replayNumber() { return bb.get(bb_pos + 136) & 0xFF; }
-  public void mutateReplayNumber(int replay_number) { bb.put(bb_pos + 136, (byte) replay_number); }
-  public int matchType() { return bb.getInt(bb_pos + 140); }
-  public void mutateMatchType(int match_type) { bb.putInt(bb_pos + 140, match_type); }
-  public int controlWord() { return bb.getInt(bb_pos + 144); }
-  public void mutateControlWord(int control_word) { bb.putInt(bb_pos + 144, control_word); }
-  public double matchTime() { return bb.getDouble(bb_pos + 152); }
-  public void mutateMatchTime(double match_time) { bb.putDouble(bb_pos + 152, match_time); }
+  public int gameData(int j) { return bb.get(bb_pos + 68 + j * 1); }
+  public void mutateGameData(int j, int game_data) { bb.put(bb_pos + 68 + j * 1, (byte) game_data); }
+  public int matchNumber() { return bb.getShort(bb_pos + 78) & 0xFFFF; }
+  public void mutateMatchNumber(int match_number) { bb.putShort(bb_pos + 78, (short) match_number); }
+  public int replayNumber() { return bb.get(bb_pos + 80) & 0xFF; }
+  public void mutateReplayNumber(int replay_number) { bb.put(bb_pos + 80, (byte) replay_number); }
+  public int matchType() { return bb.getInt(bb_pos + 84); }
+  public void mutateMatchType(int match_type) { bb.putInt(bb_pos + 84, match_type); }
+  public long controlWord() { return bb.getLong(bb_pos + 88); }
+  public void mutateControlWord(long control_word) { bb.putLong(bb_pos + 88, control_word); }
+  public double matchTime() { return bb.getDouble(bb_pos + 96); }
+  public void mutateMatchTime(double match_time) { bb.putDouble(bb_pos + 96, match_time); }
   public org.littletonrobotics.conduit.schema.Joystick joysticks(int j) { return joysticks(new org.littletonrobotics.conduit.schema.Joystick(), j); }
-  public org.littletonrobotics.conduit.schema.Joystick joysticks(org.littletonrobotics.conduit.schema.Joystick obj, int j) { return obj.__assign(bb_pos + 160 + j * 340, bb); }
+  public org.littletonrobotics.conduit.schema.Joystick joysticks(org.littletonrobotics.conduit.schema.Joystick obj, int j) { return obj.__assign(bb_pos + 104 + j * 424, bb); }
 
-  public static int createDSData(FlatBufferBuilder builder, int allianceStation, int[] eventName, int gameSpecificMessageSize, int[] gameSpecificMessage, int matchNumber, int replayNumber, int matchType, int controlWord, double matchTime, int[][] joysticks_name, int[] joysticks_type, short[] joysticks_axisCount, int[][] joysticks_axisTypes, float[][] joysticks_axisValues, int[] joysticks_buttonCount, int[] joysticks_buttons, short[] joysticks_povCount, int[][] joysticks_povValues, boolean[] joysticks_isGamepad) {
-    builder.prep(8, 2200);
+  public static int createDSData(FlatBufferBuilder builder, int allianceStation, int[] eventName, int[] gameData, int matchNumber, int replayNumber, int matchType, long controlWord, double matchTime, int[][] joysticks_name, int[] joysticks_type, int[] joysticks_supportedOutputs, int[] joysticks_axesAvailable, float[][] joysticks_axisValues, short[][] joysticks_axisRaw, long[] joysticks_buttonsAvailable, long[] joysticks_buttons, int[] joysticks_povsAvailable, int[][] joysticks_povValues, boolean[] joysticks_isGamepad, int[] joysticks_touchpadCount, int[][] joysticks_touchpads_fingerCount, int[][][] joysticks_touchpads_fingers_down, float[][][] joysticks_touchpads_fingers_x, float[][][] joysticks_touchpads_fingers_y) {
+    builder.prep(8, 2648);
     for (int _idx0 = 6; _idx0 > 0; _idx0--) {
-      builder.prep(4, 340);
+      builder.prep(8, 424);
+      builder.pad(4);
+      for (int _idx1 = 2; _idx1 > 0; _idx1--) {
+        builder.prep(4, 28);
+        for (int _idx2 = 2; _idx2 > 0; _idx2--) {
+          builder.prep(4, 12);
+          builder.putFloat(joysticks_touchpads_fingers_y[_idx0-1][_idx1-1][_idx2-1]);
+          builder.putFloat(joysticks_touchpads_fingers_x[_idx0-1][_idx1-1][_idx2-1]);
+          builder.pad(3);
+          builder.putByte((byte) joysticks_touchpads_fingers_down[_idx0-1][_idx1-1][_idx2-1]);
+        }
+        builder.pad(3);
+        builder.putByte((byte) joysticks_touchpads_fingerCount[_idx0-1][_idx1-1]);
+      }
       builder.pad(1);
+      builder.putByte((byte) joysticks_touchpadCount[_idx0-1]);
       builder.putBoolean(joysticks_isGamepad[_idx0-1]);
       for (int _idx1 = 8; _idx1 > 0; _idx1--) {
         builder.putByte((byte) joysticks_povValues[_idx0-1][_idx1-1]);
       }
-      builder.putShort(joysticks_povCount[_idx0-1]);
-      builder.putInt(joysticks_buttons[_idx0-1]);
-      builder.pad(3);
-      builder.putByte((byte) joysticks_buttonCount[_idx0-1]);
+      builder.putByte((byte) joysticks_povsAvailable[_idx0-1]);
+      builder.putLong(joysticks_buttons[_idx0-1]);
+      builder.putLong(joysticks_buttonsAvailable[_idx0-1]);
+      builder.pad(4);
+      for (int _idx1 = 12; _idx1 > 0; _idx1--) {
+        builder.putShort(joysticks_axisRaw[_idx0-1][_idx1-1]);
+      }
       for (int _idx1 = 12; _idx1 > 0; _idx1--) {
         builder.putFloat(joysticks_axisValues[_idx0-1][_idx1-1]);
       }
-      for (int _idx1 = 12; _idx1 > 0; _idx1--) {
-        builder.putByte((byte) joysticks_axisTypes[_idx0-1][_idx1-1]);
-      }
-      builder.putShort(joysticks_axisCount[_idx0-1]);
-      builder.pad(1);
+      builder.putShort((short) joysticks_axesAvailable[_idx0-1]);
+      builder.putByte((byte) joysticks_supportedOutputs[_idx0-1]);
       builder.putByte((byte) joysticks_type[_idx0-1]);
       for (int _idx1 = 256; _idx1 > 0; _idx1--) {
         builder.putByte((byte) joysticks_name[_idx0-1][_idx1-1]);
       }
     }
     builder.putDouble(matchTime);
-    builder.pad(4);
-    builder.putInt(controlWord);
+    builder.putLong(controlWord);
     builder.putInt(matchType);
     builder.pad(3);
     builder.putByte((byte) replayNumber);
     builder.putShort((short) matchNumber);
-    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
-      builder.putByte((byte) gameSpecificMessage[_idx0-1]);
+    builder.pad(1);
+    for (int _idx0 = 9; _idx0 > 0; _idx0--) {
+      builder.putByte((byte) gameData[_idx0-1]);
     }
-    builder.putShort((short) gameSpecificMessageSize);
     for (int _idx0 = 64; _idx0 > 0; _idx0--) {
       builder.putByte((byte) eventName[_idx0-1]);
     }

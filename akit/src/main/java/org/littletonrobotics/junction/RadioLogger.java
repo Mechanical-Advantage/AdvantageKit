@@ -7,8 +7,6 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotBase;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -17,6 +15,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import org.littletonrobotics.junction.LogTable.LogValue;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.system.Notifier;
 
 class RadioLogger {
   private static final double requestPeriodSecs = 5.0;

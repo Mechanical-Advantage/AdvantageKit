@@ -5,41 +5,70 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.littletonrobotics.junction.autolog;
+package org.littletonrobotics.junction;
 
-import static edu.wpi.first.units.Units.Rotations;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.units.Units.Rotations;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.MutAngle;
 import org.junit.jupiter.api.Test;
-import org.littletonrobotics.junction.LogTable;
+import org.wpilib.units.measure.Angle;
 
 /*
  * Units tests for testing storing/retrieving entries in a log table.
  */
 public class LogTableTest {
+  private static record TestRecord(int x, double y) {}
+
   @Test
-  public void TestMeasure() {
+  public void TestMeasureExplicit() {
     LogTable table = new LogTable(0);
 
-    Angle angle = Rotations.of(0.1);
-    table.put("MutableAngle", angle);
+    // 1. Test putMeasure and getMeasure explicitly
+    Angle angle = Rotations.of(0.15);
+    table.putMeasure("AngleExplicit", angle);
 
     Angle defaultAngle = Rotations.of(0.2);
-    Angle restoredAngle = table.get("MutableAngle", defaultAngle);
+    Angle restoredAngle = table.getMeasure("AngleExplicit", defaultAngle);
     assertTrue(restoredAngle.isEquivalent(angle));
+
+    // Verify stored type and value
+    assertEquals(angle.baseUnitMagnitude(), table.get("AngleExplicit").getDouble());
+    assertEquals(angle.baseUnit().name(), table.get("AngleExplicit").unitStr);
   }
 
   @Test
-  public void TestMutableMeasure() {
+  public void TestMeasureRecordPassthrough() {
     LogTable table = new LogTable(0);
 
-    MutAngle mutAngle = Rotations.mutable(0.1);
-    table.put("Angle", mutAngle);
+    // 2. Test put and get delegation on Angle record-measures
+    Angle angle = Rotations.of(0.1);
+    table.put("AngleRecord", angle); // Calls put(String, R extends Record)
 
-    MutAngle defaultMutAngle = Rotations.mutable(0.2);
-    MutAngle restoredMutAngle = table.get("Angle", defaultMutAngle);
-    assertTrue(restoredMutAngle.isEquivalent(mutAngle));
+    Angle defaultAngle = Rotations.of(0.2);
+    Angle restoredAngle =
+        table.get("AngleRecord", defaultAngle); // Calls get(String, R extends Record)
+    assertTrue(restoredAngle.isEquivalent(angle));
+
+    // Verify that the delegation redirected it to a measure instead of a struct
+    assertEquals(angle.baseUnitMagnitude(), table.get("AngleRecord").getDouble());
+    assertEquals(angle.baseUnit().name(), table.get("AngleRecord").unitStr);
+    assertTrue(table.get("AngleRecord").customTypeStr == null);
+  }
+
+  @Test
+  public void TestStandardRecord() {
+    LogTable table = new LogTable(0);
+
+    // 3. Test standard records (not measures)
+    TestRecord rec = new TestRecord(42, 3.14);
+    table.put("NormalRecord", rec);
+
+    TestRecord defaultRec = new TestRecord(0, 0.0);
+    TestRecord restoredRec = table.get("NormalRecord", defaultRec);
+    assertEquals(rec, restoredRec);
+
+    // Verify that it is stored as a struct
+    assertTrue(table.get("NormalRecord").customTypeStr.startsWith("struct:"));
   }
 }

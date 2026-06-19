@@ -7,18 +7,18 @@
 
 package org.littletonrobotics.junction.mechanism;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.DoubleEntry;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.StringEntry;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import org.littletonrobotics.junction.LogTable;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.networktables.DoubleEntry;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.StringEntry;
+import org.wpilib.networktables.StringPublisher;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.util.Color8Bit;
 
 /**
  * Ligament node on a Mechanism2d. A ligament can have its length changed (like an elevator) or

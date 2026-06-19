@@ -7,17 +7,6 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.util.WPISerializable;
-import edu.wpi.first.util.protobuf.Protobuf;
-import edu.wpi.first.util.protobuf.ProtobufBuffer;
-import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.struct.StructBuffer;
-import edu.wpi.first.util.struct.StructSerializable;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.util.Color;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -30,8 +19,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.units.Measure;
+import org.wpilib.units.Unit;
+import org.wpilib.util.Color;
+import org.wpilib.util.Color8Bit;
+import org.wpilib.util.WPISerializable;
+import org.wpilib.util.protobuf.Protobuf;
+import org.wpilib.util.protobuf.ProtobufBuffer;
+import org.wpilib.util.struct.Struct;
+import org.wpilib.util.struct.StructBuffer;
+import org.wpilib.util.struct.StructSerializable;
 import us.hebi.quickbuf.ProtoMessage;
 
 /** A table of logged data in allowable types. Can reference another higher level table. */
@@ -191,7 +190,7 @@ public class LogTable {
       return true;
     }
     if (!currentValue.type.equals(type)) {
-      DriverStation.reportWarning(
+      DriverStationErrors.reportWarning(
           "[AdvantageKit] Failed to write to field \""
               + prefix
               + key
@@ -204,7 +203,7 @@ public class LogTable {
     }
     if (currentValue.customTypeStr != customTypeStr
         && !currentValue.customTypeStr.equals(customTypeStr)) {
-      DriverStation.reportWarning(
+      DriverStationErrors.reportWarning(
           "[AdvantageKit] Failed to write to field \""
               + prefix
               + key
@@ -574,7 +573,7 @@ public class LogTable {
    * @param key The field name.
    * @param value The field value.
    */
-  public <U extends Unit> void put(String key, Measure<U> value) {
+  public <U extends Unit> void putMeasure(String key, Measure<U> value) {
     if (value == null) return;
     put(key, new LogValue(value.baseUnitMagnitude(), null, value.baseUnit().name()));
   }
@@ -600,7 +599,7 @@ public class LogTable {
   public <T extends LoggableInputs> void put(String key, T value) {
     if (value == null) return;
     if (this.depth > 100) {
-      DriverStation.reportWarning(
+      DriverStationErrors.reportWarning(
           "[AdvantageKit] Detected recursive table structure when logging value to field \""
               + prefix
               + key
@@ -787,7 +786,7 @@ public class LogTable {
       if (proto != null) {
         put(key, proto, value);
       } else {
-        DriverStation.reportError(
+        DriverStationErrors.reportError(
             "[AdvantageKit] Auto serialization is not supported for type "
                 + value.getClass().getSimpleName(),
             false);
@@ -811,7 +810,7 @@ public class LogTable {
     if (struct != null) {
       put(key, struct, value);
     } else {
-      DriverStation.reportError(
+      DriverStationErrors.reportError(
           "[AdvantageKit] Auto serialization is not supported for array type "
               + value.getClass().getComponentType().getSimpleName(),
           false);
@@ -851,6 +850,10 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> void put(String key, R value) {
+    if (value instanceof Measure<?> measure) {
+      putMeasure(key, (Measure<Unit>) measure);
+      return;
+    }
     if (value == null) return;
     Struct<R> struct = (Struct<R>) findRecordStructType(value.getClass());
     if (struct != null) {
@@ -1317,35 +1320,12 @@ public class LogTable {
    * @return The field value.
    */
   @SuppressWarnings("unchecked")
-  public <U extends Unit, M extends Measure<U>> M get(String key, M defaultValue) {
+  public <U extends Unit, M extends Measure<U>> M getMeasure(String key, M defaultValue) {
     if (data.containsKey(prefix + key)) {
       double value = get(key).getDouble(defaultValue.baseUnitMagnitude());
       return (M) defaultValue.unit().ofBaseUnits(value);
     } else {
       return defaultValue;
-    }
-  }
-
-  /**
-   * Reads a MutableMeasure value from the table.
-   *
-   * <p>Unlike other "get" methods, this method mutates the provided value instead of returning a
-   * new instance. The object returned from this method is the same instance as the provided value.
-   *
-   * @param <U> The unit type.
-   * @param <Base> The base unit type
-   * @param <M> The measure type.
-   * @param key The field name.
-   * @param value The field value, to be mutated.
-   * @return The field value.
-   */
-  public <U extends Unit, Base extends Measure<U>, M extends MutableMeasure<U, Base, M>> M get(
-      String key, M value) {
-    if (data.containsKey(prefix + key)) {
-      double baseValue = get(key).getDouble(value.baseUnitMagnitude());
-      return value.mut_setBaseUnitMagnitude(baseValue);
-    } else {
-      return value;
     }
   }
 
@@ -1358,7 +1338,7 @@ public class LogTable {
    */
   public Color get(String key, Color defaultValue) {
     if (data.containsKey(prefix + key)) {
-      return new Color(get(key).getString(defaultValue.toHexString()));
+      return new Color(new Color8Bit(get(key).getString(defaultValue.toHexString())));
     } else {
       return defaultValue;
     }
@@ -1563,6 +1543,9 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> R get(String key, R defaultValue) {
+    if (defaultValue instanceof Measure<?> measure) {
+      return (R) getMeasure(key, (Measure<?>) measure);
+    }
     if (data.containsKey(prefix + key)) {
       String typeString = data.get(prefix + key).customTypeStr;
       if (typeString.startsWith("struct:")) {

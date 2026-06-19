@@ -7,21 +7,21 @@
 
 package org.littletonrobotics.junction.mechanism;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.Radians;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.units.measure.Distance;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.littletonrobotics.junction.LogTable;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.networktables.DoublePublisher;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.units.measure.Distance;
 
 /**
  * Root Mechanism2d node.
@@ -29,7 +29,7 @@ import org.littletonrobotics.junction.LogTable;
  * <p>A root is the anchor point of other nodes (such as ligaments).
  *
  * <p>Do not create objects of this class directly! Obtain instances from the {@link
- * edu.wpi.first.wpilibj.smartdashboard.Mechanism2d#getRoot(String, double, double)} factory method.
+ * org.wpilib.smartdashboard.Mechanism2d#getRoot(String, double, double)} factory method.
  *
  * <p>Append other nodes by using {@link #append(LoggedMechanismObject2d)}.
  */

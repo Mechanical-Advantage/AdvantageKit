@@ -23,12 +23,9 @@
         "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release",
         "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
       }
-    },
-    null
+    }
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
-  "spotlessGradle.format.enable": true,
-  "spotlessGradle.diagnostics.enable": false,
   "java.import.gradle.annotationProcessing.enabled": false,
   "java.completion.favoriteStaticMembers": [
     "org.junit.Assert.*",
@@ -40,7 +37,7 @@
     "org.mockito.Mockito.*",
     "org.mockito.ArgumentMatchers.*",
     "org.mockito.Answers.*",
-    "edu.wpi.first.units.Units.*"
+    "org.wpilib.units.Units.*"
   ],
   "java.completion.filteredTypes": [
     "java.awt.*",
@@ -56,9 +53,9 @@
     "javax.swing.*",
     "javax.management.*",
     "javax.smartcardio.*",
-    "edu.wpi.first.math.proto.*",
-    "edu.wpi.first.math.**.proto.*",
-    "edu.wpi.first.math.**.struct.*"
+    "org.wpilib.math.proto.*",
+    "org.wpilib.math.**.proto.*",
+    "org.wpilib.math.**.struct.*"
   ],
   "java.dependency.enableDependencyCheckup": false,
   "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle",

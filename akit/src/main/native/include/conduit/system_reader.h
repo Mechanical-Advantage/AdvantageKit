@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/DoubleArrayTopic.h>
-#include <networktables/DoubleTopic.h>
-#include <networktables/IntegerTopic.h>
+#include <wpi/nt/BooleanTopic.hpp>
+#include <wpi/nt/DoubleArrayTopic.hpp>
+#include <wpi/nt/DoubleTopic.hpp>
+#include <wpi/nt/IntegerTopic.hpp>
 
 #include "conduit_schema_generated.h"
 using namespace org::littletonrobotics::conduit;
@@ -29,30 +29,45 @@ private:
 			org::littletonrobotics::conduit::schema::NetworkStatus &status,
 			std::vector<double> values);
 
-	nt::BooleanSubscriber watchdog_active_sub;
-	nt::IntegerSubscriber io_frequency_sub;
-	nt::IntegerSubscriber team_number_sub;
-	nt::BooleanSubscriber epoch_time_valid_sub;
+	wpi::nt::BooleanSubscriber watchdog_active_sub;
+	wpi::nt::IntegerSubscriber io_frequency_sub;
+	wpi::nt::IntegerSubscriber io_rx_frequency_sub;
+	wpi::nt::IntegerSubscriber team_number_sub;
+	wpi::nt::BooleanSubscriber epoch_time_valid_sub;
 
-	nt::DoubleArraySubscriber network_ethernet_sub;
-	nt::DoubleArraySubscriber network_wifi_sub;
-	nt::DoubleArraySubscriber network_usb0_sub;
-	nt::DoubleArraySubscriber network_usb1_sub;
-	nt::DoubleArraySubscriber network_can_subs[NUM_CAN_BUSES];
-	nt::DoubleArraySubscriber network_can_info_sub;
+	wpi::nt::IntegerSubscriber fault_brownout_sub;
+	wpi::nt::IntegerSubscriber fault_canbus_down_sub;
+	wpi::nt::IntegerSubscriber fault_canbus_unavail_sub;
+	wpi::nt::IntegerSubscriber fault_display_sub;
+	wpi::nt::IntegerSubscriber fault_imu_sub;
+	wpi::nt::IntegerSubscriber fault_io_sub;
+	wpi::nt::IntegerSubscriber fault_rsl_sub;
+	wpi::nt::IntegerSubscriber fault_usb_sub;
 
-	nt::DoubleSubscriber cpu_percent_sub;
-	nt::DoubleSubscriber cpu_temp_sub;
+	wpi::nt::IntegerSubscriber fault_count_brownout_sub;
+	wpi::nt::IntegerSubscriber fault_count_canbus_down_sub;
+	wpi::nt::IntegerSubscriber fault_count_canbus_unavail_sub;
+	wpi::nt::IntegerSubscriber fault_count_display_sub;
+	wpi::nt::IntegerSubscriber fault_count_imu_sub;
+	wpi::nt::IntegerSubscriber fault_count_io_sub;
+	wpi::nt::IntegerSubscriber fault_count_rsl_sub;
+	wpi::nt::IntegerSubscriber fault_count_usb_sub;
 
-	nt::IntegerSubscriber memory_usage_bytes_sub;
-	nt::IntegerSubscriber memory_total_bytes_sub;
-	nt::DoubleSubscriber memory_percent_sub;
+	wpi::nt::DoubleArraySubscriber network_ethernet_sub;
+	wpi::nt::DoubleArraySubscriber network_wifi_sub;
+	wpi::nt::DoubleArraySubscriber network_usb0_sub;
+	wpi::nt::DoubleArraySubscriber network_usb1_sub;
+	wpi::nt::DoubleArraySubscriber network_can_subs[NUM_CAN_BUSES];
+	wpi::nt::DoubleArraySubscriber network_can_info_sub;
 
-	nt::IntegerSubscriber storage_usage_bytes_sub;
-	nt::IntegerSubscriber storage_total_bytes_sub;
-	nt::DoubleSubscriber storage_percent_sub;
+	wpi::nt::DoubleSubscriber cpu_percent_sub;
+	wpi::nt::DoubleSubscriber cpu_temp_sub;
 
-	nt::DoubleArraySubscriber imu_euler_flat_sub;
-	nt::DoubleArraySubscriber imu_euler_landscape_sub;
-	nt::DoubleArraySubscriber imu_euler_portrait_sub;
+	wpi::nt::IntegerSubscriber memory_usage_bytes_sub;
+	wpi::nt::IntegerSubscriber memory_total_bytes_sub;
+	wpi::nt::DoubleSubscriber memory_percent_sub;
+
+	wpi::nt::IntegerSubscriber storage_usage_bytes_sub;
+	wpi::nt::IntegerSubscriber storage_total_bytes_sub;
+	wpi::nt::DoubleSubscriber storage_percent_sub;
 };
