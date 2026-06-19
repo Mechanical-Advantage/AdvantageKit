@@ -49,7 +49,7 @@ void SystemReader::start() {
 	fault_canbus_down_sub =
 			faults_table->GetIntegerTopic("canbus_down").Subscribe(0);
 	fault_canbus_unavail_sub =
-			faults_table->GetIntegerTopic("canbusu_navail").Subscribe(0);
+			faults_table->GetIntegerTopic("canbus_unavail").Subscribe(0);
 	fault_display_sub = faults_table->GetIntegerTopic("display").Subscribe(0);
 	fault_imu_sub = faults_table->GetIntegerTopic("imu").Subscribe(0);
 	fault_io_sub = faults_table->GetIntegerTopic("io").Subscribe(0);
@@ -62,7 +62,7 @@ void SystemReader::start() {
 	fault_count_canbus_down_sub = fault_counts_table->GetIntegerTopic(
 			"canbus_down").Subscribe(0);
 	fault_count_canbus_unavail_sub = fault_counts_table->GetIntegerTopic(
-			"canbusu_navail").Subscribe(0);
+			"canbus_unavail").Subscribe(0);
 	fault_count_display_sub =
 			fault_counts_table->GetIntegerTopic("display").Subscribe(0);
 	fault_count_imu_sub = fault_counts_table->GetIntegerTopic("imu").Subscribe(
