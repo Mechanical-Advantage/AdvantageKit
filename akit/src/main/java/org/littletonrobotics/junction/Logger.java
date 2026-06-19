@@ -344,7 +344,7 @@ public class Logger {
       long autoLogStart = RobotController.getMonotonicTime();
       AutoLogOutputManager.periodic();
       long alertLogStart = RobotController.getMonotonicTime();
-      LoggedAlert.periodic();
+      AlertLogger.periodic();
       long radioLogStart = RobotController.getMonotonicTime();
       if (!hasReplaySource()) {
         RadioLogger.periodic(
