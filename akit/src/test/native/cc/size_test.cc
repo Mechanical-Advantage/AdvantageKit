@@ -61,7 +61,7 @@ TEST(SizeTests, JoystickSizes) {
 			sizeof(decltype(joystick.supported_outputs())));
 
 	ASSERT_EQ(sizeof(HAL_JoystickAxes::available),
-			sizeof(decltype(joystick.axis_count())));
+			sizeof(decltype(joystick.axes_available())));
 
 	ASSERT_EQ(HAL_MAX_JOYSTICK_AXES, joystick.axis_values()->size());
 	ASSERT_EQ(sizeof(HAL_JoystickAxes::axes[0]),
@@ -78,7 +78,7 @@ TEST(SizeTests, JoystickSizes) {
 			sizeof(decltype(joystick.buttons())));
 
 	ASSERT_EQ(sizeof(HAL_JoystickPOVs::available),
-			sizeof(decltype(joystick.pov_count())));
+			sizeof(decltype(joystick.povs_available())));
 
 	ASSERT_EQ(HAL_MAX_JOYSTICK_POVS, joystick.pov_values()->size());
 
