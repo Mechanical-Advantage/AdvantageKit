@@ -11,14 +11,14 @@
 #include <wpi/hal/DriverStation.h>
 #include <wpi/hal/HAL.h>
 #include <wpi/hal/PowerDistribution.h>
-#include <wpi/util/StackTrace.hpp>
-#include <wpi/util/jni_util.hpp>
 
 #include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <mutex>
+#include <wpi/util/StackTrace.hpp>
+#include <wpi/util/jni_util.hpp>
 
 using namespace std::chrono_literals;
 
@@ -27,7 +27,7 @@ using namespace std::chrono_literals;
 void PDPReader::configure(JNIEnv *env, jint bus, jint module, jint type,
 		schema::PDPData *pdp_buf) {
 	int32_t status = 0;
-	auto stack = wpi::util::java::GetJavaStackTrace(env, "edu.wpi.first");
+	auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
 	pd_handle = HAL_InitializePowerDistribution(bus, module,
 			static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
 			&status);
