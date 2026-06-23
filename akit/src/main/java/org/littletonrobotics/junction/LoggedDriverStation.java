@@ -29,7 +29,7 @@ class LoggedDriverStation {
     table.put("MatchNumber", conduit.getMatchNumber());
     table.put("ReplayNumber", conduit.getReplayNumber());
     table.put("MatchType", conduit.getMatchType());
-    table.put("MatchTime", conduit.getMatchTime());
+    table.put("MatchTime", conduit.getMatchTime(), "seconds");
 
     long controlWord = conduit.getControlWord();
     long opModeId =
