@@ -7,7 +7,7 @@
 
 package first.robot;
 
-import org.wpilib.wpilibj.RobotBase;
+import org.wpilib.framework.RobotBase;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running

@@ -16,7 +16,7 @@ VENDORDEPS=(
     "Studica PathplannerLib Phoenix6 REVLib URCL WPILibNewCommands" # spark_swerve
     "Studica PathplannerLib Phoenix6 WPILibNewCommands" # talonfx_swerve
     "photonlib WPILibNewCommands" # vision
-    "WPILibNewCommands" # skeleton
+    "" # skeleton
 )
 
 # Clear old projects
