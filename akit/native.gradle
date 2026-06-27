@@ -36,6 +36,8 @@ model {
             if (it.targetPlatform.operatingSystem.macOsX) {
                 it.cppCompiler.args "-Wno-unknown-warning-option"
                 it.cppCompiler.args "-Wno-character-conversion"
+            } else if (it.targetPlatform.operatingSystem.linux) {
+                it.cppCompiler.args "-Wno-maybe-uninitialized"
             }
         }
     }
