@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package org.littletonrobotics.junction.console;
+package org.littletonrobotics.junction.schema;
 
 option java_outer_classname = "ProtobufConsoleDataDescriptor";
 

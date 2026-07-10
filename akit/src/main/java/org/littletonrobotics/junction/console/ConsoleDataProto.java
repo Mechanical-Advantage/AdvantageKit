@@ -7,6 +7,7 @@
 
 package org.littletonrobotics.junction.console;
 
+import org.littletonrobotics.junction.schema.ProtobufConsoleData;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
