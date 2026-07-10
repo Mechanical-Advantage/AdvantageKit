@@ -58,8 +58,6 @@ public class Logger {
   private static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
   private static boolean receiverQueueFault = false;
 
-  private static record ConsoleData(String data, int index) {}
-
   private Logger() {}
 
   /**
@@ -360,9 +358,8 @@ public class Logger {
           consoleData += extraConsoleData;
         }
         if (!consoleData.isEmpty()) {
-          recordOutput("Console", consoleData.trim());
-          recordOutput("NewConsole", new ConsoleData(consoleData.trim(), consoleIndex));
-          consoleIndex++;
+          recordOutput("Console/Data", consoleData.trim());
+          recordOutput("Console/Index", consoleIndex++);
         }
       }
       long consoleCaptureEnd = RobotController.getMonotonicTime();
