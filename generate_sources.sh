@@ -15,6 +15,5 @@ flatc --gen-compare --no-includes --gen-mutable --reflect-names --cpp-ptr-type f
 flatc --gen-compare --no-includes --gen-mutable --reflect-names \
       -o akit/src/main/generated/java --java akit/src/main/fbs/conduit_schema.fbs
 
-protoc -I=akit/src/main --java_out=akit/src/main/generated/java akit/src/main/proto/console_data.proto
-
-protoc --plugin-protoc-gen-quickbuf=$1 --quickbuf_out=gen_descriptors=true: akit/src/main/proto/console_data.proto
+protoc --plugin=protoc-gen-quickbuf=$1 --quickbuf_out=gen_descriptors=true:akit/src/main/generated/java \
+      -I=akit/src/main/proto akit/src/main/proto/console_data.proto

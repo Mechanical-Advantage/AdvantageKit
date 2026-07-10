@@ -2,9 +2,11 @@ syntax = "proto3";
 
 package org.littletonrobotics.junction.console;
 
-option java_outer_classname = "ProtobufConsoleData";
+option java_outer_classname = "ProtobufConsoleDataDescriptor";
 
-message ConsoleData {
+option java_multiple_files = true;
+
+message ProtobufConsoleData {
   string data = 1;
   uint32 index = 2;
 }
