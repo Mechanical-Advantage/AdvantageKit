@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.littletonrobotics.junction;
+package org.littletonrobotics.junction.console;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

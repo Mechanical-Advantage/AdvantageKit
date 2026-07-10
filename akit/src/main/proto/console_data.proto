@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package org.littletonrobotics.junction.console;
+
+option java_outer_classname = "ProtobufConsoleData";
+
+message ConsoleData {
+  string data = 1;
+  uint32 index = 2;
+}

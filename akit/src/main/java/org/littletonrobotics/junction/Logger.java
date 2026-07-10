@@ -21,6 +21,7 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable.LogValue;
+import org.littletonrobotics.junction.console.ConsoleSource;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
@@ -358,8 +359,8 @@ public class Logger {
           consoleData += extraConsoleData;
         }
         if (!consoleData.isEmpty()) {
-          recordOutput("Console/Data", consoleData.trim());
-          recordOutput("Console/Index", consoleIndex++);
+          recordOutput("Console", consoleData.trim());
+          consoleIndex++;
         }
       }
       long consoleCaptureEnd = RobotController.getMonotonicTime();
