@@ -1,0 +1,12 @@
+[submodule "akit/magic_enum"]
+	path = akit/magic_enum
+	url = https://github.com/Neargye/magic_enum.git
+[submodule "akit/httplib"]
+	path = akit/httplib
+	url = https://github.com/yhirose/cpp-httplib
+[submodule "akit/concurrentqueue"]
+	path = akit/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue
+[submodule "akit/readerwriterqueue"]
+	path = akit/readerwriterqueue
+	url = https://github.com/cameron314/readerwriterqueue
