@@ -10,11 +10,11 @@
 using namespace akit;
 
 ReceiverThread::ReceiverThread(
-		moodycamel::BlockingConcurrentQueue<LogTable> &queue) : queue { queue } {
+		moodycamel::BlockingReaderWriterCircularBuffer<LogTable> &queue) : queue { queue } {
 }
 
 void ReceiverThread::Start() {
-	thread = std::make_unique < std::thread > (&ReceiverThread::Run, this);
+	thread = std::make_unique < std::jthread > ([this](std::stop_token stopToken) { Run(stopToken); });
 }
 
 void ReceiverThread::End() {
@@ -28,18 +28,17 @@ void ReceiverThread::AddDataReceiver(
 	dataReceivers.emplace_back(std::move(receiver));
 }
 
-void ReceiverThread::Run() {
+void ReceiverThread::Run(std::stop_token stopToken) {
 	for (auto &receiver : dataReceivers)
 		receiver->Start();
 
-	while (running) {
-		std::optional < LogTable > entry;
-		queue.wait_dequeue(entry);
-
-		for (auto &receiver : dataReceivers)
-			receiver->PutTable(*entry);
+	std::optional<LogTable> entry;
+	while (!stopToken.stop_requested()) {
+		if (queue.wait_dequeue_timed(entry, std::chrono::milliseconds{100}))
+			for (auto &receiver : dataReceivers)
+				receiver->PutTable(*entry);
 	}
-	std::optional < LogTable > entry;
+
 	while (queue.try_dequeue(entry)) {
 		for (auto &receiver : dataReceivers)
 			receiver->PutTable(*entry);

@@ -7,7 +7,7 @@
 
 #include <queue>
 #include <thread>
-#include <blockingconcurrentqueue.h>
+#include <readerwritercircularbuffer.h>
 #include "akit/LogTable.h"
 #include "akit/LogDataReceiver.h"
 
@@ -16,16 +16,16 @@ namespace akit {
 class ReceiverThread {
 public:
 	void AddDataReceiver(std::unique_ptr<LogDataReceiver> receiver);
-	ReceiverThread(moodycamel::BlockingConcurrentQueue<LogTable> &queue);
+	ReceiverThread(moodycamel::BlockingReaderWriterCircularBuffer<LogTable> &queue);
 	void Start();
 	void End();
 
 private:
-	void Run();
+	void Run(std::stop_token);
 
 	std::atomic<bool> running = true;
-	std::unique_ptr<std::thread> thread;
-	moodycamel::BlockingConcurrentQueue<LogTable> &queue;
+	std::unique_ptr<std::jthread> thread;
+	moodycamel::BlockingReaderWriterCircularBuffer<LogTable> &queue;
 	std::vector<std::unique_ptr<LogDataReceiver>> dataReceivers;
 };
 

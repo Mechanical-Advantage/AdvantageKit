@@ -90,7 +90,7 @@ private:
 	static bool checkRobotBase;
 
 	static std::unique_ptr<LogReplaySource> replaySource;
-	static moodycamel::BlockingConcurrentQueue<LogTable> receiverQueue;
+	static moodycamel::BlockingReaderWriterCircularBuffer<LogTable> receiverQueue;
 	static ReceiverThread receiverThread;
 	static bool receiverQueueFault;
 };
