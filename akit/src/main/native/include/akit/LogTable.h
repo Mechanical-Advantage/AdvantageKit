@@ -138,11 +138,6 @@ public:
 	}
 
 	template<typename T>
-	inline void Put(std::string key, std::vector<T> value) {
-		Put(key, LogValue { value, "" });
-	}
-
-	template<typename T>
 	void Put(std::string key, std::vector<std::vector<T>> value) {
 		Put(key + "/length", static_cast<long>(value.size()));
 		for (size_t i = 0; i < value.size(); i++)
@@ -197,28 +192,26 @@ public:
 	}
 
 	template <typename T>
-	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	void Put(std::string key, T value) {
-		AddStructSchema<T>();
-		std::array<std::byte, wpi::GetStructSize<T>()> buffer;
-		wpi::PackStruct < T > (buffer);
-		Put(key, LogValue {buffer, wpi::GetStructTypeString<T>()});
-	}
+        requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
+    void Put(std::string key, T value) {
+        AddStructSchema<T>();
+        std::array<uint8_t, wpi::GetStructSize<T>()> buffer;
+        wpi::PackStruct(buffer, std::move(value));
+        std::span<const std::byte> bytes = std::as_bytes(std::span{buffer});
+        Put(key, LogValue{std::vector<std::byte>{bytes.begin(), bytes.end()}, wpi::GetStructTypeString<T>()});
+    }
 
 	template <typename T>
-	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	void Put(std::string key, std::initializer_list<T> values) {
-		AddStructSchema<T>();
-		std::vector < std::byte
-		> buffer {values.size() * wpi::GetStructSize<T>()};
-		int i = 0;
-		for (const T &value : values)
-		wpi::PackStruct(
-				std::span < std::byte
-				> (buffer).subspan(i++ * wpi::GetStructSize<T>()),
-				value);
-		Put(key, LogValue {buffer, wpi::GetStructTypeString<T>() + "[]"});
-	}
+        requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
+    void Put(std::string key, std::vector<T> values) {
+        AddStructSchema<T>();
+        std::vector<uint8_t> buffer(values.size() * wpi::GetStructSize<T>());
+        std::span<uint8_t> span{buffer};
+        for (size_t i = 0; i < values.size(); i++)
+            wpi::PackStruct(span.subspan(i * wpi::GetStructSize<T>()), values[i]);
+        std::span<const std::byte> bytes = std::as_bytes(span);
+        Put(key, LogValue{std::vector<std::byte>{bytes.begin(), bytes.end()}, wpi::GetStructTypeString<T>() + "[]"});
+    }
 
 	inline LogValue Get(std::string key) {
 		return data->at(prefix + key);
@@ -350,23 +343,19 @@ private:
 			std::string customTypeStr);
 
 	template <typename T>
-	requires wpi::StructSerializable<T> && (!std::is_arithmetic_v<T>)
-	void AddStructSchema() {
-		std::string typeString = wpi::GetStructTypeString<T>();
-		std::string key = "/.schema/" + typeString;
+    void AddStructSchema() {
+        std::string typeString = wpi::GetStructTypeString<T>();
+        std::string key = "/.schema/" + typeString;
 
-		if (data->contains(key))
-		return;
-		std::unordered_set < std::string > seen;
-		seen.insert(typeString);
+        if (data->contains(key))
+            return;
+        std::span<const std::byte> schema = std::as_bytes(wpi::GetStructSchemaBytes<T>());
+        data->emplace(key, LogValue{std::vector<std::byte>{schema.begin(), schema.end()}, "structschema"});
+        wpi::ForEachStructSchema<T>(
+            [this](std::string_view typeString, std::string_view schema) { AddStructSchema(std::string{typeString}, std::string{schema}); });
+    }
 
-		data->emplace(key, LogValue {wpi::GetStructSchemaBytes<T>(),
-					"structschema"});
-		wpi::ForEachStructSchema([&](std::string_view typeString, std::string_view schema) {AddStructSchema(std::string {typeString}, std::string {schema}, seen);});
-	}
-
-	void AddStructSchema(std::string typeString, std::string schema,
-			std::unordered_set<std::string> &seen);
+    void AddStructSchema(std::string typeString, std::string schema);
 
 	std::string prefix;
 	int depth;

@@ -191,20 +191,13 @@ void LogTable::Put(std::string key, LogTable::LogValue value) {
 		data->insert_or_assign(prefix + key, value);
 }
 
-void LogTable::AddStructSchema(std::string typeString, std::string schema,
-		std::unordered_set<std::string> &seen) {
-	std::string key = "/.schema/" + typeString;
+void LogTable::AddStructSchema(std::string typeString, std::string schema) {
+    std::string key = "/.schema/" + typeString;
+    if (data->contains(key))
+        return;
 
-	if (data->contains(key))
-		return;
-	seen.insert(typeString);
-
-	data->emplace(key,
-			LogValue {
-					std::vector<std::byte> {
-							reinterpret_cast<std::byte*>(schema.data()),
-							reinterpret_cast<std::byte*>(schema.data())
-									+ schema.size() }, "" });
+    std::span<const std::byte> schemaBytes = std::as_bytes(std::span{schema});
+    data->emplace(key, LogValue{std::vector<std::byte>{schemaBytes.begin(), schemaBytes.end()}, "structschema"});
 }
 
 std::vector<std::byte> LogTable::Get(std::string key,

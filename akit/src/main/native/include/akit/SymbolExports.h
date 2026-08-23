@@ -5,5 +5,5 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-#define WPILIB_IMPORTS
-#include <wpi/SymbolExports.h>
+// #define WPILIB_IMPORTS
+// #include <wpi/SymbolExports.h>
