@@ -34,7 +34,7 @@ class LoggedSystemStats {
     table.put("IOFrequency", conduit.getIOFrequency());
     table.put("IORXFrequency", conduit.getIORXFrequency());
     table.put("TeamNumber", conduit.getTeamNumber());
-    table.put("EpochTimeMicros", conduit.getEpochTime());
+    table.put("EpochTimeNanos", conduit.getEpochTime());
     table.put("EpochTimeValid", conduit.getEpochTimeValid());
 
     table.put("Faults/Brownout", conduit.getFaultBrownout());

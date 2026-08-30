@@ -272,12 +272,12 @@ public class Logger {
       long dashboardInputsEnd = RobotController.getMonotonicTime();
 
       // Record timing data
-      recordOutput("Logger/EntryUpdateMS", (dsStart - entryUpdateStart) / 1000.0);
+      recordOutput("Logger/EntryUpdateMS", (dsStart - entryUpdateStart) / 1_000_000.0);
       if (hasReplaySource()) {
-        recordOutput("Logger/DriverStationMS", (dashboardInputsStart - dsStart) / 1000.0);
+        recordOutput("Logger/DriverStationMS", (dashboardInputsStart - dsStart) / 1_000_000.0);
       }
       recordOutput(
-          "Logger/DashboardInputsMS", (dashboardInputsEnd - dashboardInputsStart) / 1000.0);
+          "Logger/DashboardInputsMS", (dashboardInputsEnd - dashboardInputsStart) / 1_000_000.0);
     }
   }
 
@@ -363,22 +363,22 @@ public class Logger {
       long consoleCaptureEnd = RobotController.getMonotonicTime();
 
       // Record timing data
-      recordOutput("Logger/ConduitCaptureMS", (dsStart - conduitCaptureStart) / 1000.0);
+      recordOutput("Logger/ConduitCaptureMS", (dsStart - conduitCaptureStart) / 1_000_000.0);
       if (!hasReplaySource()) {
-        recordOutput("Logger/DriverStationMS", (conduitSaveStart - dsStart) / 1000.0);
+        recordOutput("Logger/DriverStationMS", (conduitSaveStart - dsStart) / 1_000_000.0);
       }
-      recordOutput("Logger/ConduitSaveMS", (autoLogStart - conduitSaveStart) / 1000.0);
-      recordOutput("Logger/AutoLogMS", (alertLogStart - autoLogStart) / 1000.0);
-      recordOutput("Logger/AlertLogMS", (radioLogStart - alertLogStart) / 1000.0);
-      recordOutput("Logger/RadioLogMS", (consoleCaptureStart - radioLogStart) / 1000.0);
-      recordOutput("Logger/ConsoleMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
-      recordOutput("LoggedRobot/UserCodeMS", userCodeLength / 1000.0);
+      recordOutput("Logger/ConduitSaveMS", (autoLogStart - conduitSaveStart) / 1_000_000.0);
+      recordOutput("Logger/AutoLogMS", (alertLogStart - autoLogStart) / 1_000_000.0);
+      recordOutput("Logger/AlertLogMS", (radioLogStart - alertLogStart) / 1_000_000.0);
+      recordOutput("Logger/RadioLogMS", (consoleCaptureStart - radioLogStart) / 1_000_000.0);
+      recordOutput("Logger/ConsoleMS", (consoleCaptureEnd - consoleCaptureStart) / 1_000_000.0);
+      recordOutput("LoggedRobot/UserCodeMS", userCodeLength / 1_000_000.0);
       long periodicAfterLength = consoleCaptureEnd - conduitCaptureStart;
       recordOutput(
-          "LoggedRobot/LogPeriodicMS", (periodicBeforeLength + periodicAfterLength) / 1000.0);
+          "LoggedRobot/LogPeriodicMS", (periodicBeforeLength + periodicAfterLength) / 1_000_000.0);
       recordOutput(
           "LoggedRobot/FullCycleMS",
-          (periodicBeforeLength + userCodeLength + periodicAfterLength) / 1000.0);
+          (periodicBeforeLength + userCodeLength + periodicAfterLength) / 1_000_000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
 
       try {
@@ -454,7 +454,7 @@ public class Logger {
   }
 
   /**
-   * Returns the current timestamp or replayed time based on the current log entry (microseconds).
+   * Returns the current timestamp or replayed time based on the current log entry (nanoseconds).
    *
    * @return The timestamp.
    */

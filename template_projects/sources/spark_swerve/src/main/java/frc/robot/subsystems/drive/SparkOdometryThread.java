@@ -15,7 +15,7 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.DoubleSupplier;
 import org.wpilib.wpilibj.Notifier;
-import org.wpilib.wpilibj.RobotController;
+import org.wpilib.wpilibj.Timer;
 
 /**
  * Provides an interface for asynchronously reading high-frequency measurements to a set of queues.
@@ -95,7 +95,7 @@ public class SparkOdometryThread {
     Drive.odometryLock.lock();
     try {
       // Get sample timestamp
-      double timestamp = RobotController.getMonotonicTime() / 1e6;
+      double timestamp = Timer.getMonotonicTimestamp();
 
       // Read Spark values, mark invalid in case of error
       double[] sparkValues = new double[sparkSignals.size()];

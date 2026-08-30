@@ -122,6 +122,14 @@ public class WPILOGReader implements LogReplaySource {
           if (unit != null) {
             entryUnits.put(record.getStartData().entry, unit);
           }
+
+          // Check timestamp unit
+          if (record.getStartData().name.equals(LogDataReceiver.timestampKey)) {
+            if (!"nanoseconds".equals(unit)) {
+              throw new RuntimeException(
+                  "[AdvantageKit] The replay log uses an incompatible timestamp unit. Logs must be recorded and replayed on the same version of AdvantageKit.");
+            }
+          }
         } else if (record.isSetMetadata()) {
           // Handle metadata updates dynamically
           String unit = parseUnit(record.getSetMetadataData().metadata);

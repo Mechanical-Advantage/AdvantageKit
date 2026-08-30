@@ -151,7 +151,10 @@ public class WPILOGWriter implements LogDataReceiver {
     isOpen = true;
     timestampID =
         log.start(
-            timestampKey, LoggableType.Integer.getWPILOGType(), WPILOGConstants.entryMetadata, 0);
+            timestampKey,
+            LoggableType.Integer.getWPILOGType(),
+            WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", "nanoseconds"),
+            0);
     lastTable = new LogTable(0);
 
     // Reset data
@@ -206,8 +209,8 @@ public class WPILOGWriter implements LogDataReceiver {
                 && table.get("SystemStats/EpochTimeValid", false))
             || RobotBase.isSimulation()) {
           if (dsAttachedTime == null) {
-            dsAttachedTime = RobotController.getMonotonicTime() / 1000000.0;
-          } else if (RobotController.getMonotonicTime() / 1000000.0 - dsAttachedTime
+            dsAttachedTime = RobotController.getMonotonicTime() / 1_000_000_000.0;
+          } else if (RobotController.getMonotonicTime() / 1_000_000_000.0 - dsAttachedTime
                   > timestampUpdateDelay
               || RobotBase.isSimulation()) {
             logDate = LocalDateTime.now();

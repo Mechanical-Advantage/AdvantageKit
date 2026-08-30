@@ -26,7 +26,10 @@ public class NT4Publisher implements LogDataReceiver {
   public NT4Publisher() {
     akitTable = NetworkTableInstance.getDefault().getTable("/AdvantageKit");
     timestampPublisher =
-        akitTable.getIntegerTopic(timestampKey.substring(1)).publish(PubSubOption.SEND_ALL);
+        akitTable
+            .getIntegerTopic(timestampKey.substring(1))
+            .publishEx(
+                IntegerTopic.TYPE_STRING, "{\"unit\":\"nanoseconds\"}", PubSubOption.SEND_ALL);
   }
 
   public void putTable(LogTable table) {
