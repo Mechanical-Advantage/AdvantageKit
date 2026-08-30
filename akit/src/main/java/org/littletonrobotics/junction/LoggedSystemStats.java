@@ -74,6 +74,11 @@ class LoggedSystemStats {
     table.put("Storage/TotalMB", conduit.getStorageTotalBytes() * 1.0e-6);
     table.put("Storage/Percent", conduit.getStoragePercent());
 
+    table.put("3v3CurrentAmps", conduit.getCurrent3V3());
+    table.put("OS/Hash", conduit.getOSHash());
+    table.put("OS/Slot", conduit.getOSSlot());
+    table.put("OS/Version", conduit.getOSVersion());
+
     logVector3(table.getSubtable("IMU/AccelRaw"), conduit.getIMUAccelRaw());
     logVector3(table.getSubtable("IMU/GyroRates"), conduit.getIMUGyroRates());
     logVector3(table.getSubtable("IMU/GyroEuler/Flat"), conduit.getIMUGyroEulerFlat());

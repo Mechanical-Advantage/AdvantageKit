@@ -7,6 +7,9 @@ namespace org.littletonrobotics.conduit.schema;
 // Joystick name: 256 chars
 // Event name: 65 chars
 // Game specific message: 65 chars
+// OS hash: 65 chars
+// OS slot: 65 chars
+// OS version: 65 chars
 
 // If you change any of these numbers, you MUST update the corresponding constants in api and io implementations!
 
@@ -132,6 +135,10 @@ struct SystemData {
 
     cpu_percent:float64;
     cpu_temp:float64;
+    current_3v3:float64;
+    os_hash:[uint8:65];
+    os_slot:[uint8:65];
+    os_version:[uint8:65];
 
     memory_usage_bytes:int64;
     memory_total_bytes:int64;

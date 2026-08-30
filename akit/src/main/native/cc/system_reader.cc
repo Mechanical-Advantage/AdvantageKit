@@ -45,33 +45,18 @@ void SystemReader::start() {
 			"Control/HasSetWallClock").Subscribe(false);
 
 	const auto faults_table = sys_table->GetSubTable("faults");
-	fault_brownout_sub = faults_table->GetIntegerTopic("brownout").Subscribe(0);
+	faults_data_sub = faults_table->GetStructTopic < IOFaults
+			> ("data").Subscribe( { });
 	fault_canbus_down_sub =
 			faults_table->GetIntegerTopic("canbus_down").Subscribe(0);
 	fault_canbus_unavail_sub =
 			faults_table->GetIntegerTopic("canbus_unavail").Subscribe(0);
-	fault_display_sub = faults_table->GetIntegerTopic("display").Subscribe(0);
-	fault_imu_sub = faults_table->GetIntegerTopic("imu").Subscribe(0);
-	fault_io_sub = faults_table->GetIntegerTopic("io").Subscribe(0);
-	fault_rsl_sub = faults_table->GetIntegerTopic("rsl").Subscribe(0);
-	fault_usb_sub = faults_table->GetIntegerTopic("usb").Subscribe(0);
 
 	const auto fault_counts_table = sys_table->GetSubTable("faultcounts");
-	fault_count_brownout_sub =
-			fault_counts_table->GetIntegerTopic("brownout").Subscribe(0);
 	fault_count_canbus_down_sub = fault_counts_table->GetIntegerTopic(
 			"canbus_down").Subscribe(0);
 	fault_count_canbus_unavail_sub = fault_counts_table->GetIntegerTopic(
 			"canbus_unavail").Subscribe(0);
-	fault_count_display_sub =
-			fault_counts_table->GetIntegerTopic("display").Subscribe(0);
-	fault_count_imu_sub = fault_counts_table->GetIntegerTopic("imu").Subscribe(
-			0);
-	fault_count_io_sub = fault_counts_table->GetIntegerTopic("io").Subscribe(0);
-	fault_count_rsl_sub = fault_counts_table->GetIntegerTopic("rsl").Subscribe(
-			0);
-	fault_count_usb_sub = fault_counts_table->GetIntegerTopic("usb").Subscribe(
-			0);
 
 	const auto network_default = std::vector<double>(10, 0.0);
 	network_ethernet_sub =
@@ -94,6 +79,10 @@ void SystemReader::start() {
 
 	cpu_percent_sub = sys_table->GetDoubleTopic("cpu").Subscribe(0.0);
 	cpu_temp_sub = sys_table->GetDoubleTopic("temp").Subscribe(0.0);
+	current_3v3_sub = sys_table->GetDoubleTopic("current3v3").Subscribe(0.0);
+	os_hash_sub = sys_table->GetStringTopic("oshash").Subscribe("");
+	os_slot_sub = sys_table->GetStringTopic("osslot").Subscribe("");
+	os_version_sub = sys_table->GetStringTopic("osver").Subscribe("");
 
 	memory_usage_bytes_sub = sys_table->GetIntegerTopic("ram").Subscribe(0);
 	memory_total_bytes_sub = sys_table->GetIntegerTopic("ramtotal").Subscribe(
@@ -134,26 +123,27 @@ void SystemReader::read(schema::SystemData *system_buf) {
 	system_buf->mutate_epoch_time(WPI_GetSystemTime());
 	system_buf->mutate_epoch_time_valid(epoch_time_valid_sub.Get());
 
-	system_buf->mutate_fault_brownout(fault_brownout_sub.Get() != 0);
+	const auto faults_data = faults_data_sub.Get();
+	system_buf->mutate_fault_brownout(faults_data.brownout);
 	system_buf->mutate_fault_canbus_down(fault_canbus_down_sub.Get() != 0);
 	system_buf->mutate_fault_canbus_unavail(
 			fault_canbus_unavail_sub.Get() != 0);
-	system_buf->mutate_fault_display(fault_display_sub.Get() != 0);
-	system_buf->mutate_fault_imu(fault_imu_sub.Get() != 0);
-	system_buf->mutate_fault_io(fault_io_sub.Get() != 0);
-	system_buf->mutate_fault_rsl(fault_rsl_sub.Get() != 0);
-	system_buf->mutate_fault_usb(fault_usb_sub.Get() != 0);
+	system_buf->mutate_fault_display(faults_data.display);
+	system_buf->mutate_fault_imu(faults_data.imu);
+	system_buf->mutate_fault_io(faults_data.io);
+	system_buf->mutate_fault_rsl(faults_data.rsl);
+	system_buf->mutate_fault_usb(faults_data.usb);
 
-	system_buf->mutate_fault_count_brownout(fault_count_brownout_sub.Get());
+	system_buf->mutate_fault_count_brownout(faults_data.brownoutCount);
 	system_buf->mutate_fault_count_canbus_down(
 			fault_count_canbus_down_sub.Get());
 	system_buf->mutate_fault_count_canbus_unavail(
 			fault_count_canbus_unavail_sub.Get());
-	system_buf->mutate_fault_count_display(fault_count_display_sub.Get());
-	system_buf->mutate_fault_count_imu(fault_count_imu_sub.Get());
-	system_buf->mutate_fault_count_io(fault_count_io_sub.Get());
-	system_buf->mutate_fault_count_rsl(fault_count_rsl_sub.Get());
-	system_buf->mutate_fault_count_usb(fault_count_usb_sub.Get());
+	system_buf->mutate_fault_count_display(faults_data.displayCount);
+	system_buf->mutate_fault_count_imu(faults_data.imuCount);
+	system_buf->mutate_fault_count_io(faults_data.ioCount);
+	system_buf->mutate_fault_count_rsl(faults_data.rslCount);
+	system_buf->mutate_fault_count_usb(faults_data.usbCount);
 
 	update_network_status(system_buf->mutable_network_ethernet(),
 			network_ethernet_sub.Get());
@@ -182,6 +172,28 @@ void SystemReader::read(schema::SystemData *system_buf) {
 
 	system_buf->mutate_cpu_percent(cpu_percent_sub.Get());
 	system_buf->mutate_cpu_temp(cpu_temp_sub.Get());
+	system_buf->mutate_current_3v3(current_3v3_sub.Get());
+
+	auto os_hash = os_hash_sub.Get();
+	std::memset(system_buf->mutable_os_hash()->Data(), 0,
+			system_buf->os_hash()->size());
+	std::memcpy(system_buf->mutable_os_hash()->Data(), os_hash.data(),
+			std::min < size_t
+					> (system_buf->os_hash()->size() - 1, os_hash.size()));
+
+	auto os_slot = os_slot_sub.Get();
+	std::memset(system_buf->mutable_os_slot()->Data(), 0,
+			system_buf->os_slot()->size());
+	std::memcpy(system_buf->mutable_os_slot()->Data(), os_slot.data(),
+			std::min < size_t
+					> (system_buf->os_slot()->size() - 1, os_slot.size()));
+
+	auto os_version = os_version_sub.Get();
+	std::memset(system_buf->mutable_os_version()->Data(), 0,
+			system_buf->os_version()->size());
+	std::memcpy(system_buf->mutable_os_version()->Data(), os_version.data(),
+			std::min < size_t
+					> (system_buf->os_version()->size() - 1, os_version.size()));
 
 	system_buf->mutate_memory_usage_bytes(memory_usage_bytes_sub.Get());
 	system_buf->mutate_memory_total_bytes(memory_total_bytes_sub.Get());

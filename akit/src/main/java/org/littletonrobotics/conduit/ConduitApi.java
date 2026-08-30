@@ -30,6 +30,9 @@ public class ConduitApi {
   private static final byte[] eventNameBytes = new byte[65];
   private static final byte[] gameDataBytes = new byte[65];
   private static final byte[] joystickNameBytes = new byte[256];
+  private static final byte[] osHashBytes = new byte[65];
+  private static final byte[] osSlotBytes = new byte[65];
+  private static final byte[] osVersionBytes = new byte[65];
 
   private static ConduitApi instance = null;
 
@@ -371,6 +374,37 @@ public class ConduitApi {
 
   public double getCPUTempCelcius() {
     return sys.cpuTemp();
+  }
+
+  public double getCurrent3V3() {
+    return sys.current3v3();
+  }
+
+  public String getOSHash() {
+    int i;
+    for (i = 0; i < osHashBytes.length; i++) {
+      osHashBytes[i] = (byte) sys.osHash(i);
+      if (osHashBytes[i] == 0) break;
+    }
+    return new String(osHashBytes, 0, i, utf8Charset);
+  }
+
+  public String getOSSlot() {
+    int i;
+    for (i = 0; i < osSlotBytes.length; i++) {
+      osSlotBytes[i] = (byte) sys.osSlot(i);
+      if (osSlotBytes[i] == 0) break;
+    }
+    return new String(osSlotBytes, 0, i, utf8Charset);
+  }
+
+  public String getOSVersion() {
+    int i;
+    for (i = 0; i < osVersionBytes.length; i++) {
+      osVersionBytes[i] = (byte) sys.osVersion(i);
+      if (osVersionBytes[i] == 0) break;
+    }
+    return new String(osVersionBytes, 0, i, utf8Charset);
   }
 
   public long getMemoryUsageBytes() {

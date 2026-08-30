@@ -11,7 +11,9 @@
 #include <wpi/nt/DoubleArrayTopic.hpp>
 #include <wpi/nt/DoubleTopic.hpp>
 #include <wpi/nt/IntegerTopic.hpp>
-
+#include <wpi/nt/StringTopic.hpp>
+#include <wpi/nt/StructTopic.hpp>
+#include "conduit/io_faults.h"
 #include "conduit_schema_generated.h"
 using namespace org::littletonrobotics::conduit;
 
@@ -35,23 +37,11 @@ private:
 	wpi::nt::IntegerSubscriber team_number_sub;
 	wpi::nt::BooleanSubscriber epoch_time_valid_sub;
 
-	wpi::nt::IntegerSubscriber fault_brownout_sub;
+	wpi::nt::StructSubscriber<IOFaults> faults_data_sub;
 	wpi::nt::IntegerSubscriber fault_canbus_down_sub;
 	wpi::nt::IntegerSubscriber fault_canbus_unavail_sub;
-	wpi::nt::IntegerSubscriber fault_display_sub;
-	wpi::nt::IntegerSubscriber fault_imu_sub;
-	wpi::nt::IntegerSubscriber fault_io_sub;
-	wpi::nt::IntegerSubscriber fault_rsl_sub;
-	wpi::nt::IntegerSubscriber fault_usb_sub;
-
-	wpi::nt::IntegerSubscriber fault_count_brownout_sub;
 	wpi::nt::IntegerSubscriber fault_count_canbus_down_sub;
 	wpi::nt::IntegerSubscriber fault_count_canbus_unavail_sub;
-	wpi::nt::IntegerSubscriber fault_count_display_sub;
-	wpi::nt::IntegerSubscriber fault_count_imu_sub;
-	wpi::nt::IntegerSubscriber fault_count_io_sub;
-	wpi::nt::IntegerSubscriber fault_count_rsl_sub;
-	wpi::nt::IntegerSubscriber fault_count_usb_sub;
 
 	wpi::nt::DoubleArraySubscriber network_ethernet_sub;
 	wpi::nt::DoubleArraySubscriber network_wifi_sub;
@@ -62,6 +52,10 @@ private:
 
 	wpi::nt::DoubleSubscriber cpu_percent_sub;
 	wpi::nt::DoubleSubscriber cpu_temp_sub;
+	wpi::nt::DoubleSubscriber current_3v3_sub;
+	wpi::nt::StringSubscriber os_hash_sub;
+	wpi::nt::StringSubscriber os_slot_sub;
+	wpi::nt::StringSubscriber os_version_sub;
 
 	wpi::nt::IntegerSubscriber memory_usage_bytes_sub;
 	wpi::nt::IntegerSubscriber memory_total_bytes_sub;
