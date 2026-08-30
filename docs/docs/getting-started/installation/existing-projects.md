@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Existing Projects
+# Existing Projects {#existing-projects}
 
 To install the AdvantageKit vendordep, follow the instructions in the WPILib documentation for [installing vendor libraries](https://docs.wpilib.org/en/stable/docs/software/vscode-overview/3rd-party-libraries.html#installing-libraries) and choose "AdvantageKit" from the list. Alternatively, go to "WPILib: Manage Vendor Libraries" > "Install new libraries (online)" in VSCode and paste the URL below.
 
@@ -25,7 +25,7 @@ dependencies {
 }
 ```
 
-## Robot Configuration
+## Robot Configuration {#robot-configuration}
 
 The main `Robot` class **must inherit from `LoggedRobot`** (see below). `LoggedRobot` performs the same functions as `TimedRobot`, with some exceptions:
 

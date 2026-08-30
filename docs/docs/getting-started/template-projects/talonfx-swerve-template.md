@@ -5,7 +5,7 @@ sidebar_position: 4
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# TalonFX(S) Swerve Template
+# TalonFX(S) Swerve Template {#talonfxs-swerve-template}
 
 AdvantageKit includes two swerve project templates with built-in support for advanced features:
 
@@ -31,7 +31,7 @@ The AdvantageKit swerve templates are **open-source** and **fully customizable**
 
 :::
 
-## Setup
+## Setup {#setup}
 
 :::tip
 The swerve project folder includes a predefined AdvantageScope layout with tabs for each setup and tuning step described below. To open it, click `File` > `Import Layout...` in the tab bar of AdvantageScope and select the file `AdvantageScope Swerve Calibration.json` in the swerve project folder.
@@ -116,9 +116,9 @@ The project is configured to save log files when running on a real robot. **A FA
 </TabItem>
 </Tabs>
 
-## Tuning
+## Tuning {#tuning}
 
-### Torque-Current Control
+### Torque-Current Control {#torque-current-control}
 
 The project defaults to voltage control for both the drive and turn motors. Phoenix Pro subscribers can optionally switch to torque-current control, as described in the [Phoenix documentation](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/talonfx-control-intro.html#torquecurrentfoc). This can be configured by changing the values of `kSteerClosedLoopOutput` and/or `kDriveClosedLoopOutput` in `TunerConstants.java` to `ClosedLoopOutputType.TorqueCurrentFOC`.
 
@@ -130,7 +130,7 @@ Torque-current control requires different gains than voltage control. We recomme
 CTRE does not allow torque-current control on the TalonFXS.
 :::
 
-### Feedforward Characterization
+### Feedforward Characterization {#feedforward-characterization}
 
 The project includes default [feedforward gains](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-feedforward.html#introduction-to-dc-motor-feedforward) for velocity control of the drive motors (`kS` and `kV`), acceleration control of the drive motors (`kA`), and velocity control of the turn motors (`kS` and `kV`).
 
@@ -184,7 +184,7 @@ public void runCharacterization(double output) {
 
 :::
 
-### Wheel Radius Characterization
+### Wheel Radius Characterization {#wheel-radius-characterization}
 
 The effective wheel radius of a robot tends to change over time as wheels are worn down, swapped, or compress into the carpet. This can have significant impacts on odometry accuracy. We recommend regularly recharacterizing wheel radius to combat these issues.
 
@@ -200,7 +200,7 @@ The project includes an automated wheel radius characterization routine, which o
 
 5. Check the console output for the measured wheel radius, and copy the value to `kWheelRadius` in `TunerConstants.java`.
 
-### Drive/Turn PID Tuning
+### Drive/Turn PID Tuning {#driveturn-pid-tuning}
 
 The project includes default gains for the drive velocity PID controllers and turn position PID controllers, which can be found in the `steerGains` and `driveGains` configs in `TunerConstants.java`. These gains should be tuned for each robot.
 
@@ -218,7 +218,7 @@ We recommend using AdvantageScope to plot the measured and setpoint values while
 The PID gains used in simulation can be tuned using the same method. **Simulation gains are stored in `ModuleIOSim.java` instead of `TunerConstants.java`.**
 :::
 
-### Max Speed Measurement
+### Max Speed Measurement {#max-speed-measurement}
 
 The effective maximum speed of a robot is typically slightly less than the theroetically max speed based on motor free speed and gearing. To ensure that the robot remains controllable at high speeds, we recommend measuring the effective maximum speed of the robot.
 
@@ -232,7 +232,7 @@ The effective maximum speed of a robot is typically slightly less than the thero
 
 5. Record the maximum velocity achieved and update the value of `kSpeedAt12Volts`.
 
-### Slip Current Measurement
+### Slip Current Measurement {#slip-current-measurement}
 
 The value of `kSlipCurrent` can be tuned to avoid slipping the wheels.
 
@@ -244,7 +244,7 @@ The value of `kSlipCurrent` can be tuned to avoid slipping the wheels.
 
 4. Update the value of `kSlipCurrent` to this value.
 
-### PathPlanner Configuration
+### PathPlanner Configuration {#pathplanner-configuration}
 
 The project includes a built-in configuration for [PathPlanner](https://pathplanner.dev), located in the constructor of `Drive.java`. You may wish to manually adjust the following values:
 
@@ -252,13 +252,13 @@ The project includes a built-in configuration for [PathPlanner](https://pathplan
 - Drive PID constants as configured in `AutoBuilder`.
 - Turn PID constants as configured in `AutoBuilder`.
 
-## Customization
+## Customization {#customization}
 
-### Setting Odometry Frequency
+### Setting Odometry Frequency {#setting-odometry-frequency}
 
 By default, the project runs at **100Hz** on the RIO CAN bus and **250Hz** on CAN FD buses. These values are stored at the top of `Drive.java` and can be freely customized. The project configures all devices to minimize CAN bus utilization, but we recommend monitoring utilization carefully when increasing frequency.
 
-### Custom Gyro Implementations
+### Custom Gyro Implementations {#custom-gyro-implementations}
 
 The project defaults to the Pigeon 2 gyro, but can be integrated with any standard gyro. An example implementation for a NavX is included.
 
@@ -274,7 +274,7 @@ Queue<Double> yawPositionQueue = PhoenixOdometryThread.getInstance().registerSig
 Reference the full `GyroIONavX` implementation for an example of how to create a timestamp queue and update the odometry inputs for the gyro.
 :::
 
-### Custom Module Implementations
+### Custom Module Implementations {#custom-module-implementations}
 
 The template project includes multiple IO implementations for different hardware arrangements, as listed below. The selected IO implementation can be changed in `RobotContainer`.
 
@@ -307,7 +307,7 @@ turnConfig.Feedback.SensorToMechanismRatio = constants.SteerMotorGearRatio;
 tryUntilOk(5, () -> turnTalon.setPosition(customEncoder.getPositionRotations(), 0.25));
 ```
 
-### Profiled Turning PID
+### Profiled Turning PID {#profiled-turning-pid}
 
 By default, the project uses standard PID controllers for turn control. Users may choose to replace the standard control request with [Motion Magic](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html#motion-magic) or [Motion Magic Expo](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/motion-magic.html#motion-magic-expo) control requests. To implement this, simply replace the position request in `ModuleIOTalonFX` with the new request type, as shown below. The Motion Magic constraints are already configured in the `ModuleIOTalonFX` constructor, but can be adjusted.
 
@@ -316,7 +316,7 @@ private final MotionMagicVoltage positionVoltageRequest = new MotionMagicVoltage
 private final MotionMagicTorqueCurrentFOC positionTorqueCurrentRequest = new MotionMagicTorqueCurrentFOC(0.0);
 ```
 
-### Vision Integration
+### Vision Integration {#vision-integration}
 
 The `Drive` subsystem uses WPILib's [`SwerveDrivePoseEstimator`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/estimator/SwerveDrivePoseEstimator.html) class for odometry updates. The subsystem exposes the `addVisionMeasurement` method to enable vision systems to publish samples.
 
@@ -326,7 +326,7 @@ Users migrating from CTRE's swerve library should note that the AdvantageKit tem
 This project is compatible with AdvantageKit's [vision template project](./vision-template.md), which provides a starting point for implementing a pose estimation algorithm based on Limelight or PhotonVision.
 :::
 
-### Swerve Setpoint Generator
+### Swerve Setpoint Generator {#swerve-setpoint-generator}
 
 The project already includes basic mechanisms to reduce skidding, such as drive current limits and cosine optimization. Users who prefer more control over module skidding may wish to utilize Team 254's swerve setpoint generator. Documentation for using the version of this algorithm bundled with PathPlanner can be found [here](https://pathplanner.dev/pplib-swerve-setpoint-generator.html). The `SwerveSetpointGenerator` should be instantiated in the `Drive` subsystem and used in the `runVelocity` method, as shown below:
 
@@ -351,11 +351,11 @@ public void runVelocity(ChassisSpeeds speeds) {
 }
 ```
 
-### Advanced Physics Simulation
+### Advanced Physics Simulation {#advanced-physics-simulation}
 
 The project can be easily adapted to utilize Team 5516's [maple-sim](https://github.com/Shenzhen-Robotics-Alliance/Maple-Sim) library for simulation, which provides a full rigid-body simulation of the swerve drive and its interactions with the field. Check the documentation for more details on how to install and use the library.
 
-### Real-Time Thread Priority
+### Real-Time Thread Priority {#real-time-thread-priority}
 
 Optionally, the main thread can be configured to use [real-time](https://blogs.oracle.com/linux/post/task-priority) priority when running the command scheduler by removing the comments [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/a86d21b27034a36d051798e3eaef167076cd302b/template_projects/sources/talonfx_swerve/src/main/java/frc/robot/Robot.java#L110) and [here](https://github.com/Mechanical-Advantage/AdvantageKit/blob/a86d21b27034a36d051798e3eaef167076cd302b/template_projects/sources/talonfx_swerve/src/main/java/frc/robot/Robot.java#L120) (**IMPORTANT:** You must uncomment _both_ lines). This may improve the consistency of loop cycle timing in some cases, but should be used with caution as it will prevent other threads from running during the user code loop cycle (including internal threads required by NetworkTables, vendors, etc).
 

@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Annotation Logging
+# Annotation Logging {#annotation-logging}
 
 By adding the `@AutoLog` annotation to your inputs class, AdvantageKit will automatically generate implementations of `toLog` and `fromLog` for your inputs. All [data types](../supported-types.md) are supported with the exception of mechanism states. Loggable inputs can also be nested and used as fields.
 
@@ -37,7 +37,7 @@ class MyInputsAutoLogged extends MyInputs implements LoggableInputs {
 
 Note that you should use the `<className>AutoLogged` class, rather than your annotated class. The [AdvantageKit template projects](/getting-started/template-projects) are a useful reference for how to use `@AutoLog` in a full project.
 
-## Units
+## Units {#units}
 
 To ensure that AdvantageScope will correctly [visualize unit data](https://docs.advantagescope.org/tab-reference/line-graph/units), units can be specified by modifying the field name or using a `Measure` object.
 

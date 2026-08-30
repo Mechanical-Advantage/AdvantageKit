@@ -2,11 +2,11 @@
 sidebar_position: 1
 ---
 
-# 📊 Supported Types
+# 📊 Supported Types {#supported-types}
 
 Data is stored using string keys where slashes are used to denote subtables (similar to NetworkTables). Like NetworkTables, **all logged values are persistent (they will continue to appear on subsequent cycles until updated**).
 
-### Simple
+### Simple {#simple}
 
 The following simple data types are currently supported:
 
@@ -14,7 +14,7 @@ The following simple data types are currently supported:
 - Arrays: `boolean[], int[], long[], float[], double[], String[], byte[]`
 - 2D Arrays: `boolean[][], int[][], long[][], float[][], double[][], String[][], byte[][]`
 
-### Structured
+### Structured {#structured}
 
 Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). Supported classes include `Translation2d`, `Pose3d`, and `SwerveModuleState` with more coming soon. These classes can be logged as single values, arrays, or 2D arrays just like any simple type, and used as input or output fields.
 
@@ -24,7 +24,7 @@ Protobuf logging can take an extended period (>100ms) the first time that a valu
 _This issue is not applicable to struct logging, which is the default for all data types._
 :::
 
-### Records
+### Records {#records}
 
 Custom [record](https://www.baeldung.com/java-record-keyword) classes can be logged as structs, including support for single values, arrays, and 2D arrays as inputs or outputs. This enables efficient logging of custom complex data types, such as pose observations (check the [vision template](/getting-started/template-projects/vision-template) for examples).
 
@@ -43,7 +43,7 @@ Logging multiple record types of the same name can cause conflicts. All record c
 Record logging can take an extended period (>100ms) the first time that a value with any given type is logged. Subsequent logging calls using an object of the same type will be significantly faster. **Record values should always be logged for the first time when the robot is disabled.**
 :::
 
-### Units
+### Units {#units}
 
 AdvantageKit includes extensive support for unit-safe logging, including compatibility with AdvantageScope's [unit visualization](https://docs.advantagescope.org/tab-reference/line-graph/units) and the WPILib [units library](https://docs.wpilib.org/en/latest/docs/software/basic-programming/java-units.html). See the sections below for more information:
 
@@ -55,19 +55,19 @@ AdvantageKit includes extensive support for unit-safe logging, including compati
 In WPILib, measure implementations (like `Angle`, `Distance`, etc.) are defined as Java records. These record-based measures can be passed to the generic `put()`, `get()`, or `recordOutput()` methods. If a variable is declared using the interface type directly (e.g. `Measure<AngleUnit>`), you must use the explicit measure-specific methods: `putMeasure()`, `getMeasure()`, and `recordOutputMeasure()`.
 :::
 
-### Colors
+### Colors {#colors}
 
 WPILib includes a [color library](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/util/Color.html) that can be used to simplify color operations. These values will be stored in the log as a string formatted in [Hex Triplet](https://en.wikipedia.org/wiki/Web_colors) color notation.
 
-### Enums
+### Enums {#enums}
 
 [Enum](https://www.w3schools.com/java/java_enums.asp) values can be logged and replayed by AdvantageKit. These values will be stored in the log as string values (using the [`name()`](https://docs.oracle.com/javase/8/docs/api/java/lang/Enum.html#name--) method).
 
-### Suppliers (Output Only)
+### Suppliers (Output Only) {#suppliers-output-only}
 
 Primitive suppliers (`BooleanSupplier`, `IntSupplier`, `LongSupplier`, and `DoubleSupplier`) can be used in place of their single values for output logging, including annotation logging with `@AutoLogOutput`. One application of this feature is logging [`Trigger`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/button/Trigger.html) values, which extend from `BooleanSupplier`.
 
-### Mechanisms (Output Only)
+### Mechanisms (Output Only) {#mechanisms-output-only}
 
 AdvantageKit can log 2D mechanism objects as outputs, which can be viewed using AdvantageScope. If not using `@AutoLogOutput`, note that the logging call only records the current state of the `Mechanism2d` and so it must be called periodically.
 

@@ -2,9 +2,9 @@
 sidebar_position: 3
 ---
 
-# Uninitialized Inputs
+# Uninitialized Inputs {#uninitialized-inputs}
 
-## Timestamps & Driver Station
+## Timestamps & Driver Station {#timestamps-driver-station}
 
 Before calling `Logger.start()`, AdvantageKit's built-in input logging is not active. This means that Driver Station data (e.g. from the `DriverStation` or joystick classes) and timestamp data (e.g. `Timer.getTimestamp()`) are **not deterministic** and **should not be accessed** by the robot code.
 
@@ -33,7 +33,7 @@ public class Robot extends LoggedRobot {
 }
 ```
 
-## Subsystems
+## Subsystems {#subsystems}
 
 Typically, inputs from subsystems are only updated during calls to `periodic`. Note that this means updated (non-default) input data is not available in the constructor. The solution is to either wait for the first `periodic` call or call `periodic` from within the constructor.
 

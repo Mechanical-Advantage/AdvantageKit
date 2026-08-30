@@ -16,7 +16,7 @@ The 2026 version of AdvantageKit is now available! Check the [installation docs]
 
 **We value your feedback! Feedback, feature requests, and bug reports are welcome on the [issues page](https://github.com/Mechanical-Advantage/AdvantageKit/issues).**
 
-## 🧮 Unit Logging
+## 🧮 Unit Logging {#unit-logging}
 
 All logging interfaces now support specifying unit metadata compatible with [unit-aware graphing](https://docs.advantagescope.org/tab-reference/line-graph/units) in AdvantageScope. Several examples of unit metadata logging are shown in the code block below. For more details, check the documentation [here](/data-flow/supported-types#units).
 
@@ -39,13 +39,13 @@ public class Outputs {
 }
 ```
 
-## 🛜 NetworkTables Client Logging
+## 🛜 NetworkTables Client Logging {#networktables-client-logging}
 
 The `SystemStats` table now tracks which clients are connected to the NetworkTables server, including dashboards and vision coprocessors. This makes it easy to check when devices are online with no additional logging in user code. For each client, AdvantageKit automatically logs the connection status, IP address, remote port, and protocol version.
 
 ![Example of NetworkTables client logging](img/whats-new/nt-clients.png)
 
-## 💬 Improved Console Logging
+## 💬 Improved Console Logging {#improved-console-logging}
 
 AdvantageKit's [automatic console logging](/data-flow/built-in-logging#console) has been improved to capture exceptions thrown during robot code execution. This makes it easier to debug code crashes without needing to reference the Driver Station log file.
 
@@ -53,13 +53,13 @@ In addition, console output is now displayed during [Replay Watch](/getting-star
 
 ![Exception in console log](./img/whats-new/console.png)
 
-## 📦 Log Mechanisms as 3D Components
+## 📦 Log Mechanisms as 3D Components {#log-mechanisms-as-3d-components}
 
 AdvantageKit now offers an easier method of visualizing simple [articulated components](https://docs.advantagescope.org/tab-reference/3d-field/#3d-components) in AdvantageScope. The [`LoggedMechanism2d.generate3dMechanism`](<pathname:///javadoc/org/littletonrobotics/junction/mechanism/LoggedMechanism2d.html#generate3dMechanism()>) method can be used to _automatically_ generate a set of 3D poses for visualizing full 3D components in AdvantageScope. No need to manually transform 3D poses when creating an array of components!
 
 <img src={MechanismImg} height="400"/>
 
-## 🎨 Color Logging
+## 🎨 Color Logging {#color-logging}
 
 WPILib includes a [color library](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/util/Color.html) that can be used to simplify color operations. These objects can now be logged as inputs or outputs, and will be stored in the log as a string formatted in [Hex Triplet](https://en.wikipedia.org/wiki/Web_colors) color notation.
 
@@ -70,7 +70,7 @@ WPILib includes a [color library](https://github.wpilib.org/allwpilib/docs/relea
 
 </details>
 
-## 📒 Online Documentation
+## 📒 Online Documentation {#online-documentation}
 
 The AdvantageKit documentation has been significantly improved:
 
@@ -80,7 +80,7 @@ The AdvantageKit documentation has been significantly improved:
 
 ![API documentation](./img/whats-new/documentation.png)
 
-## 🦋 All-New Log Replay Comparison
+## 🦋 All-New Log Replay Comparison {#all-new-log-replay-comparison}
 
 The [log replay comparison](/theory/log-replay-comparison) page has been rewritten to be more clear, accurate, and **data-driven**. This includes deeper analysis of the effects of determinism on replay, real-world examples of the impact of rapid code iteration, and sample code exploring different subsystem code structures.
 
@@ -92,11 +92,11 @@ These updates bring the AdvantageKit documentation up-to-date with the [2026 rel
 
 _The graph above compares data produced on a real FRC robot to data produced by non-deterministic replay. See [here](/theory/log-replay-comparison/#why-does-it-matter) for details._
 
-## 🦤 New TalonFX(S) Swerve Template
+## 🦤 New TalonFX(S) Swerve Template {#new-talonfxs-swerve-template}
 
 The [TalonFX swerve template](/getting-started/template-projects/talonfx-swerve-template) has been updated with an alternative module implementation for the [TalonFXS](https://store.ctr-electronics.com/products/talon-fxs) and [CANdi](https://store.ctr-electronics.com/products/candi). Check the [documentation](/getting-started/template-projects/talonfx-swerve-template/#custom-module-implementations) for more details on configuring the template for _any_ hardware setup, including a mix of devices from different vendors.
 
-## 🐍 Bonus: Third-Party Replay in Python
+## 🐍 Bonus: Third-Party Replay in Python {#bonus-third-party-replay-in-python}
 
 While AdvantageKit is only available in Java, FRC teams developing in Python should consider using [PyKit](https://github.com/1757WestwoodRobotics/PyKit) instead. This library was developed by Team 1757 and supports deterministic log replay in Python.
 

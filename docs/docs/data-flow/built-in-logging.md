@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# 🗒️ Built-In Logging
+# 🗒️ Built-In Logging {#built-in-logging}
 
 AdvantageKit automatically logs many important fields as inputs or outputs. No configuration is required to use these features.
 
@@ -10,9 +10,9 @@ AdvantageKit automatically logs many important fields as inputs or outputs. No c
 Built-in input values are available during replay with guaranteed accuracy and can be freely accessed in user code without manual logging. **All other inputs must be logged using an [IO interface](./recording-inputs/io-interfaces.md).**
 :::
 
-## Inputs
+## Inputs {#inputs}
 
-### Timestamp
+### Timestamp {#timestamp}
 
 AdvantageKit logs and replays the value of `RobotController.getTime()`, `Timer.getTimestamp()`, etc. See [this page](/theory/deterministic-timestamps) for more details on timestamps in AdvantageKit.
 
@@ -20,7 +20,7 @@ AdvantageKit logs and replays the value of `RobotController.getTime()`, `Timer.g
 The methods `RobotController.getMonotonicTime()` and `Timer.getMonotonicTimestamp()` are used for accessing the real (non-deterministic) timestamp, and should only be used within IO implementations or for performance profiling.
 :::
 
-### Driver Station
+### Driver Station {#driver-station}
 
 All values that can be accessed via the `DriverStation` or WPILib HID classes (`Joystick`, `XboxController`, etc) are automatically logged and replayed. These fields are available under the `DriverStation` table.
 
@@ -28,19 +28,19 @@ All values that can be accessed via the `DriverStation` or WPILib HID classes (`
 The [`waitForDsConnection`](<https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/DriverStation.html#waitForDsConnection(double)>) method is not compatible with AdvantageKit.
 :::
 
-### Dashboard Inputs
+### Dashboard Inputs {#dashboard-inputs}
 
 Dashboard inputs accessed **via AdvantageKit dashboard classes** are automatically logged and replayed. See [this page](./recording-inputs/dashboard-inputs.md) for details. These fields are available under the `NetworkInputs` table.
 
-## Outputs
+## Outputs {#outputs}
 
-### Alerts
+### Alerts {#alerts}
 
 The state of any alerts created through WPILib's [persistent alerts](https://docs.wpilib.org/en/latest/docs/software/telemetry/persistent-alerts.html) API will be automatically logged as outputs. These alerts can be visualized using AdvantageScope's 📉 [Line Graph](https://docs.advantagescope.org/tab-reference/line-graph) tab. These fields are available under the `RealOutputs` or `ReplayOutputs` table.
 
 ![Alerts screenshot](img/alerts-1.png)
 
-### Console
+### Console {#console}
 
 Console output is automatically logged by AdvantageKit to the `Console` field, and can be viewed using AdvantageScope's 💬 [Console](https://docs.advantagescope.org/tab-reference/console) tab. This field is available under the `RealOutputs` or `ReplayOutputs` table.
 
@@ -50,13 +50,13 @@ Output from native code is not included when running in simulation.
 
 ![Console screenshot](img/console-1.png)
 
-### Radio Status
+### Radio Status {#radio-status}
 
 Status data from the VH-109 radio is automatically logged every ~5 seconds. This includes useful information about the connection status, bandwidth usage, etc. These fields are available under the `RadioStatus` table.
 
 ![Radio data](img/radio-1.png)
 
-### Power Distribution Data
+### Power Distribution Data {#power-distribution-data}
 
 The current on each channel, along with other useful stats, are automatically logged by AdvantageKit as outputs under the `PowerDistribution` table. This feature works by default when using the CTRE PDP or REV PDH configured to the default CAN ID (ID 0 for the PDP and ID 1 for the PDH).
 
@@ -70,11 +70,11 @@ The `LoggedPowerDistribution` class can be used to manually configure the power 
 LoggedPowerDistribution.getInstance(50, ModuleType.kRev); // Example: PDH on CAN ID 50
 ```
 
-### System Stats
+### System Stats {#system-stats}
 
 Important status information from the roboRIO is automatically recorded, such as the battery voltage, rail status, CAN status, system time, and NT client connections. These fields are available under the `SystemStats` table.
 
-### Performance Data
+### Performance Data {#performance-data}
 
 Several important fields are automatically recorded to measure the performance of the robot code:
 

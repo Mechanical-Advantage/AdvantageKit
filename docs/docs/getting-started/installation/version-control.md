@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Version Control
+# Version Control {#version-control}
 
 Typically, log replay requires that the code running on the robot and in the simulator are identical. We recommend the following tools to achieve that, enabled by version control with Git.
 
@@ -10,7 +10,7 @@ Typically, log replay requires that the code running on the robot and in the sim
 These tools are already installed in the AdvantageKit [template projects](/getting-started/template-projects), but this page explains their intended usage in more detail.
 :::
 
-## Gversion
+## Gversion {#gversion}
 
 The [gversion](https://github.com/lessthanoptimal/gversion-plugin) Gradle plugin produces a constants file with important metadata, including the [Git hash](https://www.mikestreety.co.uk/blog/the-git-commit-hash/) uniquely identifying each commit. It also includes whether the tree is "dirty" (if it included uncommitted changes). The template projects include Gversion already. Otherwise, follow the installation instructions below.
 
@@ -65,11 +65,11 @@ public Robot() {
 
 The metadata values can be viewed using AdvantageScope's 🔍 [Metadata](https://docs.advantagescope.org/tab-reference/metadata) tab. Running `git checkout ??????...` with the commit hash will return to the same version of code that was running on the robot (except for any uncommitted changes).
 
-## Event Deploy
+## Event Deploy {#event-deploy}
 
 Code often changes repeatedly during competition, which would normally mean running code with uncommitted changes. This is a problem for log replay, since the version of code running in a particular match may be impossible to recreate afterwards. This can be addressed by including a Gradle task to automatically commit working changes to a temporary branch before every deploy.
 
-### Installation
+### Installation {#installation}
 
 The Gradle task is preconfigured in the AdvantageKit template projects. Add the following lines to `build.gradle`:
 
@@ -108,7 +108,7 @@ task(eventDeploy) {
 createVersionFile.dependsOn(eventDeploy)
 ```
 
-### Usage
+### Usage {#usage}
 
 1. Before the event, create and check out a branch that starts with "event" such as "event_nhgrs". We recommend creating a new branch for each event.
 2. Deploy robot code through any method supported by WPILib.

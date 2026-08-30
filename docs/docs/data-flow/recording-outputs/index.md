@@ -1,4 +1,4 @@
-# 🔼 Recording Outputs
+# 🔼 Recording Outputs {#recording-outputs}
 
 Output data consists of any calculated values which could be recreated in the simulator, including...
 
@@ -20,7 +20,7 @@ Logger.recordOutput("FeederState", FeederState.RUNNING);
 This data is automatically saved to the `RealOutputs` or `ReplayOutputs` table, and it can be divided further into subtables using slashes (as seen above).
 :::
 
-## Structured Types
+## Structured Types {#structured-types}
 
 Logging geometry objects like `Pose2d`, `Trajectory`, etc. is common in robot code. Many WPILib classes can be serialized to binary data using [structs](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc) or [protobufs](https://protobuf.dev). These objects can be logged as single values or arrays:
 
@@ -47,7 +47,7 @@ Logger.recordOutput("MySwerveModuleStates", stateA, stateB, stateC, stateD);
 Logger.recordOutput("MySwerveModuleStates", new SwerveModuleState[] { stateA, stateB, stateC, stateD });
 ```
 
-## Units
+## Units {#units}
 
 Double or float fields can be logged with unit metadata in multiple ways. This ensures that AdvantageScope will correctly [visualize unit data](https://docs.advantagescope.org/tab-reference/line-graph/units).
 

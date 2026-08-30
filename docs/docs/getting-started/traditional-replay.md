@@ -2,9 +2,9 @@
 sidebar_position: 4
 ---
 
-# ⏪ How To: Traditional Replay
+# ⏪ How To: Traditional Replay {#how-to-traditional-replay}
 
-## Setup
+## Setup {#setup}
 
 The AdvantageKit template projects are preconfigured to support replay by changing the `simMode` option in `Constants.java` to `REPLAY`. More broadly, replay requires the following elements in the logger configuration:
 
@@ -41,7 +41,7 @@ Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim
 setUseTiming(false);
 ```
 
-## Usage
+## Usage {#usage}
 
 To launch log replay, start the robot project in [simulation](https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/introduction.html). The generated log file will be opened automatically in AdvantageScope (check the API documentation for `WPILOGWriter` for details on customizing this behavior). Replay outputs are stored in the `ReplayOutputs` table alongside the unmodified inputs and outputs (stored in the `RealOutputs` table).
 
@@ -49,7 +49,7 @@ To launch log replay, start the robot project in [simulation](https://docs.wpili
 The simulation GUI **must be disabled** when running in replay. The GUI is disabled by default in the AdvantageKit template projects.
 :::
 
-## Replay Bubble
+## Replay Bubble {#replay-bubble}
 
 The most straightforward uses of replay involve [logging additional outputs](./what-is-advantagekit/example-output-logging.md). Code can also be modified when running in log replay. However, this use case comes with limitations as **modified outputs cannot affect replayed inputs**. This issue is discussed in more detail in the clip below, which is part of 6328's [2025 Championship Conference](./what-is-advantagekit/champs-conference.md).
 

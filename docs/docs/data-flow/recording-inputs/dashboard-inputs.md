@@ -2,7 +2,7 @@
 sidebar_position: 3
 ---
 
-# Dashboard Inputs
+# Dashboard Inputs {#dashboard-inputs}
 
 Like the robot's hardware, **data retrieved from NetworkTables must be isolated and treated as input data.** For example, the following call will NOT function correctly in replay:
 

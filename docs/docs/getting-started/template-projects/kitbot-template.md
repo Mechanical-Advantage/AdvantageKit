@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# 2026 KitBot Template
+# 2026 KitBot Template {#2026-kitbot-template}
 
 The 2026 KitBot template is designed for robots based on the design of the 2026 [FIRST KitBot](https://www.firstinspires.org/resource-library/frc/kitbot). It includes all of the features of the [differential drive template](./diff-drive-template.md), along with year-specific subsystems and a simple autonomous routine. It supports a wide variety of hardware, including Spark Max/Flex, Talon SRX, and TalonFX controllers along with the navX, Pigeon 2, and similar gyros.
 
@@ -15,7 +15,7 @@ The AdvantageKit 2026 KitBot template is **open-source** and **fully customizabl
 
 :::
 
-## Setup
+## Setup {#setup}
 
 1. Download the 2026 KitBot template project from the AdvantageKit release on GitHub and open it in VSCode.
 

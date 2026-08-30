@@ -5,7 +5,7 @@ sidebar_position: 1
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# 🦋 Log Replay Comparison
+# 🦋 Log Replay Comparison {#log-replay-comparison}
 
 FRC teams have access to multiple logging tools that feature "replay" capabilities. These fall into the categories of **deterministic replay** ([AdvantageKit](/getting-started/what-is-advantagekit/), [PyKit](https://github.com/1757WestwoodRobotics/PyKit)) and **nondeterministic replay** ([Hoot Replay](https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/hoot-replay.html)). Each type of replay framework offers significantly different capabilities with regard to determinism, playback functionality, and code structure. This page compares these tools to help teams understand their key differences.
 
@@ -13,7 +13,7 @@ FRC teams have access to multiple logging tools that feature "replay" capabiliti
 Many non-replay logging options are also available (such as [WPILib data logging](https://docs.wpilib.org/en/stable/docs/software/telemetry/datalog.html) and [Epilogue](https://docs.wpilib.org/en/stable/docs/software/telemetry/robot-telemetry-with-annotations.html)), but this page focuses exclusively on replay-compatible logging tools.
 :::
 
-## 🔒 Determinism
+## 🔒 Determinism {#determinism}
 
 The biggest difference between replay frameworks the ability of each tool to replay robot code logic in a way that is **consistent, trustworthy, and robust to timing inconsistency**.
 
@@ -21,9 +21,9 @@ The biggest difference between replay frameworks the ability of each tool to rep
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | The replayed robot code will always match the behavior of the real robot. The results of replay can be trusted completely to match the actual behavior of the robot. | No guarantees are made about the accuracy of replay in simulation. Data may arrive in replay at different times or at different rates than the real robot, which impacts the accuracy of all parts of the robot code. |
 
-Determinism has a major impact on the practicality of log replay, since running simulation [faster than real-time](#-rapid-iteration) is a core part of the debugging process in practice. The accuracy of deterministic replay is unaffected by replay speed, while the accuracy of non-deterministic replay decreases when running at faster rates.
+Determinism has a major impact on the practicality of log replay, since running simulation [faster than real-time](#rapid-iteration) is a core part of the debugging process in practice. The accuracy of deterministic replay is unaffected by replay speed, while the accuracy of non-deterministic replay decreases when running at faster rates.
 
-### Why Does It Matter?
+### Why Does It Matter? {#why-does-it-matter}
 
 We are often asked by teams why they should care about deterministic replay. Non-deterministic replay creates butterfly effects that severely impact the accuracy of replay.
 
@@ -89,7 +89,7 @@ Log replay is most helpful when untangling complex code logic that is nontrivial
 
 **What about skipping in time?**
 
-The [section below](#-rapid-iteration) explains why rapid iteration and running faster than real-time are critical to any replay workflow, which is why the examples above demonstrate the impact of running Hoot Replay faster than real-time. However, one could also start the replay at a later point in the log file to work around the slow speed of non-deterministic replay.
+The [section below](#rapid-iteration) explains why rapid iteration and running faster than real-time are critical to any replay workflow, which is why the examples above demonstrate the impact of running Hoot Replay faster than real-time. However, one could also start the replay at a later point in the log file to work around the slow speed of non-deterministic replay.
 
 The graph below demonstrates why this approach is ineffective, by skipping to the middle of teleop before running simulated Hoot Replay (2x faster than real-time with loop cycle compensation). Even in this best-case scenario for Hoot Replay running at only 2x speed, the replay is completely unable to match the real outputs. Skipping large parts of the log massively increases the impact of the butterfly effect by completely changing the set of inputs accessible to the replayed code. One should not expect to see accurate outputs at any speed unless all of the inputs are accounted for during replay.
 
@@ -97,7 +97,7 @@ The graph below demonstrates why this approach is ineffective, by skipping to th
 
 </details>
 
-## 💨 Rapid Iteration
+## 💨 Rapid Iteration {#rapid-iteration}
 
 Log replay can be used in a variety of environments, which take advantage of the ability to rapidly iterate on code or debug issues without access to the robot. Here are a few examples where replay can play a critical role in the debugging process:
 
@@ -109,7 +109,7 @@ Log replay can be used in a variety of environments, which take advantage of the
 
 Every one of these use cases **depends on being able to run replay faster than real-time**. A typical match log may be 10 minutes long, and a replay feature that takes 10 minutes to run is not practical in any of these scenarios. Whether log replay is used under time pressure at an event or at home for rapid debugging, quickly running multiple replays with different outputs or tuning parameters is absolutely core to its utility.
 
-### Comparison
+### Comparison {#comparison}
 
 | AdvantageKit/PyKit                                                  | Hoot Replay                                        |
 | ------------------------------------------------------------------- | -------------------------------------------------- |
@@ -125,7 +125,7 @@ The video below demonstrates what the difference in speed between deterministic 
 
 <iframe width="100%" style={{"aspect-ratio": "3024 / 934"}} src="https://www.youtube.com/embed/SJ0F47Zej-4" title="Log Replay Speed Comparison" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-## 🧱 Code Structure
+## 🧱 Code Structure {#code-structure}
 
 While Hoot Replay involves significant trade-offs, its core design goal is to "simplify" hardware interactions. Unlike AdvantageKit, some subsystems may be compatible with Hoot Replay while using CTRE's standard subsystem structure (combining high-level logic, hardware configuration, low-level controls, and simulation in a single class).
 
@@ -135,7 +135,7 @@ Subsystems under Hoot Replay fall into the two categories shown below. Note that
 | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | <ul><li>CTRE devices on the replayed CAN bus</li></ul> | <ul><li>All other CTRE devices</li><li>Non-CTRE devices</li><li>Non-CAN sensors (e.g. RIO data)</li><li>Network devices (e.g. Limelight, PhotonVision)</li><li>Dashboard inputs (e.g. auto choosers)</li></ul> |
 
-### Hardware Abstraction vs. Data Injection
+### Hardware Abstraction vs. Data Injection {#hardware-abstraction-vs-data-injection}
 
 All replay frameworks sometimes require users to use alternative structures that maintain compatibility with replay. AdvantageKit and PyKit build all subsystems around [hardware abstraction](/data-flow/recording-inputs/io-interfaces), which provides a clean separation between parts of the code logic that must be isolated: high-level logic, simulation, and replayed code are never able to interact in unintended ways.
 
@@ -149,7 +149,7 @@ The table below compares the implications of this structure against Hoot Replay'
 | **Input Logging**  | ✅ Error-free logging of a large number of inputs is facilitated by [annotation](/data-flow/recording-inputs/annotation-logging) and [record](/data-flow/supported-types#records) logging. | ❌ Each new input field requires several lines of additional boilerplate, which can easily cause subtle issues during replay if implemented incorrectly.                   |
 | **Dashboards**     | ✅ Convenience classes are provided to simplify the process of using [dashboard inputs](/data-flow/recording-inputs/dashboard-inputs).                                                     | ❌ All data must be logged manually by the user, even outside of subsystems.                                                                                               |
 
-### Example: Vision Subsystem
+### Example: Vision Subsystem {#example-vision-subsystem}
 
 The code below represents a feature-complete Limelight vision subsystem built with both AdvantageKit (hardware abstraction) and Hoot Replay (data injection):
 
@@ -683,7 +683,7 @@ Did you notice that this example of Hoot Replay actually has **three separate** 
 
 </div>
 
-## 📋 Miscellaneous
+## 📋 Miscellaneous {#miscellaneous}
 
 The table below provides an overview of the differences between each replay tool. Note that some of the restrictions of Hoot Replay can be addressed via complex manual logging as discussed above.
 

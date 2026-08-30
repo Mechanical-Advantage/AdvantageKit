@@ -2,7 +2,7 @@
 sidebar_position: 6
 ---
 
-# Skeleton Template
+# Skeleton Template {#skeleton-template}
 
 The AdvantageKit skeleton template includes the basic code required to load AdvantageKit, but no subsystems or control logic. It is intended for teams who wish to design a complete project themselves without using a more complete template.
 

@@ -1,10 +1,10 @@
-# 📦 Installation
+# 📦 Installation {#installation}
 
 :::tip
 Looking to install AdvantageKit in a [Python robot project](https://docs.wpilib.org/en/stable/docs/software/python/index.html)? Consider using **[PyKit](https://github.com/1757WestwoodRobotics/PyKit)**, an alternative to AdvantageKit developed by [Team 1757](https://whsrobotics.org) that supports deterministic replay in Python.
 :::
 
-## New Projects
+## New Projects {#new-projects}
 
 :::info
 Template projects are not currently available for the 2027 alpha versions of AdvantageKit.
@@ -19,18 +19,18 @@ For new projects, we highly recommend starting with one of the [template project
 - **[Vision Template](../template-projects/vision-template.md)**: Example code for running simple vision targeting and pose estimation.
 - **[Skeleton Template](../template-projects/skeleton-template.md)**: Simple project with AdvantageKit installed but without subsystems or control logic.
 
-## Existing Projects
+## Existing Projects {#existing-projects}
 
 Users wishing to install AdvantageKit in an existing project should check the documentation page for [existing projects](./existing-projects.md).
 
-## Offline Installation
+## Offline Installation {#offline-installation}
 
 Maven artifacts for AdvantageKit can be downloaded and installed for offline use. This allows AdvantageKit to be accessed even if the Maven repository is blocked on school networks.
 
 1. Download the "maven_offline.zip" asset attached to the latest [GitHub release](https://github.com/Mechanical-Advantage/AdvantageKit/releases/latest).
 2. Unzip the file into "C:\Users\Public\wpilib\YEAR\maven" on Windows or "~/wpilib/YEAR/maven" on macOS/Linux.
 
-## Legacy Projects
+## Legacy Projects {#legacy-projects}
 
 Projects based on AdvantageKit v4.0.0-beta-1 or earlier may experience build failures due to the use of an invalid GitHub Packages token. To address this issue, these releases have been republished to the current Maven repository used by v4.0.0 and later (which does not require authentication). Please follow the steps below to switch to the new Maven repository:
 
