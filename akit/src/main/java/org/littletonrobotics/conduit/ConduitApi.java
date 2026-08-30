@@ -27,8 +27,8 @@ public class ConduitApi {
   public static final int NUM_JOYSTICKS = 6;
   public static final int NUM_CAN_BUSES = 5;
 
-  private static final byte[] eventNameBytes = new byte[64];
-  private static final byte[] gameDataBytes = new byte[9];
+  private static final byte[] eventNameBytes = new byte[65];
+  private static final byte[] gameDataBytes = new byte[65];
   private static final byte[] joystickNameBytes = new byte[256];
 
   private static ConduitApi instance = null;

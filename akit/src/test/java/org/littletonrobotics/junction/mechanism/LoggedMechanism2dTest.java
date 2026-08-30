@@ -43,7 +43,7 @@ public class LoggedMechanism2dTest {
     // Test EndEffector location
     Pose3d lastPose = poses.get(poses.size() - 1);
     Pose3d endeff =
-        lastPose.transformBy(new Transform3d(ligamentArm.getLength(), 0, 0, Rotation3d.kZero));
+        lastPose.transformBy(new Transform3d(ligamentArm.getLength(), 0, 0, Rotation3d.ZERO));
     assertEquals(0, endeff.getTranslation().getDistance(new Translation3d(0, 0, 1.0)), DELTA);
     // I have no idea which way WPILib will calculate the axis, and the y term might
     // flip so check both directions
@@ -78,7 +78,7 @@ public class LoggedMechanism2dTest {
     // Test EndEffector location
     Pose3d lastPose = poses.get(poses.size() - 1);
     Pose3d endeff =
-        lastPose.transformBy(new Transform3d(ligamentArm.getLength(), 0, 0, Rotation3d.kZero));
+        lastPose.transformBy(new Transform3d(ligamentArm.getLength(), 0, 0, Rotation3d.ZERO));
     assertEquals(0, endeff.getTranslation().getDistance(new Translation3d(0.5, 0, 0.5)), DELTA);
     // We probably don't need to care about axis/angle here because it should return
     // to the neutral position
@@ -115,7 +115,7 @@ public class LoggedMechanism2dTest {
     // Test EndEffector location
     Pose3d lastPose = poses.get(poses.size() - 1);
     Pose3d endeff =
-        lastPose.transformBy(new Transform3d(ligamentGripper.getLength(), 0, 0, Rotation3d.kZero));
+        lastPose.transformBy(new Transform3d(ligamentGripper.getLength(), 0, 0, Rotation3d.ZERO));
     assertEquals(0, endeff.getTranslation().getDistance(new Translation3d(0.5, 0, 0.7)), DELTA);
     var rot_axis = endeff.getRotation().getAxis();
     if (rot_axis.get(1) > 0) { // rotation axis is correct
@@ -170,7 +170,7 @@ public class LoggedMechanism2dTest {
     // Test EndEffector (1) location
     Pose3d lastPose = poses.get(2);
     Pose3d endeff =
-        lastPose.transformBy(new Transform3d(ligamentGripper.getLength(), 0, 0, Rotation3d.kZero));
+        lastPose.transformBy(new Transform3d(ligamentGripper.getLength(), 0, 0, Rotation3d.ZERO));
     assertEquals(0, endeff.getTranslation().getDistance(new Translation3d(0.5, 0, 0.7)), DELTA);
     var rot_axis = endeff.getRotation().getAxis();
     if (rot_axis.get(1) > 0) { // rotation axis is correct
@@ -181,7 +181,7 @@ public class LoggedMechanism2dTest {
     // Test EndEffector (2) location
     lastPose = poses.get(poses.size() - 1);
     endeff =
-        lastPose.transformBy(new Transform3d(ligamentGripper2.getLength(), 0, 0, Rotation3d.kZero));
+        lastPose.transformBy(new Transform3d(ligamentGripper2.getLength(), 0, 0, Rotation3d.ZERO));
     assertEquals(
         0,
         endeff

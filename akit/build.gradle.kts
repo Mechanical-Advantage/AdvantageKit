@@ -5,7 +5,7 @@ plugins {
     id("java")
     id("google-test")
     id("org.wpilib.WPILibRepositoriesPlugin") version "2027.0.0"
-    id("org.wpilib.NativeUtils") version "2027.7.1"
+    id("org.wpilib.NativeUtils") version "2027.14.3"
     id("org.wpilib.GradleJni") version "2027.0.0"
     id("org.wpilib.GradleVsCode") version "2027.0.0"
     id("com.diffplug.spotless") version "8.6.0"
@@ -19,7 +19,6 @@ sourceSets["main"].java {
 repositories {
     mavenCentral()
 }
-wpilibRepositories.use2027Repos()
 wpilibRepositories.addAllDevelopmentRepositories(project)
 
 val wpilibVersion = "2027.+"

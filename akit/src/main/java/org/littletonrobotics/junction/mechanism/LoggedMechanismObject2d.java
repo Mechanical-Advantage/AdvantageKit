@@ -109,7 +109,7 @@ public abstract class LoggedMechanismObject2d implements TelemetryLoggable {
       // recurse down the length of that ligament
       var next_pose =
           new_pose.transformBy(
-              new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
+              new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.ZERO));
 
       var more_poses = obj.getValue().generate3dMechanism(next_pose);
       poses.addAll(more_poses);

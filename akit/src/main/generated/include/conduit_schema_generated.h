@@ -380,12 +380,11 @@ inline bool operator!=(const Joystick &lhs, const Joystick &rhs) {
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
  private:
   int32_t alliance_station_;
-  uint8_t event_name_[64];
-  uint8_t game_data_[9];
-  int8_t padding0__;
+  uint8_t event_name_[65];
+  uint8_t game_data_[65];
   uint16_t match_number_;
   uint8_t replay_number_;
-  int8_t padding1__;  int16_t padding2__;
+  int8_t padding0__;  int16_t padding1__;
   int32_t match_type_;
   int64_t control_word_;
   double match_time_;
@@ -399,43 +398,38 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
       : alliance_station_(0),
         event_name_(),
         game_data_(),
-        padding0__(0),
         match_number_(0),
         replay_number_(0),
+        padding0__(0),
         padding1__(0),
-        padding2__(0),
         match_type_(0),
         control_word_(0),
         match_time_(0),
         joysticks_() {
     (void)padding0__;
     (void)padding1__;
-    (void)padding2__;
   }
   DSData(int32_t _alliance_station, uint16_t _match_number, uint8_t _replay_number, int32_t _match_type, int64_t _control_word, double _match_time)
       : alliance_station_(::flatbuffers::EndianScalar(_alliance_station)),
         event_name_(),
         game_data_(),
-        padding0__(0),
         match_number_(::flatbuffers::EndianScalar(_match_number)),
         replay_number_(::flatbuffers::EndianScalar(_replay_number)),
+        padding0__(0),
         padding1__(0),
-        padding2__(0),
         match_type_(::flatbuffers::EndianScalar(_match_type)),
         control_word_(::flatbuffers::EndianScalar(_control_word)),
         match_time_(::flatbuffers::EndianScalar(_match_time)),
         joysticks_() {
     (void)padding0__;
     (void)padding1__;
-    (void)padding2__;
   }
-  DSData(int32_t _alliance_station, ::flatbuffers::span<const uint8_t, 64> _event_name, ::flatbuffers::span<const uint8_t, 9> _game_data, uint16_t _match_number, uint8_t _replay_number, int32_t _match_type, int64_t _control_word, double _match_time, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::Joystick, 6> _joysticks)
+  DSData(int32_t _alliance_station, ::flatbuffers::span<const uint8_t, 65> _event_name, ::flatbuffers::span<const uint8_t, 65> _game_data, uint16_t _match_number, uint8_t _replay_number, int32_t _match_type, int64_t _control_word, double _match_time, ::flatbuffers::span<const org::littletonrobotics::conduit::schema::Joystick, 6> _joysticks)
       : alliance_station_(::flatbuffers::EndianScalar(_alliance_station)),
-        padding0__(0),
         match_number_(::flatbuffers::EndianScalar(_match_number)),
         replay_number_(::flatbuffers::EndianScalar(_replay_number)),
+        padding0__(0),
         padding1__(0),
-        padding2__(0),
         match_type_(::flatbuffers::EndianScalar(_match_type)),
         control_word_(::flatbuffers::EndianScalar(_control_word)),
         match_time_(::flatbuffers::EndianScalar(_match_time)) {
@@ -443,7 +437,6 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
     ::flatbuffers::CastToArray(game_data_).CopyFromSpan(_game_data);
     (void)padding0__;
     (void)padding1__;
-    (void)padding2__;
     ::flatbuffers::CastToArray(joysticks_).CopyFromSpan(_joysticks);
   }
   int32_t alliance_station() const {
@@ -452,16 +445,16 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
   void mutate_alliance_station(int32_t _alliance_station) {
     ::flatbuffers::WriteScalar(&alliance_station_, _alliance_station);
   }
-  const ::flatbuffers::Array<uint8_t, 64> *event_name() const {
+  const ::flatbuffers::Array<uint8_t, 65> *event_name() const {
     return &::flatbuffers::CastToArray(event_name_);
   }
-  ::flatbuffers::Array<uint8_t, 64> *mutable_event_name() {
+  ::flatbuffers::Array<uint8_t, 65> *mutable_event_name() {
     return &::flatbuffers::CastToArray(event_name_);
   }
-  const ::flatbuffers::Array<uint8_t, 9> *game_data() const {
+  const ::flatbuffers::Array<uint8_t, 65> *game_data() const {
     return &::flatbuffers::CastToArray(game_data_);
   }
-  ::flatbuffers::Array<uint8_t, 9> *mutable_game_data() {
+  ::flatbuffers::Array<uint8_t, 65> *mutable_game_data() {
     return &::flatbuffers::CastToArray(game_data_);
   }
   uint16_t match_number() const {
@@ -501,7 +494,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) DSData FLATBUFFERS_FINAL_CLASS {
     return &::flatbuffers::CastToArray(joysticks_);
   }
 };
-FLATBUFFERS_STRUCT_END(DSData, 2648);
+FLATBUFFERS_STRUCT_END(DSData, 2704);
 
 inline bool operator==(const DSData &lhs, const DSData &rhs) {
   return
@@ -1588,7 +1581,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CoreInputs FLATBUFFERS_FINAL_CLASS {
     return sys_;
   }
 };
-FLATBUFFERS_STRUCT_END(CoreInputs, 4000);
+FLATBUFFERS_STRUCT_END(CoreInputs, 4056);
 
 inline bool operator==(const CoreInputs &lhs, const CoreInputs &rhs) {
   return
@@ -1698,8 +1691,8 @@ inline const ::flatbuffers::TypeTable *DSDataTypeTable() {
   static const ::flatbuffers::TypeFunction type_refs[] = {
     org::littletonrobotics::conduit::schema::JoystickTypeTable
   };
-  static const int16_t array_sizes[] = { 64, 9, 6,  };
-  static const int64_t values[] = { 0, 4, 68, 78, 80, 84, 88, 96, 104, 2648 };
+  static const int16_t array_sizes[] = { 65, 65, 6,  };
+  static const int64_t values[] = { 0, 4, 69, 134, 136, 140, 144, 152, 160, 2704 };
   static const char * const names[] = {
     "alliance_station",
     "event_name",
@@ -1974,7 +1967,7 @@ inline const ::flatbuffers::TypeTable *CoreInputsTypeTable() {
     org::littletonrobotics::conduit::schema::PDPDataTypeTable,
     org::littletonrobotics::conduit::schema::SystemDataTypeTable
   };
-  static const int64_t values[] = { 0, 8, 2656, 2912, 4000 };
+  static const int64_t values[] = { 0, 8, 2712, 2968, 4056 };
   static const char * const names[] = {
     "timestamp",
     "ds",
