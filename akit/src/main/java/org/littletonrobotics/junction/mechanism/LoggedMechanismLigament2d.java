@@ -12,10 +12,7 @@ import static org.wpilib.units.Units.Meters;
 
 import org.littletonrobotics.junction.LogTable;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.networktables.DoubleEntry;
-import org.wpilib.networktables.NetworkTable;
-import org.wpilib.networktables.StringEntry;
-import org.wpilib.networktables.StringPublisher;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.util.Color8Bit;
@@ -27,21 +24,16 @@ import org.wpilib.util.Color8Bit;
  * @see org.littletonrobotics.junction.mechanism.LoggedMechanism2d
  */
 public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
-  private StringPublisher m_typePub;
   private double m_angle;
-  private DoubleEntry m_angleEntry;
   private String m_color;
-  private StringEntry m_colorEntry;
   private double m_length;
-  private DoubleEntry m_lengthEntry;
   private double m_weight;
-  private DoubleEntry m_weightEntry;
 
   /**
    * Create a new ligament.
    *
    * @param name The ligament name.
-   * @param length The ligament length in meters.
+   * @param length The ligament length.
    * @param angle The ligament angle in degrees.
    * @param lineWidth The ligament's line width.
    * @param color The ligament's color.
@@ -70,10 +62,10 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
   }
 
   /**
-   * Create a new ligament with the default color (orange) and thickness (6).
+   * Create a new ligament with the default color (orange) and thickness (10).
    *
    * @param name The ligament's name.
-   * @param length The ligament's length in meters.
+   * @param length The ligament's length.
    * @param angle The ligament's angle relative to its parent in degrees.
    */
   public LoggedMechanismLigament2d(String name, double length, double angle) {
@@ -81,7 +73,7 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
   }
 
   /**
-   * Create a new ligament with the default color (orange) and thickness (6).
+   * Create a new ligament with the default color (orange) and thickness (10).
    *
    * @param name The ligament's name.
    * @param length The ligament's length.
@@ -91,36 +83,13 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
     this(name, length.in(Meters), angle.in(Degrees));
   }
 
-  @Override
-  public void close() {
-    super.close();
-    if (m_typePub != null) {
-      m_typePub.close();
-    }
-    if (m_angleEntry != null) {
-      m_angleEntry.close();
-    }
-    if (m_colorEntry != null) {
-      m_colorEntry.close();
-    }
-    if (m_lengthEntry != null) {
-      m_lengthEntry.close();
-    }
-    if (m_weightEntry != null) {
-      m_weightEntry.close();
-    }
-  }
-
   /**
    * Set the ligament's angle relative to its parent.
    *
    * @param degrees the angle in degrees
    */
-  public synchronized void setAngle(double degrees) {
+  public final synchronized void setAngle(double degrees) {
     m_angle = degrees;
-    if (m_angleEntry != null) {
-      m_angleEntry.set(degrees);
-    }
   }
 
   /**
@@ -147,9 +116,6 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
    * @return the angle in degrees
    */
   public synchronized double getAngle() {
-    if (m_angleEntry != null) {
-      m_angle = m_angleEntry.get();
-    }
     return m_angle;
   }
 
@@ -158,11 +124,8 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
    *
    * @param length the line length
    */
-  public synchronized void setLength(double length) {
+  public final synchronized void setLength(double length) {
     m_length = length;
-    if (m_lengthEntry != null) {
-      m_lengthEntry.set(length);
-    }
   }
 
   /**
@@ -180,9 +143,6 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
    * @return the line length
    */
   public synchronized double getLength() {
-    if (m_lengthEntry != null) {
-      m_length = m_lengthEntry.get();
-    }
     return m_length;
   }
 
@@ -191,11 +151,8 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
    *
    * @param color the color of the line
    */
-  public synchronized void setColor(Color8Bit color) {
+  public final synchronized void setColor(Color8Bit color) {
     m_color = String.format("#%02X%02X%02X", color.red, color.green, color.blue);
-    if (m_colorEntry != null) {
-      m_colorEntry.set(m_color);
-    }
   }
 
   /**
@@ -204,9 +161,6 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
    * @return the color of the line
    */
   public synchronized Color8Bit getColor() {
-    if (m_colorEntry != null) {
-      m_color = m_colorEntry.get();
-    }
     int r = 0;
     int g = 0;
     int b = 0;
@@ -229,11 +183,8 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
    *
    * @param weight the line thickness
    */
-  public synchronized void setLineWeight(double weight) {
+  public final synchronized void setLineWeight(double weight) {
     m_weight = weight;
-    if (m_weightEntry != null) {
-      m_weightEntry.set(weight);
-    }
   }
 
   /**
@@ -242,45 +193,35 @@ public class LoggedMechanismLigament2d extends LoggedMechanismObject2d {
    * @return the line thickness
    */
   public synchronized double getLineWeight() {
-    if (m_weightEntry != null) {
-      m_weight = m_weightEntry.get();
-    }
     return m_weight;
   }
 
   @Override
-  protected void updateEntries(NetworkTable table) {
-    if (m_typePub != null) {
-      m_typePub.close();
+  public void logTo(TelemetryTable table) {
+    double angle;
+    double length;
+    String color;
+    double weight;
+    synchronized (this) {
+      angle = m_angle;
+      length = m_length;
+      color = m_color;
+      weight = m_weight;
     }
-    m_typePub = table.getStringTopic(".type").publish();
-    m_typePub.set("line");
 
-    if (m_angleEntry != null) {
-      m_angleEntry.close();
-    }
-    m_angleEntry = table.getDoubleTopic("angle").getEntry(0.0);
-    m_angleEntry.set(m_angle);
-
-    if (m_lengthEntry != null) {
-      m_lengthEntry.close();
-    }
-    m_lengthEntry = table.getDoubleTopic("length").getEntry(0.0);
-    m_lengthEntry.set(m_length);
-
-    if (m_colorEntry != null) {
-      m_colorEntry.close();
-    }
-    m_colorEntry = table.getStringTopic("color").getEntry("");
-    m_colorEntry.set(m_color);
-
-    if (m_weightEntry != null) {
-      m_weightEntry.close();
-    }
-    m_weightEntry = table.getDoubleTopic("weight").getEntry(0.0);
-    m_weightEntry.set(m_weight);
+    table.log("angle", angle);
+    table.log("length", length);
+    table.log("color", color);
+    table.log("weight", weight);
+    super.logTo(table);
   }
 
+  @Override
+  public String getTelemetryType() {
+    return "line";
+  }
+
+  @Override
   synchronized void logOutput(LogTable table) {
     table.put(".type", "line");
     table.put("angle", m_angle);

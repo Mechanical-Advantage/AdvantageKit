@@ -20,9 +20,9 @@ repositories {
     mavenCentral()
 }
 wpilibRepositories.use2027Repos()
-wpilibRepositories.addAllReleaseRepositories(project)
+wpilibRepositories.addAllDevelopmentRepositories(project)
 
-val wpilibVersion = "2027.0.0-alpha-6"
+val wpilibVersion = "2027.+"
 
 dependencies {
     implementation("org.wpilib.cscore:cscore-java:$wpilibVersion")
@@ -33,6 +33,8 @@ dependencies {
     implementation("org.wpilib.wpimath:wpimath-java:$wpilibVersion")
     implementation("org.wpilib.wpiunits:wpiunits-java:$wpilibVersion")
     implementation("org.wpilib.datalog:datalog-java:$wpilibVersion")
+    implementation("org.wpilib.tunables:tunables-java:$wpilibVersion")
+    implementation("org.wpilib.telemetry:telemetry-java:$wpilibVersion")
     implementation("org.wpilib.hal:hal-java:$wpilibVersion")
     implementation("org.ejml:ejml-simple:0.44.0")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")

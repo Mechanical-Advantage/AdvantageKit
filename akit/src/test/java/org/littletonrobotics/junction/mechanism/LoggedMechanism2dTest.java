@@ -24,7 +24,6 @@ public class LoggedMechanism2dTest {
   @Test
   public void TestSimpleArmFK() {
     // Simple arm setup, testing ForwardKinematics, unit test so ignore close
-    @SuppressWarnings("resource")
     LoggedMechanism2d mech2d = new LoggedMechanism2d(0, 0); // don't care, values don't do anything
 
     // leave the root at the robot origin
@@ -60,7 +59,6 @@ public class LoggedMechanism2dTest {
   @Test
   public void TestSimpleBentArmFK() {
     // Simple arm setup, testing ForwardKinematics, unit test so ignore close
-    @SuppressWarnings("resource")
     LoggedMechanism2d mech2d = new LoggedMechanism2d(0, 0); // don't care, values don't do anything
 
     // leave the root at the robot origin
@@ -91,7 +89,6 @@ public class LoggedMechanism2dTest {
   @Test
   public void TestThreeSegmentFK() {
     // Simple arm setup, testing ForwardKinematics, unit test so ignore close
-    @SuppressWarnings("resource")
     LoggedMechanism2d mech2d = new LoggedMechanism2d(0, 0); // don't care, values don't do anything
 
     // leave the root at the robot origin
@@ -131,7 +128,6 @@ public class LoggedMechanism2dTest {
   @Test
   public void TestSplitRoot() {
     // Simple arm setup, testing ForwardKinematics, unit test so ignore close
-    @SuppressWarnings("resource")
     LoggedMechanism2d mech2d = new LoggedMechanism2d(0, 0); // don't care, values don't do anything
 
     // leave the root at the robot origin

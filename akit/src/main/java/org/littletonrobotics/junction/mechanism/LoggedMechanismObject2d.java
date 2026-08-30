@@ -18,23 +18,23 @@ import org.littletonrobotics.junction.LogTable;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
-import org.wpilib.networktables.NetworkTable;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Common base class for all Mechanism2d node types.
  *
  * <p>To append another node, call {@link #append(LoggedMechanismObject2d)}. Objects that aren't
- * appended to a published {@link org.wpilib.smartdashboard.Mechanism2d} container are
- * nonfunctional.
+ * appended to a published {@link LoggedMechanism2d} container are nonfunctional.
  *
  * @see org.littletonrobotics.junction.mechanism.LoggedMechanism2d
  */
-public abstract class LoggedMechanismObject2d implements AutoCloseable {
+public abstract class LoggedMechanismObject2d implements TelemetryLoggable {
   /** Relative to parent. */
   private final String m_name;
 
-  private NetworkTable m_table;
-  private final Map<String, LoggedMechanismObject2d> m_objects = new LinkedHashMap<>(1);
+  /** Child objects appended to this object. */
+  protected final Map<String, LoggedMechanismObject2d> m_objects = new LinkedHashMap<>(1);
 
   /**
    * Create a new Mechanism node object.
@@ -43,13 +43,6 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
    */
   protected LoggedMechanismObject2d(String name) {
     m_name = name;
-  }
-
-  @Override
-  public void close() {
-    for (LoggedMechanismObject2d obj : m_objects.values()) {
-      obj.close();
-    }
   }
 
   /**
@@ -66,34 +59,25 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
       throw new UnsupportedOperationException("Mechanism object names must be unique!");
     }
     m_objects.put(object.getName(), object);
-    if (m_table != null) {
-      object.update(m_table.getSubTable(object.getName()));
-    }
     return object;
   }
 
-  final synchronized void update(NetworkTable table) {
-    m_table = table;
-    updateEntries(m_table);
-    for (LoggedMechanismObject2d obj : m_objects.values()) {
-      obj.update(m_table.getSubTable(obj.m_name));
-    }
-  }
-
   /**
-   * Update all entries with new ones from a new table.
+   * Retrieve the object's name.
    *
-   * @param table the new table.
-   */
-  protected abstract void updateEntries(NetworkTable table);
-
-  /**
-   * Get the name of the object.
-   *
-   * @return The name of the object.
+   * @return the object's name relative to its parent.
    */
   public final String getName() {
     return m_name;
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    synchronized (this) {
+      for (Entry<String, LoggedMechanismObject2d> entry : m_objects.entrySet()) {
+        table.log(entry.getKey(), entry.getValue());
+      }
+    }
   }
 
   synchronized void logOutput(LogTable table) {
@@ -103,7 +87,7 @@ public abstract class LoggedMechanismObject2d implements AutoCloseable {
   }
 
   /**
-   * Propogates the mechanism2d down the tree structure.
+   * Propagates the mechanism2d down the tree structure.
    *
    * @param seed position to start the calculations at
    * @return array list of all poses generated from this point in a depth-first pattern
