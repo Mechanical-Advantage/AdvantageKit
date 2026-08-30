@@ -141,7 +141,7 @@ jobs:
           - name: "Linux (arm64)"
             runner-image: ubuntu-24.04
             classifier: "linuxarm64"
-            container: wpilib/aarch64-cross-ubuntu:bookworm-24.04
+            container: wpilib/aarch64-cross-debian:trixie
           - name: "macOS"
             runner-image: macos-latest
             classifier: "osxuniversal"
