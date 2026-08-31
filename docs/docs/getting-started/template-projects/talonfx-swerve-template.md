@@ -44,7 +44,7 @@ The swerve project folder includes a predefined AdvantageScope layout with tabs 
 CTRE only permits the swerve project generator to be used on swerve robots with **exclusively CTRE hardware** (including a Pigeon 2). Otherwise, switch to the "Manual" tab for standard setup instructions.
 :::
 
-1. Download the TalonFX swerve template project from the AdvantageKit release on GitHub and open it in VSCode.
+1. Download the TalonFX swerve template project from the [AdvantageKit release](https://github.com/Mechanical-Advantage/AdvantageKit/releases) on GitHub and open it in VSCode.
 
 2. Click the WPILib icon in the VSCode toolbar and find the task `WPILib: Set Team Number`. Enter your team number and press enter.
 
@@ -69,7 +69,7 @@ The project is configured to save log files when running on a real robot. **A FA
 </TabItem>
 <TabItem value="manual" label="Manual" default>
 
-1. Download the TalonFX swerve template project from the AdvantageKit release on GitHub and open it in VSCode.
+1. Download the TalonFX swerve template project from the [AdvantageKit release](https://github.com/Mechanical-Advantage/AdvantageKit/releases) on GitHub and open it in VSCode.
 
 2. Click the WPILib icon in the VSCode toolbar and find the task `WPILib: Set Team Number`. Enter your team number and press enter.
 
