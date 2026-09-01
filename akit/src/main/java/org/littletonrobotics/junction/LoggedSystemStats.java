@@ -29,12 +29,12 @@ class LoggedSystemStats {
     // Update inputs from conduit
     ConduitApi conduit = ConduitApi.getInstance();
 
-    table.put("BatteryVoltage", conduit.getBatteryVoltage());
+    table.put("BatteryVoltage", conduit.getBatteryVoltage(), "volts");
     table.put("WatchdogActive", conduit.getWatchdogActive());
     table.put("IOFrequency", conduit.getIOFrequency());
     table.put("IORXFrequency", conduit.getIORXFrequency());
     table.put("TeamNumber", conduit.getTeamNumber());
-    table.put("EpochTimeMicros", conduit.getEpochTime() / 1000);
+    table.put("EpochTime", (double) (conduit.getEpochTime() / 1000), "microseconds");
     table.put("EpochTimeValid", conduit.getEpochTimeValid());
 
     table.put("Faults/Brownout", conduit.getFaultBrownout());
@@ -63,27 +63,31 @@ class LoggedSystemStats {
       logCANInfo(table.getSubtable("Network/CAN" + bus), conduit.getNetworkCANInfo(bus));
     }
 
-    table.put("CPU/Percent", conduit.getCPUPercent());
-    table.put("CPU/TempCelsius", conduit.getCPUTempCelcius());
+    table.put("CPU/Utilization", conduit.getCPUPercent(), "percent");
+    table.put("CPU/Temperature", conduit.getCPUTempCelcius(), "celcius");
 
-    table.put("Memory/UsageMB", conduit.getMemoryUsageBytes() * 1.0e-6);
-    table.put("Memory/TotalMB", conduit.getMemoryTotalBytes() * 1.0e-6);
-    table.put("Memory/Percent", conduit.getMemoryPercent());
+    table.put("Memory/Usage", conduit.getMemoryUsageBytes() * 1.0e-6, "megabytes");
+    table.put("Memory/Total", conduit.getMemoryTotalBytes() * 1.0e-6, "megabytes");
+    table.put("Memory/Utilization", conduit.getMemoryPercent(), "percent");
 
-    table.put("Storage/UsageMB", conduit.getStorageUsageBytes() * 1.0e-6);
-    table.put("Storage/TotalMB", conduit.getStorageTotalBytes() * 1.0e-6);
-    table.put("Storage/Percent", conduit.getStoragePercent());
+    table.put("Storage/Usage", conduit.getStorageUsageBytes() * 1.0e-6, "megabytes");
+    table.put("Storage/Total", conduit.getStorageTotalBytes() * 1.0e-6, "megabytes");
+    table.put("Storage/Utilization", conduit.getStoragePercent(), "percent");
 
-    table.put("3v3CurrentAmps", conduit.getCurrent3V3());
+    table.put("3v3Current", conduit.getCurrent3V3(), "amps");
     table.put("OS/Hash", conduit.getOSHash());
     table.put("OS/Slot", conduit.getOSSlot());
     table.put("OS/Version", conduit.getOSVersion());
 
-    logVector3(table.getSubtable("IMU/AccelRaw"), conduit.getIMUAccelRaw());
-    logVector3(table.getSubtable("IMU/GyroRates"), conduit.getIMUGyroRates());
-    logVector3(table.getSubtable("IMU/GyroEuler/Flat"), conduit.getIMUGyroEulerFlat());
-    logVector3(table.getSubtable("IMU/GyroEuler/Landscape"), conduit.getIMUGyroEulerLandscape());
-    logVector3(table.getSubtable("IMU/GyroEuler/Portrait"), conduit.getIMUGyroEulerPortrait());
+    logVector3(table.getSubtable("IMU/AccelRaw"), conduit.getIMUAccelRaw(), "G");
+    logVector3(table.getSubtable("IMU/GyroRates"), conduit.getIMUGyroRates(), "degrees per second");
+    logVector3(table.getSubtable("IMU/GyroEuler/Flat"), conduit.getIMUGyroEulerFlat(), "degrees");
+    logVector3(
+        table.getSubtable("IMU/GyroEuler/Landscape"),
+        conduit.getIMUGyroEulerLandscape(),
+        "degrees");
+    logVector3(
+        table.getSubtable("IMU/GyroEuler/Portrait"), conduit.getIMUGyroEulerPortrait(), "degrees");
     table.put("IMU/Gyro3d", conduit.getIMUGyroRotation3d());
     table.put("IMU/GyroYaw/Flat", conduit.getIMUGyroYawFlat());
     table.put("IMU/GyroYaw/Landscape", conduit.getIMUGyroYawLandscape());
@@ -119,25 +123,25 @@ class LoggedSystemStats {
   }
 
   private static void logNetworkDirectionStatus(LogTable table, NetworkDirStatus status) {
-    table.put("BandwidthMbps", status.bandwidthKbps() * 1.0e-3);
-    table.put("Bytes", status.bytes());
+    table.put("Bandwidth", status.bandwidthKbps() * 1.0e-3, "megabits per second");
+    table.put("Kilobytes", status.bytes() / 1024.0, "kilobytes");
     table.put("Dropped", status.dropped());
     table.put("Errors", status.errors());
     table.put("Packets", status.packets());
   }
 
   private static void logCANInfo(LogTable table, CANInfo info) {
-    table.put("MaxBandwidthMbps", info.maxBandwidthMbps());
+    table.put("MaxBandwidth", info.maxBandwidthMbps(), "megabits per second");
     table.put("FD", info.isFd());
     table.put("Available", info.isAvailable());
     table.put("InterfaceUp", info.isUp());
-    table.put("UtilizationPercent", info.utilizationPercent());
-    table.put("FPS", info.fps());
+    table.put("Utilization", info.utilizationPercent(), "percent");
+    table.put("Framerate", info.fps());
   }
 
-  private static void logVector3(LogTable table, Vector3 vector) {
-    table.put("X", vector.x());
-    table.put("Y", vector.y());
-    table.put("Z", vector.z());
+  private static void logVector3(LogTable table, Vector3 vector, String unit) {
+    table.put("X", vector.x(), unit);
+    table.put("Y", vector.y(), unit);
+    table.put("Z", vector.z(), unit);
   }
 }
