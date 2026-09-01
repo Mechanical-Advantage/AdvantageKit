@@ -1,7 +1,7 @@
 plugins {
     id "java"
+    id "application"
     id "org.wpilib.GradleRIO" version "WPILIB_VERSION"
-    id "com.gradleup.shadow" version "9.3.0"
     id "com.peterabeles.gversion" version "1.10"
     id "com.diffplug.spotless" version "8.6.0"
 }
@@ -33,6 +33,8 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 wpilibJava(getArtifactTypeClass('WPILibJavaArtifact')) {
+                    // Set to true to use debug including JNI, which will drastically impact performance.
+                    debugJni = false
                 }
 
                 // Static files artifact
@@ -49,9 +51,8 @@ deploy {
 
 def deployArtifact = deploy.targets.systemcore.artifacts.wpilibJava
 
-// Set to true to use debug for all targets including JNI, which will drastically impact
-// performance.
-wpi.java.debugJni = false
+// Set to true to use debug for simulation including JNI
+wpi.java.runSimWithDebugJni = false
 
 // Set this to true to enable desktop support.
 def includeDesktopSupport = true
@@ -103,27 +104,23 @@ test {
 wpi.sim.addGui().defaultEnabled = false
 wpi.sim.addDriverstation()
 
-// Setting up my Jar File. In this case, adding all libraries into the main jar ('fat/shaded jar')
-// in order to make them all available at runtime and merging service files to make JSON work.
-// Also adding the manifest so WPILib knows where to look for our Robot Class.
-shadowJar {
-    mergeServiceFiles()
+application.mainClass = ROBOT_MAIN_CLASS
+
+deployArtifact.configureApplication(application)
+wpi.java.configureApplication(application)
+wpi.java.configureTestTasks(test)
+
+jar {
     from('src') { into 'backup/src' }
     from('vendordeps') { into 'backup/vendordeps' }
     from('build.gradle') { into 'backup' }
-    manifest org.wpilib.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
-
-// Configure jar and deploy tasks
-deployArtifact.jarTask = shadowJar
-wpi.java.configureExecutableTasks(shadowJar)
-wpi.java.configureTestTasks(test)
 
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
+
 
 // Create version file
 project.compileJava.dependsOn(createVersionFile)

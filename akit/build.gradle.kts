@@ -19,9 +19,9 @@ sourceSets["main"].java {
 repositories {
     mavenCentral()
 }
-wpilibRepositories.addAllDevelopmentRepositories(project)
+wpilibRepositories.addAllReleaseRepositories(project)
 
-val wpilibVersion = "2027.+"
+val wpilibVersion = "2027.0.0-alpha-7"
 
 dependencies {
     implementation("org.wpilib.cscore:cscore-java:$wpilibVersion")

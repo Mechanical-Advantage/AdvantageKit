@@ -794,6 +794,8 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CANInfo FLATBUFFERS_FINAL_CLASS {
   uint8_t is_available_;
   uint8_t is_up_;
   int8_t padding0__;  int32_t padding1__;
+  double utilization_percent_;
+  double fps_;
 
  public:
   static const ::flatbuffers::TypeTable *MiniReflectTypeTable() {
@@ -805,17 +807,21 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CANInfo FLATBUFFERS_FINAL_CLASS {
         is_available_(0),
         is_up_(0),
         padding0__(0),
-        padding1__(0) {
+        padding1__(0),
+        utilization_percent_(0),
+        fps_(0) {
     (void)padding0__;
     (void)padding1__;
   }
-  CANInfo(double _max_bandwidth_mbps, bool _is_fd, bool _is_available, bool _is_up)
+  CANInfo(double _max_bandwidth_mbps, bool _is_fd, bool _is_available, bool _is_up, double _utilization_percent, double _fps)
       : max_bandwidth_mbps_(::flatbuffers::EndianScalar(_max_bandwidth_mbps)),
         is_fd_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_fd))),
         is_available_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_available))),
         is_up_(::flatbuffers::EndianScalar(static_cast<uint8_t>(_is_up))),
         padding0__(0),
-        padding1__(0) {
+        padding1__(0),
+        utilization_percent_(::flatbuffers::EndianScalar(_utilization_percent)),
+        fps_(::flatbuffers::EndianScalar(_fps)) {
     (void)padding0__;
     (void)padding1__;
   }
@@ -843,15 +849,29 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CANInfo FLATBUFFERS_FINAL_CLASS {
   void mutate_is_up(bool _is_up) {
     ::flatbuffers::WriteScalar(&is_up_, static_cast<uint8_t>(_is_up));
   }
+  double utilization_percent() const {
+    return ::flatbuffers::EndianScalar(utilization_percent_);
+  }
+  void mutate_utilization_percent(double _utilization_percent) {
+    ::flatbuffers::WriteScalar(&utilization_percent_, _utilization_percent);
+  }
+  double fps() const {
+    return ::flatbuffers::EndianScalar(fps_);
+  }
+  void mutate_fps(double _fps) {
+    ::flatbuffers::WriteScalar(&fps_, _fps);
+  }
 };
-FLATBUFFERS_STRUCT_END(CANInfo, 16);
+FLATBUFFERS_STRUCT_END(CANInfo, 32);
 
 inline bool operator==(const CANInfo &lhs, const CANInfo &rhs) {
   return
       (lhs.max_bandwidth_mbps() == rhs.max_bandwidth_mbps()) &&
       (lhs.is_fd() == rhs.is_fd()) &&
       (lhs.is_available() == rhs.is_available()) &&
-      (lhs.is_up() == rhs.is_up());
+      (lhs.is_up() == rhs.is_up()) &&
+      (lhs.utilization_percent() == rhs.utilization_percent()) &&
+      (lhs.fps() == rhs.fps());
 }
 
 inline bool operator!=(const CANInfo &lhs, const CANInfo &rhs) {
@@ -1530,7 +1550,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) SystemData FLATBUFFERS_FINAL_CLASS {
     ::flatbuffers::WriteScalar(&imu_gyro_yaw_portrait_, _imu_gyro_yaw_portrait);
   }
 };
-FLATBUFFERS_STRUCT_END(SystemData, 1296);
+FLATBUFFERS_STRUCT_END(SystemData, 1376);
 
 inline bool operator==(const SystemData &lhs, const SystemData &rhs) {
   return
@@ -1638,7 +1658,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) CoreInputs FLATBUFFERS_FINAL_CLASS {
     return sys_;
   }
 };
-FLATBUFFERS_STRUCT_END(CoreInputs, 4264);
+FLATBUFFERS_STRUCT_END(CoreInputs, 4344);
 
 inline bool operator==(const CoreInputs &lhs, const CoreInputs &rhs) {
   return
@@ -1850,17 +1870,21 @@ inline const ::flatbuffers::TypeTable *CANInfoTypeTable() {
     { ::flatbuffers::ET_DOUBLE, 0, -1 },
     { ::flatbuffers::ET_BOOL, 0, -1 },
     { ::flatbuffers::ET_BOOL, 0, -1 },
-    { ::flatbuffers::ET_BOOL, 0, -1 }
+    { ::flatbuffers::ET_BOOL, 0, -1 },
+    { ::flatbuffers::ET_DOUBLE, 0, -1 },
+    { ::flatbuffers::ET_DOUBLE, 0, -1 }
   };
-  static const int64_t values[] = { 0, 8, 9, 10, 16 };
+  static const int64_t values[] = { 0, 8, 9, 10, 16, 24, 32 };
   static const char * const names[] = {
     "max_bandwidth_mbps",
     "is_fd",
     "is_available",
-    "is_up"
+    "is_up",
+    "utilization_percent",
+    "fps"
   };
   static const ::flatbuffers::TypeTable tt = {
-    ::flatbuffers::ST_STRUCT, 4, type_codes, nullptr, nullptr, values, names
+    ::flatbuffers::ST_STRUCT, 6, type_codes, nullptr, nullptr, values, names
   };
   return &tt;
 }
@@ -1962,7 +1986,7 @@ inline const ::flatbuffers::TypeTable *SystemDataTypeTable() {
     org::littletonrobotics::conduit::schema::Vector4TypeTable
   };
   static const int16_t array_sizes[] = { 5, 5, 65, 65, 65,  };
-  static const int64_t values[] = { 0, 8, 16, 24, 32, 40, 48, 49, 50, 51, 52, 53, 54, 55, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 208, 288, 368, 768, 848, 856, 864, 872, 937, 1002, 1072, 1080, 1088, 1096, 1104, 1112, 1120, 1144, 1168, 1192, 1216, 1240, 1272, 1280, 1288, 1296 };
+  static const int64_t values[] = { 0, 8, 16, 24, 32, 40, 48, 49, 50, 51, 52, 53, 54, 55, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 208, 288, 368, 768, 928, 936, 944, 952, 1017, 1082, 1152, 1160, 1168, 1176, 1184, 1192, 1200, 1224, 1248, 1272, 1296, 1320, 1352, 1360, 1368, 1376 };
   static const char * const names[] = {
     "battery_voltage",
     "watchdog_active",
@@ -2032,7 +2056,7 @@ inline const ::flatbuffers::TypeTable *CoreInputsTypeTable() {
     org::littletonrobotics::conduit::schema::PDPDataTypeTable,
     org::littletonrobotics::conduit::schema::SystemDataTypeTable
   };
-  static const int64_t values[] = { 0, 8, 2712, 2968, 4264 };
+  static const int64_t values[] = { 0, 8, 2712, 2968, 4344 };
   static const char * const names[] = {
     "timestamp",
     "ds",

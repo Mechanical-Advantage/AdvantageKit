@@ -131,6 +131,8 @@ class LoggedSystemStats {
     table.put("FD", info.isFd());
     table.put("Available", info.isAvailable());
     table.put("InterfaceUp", info.isUp());
+    table.put("UtilizationPercent", info.utilizationPercent());
+    table.put("FPS", info.fps());
   }
 
   private static void logVector3(LogTable table, Vector3 vector) {

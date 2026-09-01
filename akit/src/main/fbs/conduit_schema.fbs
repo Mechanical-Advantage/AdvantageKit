@@ -85,6 +85,8 @@ struct CANInfo {
     is_fd:bool;
     is_available:bool;
     is_up:bool;
+    utilization_percent:float64;
+    fps:float64;
 }
 
 struct Vector3 {

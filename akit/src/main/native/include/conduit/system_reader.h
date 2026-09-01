@@ -12,8 +12,10 @@
 #include <wpi/nt/DoubleTopic.hpp>
 #include <wpi/nt/IntegerTopic.hpp>
 #include <wpi/nt/StringTopic.hpp>
+#include <wpi/nt/StructArrayTopic.hpp>
 #include <wpi/nt/StructTopic.hpp>
-#include "conduit/io_faults.h"
+
+#include "conduit/systemcore_structs.h"
 #include "conduit_schema_generated.h"
 using namespace org::littletonrobotics::conduit;
 
@@ -48,7 +50,9 @@ private:
 	wpi::nt::DoubleArraySubscriber network_usb0_sub;
 	wpi::nt::DoubleArraySubscriber network_usb1_sub;
 	wpi::nt::DoubleArraySubscriber network_can_subs[NUM_CAN_BUSES];
-	wpi::nt::DoubleArraySubscriber network_can_info_sub;
+	wpi::nt::StructArraySubscriber<CanBusInfoEntry> network_can_info_sub;
+	wpi::nt::DoubleArraySubscriber network_can_util_sub;
+	wpi::nt::DoubleArraySubscriber network_can_fps_sub;
 
 	wpi::nt::DoubleSubscriber cpu_percent_sub;
 	wpi::nt::DoubleSubscriber cpu_temp_sub;
