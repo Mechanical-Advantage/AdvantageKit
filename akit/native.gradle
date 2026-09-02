@@ -7,7 +7,8 @@ nativeUtils.withCrossLinuxArm64()
 nativeUtils {
     wpi {
         configureDependencies {
-            wpiVersion = "2027.0.0-alpha-6"
+            wpiVersion = "2027.0.0-alpha-7"
+            mrcLibVersion = "2027.1.0-alpha-1-116-g5288562"
             opencvVersion = "4.13.0-3"
         }
     }
@@ -219,7 +220,7 @@ model {
                 }
             }
 
-            nativeUtils.useRequiredLibrary(it, "wpilib_shared", "googletest_static")
+            nativeUtils.useRequiredLibrary(it, "wpilib_shared", "catch2_static")
         }
     }
 }

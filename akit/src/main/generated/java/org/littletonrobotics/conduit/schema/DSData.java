@@ -28,23 +28,23 @@ public final class DSData extends Struct {
   public void mutateAllianceStation(int alliance_station) { bb.putInt(bb_pos + 0, alliance_station); }
   public int eventName(int j) { return bb.get(bb_pos + 4 + j * 1); }
   public void mutateEventName(int j, int event_name) { bb.put(bb_pos + 4 + j * 1, (byte) event_name); }
-  public int gameData(int j) { return bb.get(bb_pos + 68 + j * 1); }
-  public void mutateGameData(int j, int game_data) { bb.put(bb_pos + 68 + j * 1, (byte) game_data); }
-  public int matchNumber() { return bb.getShort(bb_pos + 78) & 0xFFFF; }
-  public void mutateMatchNumber(int match_number) { bb.putShort(bb_pos + 78, (short) match_number); }
-  public int replayNumber() { return bb.get(bb_pos + 80) & 0xFF; }
-  public void mutateReplayNumber(int replay_number) { bb.put(bb_pos + 80, (byte) replay_number); }
-  public int matchType() { return bb.getInt(bb_pos + 84); }
-  public void mutateMatchType(int match_type) { bb.putInt(bb_pos + 84, match_type); }
-  public long controlWord() { return bb.getLong(bb_pos + 88); }
-  public void mutateControlWord(long control_word) { bb.putLong(bb_pos + 88, control_word); }
-  public double matchTime() { return bb.getDouble(bb_pos + 96); }
-  public void mutateMatchTime(double match_time) { bb.putDouble(bb_pos + 96, match_time); }
+  public int gameData(int j) { return bb.get(bb_pos + 69 + j * 1); }
+  public void mutateGameData(int j, int game_data) { bb.put(bb_pos + 69 + j * 1, (byte) game_data); }
+  public int matchNumber() { return bb.getShort(bb_pos + 134) & 0xFFFF; }
+  public void mutateMatchNumber(int match_number) { bb.putShort(bb_pos + 134, (short) match_number); }
+  public int replayNumber() { return bb.get(bb_pos + 136) & 0xFF; }
+  public void mutateReplayNumber(int replay_number) { bb.put(bb_pos + 136, (byte) replay_number); }
+  public int matchType() { return bb.getInt(bb_pos + 140); }
+  public void mutateMatchType(int match_type) { bb.putInt(bb_pos + 140, match_type); }
+  public long controlWord() { return bb.getLong(bb_pos + 144); }
+  public void mutateControlWord(long control_word) { bb.putLong(bb_pos + 144, control_word); }
+  public double matchTime() { return bb.getDouble(bb_pos + 152); }
+  public void mutateMatchTime(double match_time) { bb.putDouble(bb_pos + 152, match_time); }
   public org.littletonrobotics.conduit.schema.Joystick joysticks(int j) { return joysticks(new org.littletonrobotics.conduit.schema.Joystick(), j); }
-  public org.littletonrobotics.conduit.schema.Joystick joysticks(org.littletonrobotics.conduit.schema.Joystick obj, int j) { return obj.__assign(bb_pos + 104 + j * 424, bb); }
+  public org.littletonrobotics.conduit.schema.Joystick joysticks(org.littletonrobotics.conduit.schema.Joystick obj, int j) { return obj.__assign(bb_pos + 160 + j * 424, bb); }
 
   public static int createDSData(FlatBufferBuilder builder, int allianceStation, int[] eventName, int[] gameData, int matchNumber, int replayNumber, int matchType, long controlWord, double matchTime, int[][] joysticks_name, int[] joysticks_type, int[] joysticks_supportedOutputs, int[] joysticks_axesAvailable, float[][] joysticks_axisValues, short[][] joysticks_axisRaw, long[] joysticks_buttonsAvailable, long[] joysticks_buttons, int[] joysticks_povsAvailable, int[][] joysticks_povValues, boolean[] joysticks_isGamepad, int[] joysticks_touchpadCount, int[][] joysticks_touchpads_fingerCount, int[][][] joysticks_touchpads_fingers_down, float[][][] joysticks_touchpads_fingers_x, float[][][] joysticks_touchpads_fingers_y) {
-    builder.prep(8, 2648);
+    builder.prep(8, 2704);
     for (int _idx0 = 6; _idx0 > 0; _idx0--) {
       builder.prep(8, 424);
       builder.pad(4);
@@ -89,11 +89,10 @@ public final class DSData extends Struct {
     builder.pad(3);
     builder.putByte((byte) replayNumber);
     builder.putShort((short) matchNumber);
-    builder.pad(1);
-    for (int _idx0 = 9; _idx0 > 0; _idx0--) {
+    for (int _idx0 = 65; _idx0 > 0; _idx0--) {
       builder.putByte((byte) gameData[_idx0-1]);
     }
-    for (int _idx0 = 64; _idx0 > 0; _idx0--) {
+    for (int _idx0 = 65; _idx0 > 0; _idx0--) {
       builder.putByte((byte) eventName[_idx0-1]);
     }
     builder.putInt(allianceStation);

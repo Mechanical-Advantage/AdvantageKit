@@ -5,8 +5,11 @@ namespace org.littletonrobotics.conduit.schema;
 // 12 axes per joystick
 // 12 POVs per joystick
 // Joystick name: 256 chars
-// Event name: 64 chars
-// Game specific message: 9 chars
+// Event name: 65 chars
+// Game specific message: 65 chars
+// OS hash: 65 chars
+// OS slot: 65 chars
+// OS version: 65 chars
 
 // If you change any of these numbers, you MUST update the corresponding constants in api and io implementations!
 
@@ -39,8 +42,8 @@ struct Joystick {
 
 struct DSData {
     alliance_station:int32;
-    event_name:[uint8:64];
-    game_data:[uint8:9];
+    event_name:[uint8:65];
+    game_data:[uint8:65];
     match_number:uint16;
     replay_number:uint8;
     match_type:int32;
@@ -82,6 +85,8 @@ struct CANInfo {
     is_fd:bool;
     is_available:bool;
     is_up:bool;
+    utilization_percent:float64;
+    fps:float64;
 }
 
 struct Vector3 {
@@ -132,6 +137,10 @@ struct SystemData {
 
     cpu_percent:float64;
     cpu_temp:float64;
+    current_3v3:float64;
+    os_hash:[uint8:65];
+    os_slot:[uint8:65];
+    os_version:[uint8:65];
 
     memory_usage_bytes:int64;
     memory_total_bytes:int64;

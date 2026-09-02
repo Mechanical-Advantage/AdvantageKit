@@ -32,9 +32,15 @@ public final class CANInfo extends Struct {
   public void mutateIsAvailable(boolean is_available) { bb.put(bb_pos + 9, (byte)(is_available ? 1 : 0)); }
   public boolean isUp() { return 0!=bb.get(bb_pos + 10); }
   public void mutateIsUp(boolean is_up) { bb.put(bb_pos + 10, (byte)(is_up ? 1 : 0)); }
+  public double utilizationPercent() { return bb.getDouble(bb_pos + 16); }
+  public void mutateUtilizationPercent(double utilization_percent) { bb.putDouble(bb_pos + 16, utilization_percent); }
+  public double fps() { return bb.getDouble(bb_pos + 24); }
+  public void mutateFps(double fps) { bb.putDouble(bb_pos + 24, fps); }
 
-  public static int createCANInfo(FlatBufferBuilder builder, double maxBandwidthMbps, boolean isFd, boolean isAvailable, boolean isUp) {
-    builder.prep(8, 16);
+  public static int createCANInfo(FlatBufferBuilder builder, double maxBandwidthMbps, boolean isFd, boolean isAvailable, boolean isUp, double utilizationPercent, double fps) {
+    builder.prep(8, 32);
+    builder.putDouble(fps);
+    builder.putDouble(utilizationPercent);
     builder.pad(5);
     builder.putBoolean(isUp);
     builder.putBoolean(isAvailable);

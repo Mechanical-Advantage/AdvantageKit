@@ -12,15 +12,13 @@ import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.Radians;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import org.littletonrobotics.junction.LogTable;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
-import org.wpilib.networktables.DoublePublisher;
-import org.wpilib.networktables.NetworkTable;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.units.measure.Distance;
 
 /**
@@ -29,18 +27,12 @@ import org.wpilib.units.measure.Distance;
  * <p>A root is the anchor point of other nodes (such as ligaments).
  *
  * <p>Do not create objects of this class directly! Obtain instances from the {@link
- * org.wpilib.smartdashboard.Mechanism2d#getRoot(String, double, double)} factory method.
+ * LoggedMechanism2d#getRoot(String, double, double)} factory method.
  *
  * <p>Append other nodes by using {@link #append(LoggedMechanismObject2d)}.
  */
-public final class LoggedMechanismRoot2d implements AutoCloseable {
-  private final String m_name;
-  private NetworkTable m_table;
-  private final Map<String, LoggedMechanismObject2d> m_objects = new LinkedHashMap<>(1);
-  private double m_x;
-  private DoublePublisher m_xPub;
-  private double m_y;
-  private DoublePublisher m_yPub;
+public final class LoggedMechanismRoot2d extends LoggedMechanismObject2d {
+  private final double[] m_location = new double[2];
 
   /**
    * Package-private constructor for roots.
@@ -50,46 +42,13 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
    * @param y y coordinate of root (provide only when constructing a root node)
    */
   LoggedMechanismRoot2d(String name, double x, double y) {
-    m_name = name;
-    m_x = x;
-    m_y = y;
+    super(name);
+    m_location[0] = x;
+    m_location[1] = y;
   }
 
   LoggedMechanismRoot2d(String name, Distance x, Distance y) {
     this(name, x.in(Meters), y.in(Meters));
-  }
-
-  @Override
-  public void close() {
-    if (m_xPub != null) {
-      m_xPub.close();
-    }
-    if (m_yPub != null) {
-      m_yPub.close();
-    }
-    for (LoggedMechanismObject2d obj : m_objects.values()) {
-      obj.close();
-    }
-  }
-
-  /**
-   * Append a Mechanism object that is based on this one.
-   *
-   * @param <T> The object type.
-   * @param object the object to add.
-   * @return the object given as a parameter, useful for variable assignments and call chaining.
-   * @throws UnsupportedOperationException if the object's name is already used - object names must
-   *     be unique.
-   */
-  public synchronized <T extends LoggedMechanismObject2d> T append(T object) {
-    if (m_objects.containsKey(object.getName())) {
-      throw new UnsupportedOperationException("Mechanism object names must be unique!");
-    }
-    m_objects.put(object.getName(), object);
-    if (m_table != null) {
-      object.update(m_table.getSubTable(object.getName()));
-    }
-    return object;
   }
 
   /**
@@ -99,51 +58,78 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
    * @param y new y coordinate
    */
   public synchronized void setPosition(double x, double y) {
-    m_x = x;
-    m_y = y;
-    flush();
-  }
-
-  synchronized void update(NetworkTable table) {
-    m_table = table;
-    if (m_xPub != null) {
-      m_xPub.close();
-    }
-    m_xPub = m_table.getDoubleTopic("x").publish();
-    if (m_yPub != null) {
-      m_yPub.close();
-    }
-    m_yPub = m_table.getDoubleTopic("y").publish();
-    flush();
-    for (LoggedMechanismObject2d obj : m_objects.values()) {
-      obj.update(m_table.getSubTable(obj.getName()));
-    }
+    m_location[0] = x;
+    m_location[1] = y;
   }
 
   /**
-   * Get the name of the root.
+   * Set the root's position.
    *
-   * @return The name of the root.
+   * @param x new x coordinate
+   * @param y new y coordinate
    */
-  public String getName() {
-    return m_name;
+  public synchronized void setPosition(Distance x, Distance y) {
+    setPosition(x.in(Meters), y.in(Meters));
   }
 
-  private void flush() {
-    if (m_xPub != null) {
-      m_xPub.set(m_x);
-    }
-    if (m_yPub != null) {
-      m_yPub.set(m_y);
+  /**
+   * Set the root's position.
+   *
+   * @param position new position
+   */
+  public synchronized void setPosition(Translation2d position) {
+    setPosition(position.getX(), position.getY());
+  }
+
+  /**
+   * Get the root's position.
+   *
+   * @return double array of [x, y] coordinates
+   */
+  public synchronized double[] getPosition() {
+    return m_location.clone();
+  }
+
+  /**
+   * Get the root's x coordinate.
+   *
+   * @return x coordinate
+   */
+  public synchronized double getX() {
+    return m_location[0];
+  }
+
+  /**
+   * Get the root's y coordinate.
+   *
+   * @return y coordinate
+   */
+  public synchronized double getY() {
+    return m_location[1];
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    synchronized (this) {
+      table.log("position", m_location);
+      super.logTo(table);
     }
   }
 
+  @Override
   synchronized void logOutput(LogTable table) {
-    table.put("x", m_x);
-    table.put("y", m_y);
-    for (LoggedMechanismObject2d obj : m_objects.values()) {
-      obj.logOutput(table.getSubtable(obj.getName()));
-    }
+    table.put("position", m_location);
+    super.logOutput(table);
+  }
+
+  @Override
+  public double getObject2dRange() {
+    return 0.0;
+  }
+
+  @Override
+  public double getAngle() {
+    return 0.0;
   }
 
   /**
@@ -160,7 +146,7 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
     ArrayList<Pose3d> poses = new ArrayList<>();
 
     // Coordinate shift changes from the xz plane to the xyz plane which is 'y' is 0
-    Pose3d initial_pose = new Pose3d(m_x, 0, m_y, new Rotation3d());
+    Pose3d initial_pose = new Pose3d(m_location[0], 0, m_location[1], new Rotation3d());
     for (Entry<String, LoggedMechanismObject2d> obj : m_objects.entrySet()) {
       // convert mech2d angle to Rotation3d
       // remembering that +rotation in 2d is -pitch in 3d
@@ -173,7 +159,7 @@ public final class LoggedMechanismRoot2d implements AutoCloseable {
       // recurse down the length of that ligament
       var next_pose =
           new_pose.transformBy(
-              new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.kZero));
+              new Transform3d(obj.getValue().getObject2dRange(), 0, 0, Rotation3d.ZERO));
       var more_poses = obj.getValue().generate3dMechanism(next_pose);
       poses.addAll(more_poses);
     }

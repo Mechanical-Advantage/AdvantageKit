@@ -32,8 +32,8 @@ public class LoggedRobot extends IterativeRobotBase {
   public static final double defaultPeriodSecs = 0.02;
 
   private final int notifier = NotifierJNI.createNotifier();
-  private final long periodUs;
-  private long nextCycleUs = 0;
+  private final long periodNs;
+  private long nextCycleNs = 0;
   private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
 
   private boolean useTiming = true;
@@ -50,7 +50,7 @@ public class LoggedRobot extends IterativeRobotBase {
    */
   protected LoggedRobot(double period) {
     super(period);
-    this.periodUs = (long) (period * 1000000);
+    this.periodNs = (long) (period * 1_000_000_000.0);
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
     HAL.reportUsage("Framework", "AdvantageKit");
@@ -88,13 +88,13 @@ public class LoggedRobot extends IterativeRobotBase {
       // Loop forever, calling the appropriate mode-dependent function
       while (true) {
         if (useTiming) {
-          long currentTimeUs = RobotController.getMonotonicTime();
-          if (nextCycleUs < currentTimeUs) {
+          long currentTimeNs = RobotController.getMonotonicTime();
+          if (nextCycleNs < currentTimeNs) {
             // Loop overrun, start next cycle immediately
-            nextCycleUs = currentTimeUs;
+            nextCycleNs = currentTimeNs;
           } else {
             // Wait before next cycle
-            NotifierJNI.setNotifierAlarm(notifier, nextCycleUs, 0, true, true);
+            NotifierJNI.setNotifierAlarm(notifier, nextCycleNs, 0, true, true);
 
             try {
               WPIUtilJNI.waitForObject(notifier);
@@ -104,7 +104,7 @@ public class LoggedRobot extends IterativeRobotBase {
               break;
             }
           }
-          nextCycleUs += periodUs;
+          nextCycleNs += periodNs;
         }
 
         long periodicBeforeStart = RobotController.getMonotonicTime();

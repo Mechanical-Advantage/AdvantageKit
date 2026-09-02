@@ -15,7 +15,7 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkChooser;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.wpilibj.GenericHID;
@@ -39,7 +39,7 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedNetworkChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -79,22 +79,22 @@ public class RobotContainer {
     }
 
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser = new LoggedNetworkChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    autoChooser.addOption(
+    autoChooser.add(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
+    autoChooser.add(
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
+    autoChooser.add(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    autoChooser.add(
         "Drive SysId (Quasistatic Reverse)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    autoChooser.add(
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    autoChooser.add(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings

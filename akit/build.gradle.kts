@@ -5,7 +5,7 @@ plugins {
     id("java")
     id("google-test")
     id("org.wpilib.WPILibRepositoriesPlugin") version "2027.0.0"
-    id("org.wpilib.NativeUtils") version "2027.7.1"
+    id("org.wpilib.NativeUtils") version "2027.14.3"
     id("org.wpilib.GradleJni") version "2027.0.0"
     id("org.wpilib.GradleVsCode") version "2027.0.0"
     id("com.diffplug.spotless") version "8.6.0"
@@ -19,10 +19,9 @@ sourceSets["main"].java {
 repositories {
     mavenCentral()
 }
-wpilibRepositories.use2027Repos()
 wpilibRepositories.addAllReleaseRepositories(project)
 
-val wpilibVersion = "2027.0.0-alpha-6"
+val wpilibVersion = "2027.0.0-alpha-7"
 
 dependencies {
     implementation("org.wpilib.cscore:cscore-java:$wpilibVersion")
@@ -33,6 +32,8 @@ dependencies {
     implementation("org.wpilib.wpimath:wpimath-java:$wpilibVersion")
     implementation("org.wpilib.wpiunits:wpiunits-java:$wpilibVersion")
     implementation("org.wpilib.datalog:datalog-java:$wpilibVersion")
+    implementation("org.wpilib.tunables:tunables-java:$wpilibVersion")
+    implementation("org.wpilib.telemetry:telemetry-java:$wpilibVersion")
     implementation("org.wpilib.hal:hal-java:$wpilibVersion")
     implementation("org.ejml:ejml-simple:0.44.0")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
