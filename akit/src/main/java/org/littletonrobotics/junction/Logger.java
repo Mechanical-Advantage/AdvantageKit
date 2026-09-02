@@ -21,6 +21,8 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.LogTable.LogValue;
+import org.littletonrobotics.junction.console.ConsoleData;
+import org.littletonrobotics.junction.console.ConsoleSource;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
@@ -46,6 +48,7 @@ public class Logger {
   private static LogTable outputTable;
   private static Map<String, String> metadata = new HashMap<>();
   private static ConsoleSource console = null;
+  private static ConsoleData consoleData = new ConsoleData(null, -1);
   private static List<LoggedNetworkInput> dashboardInputs = new ArrayList<>();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean enableConsole = true;
@@ -352,12 +355,14 @@ public class Logger {
       }
       long consoleCaptureStart = RobotController.getMonotonicTime();
       if (enableConsole) {
-        String consoleData = console.getNewData();
+        String newConsoleData = console.getNewData();
         if (extraConsoleData != null) {
-          consoleData += extraConsoleData;
+          newConsoleData += extraConsoleData;
         }
-        if (!consoleData.isEmpty()) {
-          recordOutput("Console", consoleData.trim());
+        if (!newConsoleData.isEmpty()) {
+          consoleData.data = newConsoleData.trim();
+          consoleData.index++;
+          recordOutput("Console", ConsoleData.proto, consoleData);
         }
       }
       long consoleCaptureEnd = RobotController.getMonotonicTime();

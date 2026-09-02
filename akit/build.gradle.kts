@@ -47,7 +47,7 @@ dependencies {
 }
 
 tasks.withType<Javadoc> {
-    exclude("com/google/flatbuffers/**", "org/littletonrobotics/conduit/**")
+    exclude("com/google/flatbuffers/**", "org/littletonrobotics/conduit/**", "org/littletonrobotics/**/schema/*", "org/littletonrobotics/**/*Proto.java")
     title = "AdvantageKit API"
     options {
         (this as StandardJavadocDocletOptions).links("https://docs.oracle.com/en/java/javase/25/docs/api/", "https://github.wpilib.org/allwpilib/docs/release/java/")
