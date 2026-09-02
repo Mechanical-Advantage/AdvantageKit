@@ -23,7 +23,7 @@ The AdvantageKit differential drive template is **open-source** and **fully cust
 
 ## Setup {#setup}
 
-1. Download the differential drive template project from the AdvantageKit release on GitHub and open it in VSCode.
+1. Download the differential drive template project from the [AdvantageKit release](https://github.com/Mechanical-Advantage/AdvantageKit/releases) on GitHub and open it in VSCode.
 
 2. Click the WPILib icon in the VSCode toolbar and find the task `WPILib: Set Team Number`. Enter your team number and press enter.
 
