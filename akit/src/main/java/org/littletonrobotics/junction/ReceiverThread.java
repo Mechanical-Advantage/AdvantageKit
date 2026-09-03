@@ -35,9 +35,16 @@ class ReceiverThread extends Thread {
       while (true) {
         LogTable entry = queue.take(); // Wait for data
 
-        // Send data to receivers
+        // Send data to receivers — catch InterruptedException per-receiver so that a single
+        // receiver throwing it does not prematurely exit the loop and starve other receivers.
         for (int i = 0; i < dataReceivers.size(); i++) {
-          dataReceivers.get(i).putTable(entry);
+          try {
+            dataReceivers.get(i).putTable(entry);
+          } catch (InterruptedException e) {
+            // A receiver signalled an interrupt; treat it as a receiver-level error and
+            // re-interrupt the thread so the outer catch can initiate clean shutdown.
+            Thread.currentThread().interrupt();
+          }
         }
       }
     } catch (InterruptedException exception) {
