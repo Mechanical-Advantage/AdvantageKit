@@ -111,11 +111,11 @@ Every one of these use cases **depends on being able to run replay faster than r
 
 ### Comparison {#comparison}
 
-| AdvantageKit/PyKit                                                  | Hoot Replay                                        |
-| ------------------------------------------------------------------- | -------------------------------------------------- |
-| ✅ Run as fast as possible (e.g. ~50x real-time)                    | ❌ Accuracy decreases with faster speeds           |
-| ✅ [Replay Watch](/getting-started/replay-watch) for fast iteration | ❌ Replay process is fully manual                  |
-| ✅ Pull and push logs directly to AdvantageScope                    | ❌ Manual file management, multiple logs per match |
+| AdvantageKit/PyKit                                                  | Hoot Replay                              |
+| ------------------------------------------------------------------- | ---------------------------------------- |
+| ✅ Run as fast as possible (e.g. ~50x real-time)                    | ❌ Accuracy decreases with faster speeds |
+| ✅ [Replay Watch](/getting-started/replay-watch) for fast iteration | ❌ Replay process is fully manual        |
+| ✅ Pull and push logs directly to AdvantageScope                    | ❌ Manual file management                |
 
 Deterministic replay means that accuracy is unaffected by the replay speed. Running replay ~50 times faster than real-time is common, which means that **a 10 minute match log can be replayed in just _12 seconds_**. AdvantageKit is designed to make rapid iteration as painless as possible through features like [Replay Watch](/getting-started/replay-watch) and integration with AdvantageScope; just open a log, run replay, and see the results with _no manual log management required_.
 
@@ -129,11 +129,11 @@ The video below demonstrates what the difference in speed between deterministic 
 
 While Hoot Replay involves significant trade-offs, its core design goal is to "simplify" hardware interactions. Unlike AdvantageKit, some subsystems may be compatible with Hoot Replay while using CTRE's standard subsystem structure (combining high-level logic, hardware configuration, low-level controls, and simulation in a single class).
 
-Subsystems under Hoot Replay fall into the two categories shown below. Note that users must select a **single CAN bus** to replay, which means that many subsystems using entirely CTRE devices are not natively compatible with Hoot Replay. For subsystems that are not natively compatible, **every input must be manually logged and replayed**.
+Subsystems under Hoot Replay fall into the two categories shown below. For subsystems that are not natively compatible, **every input must be manually logged and replayed**.
 
-| **Natively Compatible**                                | **Manual Logging**                                                                                                                                                                                             |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <ul><li>CTRE devices on the replayed CAN bus</li></ul> | <ul><li>All other CTRE devices</li><li>Non-CTRE devices</li><li>Non-CAN sensors (e.g. RIO data)</li><li>Network devices (e.g. Limelight, PhotonVision)</li><li>Dashboard inputs (e.g. auto choosers)</li></ul> |
+| **Natively Compatible**                  | **Manual Logging**                                                                                                                                                                                                    |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <ul><li>Phoenix 6 CTRE devices</li></ul> | <ul><li>All other CTRE devices</li><li>Non-CTRE devices</li><li>Non-CAN sensors (e.g. analog encoders)</li><li>Network devices (e.g. Limelight, PhotonVision)</li><li>Dashboard inputs (e.g. auto choosers)</li></ul> |
 
 ### Hardware Abstraction vs. Data Injection {#hardware-abstraction-vs-data-injection}
 
@@ -685,19 +685,18 @@ Did you notice that this example of Hoot Replay actually has **three separate** 
 
 ## 📋 Miscellaneous {#miscellaneous}
 
-The table below provides an overview of the differences between each replay tool. Note that some of the restrictions of Hoot Replay can be addressed via complex manual logging as discussed above.
+The table below provides an overview of the differences between each replay tool.
 
 |                     | AdvantageKit                                       | PyKit                                       | Hoot Replay                                                                             |
 | ------------------- | -------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------- |
 | **Accuracy**        | ✅ Deterministic                                   | ✅ Deterministic                            | ❌ Non-deterministic                                                                    |
 | **Rapid Iteration** | ✅ Replay at any speed                             | ✅ Replay at any speed                      | ❌ Accuracy decreases with speed                                                        |
 | **Code Structure**  | ✅ Hardware abstraction + automatic logging        | ✅ Hardware abstraction + automatic logging | ❌ Manual data injection                                                                |
-| **Vendor**          | ✅ No restriction + templates for multiple vendors | ✅ No restriction                           | ❌ Vendor-locked to CTRE devices                                                        |
-| **CAN Buses**       | ✅ No restriction                                  | ✅ No restriction                           | ❌ Requires a single CAN bus                                                            |
+| **Vendor**          | ✅ No restriction + templates for multiple vendors | ✅ No restriction                           | ❌ Locked to CTRE devices                                                               |
 | **FRC Languages**   | Java                                               | Python                                      | Java, Python, C++                                                                       |
 | **Pricing**         | Free & Open Source                                 | Free & Open Source                          | 💰 Subscription: Requires [Phoenix Pro](https://store.ctr-electronics.com/phoenix-pro/) |
-| **Users in 2025**   | 598 teams                                          | NA                                          | &lt;10 teams                                                                            |
+| **Users in 2026**   | 852 teams                                          | ~30 teams                                   | &lt;10 teams                                                                            |
 
 :::note
-The number of AdvantageKit users is based on official usage reporting data published by FIRST. The number of Hoot Replay users is estimated based on a search of public GitHub repositories using Hoot Replay and the percentage of all teams that publish code on GitHub.
+The number of AdvantageKit users is based on official usage reporting data published by FIRST. The number of PyKit and Hoot Replay users is estimated based on a search of public GitHub repositories adjusted based on the percentage of all teams that publish code on GitHub.
 :::
