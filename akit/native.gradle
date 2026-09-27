@@ -1,4 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
+import org.gradle.nativeplatform.tasks.AbstractLinkTask
+import org.gradle.nativeplatform.tasks.LinkSharedLibrary
 
 nativeUtils.addWpiNativeUtils()
 nativeUtils.withCrossSystemCore()
@@ -221,6 +223,58 @@ model {
             }
 
             nativeUtils.useRequiredLibrary(it, "wpilib_shared", "catch2_static")
+        }
+    }
+}
+
+// Sign native shared libraries
+tasks.withType(AbstractLinkTask).configureEach { task ->
+    task.inputs.property "HasDeveloperId", project.hasProperty("developerID")
+    task.inputs.property "HasAzureSign", project.hasProperty("azureSign")
+
+    if (project.hasProperty("developerID")) {
+        if (task instanceof LinkSharedLibrary) {
+            doLast {
+                String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
+                def devId = project.findProperty("developerID")
+                if (devId == null || devId.toString().isEmpty() || devId.toString() == "true") {
+                    devId = "Developer ID Application"
+                }
+                providers.exec {
+                    setWorkingDir(rootDir)
+                    def args = [
+                        "sh",
+                        "-c",
+                        "codesign --force --strict --timestamp --options=runtime --verbose -s \"${devId}\" \"${path}\""
+                    ]
+                    commandLine(args)
+                }.result.get()
+            }
+        }
+    }
+
+    if (project.hasProperty("azureSign")) {
+        if (task instanceof LinkSharedLibrary) {
+            doLast {
+                String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
+                providers.exec {
+                    setWorkingDir(rootDir)
+                    def endpoint = System.getenv("AZURE_SIGNING_ENDPOINT") ?: ""
+                    def account = System.getenv("AZURE_SIGNING_ACCOUNT_NAME") ?: ""
+                    def certProfile = System.getenv("AZURE_SIGNING_CERTIFICATE_PROFILE") ?: ""
+                    def args = [
+                        "sign",
+                        "code",
+                        "artifact-signing",
+                        "--artifact-signing-endpoint", endpoint,
+                        "--artifact-signing-account", account,
+                        "--artifact-signing-certificate-profile", certProfile,
+                        "--timestamp-url", "http://timestamp.acs.microsoft.com",
+                        path
+                    ]
+                    commandLine(args)
+                }.result.get()
+            }
         }
     }
 }
