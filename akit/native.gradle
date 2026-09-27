@@ -196,6 +196,7 @@ model {
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.systemcore)
             // Leave these for future proofing
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.windowsarm64)
             sources {
                 cpp {
                     source {
