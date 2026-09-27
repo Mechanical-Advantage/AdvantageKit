@@ -162,6 +162,8 @@ jobs:
     name: "Build for ${{ matrix.name }}"
     runs-on: ${{ matrix.runner-image }}
     container: ${{ matrix.container }}
+    env:
+      GRADLE_SIGN_ARGS: ""
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
@@ -179,18 +181,55 @@ jobs:
         uses: BSFishy/pip-action@v1
         with:
           packages: requests
+      - name: "Load macOS certificate"
+        if: |
+          github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
+          matrix.classifier == 'osxuniversal'
+        uses: apple-actions/import-codesign-certs@v7
+        with:
+          p12-file-base64: ${{ secrets.APPLE_DEVELOPER_ID }}
+          p12-password: ${{ secrets.APPLE_DEVELOPER_ID_PWD }}
+      - name: "Set macOS signing args"
+        if: |
+          github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
+          matrix.classifier == 'osxuniversal'
+        shell: bash
+        run: |
+          echo "GRADLE_SIGN_ARGS=-PdeveloperID" >> $GITHUB_ENV
+      - name: "Install Windows signing tool"
+        if: |
+          github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
+          startsWith(matrix.classifier, 'windows')
+        run: dotnet tool install --global sign --prerelease
+      - name: "Load Windows signing credentials"
+        if: |
+          github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
+          startsWith(matrix.classifier, 'windows')
+        shell: bash
+        run: |
+          echo "AZURE_TENANT_ID=${{ secrets.AZURE_SIGNING_TENANT_ID }}" >> $GITHUB_ENV
+          echo "AZURE_CLIENT_ID=${{ secrets.AZURE_SIGNING_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "AZURE_CLIENT_SECRET=${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "AZURE_SIGNING_ENDPOINT=${{ vars.AZURE_SIGNING_ENDPOINT }}" >> $GITHUB_ENV
+          echo "AZURE_SIGNING_ACCOUNT_NAME=${{ vars.AZURE_SIGNING_ACCOUNT_NAME }}" >> $GITHUB_ENV
+          echo "AZURE_SIGNING_CERTIFICATE_PROFILE=${{ vars.AZURE_SIGNING_CERTIFICATE_PROFILE }}" >> $GITHUB_ENV
+          echo "GRADLE_SIGN_ARGS=-PazureSign" >> $GITHUB_ENV
       - name: "Build and test"
-        run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }}
+        run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }} ${{ env.GRADLE_SIGN_ARGS }}
       - name: "Development: Publish local"
         if: github.event_name != 'release'
-        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }}
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }} ${{ env.GRADLE_SIGN_ARGS }}
       - name: "Release: Get version number"
         id: get_version
         if: github.event_name == 'release'
         uses: battila7/get-version-action@v2
       - name: "Release: Publish local"
         if: github.event_name == 'release'
-        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }} "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }} ${{ env.GRADLE_SIGN_ARGS }} "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
       - name: "Release: Publish zip"
         if: github.event_name == 'release'
         run: |
