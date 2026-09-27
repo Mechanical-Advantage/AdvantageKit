@@ -3,7 +3,6 @@ import org.gradle.internal.os.OperatingSystem
 nativeUtils.addWpiNativeUtils()
 nativeUtils.withCrossSystemCore()
 nativeUtils.withCrossLinuxArm64()
-nativeUtils.withCrossWindowsArm64()
 
 nativeUtils {
     wpi {
@@ -197,7 +196,6 @@ model {
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.systemcore)
             // Leave these for future proofing
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.windowsarm64)
             sources {
                 cpp {
                     source {

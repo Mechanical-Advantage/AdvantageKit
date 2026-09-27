@@ -138,22 +138,27 @@ jobs:
             runner-image: ubuntu-24.04
             classifier: "linuxx86-64"
             container: ""
+            extra-args: ""
           - name: "Linux (arm64)"
             runner-image: ubuntu-24.04
             classifier: "linuxarm64"
             container: wpilib/aarch64-cross-debian:trixie
+            extra-args: ""
           - name: "macOS"
             runner-image: macos-latest
             classifier: "osxuniversal"
             container: ""
+            extra-args: ""
           - name: "Windows (x64)"
             runner-image: windows-latest
             classifier: "windowsx86-64"
             container: ""
+            extra-args: ""
           - name: "Windows (arm64)"
             runner-image: windows-latest
             classifier: "windowsarm64"
             container: ""
+            extra-args: "-Pbuildwinarm64"
     name: "Build for ${{ matrix.name }}"
     runs-on: ${{ matrix.runner-image }}
     container: ${{ matrix.container }}
@@ -175,17 +180,17 @@ jobs:
         with:
           packages: requests
       - name: "Build and test"
-        run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1
+        run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }}
       - name: "Development: Publish local"
         if: github.event_name != 'release'
-        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }}
       - name: "Release: Get version number"
         id: get_version
         if: github.event_name == 'release'
         uses: battila7/get-version-action@v2
       - name: "Release: Publish local"
         if: github.event_name == 'release'
-        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }} "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
       - name: "Release: Publish zip"
         if: github.event_name == 'release'
         run: |
