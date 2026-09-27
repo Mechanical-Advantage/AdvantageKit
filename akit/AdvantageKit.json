@@ -27,7 +27,8 @@
         "linuxx86-64",
         "linuxarm64",
         "osxuniversal",
-        "windowsx86-64"
+        "windowsx86-64",
+        "windowsarm64"
       ]
     }
   ],
