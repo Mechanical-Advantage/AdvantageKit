@@ -151,7 +151,7 @@ public class WPILOGReader implements LogReplaySource {
               break; // End of cycle
             }
 
-          } else if (timestamp != null && record.getTimestamp() == timestamp) {
+          } else if (timestamp != null) {
             entry = entry.substring(1); // Remove leading slash
             if (entry.startsWith("ReplayOutputs")) {
               // Don't retrieve old replay outputs
