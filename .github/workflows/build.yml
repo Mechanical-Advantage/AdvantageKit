@@ -190,7 +190,7 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.APPLE_DEVELOPER_ID }}
           p12-password: ${{ secrets.APPLE_DEVELOPER_ID_PWD }}
-      - name: "Set macOS signing args"
+      - name: "Set macOS signing argument"
         if: |
           github.repository == 'Mechanical-Advantage/AdvantageKit' &&
           github.event_name == 'release' &&
