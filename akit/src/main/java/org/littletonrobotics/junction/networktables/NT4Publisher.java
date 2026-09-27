@@ -29,7 +29,9 @@ public class NT4Publisher implements LogDataReceiver {
         akitTable
             .getIntegerTopic(timestampKey.substring(1))
             .publishEx(
-                IntegerTopic.TYPE_STRING, "{\"unit\":\"nanoseconds\"}", PubSubOption.SEND_ALL);
+                IntegerTopic.TYPE_STRING,
+                "{\"unit\":\"nanoseconds\",\"mutable\":\"false\"}",
+                PubSubOption.SEND_ALL);
   }
 
   public void putTable(LogTable table) {
@@ -56,7 +58,10 @@ public class NT4Publisher implements LogDataReceiver {
         publisher =
             akitTable
                 .getTopic(key)
-                .genericPublish(field.getValue().getNT4Type(), PubSubOption.SEND_ALL);
+                .genericPublishEx(
+                    field.getValue().getNT4Type(),
+                    "{\"mutable\":\"false\"}",
+                    PubSubOption.SEND_ALL);
         publishers.put(key, publisher);
 
         // Set initial unit
