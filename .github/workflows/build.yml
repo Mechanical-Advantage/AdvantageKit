@@ -184,6 +184,7 @@ jobs:
       - name: "Load macOS certificate"
         if: |
           github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
           matrix.classifier == 'osxuniversal'
         uses: apple-actions/import-codesign-certs@v7
         with:
@@ -192,6 +193,7 @@ jobs:
       - name: "Set macOS signing args"
         if: |
           github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
           matrix.classifier == 'osxuniversal'
         shell: bash
         run: |
@@ -199,11 +201,13 @@ jobs:
       - name: "Install Windows signing tool"
         if: |
           github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
           startsWith(matrix.classifier, 'windows')
         run: dotnet tool install --global sign --prerelease
       - name: "Load Windows signing credentials"
         if: |
           github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
           startsWith(matrix.classifier, 'windows')
         shell: bash
         run: |
