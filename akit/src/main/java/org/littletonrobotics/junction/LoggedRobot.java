@@ -17,12 +17,12 @@ import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 
 /**
- * LoggedRobot implements the IterativeRobotBase robot program framework.
+ * LoggedRobot is the robot base class for a robot with a single periodic loop (no separate OpMode
+ * classes). It is the equivalent of WPILib's TimedRobot and should be subclassed by the Robot class
+ * in the user program.
  *
- * <p>The LoggedRobot class is intended to be subclassed by a user creating a robot program, and
- * will call all required AdvantageKit periodic methods.
- *
- * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
+ * <p>As with all AdvantageKit robot base classes, custom periodic callbacks are not supported. See
+ * the documentation for more details and recommended alternatives.
  */
 public class LoggedRobot extends IterativeRobotBase {
   /** Default loop period. */

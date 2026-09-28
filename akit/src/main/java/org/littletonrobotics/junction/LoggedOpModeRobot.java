@@ -47,25 +47,23 @@ import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 
 /**
- * LoggedOpModeRobot implements the opmode-based robot program framework.
+ * LoggedOpModeRobot is the robot base class for a robot with separate OpMode classes. It is
+ * the equivalent of WPILib's OpModeRobot and should be subclassed by the Robot class in the user
+ * program.
  *
- * <p>The LoggedOpModeRobot class is intended to be subclassed by a user creating a robot program,
- * and will call all required AdvantageKit periodic methods.
- *
+ * <p>As with all AdvantageKit robot base classes, custom periodic callbacks are not supported. See
+ * the documentation for more details and recommended alternatives.
+ * 
  * <p>Classes annotated with {@link Autonomous}, {@link Teleop}, and {@link Utility} in the same
  * package or subpackages as the user's subclass are automatically registered as autonomous, teleop,
- * and utility opmodes respectively.
+ * and utility OpModes respectively.
  *
- * <p>Opmodes are constructed when selected on the driver station. While selected and disabled,
+ * <p>OpModes are constructed when selected on the driver station. While selected and disabled,
  * {@link OpMode#disabledPeriodic()} is called. When enabled, {@link OpMode#start()} is called once
  * and {@link OpMode#periodic()} runs at the rate from {@link #getPeriod()}. On disable or mode
- * switch while enabled, {@link OpMode#end()} is called and the opmode is then closed and discarded.
- * When no opmode is selected, {@link #nonePeriodic()} is called. {@link #driverStationConnected()}
+ * switch while enabled, {@link OpMode#end()} is called and the OpModes is then closed and discarded.
+ * When no OpModes is selected, {@link #nonePeriodic()} is called. {@link #driverStationConnected()}
  * is called once when the DS first connects.
- *
- * <p><b>All functions run as a single periodic loop for compatibility with AdvantageKit replay.
- * Custom periodic callbacks registered by Opmodes will be <i>ignored</i> (a warning will be printed
- * instead).</b>
  */
 public abstract class LoggedOpModeRobot extends RobotBase {
   private final ControlWord word = new ControlWord();
