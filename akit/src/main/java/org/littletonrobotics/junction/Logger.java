@@ -7,6 +7,8 @@
 
 package org.littletonrobotics.junction;
 
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,9 +46,11 @@ public class Logger {
   private static long cycleCount = 0;
   private static LogTable entry = new LogTable(0);
   private static LogTable outputTable;
+  private static LogTable robotBaseTable = entry.getSubtable("RobotBase");
   private static Map<String, String> metadata = new HashMap<>();
   private static ConsoleSource console = null;
   private static List<LoggedNetworkInput> dashboardInputs = new ArrayList<>();
+  private static final GcStatsCollector gcStatsCollector = new GcStatsCollector();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean enableConsole = true;
   private static boolean checkRobotBase = true;
@@ -136,19 +140,48 @@ public class Logger {
     return replaySource != null;
   }
 
+  /** Collect stats about garbage collection. */
+  private static final class GcStatsCollector {
+    private List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
+    private final long[] lastTimes = new long[gcBeans.size()];
+    private final long[] lastCounts = new long[gcBeans.size()];
+
+    public void update() {
+      long accumTime = 0;
+      long accumCounts = 0;
+      for (int i = 0; i < gcBeans.size(); i++) {
+        long gcTime = gcBeans.get(i).getCollectionTime();
+        long gcCount = gcBeans.get(i).getCollectionCount();
+        accumTime += gcTime - lastTimes[i];
+        accumCounts += gcCount - lastCounts[i];
+
+        lastTimes[i] = gcTime;
+        lastCounts[i] = gcCount;
+      }
+
+      robotBaseTable.put("GCTimeMS", (double) accumTime);
+      robotBaseTable.put("GCCounts", (double) accumCounts);
+    }
+  }
+
   /** Starts running the logging system, including any data receivers or the replay source. */
   public static void start() {
     if (!running) {
       running = true;
 
-      // Exit if LoggedRobot not present
+      // Exit if valid base class not present
       if (checkRobotBase) {
         var stackTrace = Thread.currentThread().getStackTrace();
         boolean isValid = false;
         for (var element : stackTrace) {
           try {
             Class<?> elementClass = Class.forName(element.getClassName());
-            if (LoggedRobot.class.isAssignableFrom(elementClass)) {
+            if (LoggedOpModeRobot.class.isAssignableFrom(elementClass)) {
+              robotBaseTable = entry.getSubtable("LoggedOpModeRobot");
+              isValid = true;
+              break;
+            } else if (LoggedRobot.class.isAssignableFrom(elementClass)) {
+              robotBaseTable = entry.getSubtable("LoggedRobot");
               isValid = true;
               break;
             }
@@ -157,7 +190,7 @@ public class Logger {
         }
         if (!isValid) {
           DriverStationErrors.reportError(
-              "The main robot class must inherit from LoggedRobot when using AdvantageKit. For more details, check the AdvantageKit installation documentation: https://docs.advantagekit.org/getting-started/installation\n\n*** EXITING DUE TO INVALID ADVANTAGEKIT INSTALLATION, SEE ABOVE. ***",
+              "The main robot class must inherit from LoggedRobot or LoggedOpModeRobot when using AdvantageKit. For more details, check the AdvantageKit installation documentation: https://docs.advantagekit.org/getting-started/installation\n\n*** EXITING DUE TO INVALID ADVANTAGEKIT INSTALLATION, SEE ABOVE. ***",
               false);
           System.exit(1);
         }
@@ -360,7 +393,9 @@ public class Logger {
           recordOutput("Console", consoleData.trim());
         }
       }
-      long consoleCaptureEnd = RobotController.getMonotonicTime();
+      long gcStatsStart = RobotController.getMonotonicTime();
+      gcStatsCollector.update();
+      long gcStatsEnd = RobotController.getMonotonicTime();
 
       // Record timing data
       recordOutput("Logger/ConduitCaptureMS", (dsStart - conduitCaptureStart) / 1_000_000.0);
@@ -371,13 +406,14 @@ public class Logger {
       recordOutput("Logger/AutoLogMS", (alertLogStart - autoLogStart) / 1_000_000.0);
       recordOutput("Logger/AlertLogMS", (radioLogStart - alertLogStart) / 1_000_000.0);
       recordOutput("Logger/RadioLogMS", (consoleCaptureStart - radioLogStart) / 1_000_000.0);
-      recordOutput("Logger/ConsoleMS", (consoleCaptureEnd - consoleCaptureStart) / 1_000_000.0);
-      recordOutput("LoggedRobot/UserCodeMS", userCodeLength / 1_000_000.0);
-      long periodicAfterLength = consoleCaptureEnd - conduitCaptureStart;
-      recordOutput(
-          "LoggedRobot/LogPeriodicMS", (periodicBeforeLength + periodicAfterLength) / 1_000_000.0);
-      recordOutput(
-          "LoggedRobot/FullCycleMS",
+      recordOutput("Logger/ConsoleMS", (gcStatsStart - consoleCaptureStart) / 1_000_000.0);
+      recordOutput("Logger/GCStatsMS", (gcStatsEnd - gcStatsStart) / 1_000_000.0);
+      robotBaseTable.put("UserCodeMS", userCodeLength / 1_000_000.0);
+      long periodicAfterLength = gcStatsEnd - conduitCaptureStart;
+      robotBaseTable.put(
+          "LogPeriodicMS", (periodicBeforeLength + periodicAfterLength) / 1_000_000.0);
+      robotBaseTable.put(
+          "FullCycleMS",
           (periodicBeforeLength + userCodeLength + periodicAfterLength) / 1_000_000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
 
