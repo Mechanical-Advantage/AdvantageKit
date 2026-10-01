@@ -15,7 +15,7 @@ wpi.sim.addGui().defaultEnabled = false
 wpi.sim.addDriverstation()
 ```
 
-To enable the GUI by default when running the simulation, change `defaultEnabled` to `true`. The value of `defaultEnabled` sets the extensions that are used when running `./gradlew simulateJava`, as well as the extensions that are selected by default when launching the simulation from VSCode.
+To enable the GUI by default when running the simulation, change `defaultEnabled` to `true`. The value of `defaultEnabled` sets the extensions that are used when running `./gradlew run`, as well as the extensions that are selected by default when launching the simulation from VSCode.
 
 :::warning
 If the GUI is enabled by default, it must be disabled manually before running replay. When launching from VSCode, uncheck all of the extensions in the prompt before starting the simulation.
@@ -56,9 +56,9 @@ public static final Mode simMode = Mode.valueOf(System.getProperty("simMode", "S
 The mode can now be selected when launching the simulation:
 
 ```bash
-./gradlew simulateJava                                     # Simulation, with the GUI enabled
-./gradlew simulateJava -Dakit.log.path=/path/to/log.wpilog # Replay a specific log file
-./gradlew simulateJava -DsimMode=REPLAY                    # Replay the log open in AdvantageScope, or prompt for a path
+./gradlew run                                     # Simulation, with the GUI enabled
+./gradlew run -Dakit.log.path=/path/to/log.wpilog # Replay a specific log file
+./gradlew run -DsimMode=REPLAY                    # Replay the log open in AdvantageScope, or prompt for a path
 ```
 
 When running from Windows PowerShell, wrap each `-D` argument in quotes (e.g. `"-Dakit.log.path=C:\path\to\log.wpilog"`).
@@ -68,7 +68,7 @@ Gradle accepts two types of properties from the command line: `-D` sets a Java s
 To change the default value of a property without passing it each time, add a line such as `systemProp.simMode=REPLAY` to the `gradle.properties` file in the project, or to `~/.gradle/gradle.properties` to apply it to a single computer. Values passed on the command line override the values from `gradle.properties`. Check the [Gradle documentation](https://docs.gradle.org/current/userguide/build_environment.html) for more details.
 :::
 
-[Replay watch](./replay-watch.md) is also supported by providing the log path, either using `./gradlew replayWatch -Dakit.log.path=/path/to/log.wpilog` or by setting the `AKIT_LOG_PATH` environment variable. Note that setting `AKIT_LOG_PATH` for the entire shell will cause `./gradlew simulateJava` to always run in replay.
+[Replay watch](./replay-watch.md) is also supported by providing the log path, either using `./gradlew replayWatch -Dakit.log.path=/path/to/log.wpilog` or by setting the `AKIT_LOG_PATH` environment variable. Note that setting `AKIT_LOG_PATH` for the entire shell will cause `./gradlew run` to always run in replay.
 
 :::info
 The Gradle arguments are not available when launching the simulation from VSCode, which always runs in simulation with this configuration. Use the default extensions in the VSCode prompt for simulation, or uncheck all of the extensions and set the default value of `simMode` in `Constants.java` to `"REPLAY"` for replay.
