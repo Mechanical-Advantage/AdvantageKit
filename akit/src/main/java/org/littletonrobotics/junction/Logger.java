@@ -46,7 +46,7 @@ public class Logger {
   private static long cycleCount = 0;
   private static LogTable entry = new LogTable(0);
   private static LogTable outputTable;
-  private static LogTable robotBaseTable = entry.getSubtable("RobotBase");
+  private static String robotBasePrefix = "RobotBase";
   private static Map<String, String> metadata = new HashMap<>();
   private static ConsoleSource console = null;
   private static List<LoggedNetworkInput> dashboardInputs = new ArrayList<>();
@@ -159,8 +159,8 @@ public class Logger {
         lastCounts[i] = gcCount;
       }
 
-      robotBaseTable.put("GCTimeMS", (double) accumTime);
-      robotBaseTable.put("GCCounts", (double) accumCounts);
+      recordOutput(robotBasePrefix + "/GCTimeMS", (double) accumTime);
+      recordOutput(robotBasePrefix + "/GCCounts", (double) accumCounts);
     }
   }
 
@@ -177,11 +177,11 @@ public class Logger {
           try {
             Class<?> elementClass = Class.forName(element.getClassName());
             if (LoggedOpModeRobot.class.isAssignableFrom(elementClass)) {
-              robotBaseTable = entry.getSubtable("LoggedOpModeRobot");
+              robotBasePrefix = "LoggedOpModeRobot";
               isValid = true;
               break;
             } else if (LoggedRobot.class.isAssignableFrom(elementClass)) {
-              robotBaseTable = entry.getSubtable("LoggedRobot");
+              robotBasePrefix = "LoggedRobot";
               isValid = true;
               break;
             }
@@ -408,12 +408,13 @@ public class Logger {
       recordOutput("Logger/RadioLogMS", (consoleCaptureStart - radioLogStart) / 1_000_000.0);
       recordOutput("Logger/ConsoleMS", (gcStatsStart - consoleCaptureStart) / 1_000_000.0);
       recordOutput("Logger/GCStatsMS", (gcStatsEnd - gcStatsStart) / 1_000_000.0);
-      robotBaseTable.put("UserCodeMS", userCodeLength / 1_000_000.0);
+      recordOutput(robotBasePrefix + "/UserCodeMS", userCodeLength / 1_000_000.0);
       long periodicAfterLength = gcStatsEnd - conduitCaptureStart;
-      robotBaseTable.put(
-          "LogPeriodicMS", (periodicBeforeLength + periodicAfterLength) / 1_000_000.0);
-      robotBaseTable.put(
-          "FullCycleMS",
+      recordOutput(
+          robotBasePrefix + "/LogPeriodicMS",
+          (periodicBeforeLength + periodicAfterLength) / 1_000_000.0);
+      recordOutput(
+          robotBasePrefix + "/FullCycleMS",
           (periodicBeforeLength + userCodeLength + periodicAfterLength) / 1_000_000.0);
       recordOutput("Logger/QueuedCycles", receiverQueue.size());
 
