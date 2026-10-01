@@ -9,23 +9,20 @@ package org.littletonrobotics.junction;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.util.List;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.IterativeRobotBase;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 
 /**
- * LoggedRobot implements the IterativeRobotBase robot program framework.
+ * LoggedRobot is the robot base class for a robot with a single periodic loop (no separate OpMode
+ * classes). It is the equivalent of WPILib's TimedRobot and should be subclassed by the Robot class
+ * in the user program.
  *
- * <p>The LoggedRobot class is intended to be subclassed by a user creating a robot program, and
- * will call all required AdvantageKit periodic methods.
- *
- * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
+ * <p>As with all AdvantageKit robot base classes, custom periodic callbacks are not supported. See
+ * the documentation for more details and recommended alternatives.
  */
 public class LoggedRobot extends IterativeRobotBase {
   /** Default loop period. */
@@ -34,7 +31,6 @@ public class LoggedRobot extends IterativeRobotBase {
   private final int notifier = NotifierJNI.createNotifier();
   private final long periodNs;
   private long nextCycleNs = 0;
-  private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
 
   private boolean useTiming = true;
 
@@ -53,8 +49,8 @@ public class LoggedRobot extends IterativeRobotBase {
     this.periodNs = (long) (period * 1_000_000_000.0);
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
-    HAL.reportUsage("Framework", "AdvantageKit");
-    HAL.reportUsage("LoggingFramework", "AdvantageKit");
+    UsageReporting.reportUsage("Framework", "AdvantageKit_LoggedRobot");
+    UsageReporting.reportUsage("LoggingFramework", "AdvantageKit");
   }
 
   @Override
@@ -113,7 +109,6 @@ public class LoggedRobot extends IterativeRobotBase {
         loopFunc();
         long userCodeEnd = RobotController.getMonotonicTime();
 
-        gcStatsCollector.update();
         Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
       }
     } catch (Exception exception) {
@@ -133,34 +128,22 @@ public class LoggedRobot extends IterativeRobotBase {
   }
 
   /**
+   * Return the system clock time in nanoseconds for the start of the current loop cycle. This is
+   * the same as Timer.getTimestamp() and Logger.getTimestamp(), but is stable through a loop. It is
+   * updated at the beginning of every loop cycle.
+   *
+   * @return Robot running time in nanoseconds, as of the start of the current loop cycle.
+   */
+  public long getLoopStartTime() {
+    return Logger.getTimestamp();
+  }
+
+  /**
    * Sets whether to use standard timing or run as fast as possible.
    *
    * @param useTiming If true, use standard timing. If false, run as fast as possible.
    */
   public void setUseTiming(boolean useTiming) {
     this.useTiming = useTiming;
-  }
-
-  private static final class GcStatsCollector {
-    private List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
-    private final long[] lastTimes = new long[gcBeans.size()];
-    private final long[] lastCounts = new long[gcBeans.size()];
-
-    public void update() {
-      long accumTime = 0;
-      long accumCounts = 0;
-      for (int i = 0; i < gcBeans.size(); i++) {
-        long gcTime = gcBeans.get(i).getCollectionTime();
-        long gcCount = gcBeans.get(i).getCollectionCount();
-        accumTime += gcTime - lastTimes[i];
-        accumCounts += gcCount - lastCounts[i];
-
-        lastTimes[i] = gcTime;
-        lastCounts[i] = gcCount;
-      }
-
-      Logger.recordOutput("LoggedRobot/GCTimeMS", (double) accumTime);
-      Logger.recordOutput("LoggedRobot/GCCounts", (double) accumCounts);
-    }
   }
 }
