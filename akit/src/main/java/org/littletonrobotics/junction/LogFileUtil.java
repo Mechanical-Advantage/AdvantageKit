@@ -28,6 +28,7 @@ public class LogFileUtil {
    * @return The new path.
    */
   public static String addPathSuffix(String path, String suffix) {
+    if (suffix.isEmpty()) return path;
     int dotIndex = path.lastIndexOf(".");
     if (dotIndex == -1) {
       return path;
@@ -100,7 +101,9 @@ public class LogFileUtil {
         Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
     String advantageScopeLogPath = null;
     try (Scanner fileScanner = new Scanner(advantageScopeTempPath)) {
-      advantageScopeLogPath = fileScanner.nextLine();
+      if (fileScanner.hasNextLine()) {
+        advantageScopeLogPath = fileScanner.nextLine();
+      }
     } catch (IOException e) {
     }
     return advantageScopeLogPath;
