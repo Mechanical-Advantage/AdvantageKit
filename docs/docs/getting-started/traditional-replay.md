@@ -21,6 +21,8 @@ String logPath = LogFileUtil.findReplayLog();
 // 3. The result of the prompt displayed to the user
 ```
 
+See [finding the replay log](#finding-the-replay-log) for more details.
+
 - A replay source such as `WPILOGReader`:
 
 ```java
@@ -41,9 +43,31 @@ Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim
 setUseTiming(false);
 ```
 
+## Finding the Replay Log {#finding-the-replay-log}
+
+The `LogFileUtil` class provides helper functions for selecting the log files used in replay. These functions are optional, and the log path can be provided from any source.
+
+`LogFileUtil.findReplayLog()` returns the path of the log to replay, checking the following sources in order:
+
+1. **`AKIT_LOG_PATH` environment variable:** If set, its value is used as the log path. This is useful when launching replay from a script or the [command line](./replay-configuration.md#selecting-the-mode-from-the-command-line).
+2. **AdvantageScope:** The log file currently open in AdvantageScope is used, so replay can be started without providing a path after opening the original log.
+3. **Prompt:** If neither source is available, the path is requested in the terminal. Quotes around the path are removed, so paths copied or dragged into the terminal can be used directly.
+
+`LogFileUtil.addPathSuffix(path, suffix)` generates the path for the replayed log by adding a suffix to the original filename (e.g. `match.wpilog` → `match_sim.wpilog`). If the filename already ends with the suffix, a numeric index is added instead (`match_sim.wpilog` → `match_sim_2.wpilog` → `match_sim_3.wpilog`), so replaying the output of a previous replay does not overwrite it.
+
 ## Usage {#usage}
 
-To launch log replay, start the robot project in [simulation](https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/introduction.html). The generated log file will be opened automatically in AdvantageScope (check the API documentation for `WPILOGWriter` for details on customizing this behavior). Replay outputs are stored in the `ReplayOutputs` table alongside the unmodified inputs and outputs (stored in the `RealOutputs` table).
+To launch log replay, start the robot project in [simulation](https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/introduction.html). The generated log file will be opened automatically in AdvantageScope. Replay outputs are stored in the `ReplayOutputs` table alongside the unmodified inputs and outputs (stored in the `RealOutputs` table).
+
+The behavior for opening log files in AdvantageScope can be customized by passing an `AdvantageScopeOpenBehavior` to the `WPILOGWriter` constructor (check the [API docs](pathname:///javadoc/org/littletonrobotics/junction/wpilog/WPILOGWriter.AdvantageScopeOpenBehavior.html) for details):
+
+- `AUTO` (default): Open the log file in AdvantageScope when running in replay.
+- `ALWAYS`: Always open the log file in AdvantageScope when running in simulation.
+- `NEVER`: Never open the log file in AdvantageScope.
+
+```java
+Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"), AdvantageScopeOpenBehavior.NEVER));
+```
 
 :::tip
 The simulation GUI **must be disabled** when running in replay. The GUI is disabled by default in the AdvantageKit template projects.
