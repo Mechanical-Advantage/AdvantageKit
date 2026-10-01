@@ -21,6 +21,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -47,13 +49,13 @@ import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 
 /**
- * LoggedOpModeRobot is the robot base class for a robot with separate OpMode classes. It is
- * the equivalent of WPILib's OpModeRobot and should be subclassed by the Robot class in the user
+ * LoggedOpModeRobot is the robot base class for a robot with separate OpMode classes. It is the
+ * equivalent of WPILib's OpModeRobot and should be subclassed by the Robot class in the user
  * program.
  *
  * <p>As with all AdvantageKit robot base classes, custom periodic callbacks are not supported. See
  * the documentation for more details and recommended alternatives.
- * 
+ *
  * <p>Classes annotated with {@link Autonomous}, {@link Teleop}, and {@link Utility} in the same
  * package or subpackages as the user's subclass are automatically registered as autonomous, teleop,
  * and utility OpModes respectively.
@@ -61,9 +63,9 @@ import org.wpilib.util.WPIUtilJNI;
  * <p>OpModes are constructed when selected on the driver station. While selected and disabled,
  * {@link OpMode#disabledPeriodic()} is called. When enabled, {@link OpMode#start()} is called once
  * and {@link OpMode#periodic()} runs at the rate from {@link #getPeriod()}. On disable or mode
- * switch while enabled, {@link OpMode#end()} is called and the OpModes is then closed and discarded.
- * When no OpModes is selected, {@link #nonePeriodic()} is called. {@link #driverStationConnected()}
- * is called once when the DS first connects.
+ * switch while enabled, {@link OpMode#end()} is called and the OpModes is then closed and
+ * discarded. When no OpModes is selected, {@link #nonePeriodic()} is called. {@link
+ * #driverStationConnected()} is called once when the DS first connects.
  */
 public abstract class LoggedOpModeRobot extends RobotBase {
   private final ControlWord word = new ControlWord();
@@ -384,9 +386,7 @@ public abstract class LoggedOpModeRobot extends RobotBase {
     addAnnotatedOpModeImpl(cls, auto, teleop, utility);
   }
 
-  private void addAnnotatedOpModeClass(String name) {
-    // trim ".class" from end
-    String className = name.replace('/', '.').substring(0, name.length() - 6);
+  private void addAnnotatedOpModeClass(String className) {
     Class<? extends OpMode> cls;
     try {
       cls =
@@ -408,17 +408,19 @@ public abstract class LoggedOpModeRobot extends RobotBase {
     }
   }
 
-  private void addAnnotatedOpModeClassesDir(File root, File dir, String packagePath) {
+  private void addAnnotatedOpModeClassesDir(
+      File root, File dir, String packageName, Set<String> classNames) {
     File[] files = dir.listFiles();
     if (files == null) {
       return;
     }
     for (File file : files) {
       if (file.isDirectory()) {
-        addAnnotatedOpModeClassesDir(root, file, packagePath);
+        addAnnotatedOpModeClassesDir(root, file, packageName, classNames);
       } else if (file.getName().endsWith(".class")) {
         String relPath = root.toPath().relativize(file.toPath()).toString().replace('\\', '/');
-        addAnnotatedOpModeClass(packagePath + "." + relPath);
+        String relClassName = relPath.substring(0, relPath.length() - 6).replace('/', '.');
+        classNames.add(packageName.isEmpty() ? relClassName : packageName + "." + relClassName);
       }
     }
   }
@@ -434,6 +436,7 @@ public abstract class LoggedOpModeRobot extends RobotBase {
     String packageName = pkg.getName();
     String packagePath = packageName.replace('.', '/');
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Set<String> classNames = new TreeSet<>();
 
     try {
       Enumeration<URL> resources = classLoader.getResources(packagePath);
@@ -458,19 +461,28 @@ public abstract class LoggedOpModeRobot extends RobotBase {
               if (!name.startsWith(packagePath) || !name.endsWith(".class")) {
                 continue;
               }
-              addAnnotatedOpModeClass(name);
+              String className = name.substring(0, name.length() - 6).replace('/', '.');
+              classNames.add(className);
             }
           }
         } else if ("file".equals(resource.getProtocol())) {
           // Handle .class files in directories
           File dir = new File(resource.toURI());
           if (dir.exists() && dir.isDirectory()) {
-            addAnnotatedOpModeClassesDir(dir, dir, packagePath);
+            addAnnotatedOpModeClassesDir(dir, dir, packageName, classNames);
           }
         }
       }
     } catch (IOException | URISyntaxException e) {
       e.printStackTrace();
+    }
+
+    // Add all found classes in alphabetical order to ensure deterministic order
+    // across platforms. This differs from the original WPILib behavior, but is
+    // necessary to ensure that OpMode IDs are consistent across platforms in case
+    // of a name hash conflict (since the resolution depends on registration order).
+    for (String className : classNames) {
+      addAnnotatedOpModeClass(className);
     }
   }
 
