@@ -55,10 +55,11 @@ class AlertLogger {
         }
       }
 
-      Logger.recordOutput(group + "/.type", "Alerts");
-      Logger.recordOutput(group + "/errors", errors.toArray(new String[0]));
-      Logger.recordOutput(group + "/warnings", warnings.toArray(new String[0]));
-      Logger.recordOutput(group + "/infos", infos.toArray(new String[0]));
+      String table = group.isEmpty() ? "Alerts" : "AlertGroups/" + group;
+      Logger.recordOutput(table + "/.type", "Alerts");
+      Logger.recordOutput(table + "/errors", errors.toArray(new String[0]));
+      Logger.recordOutput(table + "/warnings", warnings.toArray(new String[0]));
+      Logger.recordOutput(table + "/infos", infos.toArray(new String[0]));
     }
   }
 }

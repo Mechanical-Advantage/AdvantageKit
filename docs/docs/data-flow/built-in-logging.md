@@ -36,7 +36,7 @@ Dashboard inputs accessed **via AdvantageKit dashboard classes** are automatical
 
 ### Alerts {#alerts}
 
-The state of any alerts created through WPILib's [persistent alerts](https://docs.wpilib.org/en/latest/docs/software/telemetry/persistent-alerts.html) API will be automatically logged as outputs. These alerts can be visualized using AdvantageScope's 📉 [Line Graph](https://docs.advantagescope.org/tab-reference/line-graph) tab. These fields are available under the `RealOutputs` or `ReplayOutputs` table.
+The state of any alerts created through WPILib's [persistent alerts](https://docs.wpilib.org/en/latest/docs/software/telemetry/persistent-alerts.html) API will be automatically logged as outputs. These alerts can be visualized using AdvantageScope's 📉 [Line Graph](https://docs.advantagescope.org/tab-reference/line-graph) tab. Alerts in the default group are available under `RealOutputs/Alerts` (or `ReplayOutputs/Alerts`), while alerts in custom groups are stored under the `AlertGroups` subtable (e.g. `RealOutputs/AlertGroups/MyGroup`).
 
 ![Alerts screenshot](img/alerts-1.png)
 
