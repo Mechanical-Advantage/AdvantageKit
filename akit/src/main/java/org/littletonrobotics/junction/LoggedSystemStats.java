@@ -80,14 +80,14 @@ class LoggedSystemStats {
     table.put("OS/Version", conduit.getOSVersion());
 
     logVector3(table.getSubtable("IMU/AccelRaw"), conduit.getIMUAccelRaw(), "G");
-    logVector3(table.getSubtable("IMU/GyroRates"), conduit.getIMUGyroRates(), "degrees per second");
-    logVector3(table.getSubtable("IMU/GyroEuler/Flat"), conduit.getIMUGyroEulerFlat(), "degrees");
+    logVector3(table.getSubtable("IMU/GyroRates"), conduit.getIMUGyroRates(), "radians per second");
+    logVector3(table.getSubtable("IMU/GyroEuler/Flat"), conduit.getIMUGyroEulerFlat(), "radians");
     logVector3(
         table.getSubtable("IMU/GyroEuler/Landscape"),
         conduit.getIMUGyroEulerLandscape(),
-        "degrees");
+        "radians");
     logVector3(
-        table.getSubtable("IMU/GyroEuler/Portrait"), conduit.getIMUGyroEulerPortrait(), "degrees");
+        table.getSubtable("IMU/GyroEuler/Portrait"), conduit.getIMUGyroEulerPortrait(), "radians");
     table.put("IMU/Gyro3d", conduit.getIMUGyroRotation3d());
     table.put("IMU/GyroYaw/Flat", conduit.getIMUGyroYawFlat());
     table.put("IMU/GyroYaw/Landscape", conduit.getIMUGyroYawLandscape());
