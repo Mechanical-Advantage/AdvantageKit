@@ -8,6 +8,7 @@
 package org.littletonrobotics.junction.wpilog;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.FileSystems;
@@ -33,6 +34,7 @@ import org.wpilib.system.RobotController;
 public class WPILOGWriter implements LogDataReceiver {
   // Wait several seconds after DS attached to ensure time is updated
   private static final double timestampUpdateDelay = 5.0;
+  private static final long flushPeriod = 250000L; // Flush every 250ms
   private static final String defaultPathRobot = "/U/logs";
   private static final String defaultPathSim = "logs";
   private static final DateTimeFormatter timeFormatter =
@@ -50,9 +52,11 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private DataLogWriter log;
   private boolean isOpen = false;
+  private FileOutputStream fileOutputStream;
   private final AdvantageScopeOpenBehavior openBehavior;
   private LogTable lastTable;
   private int timestampID;
+  private long lastFlushTimestamp = 0;
   private Map<String, Integer> entryIDs;
   private Map<String, LoggableType> entryTypes;
   private Map<String, String> entryUnits;
@@ -144,6 +148,9 @@ public class WPILOGWriter implements LogDataReceiver {
     System.out.println("[AdvantageKit] Logging to \"" + logPath + "\"");
     try {
       log = new DataLogWriter(logPath, WPILOGConstants.extraHeader);
+      if (RobotBase.isReal()) {
+        fileOutputStream = new FileOutputStream(logPath, true);
+      }
     } catch (IOException e) {
       DriverStationErrors.reportError("[AdvantageKit] Failed to open output log file.", true);
       return;
@@ -167,6 +174,12 @@ public class WPILOGWriter implements LogDataReceiver {
 
   public void end() {
     log.close();
+    if (fileOutputStream != null) {
+      try {
+        fileOutputStream.close();
+      } catch (IOException e) {
+      }
+    }
 
     // Send log path to AdvantageScope
     boolean shouldOpen =
@@ -279,8 +292,9 @@ public class WPILOGWriter implements LogDataReceiver {
 
         File fileA = new File(folder, filename);
         File fileB = new File(folder, newFilename);
-        fileA.renameTo(fileB);
-        filename = newFilename;
+        if (fileA.renameTo(fileB)) {
+          filename = newFilename;
+        }
       }
     }
 
@@ -370,6 +384,13 @@ public class WPILOGWriter implements LogDataReceiver {
 
     // Flush to disk
     log.flush();
+    if (fileOutputStream != null && table.getTimestamp() - lastFlushTimestamp > flushPeriod) {
+      lastFlushTimestamp = table.getTimestamp();
+      try {
+        fileOutputStream.getFD().sync();
+      } catch (IOException e) {
+      }
+    }
 
     // Update last table
     lastTable = table;
