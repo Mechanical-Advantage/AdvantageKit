@@ -342,7 +342,7 @@ public class WPILOGWriter implements LogDataReceiver {
           matchType = MatchType.NONE;
           break;
       }
-      if (logMatchText == null && matchType != MatchType.NONE) {
+      if (matchType != MatchType.NONE) {
         logMatchText = "";
         switch (matchType) {
           case PRACTICE:
@@ -368,14 +368,17 @@ public class WPILOGWriter implements LogDataReceiver {
       } else {
         newFilenameBuilder.append(timeFormatter.format(logDate));
       }
-      String eventName = table.get("DriverStation/EventName", "").toLowerCase();
-      if (eventName.length() > 0) {
-        newFilenameBuilder.append("_");
-        newFilenameBuilder.append(eventName);
-      }
-      if (logMatchText != null) {
-        newFilenameBuilder.append("_");
-        newFilenameBuilder.append(logMatchText);
+      boolean fmsAttached = table.get("DriverStation/FMSAttached", false);
+      if (fmsAttached) {
+        String eventName = table.get("DriverStation/EventName", "").toLowerCase();
+        if (eventName.length() > 0) {
+          newFilenameBuilder.append("_");
+          newFilenameBuilder.append(eventName);
+        }
+        if (logMatchText != null) {
+          newFilenameBuilder.append("_");
+          newFilenameBuilder.append(logMatchText);
+        }
       }
       newFilenameBuilder.append(".wpilog");
       String newFilename = newFilenameBuilder.toString();
