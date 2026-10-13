@@ -8,15 +8,22 @@
 package org.littletonrobotics.junction.wpilog;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.channels.FileChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.Queue;
 import java.util.Random;
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
@@ -32,7 +39,10 @@ import org.wpilib.system.RobotController;
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
   // Wait several seconds after DS attached to ensure time is updated
-  private static final double timestampUpdateDelay = 5.0;
+  private static final double timestampUpdateDelayNs = 5_000_000_000L;
+  private static final long flushPeriodNs = 250_000L;
+  private static final long mountCheckPeriodNs = 250_000L;
+  private static final long mountTimeoutNs = 15_000_000_000L;
   private static final String defaultPathRobot = "/U/logs";
   private static final String defaultPathSim = "logs";
   private static final DateTimeFormatter timeFormatter =
@@ -41,8 +51,9 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private String folder;
   private String filename;
+  private final Optional<String> usbPrefix;
   private final String randomIdentifier;
-  private Double dsAttachedTime;
+  private OptionalLong dsAttachedTime;
 
   private boolean autoRename;
   private LocalDateTime logDate;
@@ -50,9 +61,15 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private DataLogWriter log;
   private boolean isOpen = false;
+  private boolean waitingForMount = false;
+  private long mountWaitStartTime = 0;
+  private long lastMountCheckTimestamp = 0;
+  private final Queue<LogTable> pendingTables = new ArrayDeque<>();
+  private FileOutputStream fileOutputStream;
   private final AdvantageScopeOpenBehavior openBehavior;
   private LogTable lastTable;
   private int timestampID;
+  private long lastFlushTimestamp = 0;
   private Map<String, Integer> entryIDs;
   private Map<String, LoggableType> entryTypes;
   private Map<String, String> entryUnits;
@@ -88,6 +105,7 @@ public class WPILOGWriter implements LogDataReceiver {
       filename = "akit_" + randomIdentifier + ".wpilog";
       autoRename = true;
     }
+    usbPrefix = USBDriveUtil.getUSBDrivePrefix(folder);
   }
 
   /**
@@ -126,29 +144,65 @@ public class WPILOGWriter implements LogDataReceiver {
         AdvantageScopeOpenBehavior.AUTO);
   }
 
+  private static void syncDirectory(String dirPath) {
+    if (dirPath == null) {
+      return;
+    }
+    try (FileChannel dirChannel = FileChannel.open(Path.of(dirPath), StandardOpenOption.READ)) {
+      dirChannel.force(true);
+    } catch (Exception ignored) {
+    }
+  }
+
   public void start() {
+    if (usbPrefix.isPresent()) {
+      if (USBDriveUtil.isUSBMounted(usbPrefix.get())) {
+        openLogFile();
+      } else {
+        waitingForMount = true;
+        mountWaitStartTime = RobotController.getMonotonicTime();
+        lastMountCheckTimestamp = 0;
+        System.out.println(
+            "[AdvantageKit] Waiting for USB drive to mount before opening log at \""
+                + folder
+                + "\"...");
+      }
+    } else {
+      openLogFile();
+    }
+  }
+
+  private void openLogFile() {
     // Create folder if necessary
-    File logFolder = new File(folder);
-    if (!logFolder.exists()) {
-      logFolder.mkdirs();
+    if (folder != null) {
+      File logFolder = new File(folder);
+      if (!logFolder.exists()) {
+        logFolder.mkdirs();
+      }
     }
 
     // Delete log if it already exists
-    File logFile = new File(folder, filename);
+    File logFile = folder == null ? new File(filename) : new File(folder, filename);
     if (logFile.exists()) {
       logFile.delete();
     }
 
     // Create new log
-    String logPath = Path.of(folder, filename).toString();
+    String logPath =
+        folder == null ? filename : FileSystems.getDefault().getPath(folder, filename).toString();
     System.out.println("[AdvantageKit] Logging to \"" + logPath + "\"");
     try {
       log = new DataLogWriter(logPath, WPILOGConstants.extraHeader);
+      if (RobotBase.isReal()) {
+        fileOutputStream = new FileOutputStream(logPath, true);
+        syncDirectory(folder);
+      }
     } catch (IOException e) {
       DriverStationErrors.reportError("[AdvantageKit] Failed to open output log file.", true);
       return;
     }
     isOpen = true;
+    waitingForMount = false;
     timestampID =
         log.start(
             timestampKey,
@@ -166,7 +220,25 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   public void end() {
+    if (waitingForMount) {
+      waitingForMount = false;
+      pendingTables.clear();
+      return;
+    }
+
+    if (!isOpen) {
+      return;
+    }
+
     log.close();
+    if (fileOutputStream != null) {
+      try {
+        fileOutputStream.getFD().sync();
+        fileOutputStream.close();
+        syncDirectory(folder);
+      } catch (IOException e) {
+      }
+    }
 
     // Send log path to AdvantageScope
     boolean shouldOpen =
@@ -178,11 +250,13 @@ public class WPILOGWriter implements LogDataReceiver {
     if (shouldOpen) {
       try {
         String fullLogPath =
-            FileSystems.getDefault()
-                .getPath(folder, filename)
-                .normalize()
-                .toAbsolutePath()
-                .toString();
+            folder == null
+                ? FileSystems.getDefault().getPath(filename).normalize().toAbsolutePath().toString()
+                : FileSystems.getDefault()
+                    .getPath(folder, filename)
+                    .normalize()
+                    .toAbsolutePath()
+                    .toString();
         Path advantageScopeTempPath =
             Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
         PrintWriter writer = new PrintWriter(advantageScopeTempPath.toString(), "UTF-8");
@@ -197,9 +271,41 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   public void putTable(LogTable table) {
+    if (waitingForMount) {
+      pendingTables.add(table);
+      long now = table.getTimestamp();
+      if (now - lastMountCheckTimestamp > mountCheckPeriodNs) {
+        lastMountCheckTimestamp = now;
+        if (USBDriveUtil.isUSBMounted(usbPrefix.get())) {
+          openLogFile();
+          if (isOpen) {
+            while (!pendingTables.isEmpty()) {
+              putTableInternal(pendingTables.poll());
+            }
+          } else {
+            waitingForMount = false;
+            pendingTables.clear();
+          }
+        } else if (RobotController.getMonotonicTime() - mountWaitStartTime > mountTimeoutNs) {
+          waitingForMount = false;
+          pendingTables.clear();
+          DriverStationErrors.reportWarning(
+              "[AdvantageKit] Timed out waiting for USB drive at \""
+                  + folder
+                  + "\". Logging disabled.",
+              false);
+        }
+      }
+      return;
+    }
+
     // Exit if log not open
     if (!isOpen) return;
 
+    putTableInternal(table);
+  }
+
+  private void putTableInternal(LogTable table) {
     // Auto rename
     if (autoRename) {
 
@@ -209,9 +315,9 @@ public class WPILOGWriter implements LogDataReceiver {
                 && table.get("SystemStats/EpochTimeValid", false))
             || RobotBase.isSimulation()) {
           if (dsAttachedTime == null) {
-            dsAttachedTime = RobotController.getMonotonicTime() / 1_000_000_000.0;
-          } else if (RobotController.getMonotonicTime() / 1_000_000_000.0 - dsAttachedTime
-                  > timestampUpdateDelay
+            dsAttachedTime = OptionalLong.of(RobotController.getMonotonicTime());
+          } else if (RobotController.getMonotonicTime() - dsAttachedTime.getAsLong()
+                  > timestampUpdateDelayNs
               || RobotBase.isSimulation()) {
             logDate = LocalDateTime.now();
           }
@@ -274,13 +380,32 @@ public class WPILOGWriter implements LogDataReceiver {
       newFilenameBuilder.append(".wpilog");
       String newFilename = newFilenameBuilder.toString();
       if (!newFilename.equals(filename)) {
-        String logPath = Path.of(folder, newFilename).toString();
+        String logPath =
+            folder == null
+                ? newFilename
+                : FileSystems.getDefault().getPath(folder, newFilename).toString();
         System.out.println("[AdvantageKit] Renaming log to \"" + logPath + "\"");
 
-        File fileA = new File(folder, filename);
-        File fileB = new File(folder, newFilename);
-        fileA.renameTo(fileB);
-        filename = newFilename;
+        File fileA = folder == null ? new File(filename) : new File(folder, filename);
+        File fileB = folder == null ? new File(newFilename) : new File(folder, newFilename);
+        if (fileA.renameTo(fileB)) {
+          filename = newFilename;
+          if (RobotBase.isReal()) {
+            if (fileOutputStream != null) {
+              try {
+                fileOutputStream.getFD().sync();
+                fileOutputStream.close();
+              } catch (IOException ignored) {
+              }
+            }
+            try {
+              fileOutputStream = new FileOutputStream(logPath, true);
+            } catch (IOException ignored) {
+              fileOutputStream = null;
+            }
+            syncDirectory(folder);
+          }
+        }
       }
     }
 
@@ -370,6 +495,14 @@ public class WPILOGWriter implements LogDataReceiver {
 
     // Flush to disk
     log.flush();
+    if (fileOutputStream != null && table.getTimestamp() - lastFlushTimestamp > flushPeriodNs) {
+      lastFlushTimestamp = table.getTimestamp();
+      try {
+        fileOutputStream.getFD().sync();
+        syncDirectory(folder);
+      } catch (IOException e) {
+      }
+    }
 
     // Update last table
     lastTable = table;
