@@ -420,12 +420,20 @@ public class Logger {
       try {
         // Send a copy of the data to the receivers. The original object will be
         // kept and updated with the next timestamp (and new data if replaying).
-        receiverQueue.add(LogTable.clone(entry));
+        if (hasReplaySource()) {
+          // When in replay, block the thread if the queue is full to avoid dropping data
+          receiverQueue.put(LogTable.clone(entry));
+        } else {
+          // When not in replay, drop data rather than blocking the main thread
+          receiverQueue.add(LogTable.clone(entry));
+        }
         receiverQueueFault = false;
       } catch (IllegalStateException exception) {
         receiverQueueFault = true;
         DriverStationErrors.reportError(
             "[AdvantageKit] Capacity of receiver queue exceeded, data will NOT be logged.", false);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
     }
   }
