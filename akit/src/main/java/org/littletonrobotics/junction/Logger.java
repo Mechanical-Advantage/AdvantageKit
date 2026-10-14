@@ -40,7 +40,7 @@ import us.hebi.quickbuf.ProtoMessage;
 
 /** Central class for recording and replaying log data. */
 public class Logger {
-  private static final int receiverQueueCapacity = 500; // 10s at 50Hz
+  private static final int receiverQueueCapacity = 2000; // 10s at 200Hz
 
   private static boolean running = false;
   private static long cycleCount = 0;
@@ -415,7 +415,9 @@ public class Logger {
       recordOutput(
           robotBasePrefix + "/FullCycleMS",
           (periodicBeforeLength + userCodeLength + periodicAfterLength) / 1_000_000.0);
-      recordOutput("Logger/QueuedCycles", receiverQueue.size());
+
+      // Record receiver thread data
+      receiverThread.logOutputs();
 
       try {
         // Send a copy of the data to the receivers. The original object will be
