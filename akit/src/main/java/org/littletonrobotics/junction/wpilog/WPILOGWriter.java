@@ -555,9 +555,8 @@ public class WPILOGWriter implements LogDataReceiver {
       }
 
       // Flush to disk
-      long now = RobotController.getMonotonicTime();
-      if (now - lastFlushTimestamp > flushPeriodNs) {
-        lastFlushTimestamp = now;
+      if (table.getTimestamp() - lastFlushTimestamp > flushPeriodNs) {
+        lastFlushTimestamp = table.getTimestamp();
         try {
           wpilogEncoder.flush();
           fileOutputStream.getFD().sync();
