@@ -65,12 +65,12 @@ public class Logger {
 
   /**
    * Sets the source to use for replaying data. Use null to disable replay. This method only works
-   * during setup before starting to log.
+   * during setup before starting to log and is disabled on the real robot.
    *
    * @param replaySource The supplier for incoming replay data.
    */
   public static void setReplaySource(LogReplaySource replaySource) {
-    if (!running) {
+    if (!running && RobotBase.isSimulation()) {
       Logger.replaySource = replaySource;
     }
   }
