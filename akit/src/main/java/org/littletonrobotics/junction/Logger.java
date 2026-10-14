@@ -380,8 +380,7 @@ public class Logger {
       AlertLogger.periodic();
       long radioLogStart = RobotController.getMonotonicTime();
       if (!hasReplaySource()) {
-        RadioLogger.periodic(
-            entry.getSubtable("RadioStatus"), entry.get("SystemStats/TeamNumber", -1));
+        RadioLogger.periodic(entry.getSubtable("RadioStatus"));
       }
       long consoleCaptureStart = RobotController.getMonotonicTime();
       if (enableConsole) {
