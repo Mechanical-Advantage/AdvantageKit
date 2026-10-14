@@ -7,9 +7,11 @@
 
 package org.littletonrobotics.junction.wpilog;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 import java.nio.file.FileSystems;
@@ -22,6 +24,7 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Queue;
 import java.util.Random;
@@ -30,7 +33,8 @@ import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
 import org.littletonrobotics.junction.Logger;
-import org.wpilib.datalog.DataLogWriter;
+import org.tukaani.xz.LZMA2Options;
+import org.tukaani.xz.XZOutputStream;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.MatchType;
 import org.wpilib.framework.RobotBase;
@@ -40,8 +44,8 @@ import org.wpilib.system.RobotController;
 public class WPILOGWriter implements LogDataReceiver {
   // Wait several seconds after DS attached to ensure time is updated
   private static final double timestampUpdateDelayNs = 5_000_000_000L;
-  private static final long flushPeriodNs = 250_000L;
-  private static final long mountCheckPeriodNs = 250_000L;
+  private static final long flushPeriodNs = 250_000_000L;
+  private static final long mountCheckPeriodNs = 250_000_000L;
   private static final long mountTimeoutNs = 15_000_000_000L;
   private static final String defaultPathRobot = "/U/logs";
   private static final String defaultPathSim = "logs";
@@ -49,24 +53,28 @@ public class WPILOGWriter implements LogDataReceiver {
       DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
   private static final String advantageScopeFileName = "ascope-log-path.txt";
 
-  private String folder;
+  private final String folder;
+  private final String baseFilename;
   private String filename;
   private final Optional<String> usbPrefix;
   private final String randomIdentifier;
   private OptionalLong dsAttachedTime;
+  private OptionalInt xzPreset = OptionalInt.of(LZMA2Options.PRESET_MIN);
+  private AdvantageScopeOpenBehavior openBehavior = AdvantageScopeOpenBehavior.AUTO;
 
-  private boolean autoRename;
+  private WPILOGEncoder wpilogEncoder;
+  private FileOutputStream fileOutputStream;
+
+  private final boolean autoRename;
   private LocalDateTime logDate;
   private String logMatchText;
 
-  private DataLogWriter log;
+  private boolean isStarted = false;
   private boolean isOpen = false;
   private boolean waitingForMount = false;
   private long mountWaitStartTime = 0;
   private long lastMountCheckTimestamp = 0;
   private final Queue<LogTable> pendingTables = new ArrayDeque<>();
-  private FileOutputStream fileOutputStream;
-  private final AdvantageScopeOpenBehavior openBehavior;
   private LogTable lastTable;
   private int timestampID;
   private long lastFlushTimestamp = 0;
@@ -75,17 +83,12 @@ public class WPILOGWriter implements LogDataReceiver {
   private Map<String, String> entryUnits;
 
   /**
-   * Create a new WPILOGWriter for writing to a ".wpilog" file.
+   * Create a new WPILOGWriter for writing to a ".wpilog" or ".wpilogxz" file.
    *
    * @param path Path to log file or folder. If only a folder is provided, the filename will be
    *     generated based on the current time and match number (if applicable).
-   * @param openBehavior Whether to automatically open the log file in AdvantageScope. See {@link
-   *     org.littletonrobotics.junction.wpilog.WPILOGWriter.AdvantageScopeOpenBehavior
-   *     AdvantageScopeOpenBehavior} for details.
    */
-  public WPILOGWriter(String path, AdvantageScopeOpenBehavior openBehavior) {
-    this.openBehavior = openBehavior;
-
+  public WPILOGWriter(String path) {
     // Create random identifier
     Random random = new Random();
     StringBuilder randomIdentifierBuilder = new StringBuilder();
@@ -94,54 +97,92 @@ public class WPILOGWriter implements LogDataReceiver {
     }
     randomIdentifier = randomIdentifierBuilder.toString();
 
-    // Set up folder and filename
-    if (path.endsWith(".wpilog")) {
+    // Set up folder, base filename, and default compression
+    if (path.endsWith(".wpilog") || path.endsWith(".wpilogxz")) {
       File pathFile = new File(path);
       folder = pathFile.getParent();
-      filename = pathFile.getName();
+      String rawFilename = pathFile.getName();
+      if (rawFilename.endsWith(".wpilogxz")) {
+        baseFilename = rawFilename.substring(0, rawFilename.length() - ".wpilogxz".length());
+      } else {
+        baseFilename = rawFilename.substring(0, rawFilename.length() - ".wpilog".length());
+        xzPreset = OptionalInt.empty();
+      }
       autoRename = false;
     } else {
       folder = path;
-      filename = "akit_" + randomIdentifier + ".wpilog";
+      baseFilename = "akit_" + randomIdentifier;
       autoRename = true;
     }
     usbPrefix = USBDriveUtil.getUSBDrivePrefix(folder);
   }
 
   /**
-   * Create a new WPILOGWriter for writing to a ".wpilog" file.
-   *
-   * @param path Path to log file or folder. If only a folder is provided, the filename will be
-   *     generated based on the current time and match number (if applicable).
-   */
-  public WPILOGWriter(String path) {
-    this(path, AdvantageScopeOpenBehavior.AUTO);
-  }
-
-  /**
-   * Create a new WPILOGWriter for writing to a ".wpilog" file.
-   *
-   * <p>The logs will be saved to "/U/logs" on the robot and "logs" in sim. The filename will be
-   * generated based on the current time and match number (if applicable).
-   *
-   * @param openBehavior Whether to automatically open the log file in AdvantageScope. See {@link
-   *     org.littletonrobotics.junction.wpilog.WPILOGWriter.AdvantageScopeOpenBehavior
-   *     AdvantageScopeOpenBehavior} for details.
-   */
-  public WPILOGWriter(AdvantageScopeOpenBehavior openBehavior) {
-    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRobot, openBehavior);
-  }
-
-  /**
-   * Create a new WPILOGWriter for writing to a ".wpilog" file.
+   * Create a new WPILOGWriter for writing to a ".wpilog" or ".wpilogxz" file.
    *
    * <p>The logs will be saved to "/U/logs" on the robot and "logs" in sim. The filename will be
    * generated based on the current time and match number (if applicable).
    */
   public WPILOGWriter() {
-    this(
-        RobotBase.isSimulation() ? defaultPathSim : defaultPathRobot,
-        AdvantageScopeOpenBehavior.AUTO);
+    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRobot);
+  }
+
+  /**
+   * Set the XZ compression preset to use when writing the log file. Check the AdvantageKit
+   * documentation for details.
+   *
+   * <p>This method must be called before starting the AdvantageKit logger, otherwise it will have
+   * no effect.
+   *
+   * @param preset The preset to use. Must be between 0 and 9, inclusive.
+   * @return This WPILOGWriter instance, for chaining.
+   */
+  public WPILOGWriter withXZCompressionPreset(int preset) {
+    if (preset < LZMA2Options.PRESET_MIN || preset > LZMA2Options.PRESET_MAX) {
+      preset = Math.clamp(preset, LZMA2Options.PRESET_MIN, LZMA2Options.PRESET_MAX);
+      DriverStationErrors.reportWarning(
+          "[AdvantageKit] XZ compression preset must be between "
+              + LZMA2Options.PRESET_MIN
+              + " and "
+              + LZMA2Options.PRESET_MAX
+              + ". Clamping to "
+              + preset
+              + ".",
+          false);
+    }
+    if (!isStarted) {
+      xzPreset = OptionalInt.of(preset);
+    }
+    return this;
+  }
+
+  /**
+   * Disable XZ compression when writing the log file.
+   *
+   * <p>This method must be called before starting the AdvantageKit logger, otherwise it will have
+   * no effect.
+   *
+   * @return This WPILOGWriter instance, for chaining.
+   */
+  public WPILOGWriter withNoCompression() {
+    if (!isStarted) {
+      xzPreset = OptionalInt.empty();
+    }
+    return this;
+  }
+
+  /**
+   * Set the behavior to use when sending the log file to AdvantageScope after the robot program
+   * exits in simulation.
+   *
+   * @param openBehavior The open behavior. See {@link
+   *     org.littletonrobotics.junction.wpilog.WPILOGWriter.AdvantageScopeOpenBehavior
+   *     AdvantageScopeOpenBehavior} for details.
+   * @return This WPILOGWriter instance, for chaining.
+   */
+  public WPILOGWriter withAdvantageScopeOpenBehavior(AdvantageScopeOpenBehavior openBehavior) {
+    this.openBehavior = openBehavior;
+    return this;
   }
 
   private static void syncDirectory(String dirPath) {
@@ -155,6 +196,7 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   public void start() {
+    isStarted = true;
     if (usbPrefix.isPresent()) {
       if (USBDriveUtil.isUSBMounted(usbPrefix.get())) {
         openLogFile();
@@ -172,7 +214,14 @@ public class WPILOGWriter implements LogDataReceiver {
     }
   }
 
+  private String getExtension() {
+    return xzPreset.isPresent() ? ".wpilogxz" : ".wpilog";
+  }
+
   private void openLogFile() {
+    // Construct filename
+    filename = baseFilename + getExtension();
+
     // Create folder if necessary
     if (folder != null) {
       File logFolder = new File(folder);
@@ -190,26 +239,42 @@ public class WPILOGWriter implements LogDataReceiver {
     // Create new log
     String logPath =
         folder == null ? filename : FileSystems.getDefault().getPath(folder, filename).toString();
-    System.out.println("[AdvantageKit] Logging to \"" + logPath + "\"");
+    System.out.println(
+        "[AdvantageKit] Logging to \""
+            + logPath
+            + "\""
+            + (xzPreset.isPresent() ? " with XZ compression" : ""));
     try {
-      log = new DataLogWriter(logPath, WPILOGConstants.extraHeader);
-      if (RobotBase.isReal()) {
-        fileOutputStream = new FileOutputStream(logPath, true);
-        syncDirectory(folder);
+      fileOutputStream = new FileOutputStream(logPath);
+      BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+      OutputStream compressionStream = bufferedOutputStream;
+      if (xzPreset.isPresent()) {
+        compressionStream =
+            new XZOutputStream(bufferedOutputStream, new LZMA2Options(xzPreset.getAsInt()));
       }
+      wpilogEncoder = new WPILOGEncoder(compressionStream);
+      syncDirectory(folder);
     } catch (IOException e) {
       DriverStationErrors.reportError("[AdvantageKit] Failed to open output log file.", true);
       return;
     }
+
+    // Initialize log
+    try {
+      wpilogEncoder.writeHeader(WPILOGConstants.extraHeader);
+      timestampID =
+          wpilogEncoder.startEntry(
+              timestampKey,
+              LoggableType.Integer.getWPILOGType(),
+              WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", "nanoseconds"),
+              0);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return;
+    }
+    lastTable = new LogTable(0);
     isOpen = true;
     waitingForMount = false;
-    timestampID =
-        log.start(
-            timestampKey,
-            LoggableType.Integer.getWPILOGType(),
-            WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", "nanoseconds"),
-            0);
-    lastTable = new LogTable(0);
 
     // Reset data
     entryIDs = new HashMap<>();
@@ -230,14 +295,12 @@ public class WPILOGWriter implements LogDataReceiver {
       return;
     }
 
-    log.close();
-    if (fileOutputStream != null) {
-      try {
-        fileOutputStream.getFD().sync();
-        fileOutputStream.close();
-        syncDirectory(folder);
-      } catch (IOException e) {
-      }
+    try {
+      wpilogEncoder.flush();
+      fileOutputStream.getFD().sync();
+      syncDirectory(folder);
+      wpilogEncoder.close();
+    } catch (IOException e) {
     }
 
     // Send log path to AdvantageScope
@@ -268,12 +331,13 @@ public class WPILOGWriter implements LogDataReceiver {
             "[AdvantageKit] Failed to send log to AdvantageScope.", false);
       }
     }
+    isStarted = false;
   }
 
   public void putTable(LogTable table) {
     if (waitingForMount) {
       pendingTables.add(table);
-      long now = table.getTimestamp();
+      long now = RobotController.getMonotonicTime();
       if (now - lastMountCheckTimestamp > mountCheckPeriodNs) {
         lastMountCheckTimestamp = now;
         if (USBDriveUtil.isUSBMounted(usbPrefix.get())) {
@@ -380,7 +444,7 @@ public class WPILOGWriter implements LogDataReceiver {
           newFilenameBuilder.append(logMatchText);
         }
       }
-      newFilenameBuilder.append(".wpilog");
+      newFilenameBuilder.append(getExtension());
       String newFilename = newFilenameBuilder.toString();
       if (!newFilename.equals(filename)) {
         String logPath =
@@ -393,118 +457,116 @@ public class WPILOGWriter implements LogDataReceiver {
         File fileB = folder == null ? new File(newFilename) : new File(folder, newFilename);
         if (fileA.renameTo(fileB)) {
           filename = newFilename;
-          if (RobotBase.isReal()) {
-            if (fileOutputStream != null) {
-              try {
-                fileOutputStream.getFD().sync();
-                fileOutputStream.close();
-              } catch (IOException ignored) {
-              }
-            }
-            try {
-              fileOutputStream = new FileOutputStream(logPath, true);
-            } catch (IOException ignored) {
-              fileOutputStream = null;
-            }
-            syncDirectory(folder);
+        }
+      }
+    }
+
+    try {
+      // Save timestamp
+      wpilogEncoder.appendInteger(timestampID, table.getTimestamp(), table.getTimestamp());
+
+      // Get new and old data
+      Map<String, LogValue> newMap = table.getAll(false);
+      Map<String, LogValue> oldMap = lastTable.getAll(false);
+
+      // Encode fields
+      for (Map.Entry<String, LogValue> field : newMap.entrySet()) {
+
+        // Check if field should be updated
+        LoggableType type = field.getValue().type;
+        String unit = field.getValue().unitStr;
+        boolean appendData = false;
+        if (!entryIDs.containsKey(field.getKey())) { // New field
+          String metadata =
+              unit == null
+                  ? WPILOGConstants.entryMetadata
+                  : WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", unit);
+          entryIDs.put(
+              field.getKey(),
+              wpilogEncoder.startEntry(
+                  field.getKey(),
+                  field.getValue().getWPILOGType(),
+                  metadata,
+                  table.getTimestamp()));
+          entryTypes.put(field.getKey(), type);
+          if (unit != null) {
+            entryUnits.put(field.getKey(), unit);
+          }
+          appendData = true;
+        } else if (!field.getValue().equals(oldMap.get(field.getKey()))) { // Updated field
+          appendData = true;
+        }
+
+        // Append data
+        if (appendData) {
+          int id = entryIDs.get(field.getKey());
+
+          // Check if unit changed
+          if (unit != null && !unit.equals(entryUnits.get(field.getKey()))) {
+            wpilogEncoder.setMetadata(
+                id,
+                WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", unit),
+                table.getTimestamp());
+            entryUnits.put(field.getKey(), unit);
+          }
+
+          // Add field value
+          switch (field.getValue().type) {
+            case Raw:
+              wpilogEncoder.appendRaw(id, field.getValue().getRaw(), table.getTimestamp());
+              break;
+            case Boolean:
+              wpilogEncoder.appendBoolean(id, field.getValue().getBoolean(), table.getTimestamp());
+              break;
+            case Integer:
+              wpilogEncoder.appendInteger(id, field.getValue().getInteger(), table.getTimestamp());
+              break;
+            case Float:
+              wpilogEncoder.appendFloat(id, field.getValue().getFloat(), table.getTimestamp());
+              break;
+            case Double:
+              wpilogEncoder.appendDouble(id, field.getValue().getDouble(), table.getTimestamp());
+              break;
+            case String:
+              wpilogEncoder.appendString(id, field.getValue().getString(), table.getTimestamp());
+              break;
+            case BooleanArray:
+              wpilogEncoder.appendBooleanArray(
+                  id, field.getValue().getBooleanArray(), table.getTimestamp());
+              break;
+            case IntegerArray:
+              wpilogEncoder.appendIntegerArray(
+                  id, field.getValue().getIntegerArray(), table.getTimestamp());
+              break;
+            case FloatArray:
+              wpilogEncoder.appendFloatArray(
+                  id, field.getValue().getFloatArray(), table.getTimestamp());
+              break;
+            case DoubleArray:
+              wpilogEncoder.appendDoubleArray(
+                  id, field.getValue().getDoubleArray(), table.getTimestamp());
+              break;
+            case StringArray:
+              wpilogEncoder.appendStringArray(
+                  id, field.getValue().getStringArray(), table.getTimestamp());
+              break;
           }
         }
       }
-    }
 
-    // Save timestamp
-    log.appendInteger(timestampID, table.getTimestamp(), table.getTimestamp());
-
-    // Get new and old data
-    Map<String, LogValue> newMap = table.getAll(false);
-    Map<String, LogValue> oldMap = lastTable.getAll(false);
-
-    // Encode fields
-    for (Map.Entry<String, LogValue> field : newMap.entrySet()) {
-
-      // Check if field should be updated
-      LoggableType type = field.getValue().type;
-      String unit = field.getValue().unitStr;
-      boolean appendData = false;
-      if (!entryIDs.containsKey(field.getKey())) { // New field
-        String metadata =
-            unit == null
-                ? WPILOGConstants.entryMetadata
-                : WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", unit);
-        entryIDs.put(
-            field.getKey(),
-            log.start(
-                field.getKey(), field.getValue().getWPILOGType(), metadata, table.getTimestamp()));
-        entryTypes.put(field.getKey(), type);
-        if (unit != null) {
-          entryUnits.put(field.getKey(), unit);
-        }
-        appendData = true;
-      } else if (!field.getValue().equals(oldMap.get(field.getKey()))) { // Updated field
-        appendData = true;
-      }
-
-      // Append data
-      if (appendData) {
-        int id = entryIDs.get(field.getKey());
-
-        // Check if unit changed
-        if (unit != null && !unit.equals(entryUnits.get(field.getKey()))) {
-          log.setMetadata(
-              id,
-              WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", unit),
-              table.getTimestamp());
-          entryUnits.put(field.getKey(), unit);
-        }
-
-        // Add field value
-        switch (field.getValue().type) {
-          case Raw:
-            log.appendRaw(id, field.getValue().getRaw(), table.getTimestamp());
-            break;
-          case Boolean:
-            log.appendBoolean(id, field.getValue().getBoolean(), table.getTimestamp());
-            break;
-          case Integer:
-            log.appendInteger(id, field.getValue().getInteger(), table.getTimestamp());
-            break;
-          case Float:
-            log.appendFloat(id, field.getValue().getFloat(), table.getTimestamp());
-            break;
-          case Double:
-            log.appendDouble(id, field.getValue().getDouble(), table.getTimestamp());
-            break;
-          case String:
-            log.appendString(id, field.getValue().getString(), table.getTimestamp());
-            break;
-          case BooleanArray:
-            log.appendBooleanArray(id, field.getValue().getBooleanArray(), table.getTimestamp());
-            break;
-          case IntegerArray:
-            log.appendIntegerArray(id, field.getValue().getIntegerArray(), table.getTimestamp());
-            break;
-          case FloatArray:
-            log.appendFloatArray(id, field.getValue().getFloatArray(), table.getTimestamp());
-            break;
-          case DoubleArray:
-            log.appendDoubleArray(id, field.getValue().getDoubleArray(), table.getTimestamp());
-            break;
-          case StringArray:
-            log.appendStringArray(id, field.getValue().getStringArray(), table.getTimestamp());
-            break;
+      // Flush to disk
+      long now = RobotController.getMonotonicTime();
+      if (now - lastFlushTimestamp > flushPeriodNs) {
+        lastFlushTimestamp = now;
+        try {
+          wpilogEncoder.flush();
+          fileOutputStream.getFD().sync();
+          syncDirectory(folder);
+        } catch (IOException e) {
         }
       }
-    }
-
-    // Flush to disk
-    log.flush();
-    if (fileOutputStream != null && table.getTimestamp() - lastFlushTimestamp > flushPeriodNs) {
-      lastFlushTimestamp = table.getTimestamp();
-      try {
-        fileOutputStream.getFD().sync();
-        syncDirectory(folder);
-      } catch (IOException e) {
-      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
 
     // Update last table

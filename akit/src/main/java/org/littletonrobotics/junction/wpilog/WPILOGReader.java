@@ -7,7 +7,10 @@
 
 package org.littletonrobotics.junction.wpilog;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import org.littletonrobotics.junction.LogDataReceiver;
@@ -15,10 +18,12 @@ import org.littletonrobotics.junction.LogReplaySource;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
+import org.tukaani.xz.XZInputStream;
 import org.wpilib.datalog.DataLogIterator;
 import org.wpilib.datalog.DataLogReader;
 import org.wpilib.datalog.DataLogRecord;
 import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.system.Timer;
 
 /** Replays log values from a WPILOG file. */
 public class WPILOGReader implements LogReplaySource {
@@ -35,7 +40,7 @@ public class WPILOGReader implements LogReplaySource {
   private Map<Integer, String> entryUnits;
 
   /**
-   * Creates a new WPILOGReader.
+   * Creates a new WPILOGReader for reading from a ".wpilog" or ".wpilogxz" file.
    *
    * @param filename The log filename to read.
    */
@@ -46,7 +51,35 @@ public class WPILOGReader implements LogReplaySource {
   public void start() {
     // Open log file
     try {
-      reader = new DataLogReader(filename);
+      if (filename.endsWith(".wpilogxz")) {
+        // Compressed log file, decompress in memory
+        double startTime = Timer.getMonotonicTimestamp();
+        try (FileInputStream fileInputStream = new FileInputStream(filename);
+            XZInputStream xzInputStream = new XZInputStream(fileInputStream)) {
+          ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+          byte[] buffer = new byte[8192];
+          int read;
+          try {
+            while ((read = xzInputStream.read(buffer)) != -1) {
+              outputStream.write(buffer, 0, read);
+            }
+          } catch (IOException e) {
+            // Ignore errors if we have read some data (likely a truncated file)
+            if (outputStream.size() == 0) {
+              throw e;
+            }
+          }
+          reader = new DataLogReader(ByteBuffer.wrap(outputStream.toByteArray()));
+        }
+        double endTime = Timer.getMonotonicTimestamp();
+        System.out.printf(
+            "[AdvantageKit] Replay log file decompressed in %.1f seconds.%n",
+            (endTime - startTime));
+
+      } else {
+        // Uncompressed log file, read directly from disk
+        reader = new DataLogReader(filename);
+      }
     } catch (IOException e) {
       DriverStationErrors.reportError("[AdvantageKit] Failed to open replay log file.", true);
     }

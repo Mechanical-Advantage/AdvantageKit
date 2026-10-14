@@ -1,3 +1,4 @@
+import java.util.concurrent.Callable
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 
 plugins {
@@ -23,6 +24,12 @@ wpilibRepositories.addAllReleaseRepositories(project)
 
 val wpilibVersion = "2027.0.0-alpha-7"
 
+val bundle by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+configurations.implementation.get().extendsFrom(bundle)
+
 dependencies {
     implementation("org.wpilib.cscore:cscore-java:$wpilibVersion")
     implementation("org.wpilib.cameraserver:cameraserver-java:$wpilibVersion")
@@ -42,6 +49,7 @@ dependencies {
     implementation("org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-3")
     implementation("us.hebi.quickbuf:quickbuf-runtime:1.4")
     implementation("io.avaje:avaje-jsonb:3.11")
+    bundle("org.tukaani:xz:1.11")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -59,6 +67,24 @@ tasks.withType<Javadoc> {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+}
+
+tasks.named<Jar>("jar") {
+    from(Callable {
+        bundle.map {
+            zipTree(it).matching {
+                exclude(
+                    "module-info.class",
+                    "META-INF/MANIFEST.MF",
+                    "META-INF/maven/**",
+                    "META-INF/*.SF",
+                    "META-INF/*.DSA",
+                    "META-INF/*.RSA"
+                )
+            }
+        }
+    })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 java {
