@@ -18,7 +18,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.units.Measure;
@@ -35,14 +38,26 @@ import us.hebi.quickbuf.ProtoMessage;
 
 /** A table of logged data in allowable types. Can reference another higher level table. */
 public class LogTable {
+  private static class QueuedValue {
+    public final String key;
+    public final LogValue value;
+
+    public QueuedValue(String key, LogValue value) {
+      this.key = key;
+      this.value = value;
+    }
+  }
+
   private final String prefix;
   private final int depth;
   private final SharedTimestamp timestamp;
   private final Map<String, LogValue> data;
-  private final Map<String, StructBuffer<?>> structBuffers;
-  private final Map<String, ProtobufBuffer<?, ?>> protoBuffers;
+  private final ThreadLocal<Map<String, StructBuffer<?>>> structBuffers;
+  private final ThreadLocal<Map<String, ProtobufBuffer<?, ?>>> protoBuffers;
   private final Map<String, Struct<?>> structTypeCache;
   private final Map<String, Protobuf<?, ?>> protoTypeCache;
+  private final Set<String> registeredSchemas;
+  private final Queue<QueuedValue> asyncQueue;
 
   /** Timestamp wrapper to enable passing by reference to subtables. */
   private static class SharedTimestamp {
@@ -59,10 +74,12 @@ public class LogTable {
       int depth,
       SharedTimestamp timestamp,
       Map<String, LogValue> data,
-      Map<String, StructBuffer<?>> structBuffers,
-      Map<String, ProtobufBuffer<?, ?>> protoBuffers,
+      ThreadLocal<Map<String, StructBuffer<?>>> structBuffers,
+      ThreadLocal<Map<String, ProtobufBuffer<?, ?>>> protoBuffers,
       Map<String, Struct<?>> structTypeCache,
-      Map<String, Protobuf<?, ?>> protoTypeCache) {
+      Map<String, Protobuf<?, ?>> protoTypeCache,
+      Set<String> registeredSchemas,
+      Queue<QueuedValue> asyncQueue) {
     this.prefix = prefix;
     this.depth = depth;
     this.timestamp = timestamp;
@@ -71,6 +88,8 @@ public class LogTable {
     this.protoBuffers = protoBuffers;
     this.structTypeCache = structTypeCache;
     this.protoTypeCache = protoTypeCache;
+    this.registeredSchemas = registeredSchemas;
+    this.asyncQueue = asyncQueue;
   }
 
   /**
@@ -84,10 +103,12 @@ public class LogTable {
         0,
         new SharedTimestamp(timestamp),
         new HashMap<>(),
-        new HashMap<>(),
-        new HashMap<>(),
-        new HashMap<>(),
-        new HashMap<>());
+        ThreadLocal.withInitial(HashMap::new),
+        ThreadLocal.withInitial(HashMap::new),
+        new ConcurrentHashMap<>(),
+        new ConcurrentHashMap<>(),
+        ConcurrentHashMap.newKeySet(),
+        new ConcurrentLinkedQueue<>());
   }
 
   /**
@@ -105,7 +126,9 @@ public class LogTable {
         parent.structBuffers,
         parent.protoBuffers,
         parent.structTypeCache,
-        parent.protoTypeCache);
+        parent.protoTypeCache,
+        parent.registeredSchemas,
+        parent.asyncQueue);
   }
 
   /**
@@ -123,10 +146,12 @@ public class LogTable {
         source.depth,
         new SharedTimestamp(source.timestamp.value),
         data,
-        new HashMap<>(),
-        new HashMap<>(),
-        new HashMap<>(),
-        new HashMap<>());
+        ThreadLocal.withInitial(HashMap::new),
+        ThreadLocal.withInitial(HashMap::new),
+        new ConcurrentHashMap<>(),
+        new ConcurrentHashMap<>(),
+        ConcurrentHashMap.newKeySet(),
+        new ConcurrentLinkedQueue<>());
   }
 
   /**
@@ -180,20 +205,24 @@ public class LogTable {
     }
   }
 
+  private boolean isMainThread() {
+    Thread main = Logger.getMainThread();
+    return main == null || Thread.currentThread() == main;
+  }
+
   /**
    * Checks whether the field can be updated with the specified type (it doesn't exist or is already
    * the correct type). Sends a warning to the Driver Station if the existing type is different.
    */
-  private boolean writeAllowed(String key, LoggableType type, String customTypeStr) {
-    LogValue currentValue = data.get(prefix + key);
+  private boolean writeAllowedAbsolute(String fullKey, LoggableType type, String customTypeStr) {
+    LogValue currentValue = data.get(fullKey);
     if (currentValue == null) {
       return true;
     }
     if (!currentValue.type.equals(type)) {
       DriverStationErrors.reportWarning(
           "[AdvantageKit] Failed to write to field \""
-              + prefix
-              + key
+              + fullKey
               + "\" - attempted to write "
               + type
               + " value but expected "
@@ -201,12 +230,10 @@ public class LogTable {
           true);
       return false;
     }
-    if (currentValue.customTypeStr != customTypeStr
-        && !currentValue.customTypeStr.equals(customTypeStr)) {
+    if (!Objects.equals(currentValue.customTypeStr, customTypeStr)) {
       DriverStationErrors.reportWarning(
           "[AdvantageKit] Failed to write to field \""
-              + prefix
-              + key
+              + fullKey
               + "\" - attempted to write "
               + customTypeStr
               + " value but expected "
@@ -217,6 +244,31 @@ public class LogTable {
     return true;
   }
 
+  private boolean writeAllowed(String key, LoggableType type, String customTypeStr) {
+    return writeAllowedAbsolute(prefix + key, type, customTypeStr);
+  }
+
+  private void putAbsolute(String fullKey, LogValue value) {
+    if (isMainThread()) {
+      data.put(fullKey, value);
+    } else {
+      asyncQueue.offer(new QueuedValue(fullKey, value));
+    }
+  }
+
+  /**
+   * Drains all pending values that were recorded from background threads into this table. Only call
+   * from the main thread.
+   */
+  public void drainAsyncQueue() {
+    QueuedValue item;
+    while ((item = asyncQueue.poll()) != null) {
+      if (writeAllowedAbsolute(item.key, item.value.type, item.value.customTypeStr)) {
+        data.put(item.key, item.value);
+      }
+    }
+  }
+
   /**
    * Writes a new generic value to the table. Skipped if the key already exists as a different type.
    *
@@ -225,8 +277,12 @@ public class LogTable {
    */
   public void put(String key, LogValue value) {
     if (value == null) return;
-    if (writeAllowed(key, value.type, value.customTypeStr)) {
-      data.put(prefix + key, value);
+    if (isMainThread()) {
+      if (writeAllowed(key, value.type, value.customTypeStr)) {
+        data.put(prefix + key, value);
+      }
+    } else {
+      asyncQueue.offer(new QueuedValue(prefix + key, value));
     }
   }
 
@@ -612,15 +668,16 @@ public class LogTable {
 
   private void addStructSchema(Struct<?> struct, Set<String> seen) {
     String typeString = struct.getTypeString();
-    String key = "/.schema/" + typeString;
-    if (data.containsKey(key)) {
+    if (!registeredSchemas.add(typeString)) {
       return;
     }
     if (!seen.add(typeString)) {
       throw new UnsupportedOperationException(typeString + ": circular reference with " + seen);
     }
     try {
-      data.put(key, new LogValue(struct.getSchema().getBytes("UTF-8"), "structschema"));
+      putAbsolute(
+          "/.schema/" + typeString,
+          new LogValue(struct.getSchema().getBytes("UTF-8"), "structschema"));
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
@@ -642,10 +699,11 @@ public class LogTable {
   public <T> void put(String key, Struct<T> struct, T value) {
     if (value == null) return;
     addStructSchema(struct, new HashSet<>());
-    if (!structBuffers.containsKey(struct.getTypeString())) {
-      structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
+    Map<String, StructBuffer<?>> buffers = structBuffers.get();
+    if (!buffers.containsKey(struct.getTypeString())) {
+      buffers.put(struct.getTypeString(), StructBuffer.create(struct));
     }
-    StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+    StructBuffer<T> buffer = (StructBuffer<T>) buffers.get(struct.getTypeString());
     ByteBuffer bb = buffer.write(value);
     byte[] array = new byte[bb.position()];
     bb.position(0);
@@ -666,10 +724,11 @@ public class LogTable {
   public <T> void put(String key, Struct<T> struct, T... value) {
     if (value == null) return;
     addStructSchema(struct, new HashSet<>());
-    if (!structBuffers.containsKey(struct.getTypeString())) {
-      structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
+    Map<String, StructBuffer<?>> buffers = structBuffers.get();
+    if (!buffers.containsKey(struct.getTypeString())) {
+      buffers.put(struct.getTypeString(), StructBuffer.create(struct));
     }
-    StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+    StructBuffer<T> buffer = (StructBuffer<T>) buffers.get(struct.getTypeString());
     ByteBuffer bb = buffer.writeArray(value);
     byte[] array = new byte[bb.position()];
     bb.position(0);
@@ -709,14 +768,19 @@ public class LogTable {
       String key, Protobuf<T, MessageType> proto, T value) {
     if (value == null) return;
     proto.forEachDescriptor(
-        (name) -> data.containsKey("/.schema/" + name),
-        (typeString, schema) ->
-            data.put("/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto")));
-    if (!protoBuffers.containsKey(proto.getTypeString())) {
-      protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
+        registeredSchemas::contains,
+        (typeString, schema) -> {
+          if (registeredSchemas.add(typeString)) {
+            putAbsolute(
+                "/.schema/" + typeString, new LogValue(schema, "proto:FileDescriptorProto"));
+          }
+        });
+    Map<String, ProtobufBuffer<?, ?>> buffers = protoBuffers.get();
+    if (!buffers.containsKey(proto.getTypeString())) {
+      buffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
     }
     ProtobufBuffer<T, MessageType> buffer =
-        (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
+        (ProtobufBuffer<T, MessageType>) buffers.get(proto.getTypeString());
     ByteBuffer bb;
     try {
       bb = buffer.write(value);
@@ -1370,10 +1434,11 @@ public class LogTable {
   @SuppressWarnings("unchecked")
   public <T> T get(String key, Struct<T> struct, T defaultValue) {
     if (data.containsKey(prefix + key)) {
-      if (!structBuffers.containsKey(struct.getTypeString())) {
-        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
+      Map<String, StructBuffer<?>> buffers = structBuffers.get();
+      if (!buffers.containsKey(struct.getTypeString())) {
+        buffers.put(struct.getTypeString(), StructBuffer.create(struct));
       }
-      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+      StructBuffer<T> buffer = (StructBuffer<T>) buffers.get(struct.getTypeString());
       return buffer.read(get(key).getRaw());
     } else {
       return defaultValue;
@@ -1392,10 +1457,11 @@ public class LogTable {
   @SuppressWarnings("unchecked")
   public <T> T[] get(String key, Struct<T> struct, T... defaultValue) {
     if (data.containsKey(prefix + key)) {
-      if (!structBuffers.containsKey(struct.getTypeString())) {
-        structBuffers.put(struct.getTypeString(), StructBuffer.create(struct));
+      Map<String, StructBuffer<?>> buffers = structBuffers.get();
+      if (!buffers.containsKey(struct.getTypeString())) {
+        buffers.put(struct.getTypeString(), StructBuffer.create(struct));
       }
-      StructBuffer<T> buffer = (StructBuffer<T>) structBuffers.get(struct.getTypeString());
+      StructBuffer<T> buffer = (StructBuffer<T>) buffers.get(struct.getTypeString());
       return buffer.readArray(get(key).getRaw());
     } else {
       return defaultValue;
@@ -1442,11 +1508,12 @@ public class LogTable {
   public <T, MessageType extends ProtoMessage<?>> T get(
       String key, Protobuf<T, MessageType> proto, T defaultValue) {
     if (data.containsKey(prefix + key)) {
-      if (!protoBuffers.containsKey(proto.getTypeString())) {
-        protoBuffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
+      Map<String, ProtobufBuffer<?, ?>> buffers = protoBuffers.get();
+      if (!buffers.containsKey(proto.getTypeString())) {
+        buffers.put(proto.getTypeString(), ProtobufBuffer.create(proto));
       }
       ProtobufBuffer<T, MessageType> buffer =
-          (ProtobufBuffer<T, MessageType>) protoBuffers.get(proto.getTypeString());
+          (ProtobufBuffer<T, MessageType>) buffers.get(proto.getTypeString());
       try {
         return buffer.read(get(key).getRaw());
       } catch (IOException e) {

@@ -13,4 +13,6 @@ There are two solutions to this issue:
 
 ## Logging From Threads {#logging-from-threads}
 
-AdvantageKit's logging APIs (i.e. `recordOutput` and `processInputs`) are **not** thread-safe, and should only be called from the main thread. As all values in AdvantageKit are synchronized to the main loop cycle, logging data from other threads would fail to capture values accurately even if this functionality was supported. Instead, threads should only be used in IO implementations (see above) and should record all values as inputs, synchronized appropriately to the main loop cycle in a thread-safe manner.
+AdvantageKit's `recordOutput` API is thread-safe. Outputs logged from background threads are safely queued and recorded with the active loop cycle. This allows background threads (such as vision coprocessor communication or asynchronous path generation) to record telemetry and debug data without manually piping it back to the main thread.
+
+However, `processInputs` is **not** thread-safe and must only be called from the main thread. As inputs define the boundary between IO implementations and deterministic robot logic, recording inputs from secondary threads would break log replay synchronization. If `processInputs` is invoked from a non-main thread, the call is ignored (no-op) and a warning is printed to the Driver Station.

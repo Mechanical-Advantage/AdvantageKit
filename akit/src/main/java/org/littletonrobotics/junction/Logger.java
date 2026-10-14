@@ -14,8 +14,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
@@ -45,7 +48,7 @@ public class Logger {
   private static boolean running = false;
   private static long cycleCount = 0;
   private static LogTable entry = new LogTable(0);
-  private static LogTable outputTable;
+  private static LogTable outputTable = entry.getSubtable("RealOutputs");
   private static String robotBasePrefix = "RobotBase";
   private static Map<String, String> metadata = new HashMap<>();
   private static ConsoleSource console = null;
@@ -54,12 +57,39 @@ public class Logger {
   private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean enableConsole = true;
   private static boolean checkRobotBase = true;
+  private static Thread mainThread = null;
+  private static final Set<String> warnedProcessInputsKeys = ConcurrentHashMap.newKeySet();
 
   private static LogReplaySource replaySource;
   private static final BlockingQueue<LogTable> receiverQueue =
       new ArrayBlockingQueue<LogTable>(receiverQueueCapacity);
   private static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
   private static boolean receiverQueueFault = false;
+
+  static Thread getMainThread() {
+    return mainThread;
+  }
+
+  static void setMainThread(Thread thread) {
+    mainThread = thread;
+  }
+
+  static void setRunning(boolean running) {
+    Logger.running = running;
+    if (!running) {
+      warnedProcessInputsKeys.clear();
+    }
+  }
+
+  private static BiConsumer<String, Boolean> warningHandler = null;
+
+  static void reportWarning(String warning, boolean printTrace) {
+    if (warningHandler != null) {
+      warningHandler.accept(warning, printTrace);
+    } else {
+      DriverStationErrors.reportWarning(warning, printTrace);
+    }
+  }
 
   private Logger() {}
 
@@ -168,6 +198,7 @@ public class Logger {
   public static void start() {
     if (!running) {
       running = true;
+      mainThread = Thread.currentThread();
 
       // Exit if valid base class not present
       if (checkRobotBase) {
@@ -260,6 +291,7 @@ public class Logger {
       if (replaySource != null) {
         replaySource.end();
       }
+      entry.drainAsyncQueue();
       receiverThread.interrupt();
       try {
         receiverThread.join();
@@ -268,6 +300,10 @@ public class Logger {
       }
       RobotController.setTimeSource(RobotController::getMonotonicTime);
       RobotController.getTime();
+      mainThread = null;
+      warnedProcessInputsKeys.clear();
+      entry = new LogTable(0);
+      outputTable = entry.getSubtable("RealOutputs");
     }
   }
 
@@ -278,6 +314,9 @@ public class Logger {
   static void periodicBeforeUser() {
     cycleCount++;
     if (running) {
+      if (mainThread == null) {
+        mainThread = Thread.currentThread();
+      }
       // Get next entry
       long entryUpdateStart = RobotController.getMonotonicTime();
       if (replaySource == null) {
@@ -419,6 +458,9 @@ public class Logger {
       // Record receiver thread data
       receiverThread.logOutputs();
 
+      // Drain queued async outputs
+      entry.drainAsyncQueue();
+
       try {
         // Send a copy of the data to the receivers. The original object will be
         // kept and updated with the next timestamp (and new data if replaying).
@@ -486,6 +528,42 @@ public class Logger {
       Logger.console = console;
     }
 
+    /**
+     * Sets the thread considered to be the main thread for logging.
+     *
+     * @param thread The main thread.
+     */
+    public static void setMainThread(Thread thread) {
+      Logger.setMainThread(thread);
+    }
+
+    /**
+     * Returns the thread currently considered to be the main thread for logging.
+     *
+     * @return The main thread.
+     */
+    public static Thread getMainThread() {
+      return Logger.getMainThread();
+    }
+
+    /**
+     * Sets a custom warning handler for testing or custom reporting.
+     *
+     * @param handler The handler to receive warnings.
+     */
+    public static void setWarningHandler(BiConsumer<String, Boolean> handler) {
+      Logger.warningHandler = handler;
+    }
+
+    /**
+     * Returns the current entry table used by the logger.
+     *
+     * @return The entry table.
+     */
+    public static LogTable getEntry() {
+      return entry;
+    }
+
     private AdvancedHooks() {}
   }
 
@@ -535,8 +613,8 @@ public class Logger {
    * This should be called every loop cycle after updating the inputs from the hardware (if
    * applicable).
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Calls
+   * from any other thread will be ignored and log a warning. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -545,6 +623,16 @@ public class Logger {
    */
   public static void processInputs(String key, LoggableInputs inputs) {
     if (running) {
+      if (mainThread != null && Thread.currentThread() != mainThread) {
+        if (warnedProcessInputsKeys.add(key == null ? "" : key)) {
+          reportWarning(
+              "[AdvantageKit] processInputs(\""
+                  + key
+                  + "\", ...) was called from a non-main thread. Inputs can only be processed on the main thread.",
+              true);
+        }
+        return;
+      }
       if (replaySource == null) {
         inputs.toLog(entry.getSubtable(key));
       } else {
@@ -557,8 +645,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -576,8 +664,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -595,8 +683,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -614,8 +702,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -633,8 +721,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -652,8 +740,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -671,8 +759,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -690,8 +778,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -709,8 +797,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -728,8 +816,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -747,8 +835,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -766,8 +854,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -785,8 +873,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -804,8 +892,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -823,8 +911,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -842,8 +930,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -865,8 +953,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -888,8 +976,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -907,8 +995,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -926,8 +1014,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -945,8 +1033,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -968,8 +1056,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -991,8 +1079,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1010,8 +1098,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1029,8 +1117,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1048,8 +1136,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1067,8 +1155,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1086,8 +1174,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1105,8 +1193,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1125,8 +1213,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1145,8 +1233,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1165,8 +1253,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1191,8 +1279,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1219,8 +1307,8 @@ public class Logger {
    * recordOutput("MyPoses", Pose2d.struct, new Pose2d(), new Pose2d()); recordOutput("MyPoses",
    * Pose2d.struct, new Pose2d[] {new Pose2d(), new Pose2d()}); }
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1241,8 +1329,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1266,8 +1354,8 @@ public class Logger {
    * objects that do not support struct serialization. Example usage: {@code recordOutput("MyPose",
    * Pose2d.proto, new Pose2d())}
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1292,8 +1380,8 @@ public class Logger {
    * <p>This method serializes a single object as a struct or protobuf automatically. Struct is
    * preferred if both methods are supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1315,8 +1403,8 @@ public class Logger {
    * <p>This method serializes an array of objects as a struct automatically. Top-level protobuf
    * arrays are not supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1339,8 +1427,8 @@ public class Logger {
    * <p>This method serializes an array of objects as a struct automatically. Top-level protobuf
    * arrays are not supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1362,8 +1450,8 @@ public class Logger {
    * <p>This method serializes a single object as a struct or protobuf automatically. Struct is
    * preferred if both methods are supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1390,8 +1478,8 @@ public class Logger {
    * <p>This method serializes an array of objects as a struct automatically. Top-level protobuf
    * arrays are not supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1414,8 +1502,8 @@ public class Logger {
    * <p>This method serializes an array of objects as a struct automatically. Top-level protobuf
    * arrays are not supported.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1437,8 +1525,8 @@ public class Logger {
    * <p>The current position of the Mechanism2d is logged once as a set of nested fields. If the
    * position is updated, this method must be called again.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
@@ -1456,8 +1544,8 @@ public class Logger {
    * Records a single output field for easy access when viewing the log. On the simulator, use this
    * method to record extra data based on the original inputs.
    *
-   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
-   * the <a href=
+   * <p>This method is thread-safe. Outputs recorded from threads other than the main thread will be
+   * queued and saved with the current periodic cycle. Check the <a href=
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
