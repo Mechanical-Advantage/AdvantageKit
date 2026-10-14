@@ -57,6 +57,7 @@ public class Logger {
   private static final GcStatsCollector gcStatsCollector = new GcStatsCollector();
   private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean enableConsole = true;
+  private static String vendorLogCaptureDirectory = null;
   private static boolean checkRobotBase = true;
 
   private static LogReplaySource replaySource;
@@ -140,6 +141,32 @@ public class Logger {
   /** Disables automatic console capture. */
   public static void disableConsoleCapture() {
     enableConsole = false;
+  }
+
+  /**
+   * Sets the directory for automatic vendor log capture and enables capture. This method only works
+   * during setup before starting to log.
+   *
+   * <p>You must select an appropriate directory (such as {@code "/U/logs/"}) for temporarily
+   * staging vendor logs during capture. Vendor logging tools must be initialized AFTER the
+   * AdvantageKit logger. Check the AdvantageKit documentation for details.
+   *
+   * @param directory The directory path.
+   */
+  public static void setVendorLogDirectory(String directory) {
+    if (!running) {
+      vendorLogCaptureDirectory = directory;
+    }
+  }
+
+  /**
+   * Disables automatic vendor log capture. This method only works during setup before starting to
+   * log.
+   */
+  public static void disableVendorLogCapture() {
+    if (!running) {
+      vendorLogCaptureDirectory = null;
+    }
   }
 
   /**
@@ -227,6 +254,11 @@ public class Logger {
         }
       }
 
+      // Start vendor log capture
+      if (!hasReplaySource() && vendorLogCaptureDirectory != null) {
+        VendorLogCapture.start(vendorLogCaptureDirectory);
+      }
+
       // Start replay source
       if (replaySource != null) {
         replaySource.start();
@@ -267,6 +299,9 @@ public class Logger {
         } catch (Exception e) {
           DriverStationErrors.reportError("[AdvantageKit] Failed to stop console capture.", true);
         }
+      }
+      if (!hasReplaySource() && vendorLogCaptureDirectory != null) {
+        VendorLogCapture.end();
       }
       if (replaySource != null) {
         replaySource.end();
@@ -393,6 +428,10 @@ public class Logger {
       if (!hasReplaySource()) {
         RadioLogger.periodic(entry.getSubtable("RadioStatus"));
       }
+      long vendorLogStart = RobotController.getMonotonicTime();
+      if (!hasReplaySource() && vendorLogCaptureDirectory != null) {
+        VendorLogCapture.periodic(entry);
+      }
       long consoleCaptureStart = RobotController.getMonotonicTime();
       if (enableConsole) {
         String consoleData = console.getNewData();
@@ -415,7 +454,10 @@ public class Logger {
       recordOutput("Logger/ConduitSaveMS", (autoLogStart - conduitSaveStart) / 1_000_000.0);
       recordOutput("Logger/AutoLogMS", (alertLogStart - autoLogStart) / 1_000_000.0);
       recordOutput("Logger/AlertLogMS", (radioLogStart - alertLogStart) / 1_000_000.0);
-      recordOutput("Logger/RadioLogMS", (consoleCaptureStart - radioLogStart) / 1_000_000.0);
+      recordOutput("Logger/RadioLogMS", (vendorLogStart - radioLogStart) / 1_000_000.0);
+      if (vendorLogCaptureDirectory != null) {
+        recordOutput("Logger/VendorLogMS", (consoleCaptureStart - vendorLogStart) / 1_000_000.0);
+      }
       recordOutput("Logger/ConsoleMS", (gcStatsStart - consoleCaptureStart) / 1_000_000.0);
       recordOutput("Logger/GCStatsMS", (gcStatsEnd - gcStatsStart) / 1_000_000.0);
       recordOutput(robotBasePrefix + "/UserCodeMS", userCodeLength / 1_000_000.0);
