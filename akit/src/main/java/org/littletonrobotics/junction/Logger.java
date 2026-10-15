@@ -443,7 +443,8 @@ public class Logger {
         receiverQueueFault = true;
         receiverQueueAlert.set(true);
         DriverStationErrors.reportError(
-            "[AdvantageKit] Capacity of receiver queue exceeded, some data will be lost.", false);
+            "[AdvantageKit] Capacity of receiver queue exceeded, some data will be lost. If logging with compression, consider lowering the preset or disabling compression.",
+            false);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
