@@ -75,33 +75,29 @@ The Gradle task is preconfigured in the AdvantageKit template projects. Add the 
 
 ```groovy
 // Create commit with working changes on event branches
-task(eventDeploy) {
+tasks.register("eventDeploy") {
     doLast {
         if (project.gradle.startParameter.taskNames.any({ it.toLowerCase().contains("deploy") })) {
             def branchPrefix = "event"
-            def branch = 'git branch --show-current'.execute().text.trim()
-            def commitMessage = "Update at '${new Date().toString()}'"
+            def branch = providers.exec {
+                workingDir(projectDir)
+                commandLine 'git', 'branch', '--show-current'
+            }.standardOutput.asText.get().trim()
+            def commitMessage = "Update at \"${new Date().toString()}\""
 
             if (branch.startsWith(branchPrefix)) {
-                exec {
+                providers.exec {
                     workingDir(projectDir)
-                    executable 'git'
-                    args 'add', '-A'
-                }
-                exec {
+                    commandLine 'git', 'add', '-A'
+                }.result.get()
+                providers.exec {
                     workingDir(projectDir)
-                    executable 'git'
-                    args 'commit', '-m', commitMessage
+                    commandLine 'git', 'commit', '-m', commitMessage
                     ignoreExitValue = true
-                }
+                }.result.get()
 
-                println "Committed to branch: '$branch'"
-                println "Commit message: '$commitMessage'"
-            } else {
-                println "Not on an event branch, skipping commit"
+                println "Committed to '$branch' with message '$commitMessage'"
             }
-        } else {
-            println "Not running deploy task, skipping commit"
         }
     }
 }
