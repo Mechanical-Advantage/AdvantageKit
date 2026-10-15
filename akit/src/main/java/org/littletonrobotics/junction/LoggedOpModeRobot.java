@@ -7,8 +7,6 @@
 
 package org.littletonrobotics.junction;
 
-import static org.wpilib.units.Units.Seconds;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -523,7 +521,7 @@ public abstract class LoggedOpModeRobot extends RobotBase {
   /**
    * Constructor with specified period.
    *
-   * @param period the period at which to run the robot and opmode periodic callbacks.
+   * @param period The period at which to run the robot and OpMode periodic callbacks.
    */
   @SuppressWarnings("this-escape")
   public LoggedOpModeRobot(double period) {
@@ -531,7 +529,7 @@ public abstract class LoggedOpModeRobot extends RobotBase {
     NotifierJNI.setNotifierName(notifier, "LoggedOpModeRobot");
     this.periodNs = (long) (period * 1_000_000_000.0);
 
-    watchdog = new Watchdog(Seconds.of(period), this::printLoopOverrunMessage);
+    watchdog = new Watchdog(Double.POSITIVE_INFINITY, this::printLoopOverrunMessage);
 
     // Scan for annotated opmode classes within the derived class's package and
     // subpackages
@@ -824,6 +822,18 @@ public abstract class LoggedOpModeRobot extends RobotBase {
    */
   public void setUseTiming(boolean useTiming) {
     this.useTiming = useTiming;
+  }
+
+  /**
+   * Sets the timeout before a loop overrun warning is printed to the console. By default, loop
+   * overrun warnings are disabled. Loop times are always logged by AdvantageKit under
+   * "/RealOutputs/LoggedOpModeRobot".
+   *
+   * @param timeoutSecs The timeout before a loop overrun warning is printed. This value should
+   *     generally be greater than or equal to the loop cycle period.
+   */
+  public void setLoopOverrunWarningTimeout(double timeoutSecs) {
+    watchdog.setTimeout(timeoutSecs);
   }
 
   @Override
