@@ -9,10 +9,12 @@ package org.littletonrobotics.junction;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.IterativeRobotBase;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
+import org.wpilib.system.Watchdog;
 import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 
@@ -30,6 +32,7 @@ public class LoggedRobot extends IterativeRobotBase {
 
   private final int notifier = NotifierJNI.createNotifier();
   private final long periodNs;
+  private Watchdog watchdog;
   private long nextCycleNs = 0;
 
   private boolean useTiming = true;
@@ -48,6 +51,16 @@ public class LoggedRobot extends IterativeRobotBase {
     super(period);
     this.periodNs = (long) (period * 1_000_000_000.0);
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
+
+    try {
+      Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
+      watchdogField.setAccessible(true);
+      watchdog = (Watchdog) watchdogField.get(this);
+    } catch (Exception e) {
+    }
+    if (watchdog != null) {
+      watchdog.setTimeout(Double.POSITIVE_INFINITY);
+    }
 
     UsageReporting.reportUsage("Framework", "AdvantageKit_LoggedRobot");
     UsageReporting.reportUsage("LoggingFramework", "AdvantageKit");
@@ -145,5 +158,19 @@ public class LoggedRobot extends IterativeRobotBase {
    */
   public void setUseTiming(boolean useTiming) {
     this.useTiming = useTiming;
+  }
+
+  /**
+   * Sets the timeout before a loop overrun warning is printed to the console. By default, loop
+   * overrun warnings are disabled. Loop times are always logged by AdvantageKit under
+   * "/RealOutputs/LoggedRobot".
+   *
+   * @param timeoutSecs The timeout before a loop overrun warning is printed. This value should
+   *     generally be greater than or equal to the loop cycle period.
+   */
+  public void setLoopOverrunWarningTimeout(double timeoutSecs) {
+    if (watchdog != null) {
+      watchdog.setTimeout(timeoutSecs);
+    }
   }
 }

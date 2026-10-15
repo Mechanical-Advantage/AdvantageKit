@@ -153,7 +153,7 @@ public class ReplayWatch {
                 hasSpotless
                     ? new String[] {
                       isWindows ? "gradlew.bat" : "./gradlew",
-                      "simulateJava",
+                      "run",
                       "-x",
                       "test",
                       "-x",
@@ -161,9 +161,7 @@ public class ReplayWatch {
                       "-x",
                       "spotlessCheck"
                     }
-                    : new String[] {
-                      isWindows ? "gradlew.bat" : "./gradlew", "simulateJava", "-x", "test"
-                    })
+                    : new String[] {isWindows ? "gradlew.bat" : "./gradlew", "run", "-x", "test"})
             .inheritIO();
     gradleBuilder.environment().put(LogFileUtil.environmentVariable, inputLog);
     var gradle = gradleBuilder.start();
