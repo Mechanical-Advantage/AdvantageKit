@@ -31,6 +31,8 @@ import org.wpilib.framework.RobotBase;
 import org.wpilib.system.RobotController;
 import org.wpilib.units.Measure;
 import org.wpilib.units.Unit;
+import org.wpilib.util.Alert;
+import org.wpilib.util.Alert.Level;
 import org.wpilib.util.Color;
 import org.wpilib.util.WPISerializable;
 import org.wpilib.util.protobuf.Protobuf;
@@ -60,6 +62,12 @@ public class Logger {
       new ArrayBlockingQueue<LogTable>(receiverQueueCapacity);
   private static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
   private static boolean receiverQueueFault = false;
+  private static final Alert receiverQueueAlert =
+      new Alert(
+          "AdvantageKit",
+          "receiver-queue",
+          "Log data receivers are not keeping up, some AdvantageKit data will be lost.",
+          Level.MEDIUM);
 
   private Logger() {}
 
@@ -430,10 +438,12 @@ public class Logger {
           receiverQueue.add(LogTable.clone(entry));
         }
         receiverQueueFault = false;
+        receiverQueueAlert.set(false);
       } catch (IllegalStateException exception) {
         receiverQueueFault = true;
+        receiverQueueAlert.set(true);
         DriverStationErrors.reportError(
-            "[AdvantageKit] Capacity of receiver queue exceeded, data will NOT be logged.", false);
+            "[AdvantageKit] Capacity of receiver queue exceeded, some data will be lost.", false);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -497,6 +507,15 @@ public class Logger {
    */
   public static boolean getReceiverQueueFault() {
     return receiverQueueFault;
+  }
+
+  /**
+   * Returns the state of the console fault. This is tripped when console log capture fails.
+   *
+   * @return Whether console log capture has failed.
+   */
+  public static boolean getConsoleFault() {
+    return console != null && console.getFault();
   }
 
   /**

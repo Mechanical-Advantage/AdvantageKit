@@ -35,6 +35,8 @@ import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.MatchType;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.system.RobotController;
+import org.wpilib.util.Alert;
+import org.wpilib.util.Alert.Level;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
@@ -73,6 +75,14 @@ public class WPILOGWriter implements LogDataReceiver {
   private Map<String, Integer> entryIDs;
   private Map<String, LoggableType> entryTypes;
   private Map<String, String> entryUnits;
+
+  private boolean failedFault = false;
+  private static final Alert failedAlert =
+      new Alert(
+          "AdvantageKit",
+          "wpilog-failed",
+          "Failed to start WPILOG logging, no data will be saved.",
+          Level.MEDIUM);
 
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
@@ -198,7 +208,10 @@ public class WPILOGWriter implements LogDataReceiver {
         syncDirectory(folder);
       }
     } catch (IOException e) {
-      DriverStationErrors.reportError("[AdvantageKit] Failed to open output log file.", true);
+      DriverStationErrors.reportError(
+          "[AdvantageKit] Failed to open output log file, no data will be saved.", true);
+      failedFault = true;
+      failedAlert.set(true);
       return;
     }
     isOpen = true;
@@ -292,8 +305,10 @@ public class WPILOGWriter implements LogDataReceiver {
           DriverStationErrors.reportWarning(
               "[AdvantageKit] Timed out waiting for USB drive at \""
                   + folder
-                  + "\". Logging disabled.",
+                  + "\", no data will be saved.",
               false);
+          failedFault = true;
+          failedAlert.set(true);
         }
       }
       return;
@@ -509,6 +524,16 @@ public class WPILOGWriter implements LogDataReceiver {
 
     // Update last table
     lastTable = table;
+  }
+
+  /**
+   * Returns the state of the general "failed" fault. This is tripped when the log file fails to
+   * open due to a general IO error or USB timeout.
+   *
+   * @return Whether the fault is active.
+   */
+  public boolean getFailedFault() {
+    return failedFault;
   }
 
   /**
