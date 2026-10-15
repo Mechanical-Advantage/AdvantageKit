@@ -14,3 +14,11 @@ flatc --gen-compare --no-includes --gen-mutable --reflect-names --cpp-ptr-type f
 
 flatc --gen-compare --no-includes --gen-mutable --reflect-names \
       -o akit/src/main/generated/java --java akit/src/main/fbs/conduit_schema.fbs
+
+if [ $# -eq 0 ]; then
+      echo "QuickBuffers plugin binary not provided, Protobuf generation failed."
+      exit 1
+fi
+
+protoc --plugin=protoc-gen-quickbuf=$1 --quickbuf_out=gen_descriptors=true:akit/src/main/generated/java \
+      -I=akit/src/main/proto akit/src/main/proto/console_data.proto

@@ -1,3 +1,7 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.diagnostic.filter": [
+        "**akit/src/main/generated/**",
+        "**akit/src/main/thirdparty/**"
+    ]
 }
