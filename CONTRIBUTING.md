@@ -18,7 +18,7 @@ Please remember to behave with **Gracious Professionalism** in all interactions.
 
 ## Development Setup
 
-1. **Java Version:** Ensure you have JDK 17 or newer installed.
+1. **Java Version:** Ensure you have JDK 25 or newer installed.
 2. **Clone the Repository:**
 
 ```bash
