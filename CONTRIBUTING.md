@@ -62,15 +62,27 @@ To use your locally built version of AdvantageKit in a robot project:
 
 1. Open your robot project.
 2. Locate the `vendordeps/AdvantageKit.json` file.
-3. **Update the Version:** Change the version field to `"dev"`.
+3. **Update the Version:** Change all version fields to `"dev"`.
 
 ```json
 {
-  "fileName": "AdvantageKit.json",
-  "name": "AdvantageKit",
+  // ...
   "version": "dev",
-  "uuid": "...",
-  ...
+  // ...
+  "javaDependencies": [
+    {
+      // ...
+      "version": "dev"
+      // ...
+    }
+  ],
+  "jniDependencies": [
+    {
+      // ...
+      "version": "dev"
+      // ...
+    }
+  ]
 }
 ```
 
