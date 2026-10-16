@@ -23,10 +23,10 @@ import org.wpilib.wpilibj.Timer;
 /**
  * Provides an interface for asynchronously reading high-frequency measurements to a set of queues.
  *
- * <p>This version is intended for Phoenix 6 devices on both the RIO and CANivore buses. When using
- * a CANivore, the thread uses the "waitForAll" blocking method to enable more consistent sampling.
- * This also allows Phoenix Pro users to benefit from lower latency between devices using CANivore
- * time synchronization.
+ * <p>This version is intended for Phoenix 6 devices on any CAN bus. When using a CANivore, the
+ * thread uses the "waitForAll" blocking method to enable more consistent sampling. This also allows
+ * Phoenix Pro users to benefit from lower latency between devices using CANivore time
+ * synchronization.
  */
 public class PhoenixOdometryThread extends Thread {
   private final Lock signalsLock =

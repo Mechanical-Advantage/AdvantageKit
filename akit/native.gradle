@@ -22,12 +22,6 @@ nativeUtils.wpi.addWarningsAsErrors()
 nativeUtils.setSinglePrintPerPlatform()
 
 model {
-    // Uncomment this, and remove lines below it to enable builds for just roborio
-    // components {
-    //     all {
-    //         targetPlatform nativeUtils.wpi.platforms.roborio
-    //     }
-    // }
     components {
         all {
             nativeUtils.useAllPlatforms(it)

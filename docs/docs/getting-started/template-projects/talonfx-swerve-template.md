@@ -50,20 +50,18 @@ CTRE only permits the swerve project generator to be used on swerve robots with 
 
 3. If not already available, download and install [Git](https://git-scm.com/downloads).
 
-4. If the project will run **only on the roboRIO 2**, uncomment lines 39-42 of `build.gradle`. These contain additional [garbage collection](https://www.geeksforgeeks.org/garbage-collection-java/) optimizations for the RIO 2 to improve performance.
+4. Follow the instructions in the Phoenix documentation for the [Tuner X Swerve Project Generator](https://v6.docs.ctr-electronics.com/en/latest/docs/tuner/tuner-swerve/index.html).
 
-5. Follow the instructions in the Phoenix documentation for the [Tuner X Swerve Project Generator](https://v6.docs.ctr-electronics.com/en/latest/docs/tuner/tuner-swerve/index.html).
+5. On the final screen in Tuner X, choose "Generate only TunerConstants" and overwrite the file located at `src/main/java/frc/robot/generated/TunerConstants.java`.
 
-6. On the final screen in Tuner X, choose "Generate only TunerConstants" and overwrite the file located at `src/main/java/frc/robot/generated/TunerConstants.java`.
+6. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/88be410fdbfd811e6f776197d41c0bea5f109b0e/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L17) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/88be410fdbfd811e6f776197d41c0bea5f109b0e/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L198-L202). Before removing them, both lines will be marked as errors in VSCode.
 
-7. In `TunerConstants.java`, comment out the [last import](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/88be410fdbfd811e6f776197d41c0bea5f109b0e/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L17) and [last method](https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/88be410fdbfd811e6f776197d41c0bea5f109b0e/java/SwerveWithPathPlanner/src/main/java/frc/robot/generated/TunerConstants.java#L198-L202). Before removing them, both lines will be marked as errors in VSCode.
+7. In `TunerConstants.java`, change `kSteerInertia` to 0.004 and `kDriveInertia` to 0.025.
 
-8. In `TunerConstants.java`, change `kSteerInertia` to 0.004 and `kDriveInertia` to 0.025.
-
-9. If the robot does not use the default arrangement of 8 TalonFXs and 4 CANcoders, please see the section [here](#custom-module-implementations) on alternative module IO implementations.
+8. If the robot does not use the default arrangement of 8 TalonFXs and 4 CANcoders, please see the section [here](#custom-module-implementations) on alternative module IO implementations.
 
 :::warning
-The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**
+The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the USB ports to save log files.**
 :::
 
 </TabItem>
@@ -75,32 +73,30 @@ The project is configured to save log files when running on a real robot. **A FA
 
 3. If not already available, download and install [Git](https://git-scm.com/downloads).
 
-4. If the project will run **only on the roboRIO 2**, uncomment lines 39-42 of `build.gradle`. These contain additional [garbage collection](https://www.geeksforgeeks.org/garbage-collection-java/) optimizations for the RIO 2 to improve performance.
+4. Navigate to `src/main/java/frc/robot/generated/TunerConstants.java` in the AdvantageKit project.
 
-5. Navigate to `src/main/java/frc/robot/generated/TunerConstants.java` in the AdvantageKit project.
+5. Update the values of `kDriveGearRatio` and `kSteerGearRatio` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
 
-6. Update the values of `kDriveGearRatio` and `kSteerGearRatio` based on the robot's module type and configuration. This information can typically be found on the product page for the swerve module. These values represent reductions and should generally be greater than one.
+6. Update the value of `kWheelRadius` to the theoretical radius of each wheel. This value can be further refined as described in the "Tuning" section below.
 
-7. Update the value of `kWheelRadius` to the theoretical radius of each wheel. This value can be further refined as described in the "Tuning" section below.
+7. Update the value of `kSpeedAt12Volts` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
 
-8. Update the value of `kSpeedAt12Volts` to the theoretical max speed of the robot. This value can be further refined as described in the "Tuning" section below.
+8. Update the value of `kCANBus` based on the CAN bus used by the drive devices. Check the [`CANBus`](https://api.ctr-electronics.com/phoenix6/latest/java/com/ctre/phoenix6/CANBus.html) API documentation for details on possible values.
 
-9. Update the value of `kCANBus` based on the CAN bus used by the drive devices. Check the [`CANBus`](https://api.ctr-electronics.com/phoenix6/latest/java/com/ctre/phoenix6/CANBus.html) API documentation for details on possible values.
+9. Set the value of `kPigeonId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
 
-10. Set the value of `kPigeonId` to the correct CAN ID of the Pigeon 2 (as configured using Tuner X). **If using a NavX instead of a Pigeon 2, see the [customization](#customization) section below.**
+10. For each module, set the values of `k...DriveMotorId`, `k...SteerMotorId`, and `k...EncoderId` to the correct CAN IDs of the drive TalonFX(S), turn TalonFX(S), and CANcoder/CANdi (as configured in Tuner X).
 
-11. For each module, set the values of `k...DriveMotorId`, `k...SteerMotorId`, and `k...EncoderId` to the correct CAN IDs of the drive TalonFX(S), turn TalonFX(S), and CANcoder/CANdi (as configured in Tuner X).
+11. For each module, set the values of `k...XPos` and `k...YPos` based on the distance from each module to the center of the robot. Positive X values are closer to the front of the robot and positive Y values are closer to the left side of the robot.
 
-12. For each module, set the values of `k...XPos` and `k...YPos` based on the distance from each module to the center of the robot. Positive X values are closer to the front of the robot and positive Y values are closer to the left side of the robot.
+12. For each module, set the value of `k...EncoderOffset` to `Radians.of(0.0)`.
 
-13. For each module, set the value of `k...EncoderOffset` to `Radians.of(0.0)`.
+13. Deploy the project to the robot and connect using AdvantageScope.
 
-14. Deploy the project to the robot and connect using AdvantageScope.
-
-15. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify tha CAN IDs, firmware versions, and configurations of all devices.
+14. Check that there are no dashboard alerts or errors in the Driver Station console. If any errors appear, verify tha CAN IDs, firmware versions, and configurations of all devices.
 
 :::warning
-The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**
+The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the USB ports to save log files.**
 :::
 
 16. Manually rotate the turning position of each module such that the position in AdvantageScope (`/Drive/Module.../TurnPosition`) is **increasing**. The module should be rotating **counter-clockwise** as viewed from above the robot. Verify that the units visible in AdvantageScope (radians) match the physical motion of the module. If necessary, change the value of `k...SteerMotorInverted` or `kSteerGearRatio`.
@@ -135,7 +131,7 @@ CTRE does not allow torque-current control on the TalonFXS.
 The project includes default [feedforward gains](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-feedforward.html#introduction-to-dc-motor-feedforward) for velocity control of the drive motors (`kS` and `kV`), acceleration control of the drive motors (`kA`), and velocity control of the turn motors (`kS` and `kV`).
 
 :::info
-The AdvantageKit template requires different feedforward gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX(S) firmware and not on the RIO.
+The AdvantageKit template requires different feedforward gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX(S) firmware and not on the robot controller.
 :::
 
 :::tip
@@ -205,7 +201,7 @@ The project includes an automated wheel radius characterization routine, which o
 The project includes default gains for the drive velocity PID controllers and turn position PID controllers, which can be found in the `steerGains` and `driveGains` configs in `TunerConstants.java`. These gains should be tuned for each robot.
 
 :::info
-The AdvantageKit template requires different PID gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX(S) firmware and not on the RIO.
+The AdvantageKit template requires different PID gains than CTRE's default swerve code, because it applies the swerve gear ratio using the TalonFX(S) firmware and not on the robot controller.
 :::
 
 :::tip
@@ -256,7 +252,7 @@ The project includes a built-in configuration for [PathPlanner](https://pathplan
 
 ### Setting Odometry Frequency {#setting-odometry-frequency}
 
-By default, the project runs at **100Hz** on the RIO CAN bus and **250Hz** on CAN FD buses. These values are stored at the top of `Drive.java` and can be freely customized. The project configures all devices to minimize CAN bus utilization, but we recommend monitoring utilization carefully when increasing frequency.
+By default, the project runs at **100Hz** on CAN 2.0 buses and **250Hz** on CAN FD buses. These values are stored at the top of `Drive.java` and can be freely customized. The project configures all devices to minimize CAN bus utilization, but we recommend monitoring utilization carefully when increasing frequency.
 
 ### Custom Gyro Implementations {#custom-gyro-implementations}
 

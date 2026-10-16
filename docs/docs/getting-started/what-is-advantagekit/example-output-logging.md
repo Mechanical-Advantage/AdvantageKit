@@ -25,7 +25,7 @@ This line doesn't change the behavior of the robot code, but it logs extra "outp
 - The **same code** is running on the robot and in the simulator AND...
 - AdvantageKit will provide the **same inputs** to the simulator that occurred on the real robot...
 
-...the outputs from the line we added are the same as if we were logging this data on the real robot. When we start the simulator, AdvantageKit loads the log file and replays the loop cycles as quickly as possible (most laptops are much faster than the roboRIO):
+...the outputs from the line we added are the same as if we were logging this data on the real robot. When we start the simulator, AdvantageKit loads the log file and replays the loop cycles as quickly as possible:
 
 ![Log replay](img/example-3.gif)
 

@@ -7,7 +7,7 @@ sidebar_position: 6
 The AdvantageKit skeleton template includes the basic code required to load AdvantageKit, but no subsystems or control logic. It is intended for teams who wish to design a complete project themselves without using a more complete template.
 
 :::warning
-The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the roboRIO USB ports to save log files.**
+The project is configured to save log files when running on a real robot. **A FAT32 formatted USB stick must be connected to one of the USB ports to save log files.**
 :::
 
 We recommend that most users start with one of the other provided template projects:

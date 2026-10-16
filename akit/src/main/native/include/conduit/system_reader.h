@@ -19,8 +19,8 @@
 #include "conduit_schema_generated.h"
 using namespace org::littletonrobotics::conduit;
 
-// Reads system stats data from the RIO. The data is read synchronously as
-// there are no periodic updates (unlike DS and PD data).
+// Reads system stats data from the robot controller. The data is read
+// synchronously as there are no periodic updates (unlike DS and PD data).
 class SystemReader {
 public:
 	void start();

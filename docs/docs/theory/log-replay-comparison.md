@@ -105,7 +105,7 @@ Log replay can be used in a variety of environments, which take advantage of the
 - Retuning an auto-score tolerance in the pits based on data from the last match.
 - Testing a variety of vision filtering techniques between in-person meetings.
 - Remotely debugging issues for a team by repeatedly logging additional outputs.
-- Generating outputs after every match that are too complex to run on the RoboRIO.
+- Generating outputs after every match that are too complex to run on the real robot.
 
 Every one of these use cases **depends on being able to run replay faster than real-time**. A typical match log may be 10 minutes long, and a replay feature that takes 10 minutes to run is not practical in any of these scenarios. Whether log replay is used under time pressure at an event or at home for rapid debugging, quickly running multiple replays with different outputs or tuning parameters is absolutely core to its utility.
 

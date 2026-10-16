@@ -26,10 +26,10 @@ git clone https://github.com/Mechanical-Advantage/AdvantageKit.git
 cd AdvantageKit
 ```
 
-3. **Install the roboRIO Toolchain:** (if needed)
+3. **Install the Systemcore Toolchain:** (if needed)
 
 ```bash
-./gradlew :akit:installRoboRioToolchain
+./gradlew :akit:installSystemcoreToolchain
 ```
 
 4. **Build the Project:**

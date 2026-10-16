@@ -24,7 +24,7 @@ Optionally, AdvantageKit allows you to disable deterministic timestamps. This re
 
 1. The control logic depends on the exact timestamp _within_ a single loop cycle, like a high precision control loop that is significantly affected by the precise time that it is executed within each (usually 20ms) loop cycle.
 2. The sensor values used in the loop cannot be associated with timestamps in an IO implementation. See solution #1.
-3. The IO (sensors, actuators, etc) involved in the loop are sufficiently low-latency that the exact timestamp on the RIO is significant. For example, CAN motor controllers are limited by the rate of their CAN frames, so the extra precision on the RIO is insignificant in most cases.
+3. The IO (sensors, actuators, etc) involved in the loop are sufficiently low-latency that the exact timestamp on the robot controller is significant. For example, CAN motor controllers are limited by the rate of their CAN frames, so the extra precision on the robot controller is insignificant in most cases.
 
 If you need to disable deterministic timestamps globally, add the following lines to the constructor of `Robot` _after_ `Logger.start()`:
 
