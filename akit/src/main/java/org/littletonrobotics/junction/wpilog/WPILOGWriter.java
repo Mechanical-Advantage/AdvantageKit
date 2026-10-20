@@ -20,13 +20,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import java.util.Queue;
 import java.util.Random;
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
@@ -65,6 +63,7 @@ public class WPILOGWriter implements LogDataReceiver {
   private AdvantageScopeOpenBehavior openBehavior = AdvantageScopeOpenBehavior.AUTO;
 
   private WPILOGEncoder wpilogEncoder;
+  private QueuedOutputStream queuedOutputStream;
   private FileOutputStream fileOutputStream;
 
   private final boolean autoRename;
@@ -76,7 +75,6 @@ public class WPILOGWriter implements LogDataReceiver {
   private boolean waitingForMount = false;
   private long mountWaitStartTime = 0;
   private long lastMountCheckTimestamp = 0;
-  private final Queue<LogTable> pendingTables = new ArrayDeque<>();
   private LogTable lastTable;
   private int timestampID;
   private long lastFlushTimestamp = 0;
@@ -207,18 +205,46 @@ public class WPILOGWriter implements LogDataReceiver {
 
   public void start() {
     isStarted = true;
-    if (usbPrefix.isPresent()) {
-      if (USBDriveUtil.isUSBMounted(usbPrefix.get())) {
-        openLogFile();
-      } else {
-        waitingForMount = true;
-        mountWaitStartTime = RobotController.getMonotonicTime();
-        lastMountCheckTimestamp = 0;
-        System.out.println(
-            "[AdvantageKit] Waiting for USB drive to mount before opening log at \""
-                + folder
-                + "\"...");
+    filename = baseFilename + getExtension();
+
+    // Reset data
+    lastTable = new LogTable(0);
+    entryIDs = new HashMap<>();
+    entryTypes = new HashMap<>();
+    entryUnits = new HashMap<>();
+    logDate = null;
+    logMatchText = null;
+
+    // Create encoder and initialize log
+    try {
+      queuedOutputStream = new QueuedOutputStream();
+      OutputStream compressionStream = queuedOutputStream;
+      if (xzPreset.isPresent()) {
+        compressionStream =
+            new XZOutputStream(queuedOutputStream, new LZMA2Options(xzPreset.getAsInt()));
       }
+      wpilogEncoder = new WPILOGEncoder(compressionStream);
+      wpilogEncoder.writeHeader(WPILOGConstants.extraHeader);
+      timestampID =
+          wpilogEncoder.startEntry(
+              timestampKey,
+              LoggableType.Integer.getWPILOGType(),
+              WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", "nanoseconds"),
+              0);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return;
+    }
+
+    // Open log file or wait for USB mount
+    if (usbPrefix.isPresent() && !USBDriveUtil.isUSBMounted(usbPrefix.get())) {
+      waitingForMount = true;
+      mountWaitStartTime = RobotController.getMonotonicTime();
+      lastMountCheckTimestamp = 0;
+      System.out.println(
+          "[AdvantageKit] Waiting for USB drive to mount before opening log at \""
+              + folder
+              + "\"...");
     } else {
       openLogFile();
     }
@@ -229,9 +255,6 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   private void openLogFile() {
-    // Construct filename
-    filename = baseFilename + getExtension();
-
     // Create folder if necessary
     if (folder != null) {
       File logFolder = new File(folder);
@@ -256,51 +279,33 @@ public class WPILOGWriter implements LogDataReceiver {
             + (xzPreset.isPresent() ? " with XZ compression" : ""));
     try {
       fileOutputStream = new FileOutputStream(logPath);
-      BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-      OutputStream compressionStream = bufferedOutputStream;
-      if (xzPreset.isPresent()) {
-        compressionStream =
-            new XZOutputStream(bufferedOutputStream, new LZMA2Options(xzPreset.getAsInt()));
-      }
-      wpilogEncoder = new WPILOGEncoder(compressionStream);
+      queuedOutputStream.setFileStream(new BufferedOutputStream(fileOutputStream));
       syncDirectory(folder);
     } catch (IOException e) {
       DriverStationErrors.reportError(
           "[AdvantageKit] Failed to open output log file, no data will be saved.", true);
+      try {
+        queuedOutputStream.close();
+      } catch (IOException ignored) {
+      }
+      waitingForMount = false;
       failedFault = true;
       failedAlert.set(true);
       return;
     }
 
-    // Initialize log
-    try {
-      wpilogEncoder.writeHeader(WPILOGConstants.extraHeader);
-      timestampID =
-          wpilogEncoder.startEntry(
-              timestampKey,
-              LoggableType.Integer.getWPILOGType(),
-              WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", "nanoseconds"),
-              0);
-    } catch (IOException e) {
-      e.printStackTrace();
-      return;
-    }
-    lastTable = new LogTable(0);
     isOpen = true;
     waitingForMount = false;
-
-    // Reset data
-    entryIDs = new HashMap<>();
-    entryTypes = new HashMap<>();
-    entryUnits = new HashMap<>();
-    logDate = null;
-    logMatchText = null;
   }
 
   public void end() {
     if (waitingForMount) {
       waitingForMount = false;
-      pendingTables.clear();
+      try {
+        queuedOutputStream.close();
+      } catch (IOException ignored) {
+      }
+      isStarted = false;
       return;
     }
 
@@ -349,23 +354,17 @@ public class WPILOGWriter implements LogDataReceiver {
 
   public void putTable(LogTable table) {
     if (waitingForMount) {
-      pendingTables.add(table);
       long now = RobotController.getMonotonicTime();
       if (now - lastMountCheckTimestamp > mountCheckPeriodNs) {
         lastMountCheckTimestamp = now;
         if (USBDriveUtil.isUSBMounted(usbPrefix.get())) {
           openLogFile();
-          if (isOpen) {
-            while (!pendingTables.isEmpty()) {
-              putTableInternal(pendingTables.poll());
-            }
-          } else {
-            waitingForMount = false;
-            pendingTables.clear();
-          }
-        } else if (RobotController.getMonotonicTime() - mountWaitStartTime > mountTimeoutNs) {
+        } else if (now - mountWaitStartTime > mountTimeoutNs) {
           waitingForMount = false;
-          pendingTables.clear();
+          try {
+            queuedOutputStream.close();
+          } catch (IOException ignored) {
+          }
           DriverStationErrors.reportWarning(
               "[AdvantageKit] Timed out waiting for USB drive at \""
                   + folder
@@ -373,18 +372,14 @@ public class WPILOGWriter implements LogDataReceiver {
               false);
           failedFault = true;
           failedAlert.set(true);
+          return;
         }
       }
-      return;
     }
 
-    // Exit if log not open
-    if (!isOpen) return;
+    // Exit if log not open and not waiting for mount
+    if (!isOpen && !waitingForMount) return;
 
-    putTableInternal(table);
-  }
-
-  private void putTableInternal(LogTable table) {
     // Auto rename
     if (autoRename) {
 
@@ -440,38 +435,40 @@ public class WPILOGWriter implements LogDataReceiver {
       }
 
       // Update filename
-      StringBuilder newFilenameBuilder = new StringBuilder();
-      newFilenameBuilder.append("akit_");
-      if (logDate == null) {
-        newFilenameBuilder.append(randomIdentifier);
-      } else {
-        newFilenameBuilder.append(timeFormatter.format(logDate));
-      }
-      boolean fmsAttached = table.get("DriverStation/FMSAttached", false);
-      if (fmsAttached) {
-        String eventName = table.get("DriverStation/EventName", "").toLowerCase();
-        if (eventName.length() > 0) {
-          newFilenameBuilder.append("_");
-          newFilenameBuilder.append(eventName);
+      if (isOpen) {
+        StringBuilder newFilenameBuilder = new StringBuilder();
+        newFilenameBuilder.append("akit_");
+        if (logDate == null) {
+          newFilenameBuilder.append(randomIdentifier);
+        } else {
+          newFilenameBuilder.append(timeFormatter.format(logDate));
         }
-        if (logMatchText != null) {
-          newFilenameBuilder.append("_");
-          newFilenameBuilder.append(logMatchText);
+        boolean fmsAttached = table.get("DriverStation/FMSAttached", false);
+        if (fmsAttached) {
+          String eventName = table.get("DriverStation/EventName", "").toLowerCase();
+          if (eventName.length() > 0) {
+            newFilenameBuilder.append("_");
+            newFilenameBuilder.append(eventName);
+          }
+          if (logMatchText != null) {
+            newFilenameBuilder.append("_");
+            newFilenameBuilder.append(logMatchText);
+          }
         }
-      }
-      newFilenameBuilder.append(getExtension());
-      String newFilename = newFilenameBuilder.toString();
-      if (!newFilename.equals(filename)) {
-        String logPath =
-            folder == null
-                ? newFilename
-                : FileSystems.getDefault().getPath(folder, newFilename).toString();
-        System.out.println("[AdvantageKit] Renaming log to \"" + logPath + "\"");
+        newFilenameBuilder.append(getExtension());
+        String newFilename = newFilenameBuilder.toString();
+        if (!newFilename.equals(filename)) {
+          String logPath =
+              folder == null
+                  ? newFilename
+                  : FileSystems.getDefault().getPath(folder, newFilename).toString();
+          System.out.println("[AdvantageKit] Renaming log to \"" + logPath + "\"");
 
-        File fileA = folder == null ? new File(filename) : new File(folder, filename);
-        File fileB = folder == null ? new File(newFilename) : new File(folder, newFilename);
-        if (fileA.renameTo(fileB)) {
-          filename = newFilename;
+          File fileA = folder == null ? new File(filename) : new File(folder, filename);
+          File fileB = folder == null ? new File(newFilename) : new File(folder, newFilename);
+          if (fileA.renameTo(fileB)) {
+            filename = newFilename;
+          }
         }
       }
     }
@@ -570,7 +567,7 @@ public class WPILOGWriter implements LogDataReceiver {
       }
 
       // Flush to disk
-      if (table.getTimestamp() - lastFlushTimestamp > flushPeriodNs) {
+      if (isOpen && table.getTimestamp() - lastFlushTimestamp > flushPeriodNs) {
         lastFlushTimestamp = table.getTimestamp();
         try {
           wpilogEncoder.flush();
