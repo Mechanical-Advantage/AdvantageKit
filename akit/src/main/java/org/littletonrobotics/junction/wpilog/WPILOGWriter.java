@@ -42,8 +42,8 @@ import org.wpilib.util.Alert.Level;
 public class WPILOGWriter implements LogDataReceiver {
   // Wait several seconds after DS attached to ensure time is updated
   private static final double timestampUpdateDelayNs = 5_000_000_000L;
-  private static final long flushPeriodNs = 250_000L;
-  private static final long mountCheckPeriodNs = 250_000L;
+  private static final long flushPeriodNs = 250_000_000L;
+  private static final long mountCheckPeriodNs = 250_000_000L;
   private static final long mountTimeoutNs = 15_000_000_000L;
   private static final String defaultPathRobot = "/U/logs";
   private static final String defaultPathSim = "logs";
