@@ -55,7 +55,7 @@ class AlertLogger {
         }
       }
 
-      String table = group.isEmpty() ? "Alerts" : "AlertGroups/" + group;
+      String table = group.isEmpty() || group.equals("Alerts") ? "Alerts" : "AlertGroups/" + group;
       Logger.recordOutput(table + "/.type", "Alerts");
       Logger.recordOutput(table + "/errors", errors.toArray(new String[0]));
       Logger.recordOutput(table + "/warnings", warnings.toArray(new String[0]));

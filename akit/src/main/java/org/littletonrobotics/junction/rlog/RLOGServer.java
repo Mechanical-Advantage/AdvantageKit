@@ -189,7 +189,7 @@ public class RLOGServer implements LogDataReceiver {
 
     private void printDisconnectMessage(Socket socket, String reason) {
       System.out.println(
-          "Disconnected from RLOG client ("
+          "[AdvantageKit] Disconnected from RLOG client ("
               + reason
               + ") - "
               + socket.getInetAddress().getHostAddress());

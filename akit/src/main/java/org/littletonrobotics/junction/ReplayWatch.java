@@ -52,7 +52,7 @@ public class ReplayWatch {
     }
     if (inputLog == null) {
       System.out.println(
-          "No input log available for replay watch, please provide with the \""
+          "[AdvantageKit] No input log available for replay watch, please provide with the \""
               + LogFileUtil.environmentVariable
               + "\" environment variable or through AdvantageScope.");
       System.exit(1);
