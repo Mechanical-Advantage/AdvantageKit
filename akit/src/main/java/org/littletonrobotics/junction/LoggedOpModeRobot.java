@@ -529,7 +529,7 @@ public abstract class LoggedOpModeRobot extends RobotBase {
     NotifierJNI.setNotifierName(notifier, "LoggedOpModeRobot");
     this.periodNs = (long) (period * 1_000_000_000.0);
 
-    watchdog = new Watchdog(Double.POSITIVE_INFINITY, this::printLoopOverrunMessage);
+    watchdog = new Watchdog(1.0e9, this::printLoopOverrunMessage);
 
     // Scan for annotated opmode classes within the derived class's package and
     // subpackages

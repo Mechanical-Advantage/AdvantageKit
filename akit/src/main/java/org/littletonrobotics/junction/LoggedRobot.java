@@ -59,7 +59,7 @@ public class LoggedRobot extends IterativeRobotBase {
     } catch (Exception e) {
     }
     if (watchdog != null) {
-      watchdog.setTimeout(Double.POSITIVE_INFINITY);
+      watchdog.setTimeout(1.0e9);
     }
 
     UsageReporting.reportUsage("Framework", "AdvantageKit_LoggedRobot");
