@@ -10,23 +10,29 @@ package org.littletonrobotics.conduit;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import org.littletonrobotics.conduit.schema.CANInfo;
 import org.littletonrobotics.conduit.schema.CoreInputs;
 import org.littletonrobotics.conduit.schema.DSData;
 import org.littletonrobotics.conduit.schema.Joystick;
+import org.littletonrobotics.conduit.schema.NetworkStatus;
 import org.littletonrobotics.conduit.schema.PDPData;
 import org.littletonrobotics.conduit.schema.SystemData;
+import org.littletonrobotics.conduit.schema.Vector3;
+import org.wpilib.math.geometry.Quaternion;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
 
 public class ConduitApi {
   // Length constants
-  private static final int NUM_JOYSTICKS = 6;
-  private static final int NUM_JOYSTICK_AXES = 12;
-  private static final int NUM_JOYSTICK_POVS = 12;
+  public static final int NUM_JOYSTICKS = 6;
+  public static final int NUM_CAN_BUSES = 5;
 
-  private static final byte[] eventNameBytes = new byte[64];
-  private static final byte[] gameSpecificMessageBytes = new byte[64];
+  private static final byte[] eventNameBytes = new byte[65];
+  private static final byte[] gameDataBytes = new byte[65];
   private static final byte[] joystickNameBytes = new byte[256];
-  private static final byte[] serialNumberBytes = new byte[8];
-  private static final byte[] commentsBytes = new byte[64];
+  private static final byte[] osHashBytes = new byte[65];
+  private static final byte[] osSlotBytes = new byte[65];
+  private static final byte[] osVersionBytes = new byte[65];
 
   private static ConduitApi instance = null;
 
@@ -75,21 +81,22 @@ public class ConduitApi {
     int i;
     for (i = 0; i < eventNameBytes.length; i++) {
       eventNameBytes[i] = (byte) ds.eventName(i);
-      if (eventNameBytes[i] == 0) break;
+      if (eventNameBytes[i] == 0) {
+        break;
+      }
     }
     return new String(eventNameBytes, 0, i, utf8Charset);
   }
 
-  public String getGameSpecificMessage() {
+  public String getGameData() {
     int i;
-    for (i = 0; i < getGameSpecificMessageSize(); i++) {
-      gameSpecificMessageBytes[i] = (byte) ds.gameSpecificMessage(i);
+    for (i = 0; i < gameDataBytes.length; i++) {
+      gameDataBytes[i] = (byte) ds.gameData(i);
+      if (gameDataBytes[i] == 0) {
+        break;
+      }
     }
-    return new String(gameSpecificMessageBytes, 0, i, utf8Charset);
-  }
-
-  public int getGameSpecificMessageSize() {
-    return ds.gameSpecificMessageSize();
+    return new String(gameDataBytes, 0, i, utf8Charset);
   }
 
   public int getMatchNumber() {
@@ -104,7 +111,7 @@ public class ConduitApi {
     return ds.matchType();
   }
 
-  public int getControlWord() {
+  public long getControlWord() {
     return ds.controlWord();
   }
 
@@ -126,48 +133,103 @@ public class ConduitApi {
     return joysticks[joystickId].type();
   }
 
-  public int getButtonCount(int joystickId) {
-    return joysticks[joystickId].buttonCount();
+  public int getJoystickSupportedOutputs(int joystickId) {
+    return joysticks[joystickId].supportedOutputs();
   }
 
-  public int getButtonValues(int joystickId) {
+  public long getButtonsAvailable(int joystickId) {
+    return joysticks[joystickId].buttonsAvailable();
+  }
+
+  public long getButtonValues(int joystickId) {
     return joysticks[joystickId].buttons();
   }
 
-  public int getAxisCount(int joystickId) {
-    return joysticks[joystickId].axisCount();
-  }
-
-  public int[] getAxisTypes(int joystickId) {
-    int[] ret = new int[NUM_JOYSTICK_AXES];
-    for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
-      ret[i] = joysticks[joystickId].axisTypes(i);
-    }
-    return ret;
+  public int getAxesAvailable(int joystickId) {
+    return joysticks[joystickId].axesAvailable();
   }
 
   public float[] getAxisValues(int joystickId) {
-    float[] ret = new float[NUM_JOYSTICK_AXES];
-    for (int i = 0; i < NUM_JOYSTICK_AXES; i++) {
+    int count = availableToCount(getAxesAvailable(joystickId));
+    float[] ret = new float[count];
+    for (int i = 0; i < count; i++) {
       ret[i] = joysticks[joystickId].axisValues(i);
     }
     return ret;
   }
 
-  public int getPovCount(int joystickId) {
-    return joysticks[joystickId].povCount();
+  public int[] getAxisValuesRaw(int joystickId) {
+    int count = availableToCount(getAxesAvailable(joystickId));
+    int[] ret = new int[count];
+    for (int i = 0; i < count; i++) {
+      ret[i] = (int) joysticks[joystickId].axisRaw(i);
+    }
+    return ret;
+  }
+
+  public int getPovsAvailable(int joystickId) {
+    return joysticks[joystickId].povsAvailable();
   }
 
   public int[] getPovValues(int joystickId) {
-    int[] ret = new int[NUM_JOYSTICK_POVS];
-    for (int i = 0; i < NUM_JOYSTICK_POVS; i++) {
+    int count = availableToCount(getPovsAvailable(joystickId));
+    int[] ret = new int[count];
+    for (int i = 0; i < count; i++) {
       ret[i] = joysticks[joystickId].povValues(i);
     }
     return ret;
   }
 
-  public boolean isXbox(int joystickId) {
-    return joysticks[joystickId].isXbox();
+  public boolean isGamepad(int joystickId) {
+    return joysticks[joystickId].isGamepad();
+  }
+
+  public int getTouchpadCount(int joystickId) {
+    return joysticks[joystickId].touchpadCount();
+  }
+
+  public int getTouchpadFingerCount(int joystickId, int touchpadId) {
+    return joysticks[joystickId].touchpads(touchpadId).fingerCount();
+  }
+
+  public boolean getTouchpadFingerDown(int joystickId, int touchpadId, int fingerId) {
+    return joysticks[joystickId].touchpads(touchpadId).fingers(fingerId).down() != 0;
+  }
+
+  public float getTouchpadFingerX(int joystickId, int touchpadId, int fingerId) {
+    return joysticks[joystickId].touchpads(touchpadId).fingers(fingerId).x();
+  }
+
+  public float getTouchpadFingerY(int joystickId, int touchpadId, int fingerId) {
+    return joysticks[joystickId].touchpads(touchpadId).fingers(fingerId).y();
+  }
+
+  public void configurePowerDistribution(int busID, int moduleID, int type) {
+    ConduitJni.configurePowerDistribution(busID, moduleID, type);
+  }
+
+  public int getPDPChannelCount() {
+    return pdp.channelCount();
+  }
+
+  public int getPDPHandle() {
+    return pdp.handle();
+  }
+
+  public int getPDPType() {
+    return pdp.type();
+  }
+
+  public int getPDPModuleId() {
+    return pdp.moduleId();
+  }
+
+  public long getPDPFaults() {
+    return pdp.faults();
+  }
+
+  public long getPDPStickyFaults() {
+    return pdp.stickyFaults();
   }
 
   public double getPDPTemperature() {
@@ -194,171 +256,235 @@ public class ConduitApi {
     return pdp.totalEnergy();
   }
 
-  public int getFPGAVersion() {
-    return sys.fpgaVersion();
+  public double getBatteryVoltage() {
+    return sys.batteryVoltage();
   }
 
-  public int getFPGARevision() {
-    return sys.fpgaRevision();
+  public boolean getWatchdogActive() {
+    return sys.watchdogActive();
   }
 
-  public String getSerialNumber() {
-    int i;
-    for (i = 0; i < Math.min(serialNumberBytes.length, sys.serialNumberSize()); i++) {
-      serialNumberBytes[i] = (byte) sys.serialNumber(i);
-    }
-    return new String(serialNumberBytes, 0, i, utf8Charset);
+  public long getIOFrequency() {
+    return sys.ioFrequency();
   }
 
-  public String getComments() {
-    int i;
-    for (i = 0; i < Math.min(commentsBytes.length, sys.commentsSize()); i++) {
-      commentsBytes[i] = (byte) sys.comments(i);
-    }
-    return new String(commentsBytes, 0, i, utf8Charset);
+  public long getIORXFrequency() {
+    return sys.ioRxFrequency();
   }
 
-  public int getTeamNumber() {
+  public long getTeamNumber() {
     return sys.teamNumber();
-  }
-
-  public boolean getFPGAButton() {
-    return sys.fpgaButton() != 0;
-  }
-
-  public boolean getSystemActive() {
-    return sys.systemActive() != 0;
-  }
-
-  public boolean getBrownedOut() {
-    return sys.brownedOut() != 0;
-  }
-
-  public int getCommsDisableCount() {
-    return sys.commsDisableCount();
-  }
-
-  public boolean getRSLState() {
-    return sys.rslState() != 0;
-  }
-
-  public boolean getSystemTimeValid() {
-    return sys.systemTimeValid() != 0;
-  }
-
-  public double getVoltageVin() {
-    return sys.voltageVin();
-  }
-
-  public double getCurrentVin() {
-    return sys.currentVin();
-  }
-
-  public double getUserVoltage3v3() {
-    return sys.userVoltage3v3();
-  }
-
-  public double getUserCurrent3v3() {
-    return sys.userCurrent3v3();
-  }
-
-  public boolean getUserActive3v3() {
-    return sys.userActive3v3() != 0;
-  }
-
-  public int getUserCurrentFaults3v3() {
-    return sys.userCurrentFaults3v3();
-  }
-
-  public double getUserVoltage5v() {
-    return sys.userVoltage5v();
-  }
-
-  public double getUserCurrent5v() {
-    return sys.userCurrent5v();
-  }
-
-  public boolean getUserActive5v() {
-    return sys.userActive5v() != 0;
-  }
-
-  public int getUserCurrentFaults5v() {
-    return sys.userCurrentFaults5v();
-  }
-
-  public double getUserVoltage6v() {
-    return sys.userVoltage6v();
-  }
-
-  public double getUserCurrent6v() {
-    return sys.userCurrent6v();
-  }
-
-  public boolean getUserActive6v() {
-    return sys.userActive6v() != 0;
-  }
-
-  public int getUserCurrentFaults6v() {
-    return sys.userCurrentFaults6v();
-  }
-
-  public double getBrownoutVoltage() {
-    return sys.brownoutVoltage();
-  }
-
-  public double getCPUTemp() {
-    return sys.cpuTemp();
-  }
-
-  public float getCANBusUtilization() {
-    return sys.canStatus().percentBusUtilization();
-  }
-
-  public long getBusOffCount() {
-    return sys.canStatus().busOffCount();
-  }
-
-  public long getTxFullCount() {
-    return sys.canStatus().txFullCount();
-  }
-
-  public long getReceiveErrorCount() {
-    return sys.canStatus().receiveErrorCount();
-  }
-
-  public long getTransmitErrorCount() {
-    return sys.canStatus().transmitErrorCount();
   }
 
   public long getEpochTime() {
     return sys.epochTime();
   }
 
-  public void configurePowerDistribution(int moduleID, int type) {
-    ConduitJni.configurePowerDistribution(moduleID, type);
+  public boolean getEpochTimeValid() {
+    return sys.epochTimeValid();
   }
 
-  public int getPDPChannelCount() {
-    return pdp.channelCount();
+  public boolean getFaultBrownout() {
+    return sys.faultBrownout();
   }
 
-  public int getPDPHandle() {
-    return pdp.handle();
+  public boolean getFaultCanbusDown() {
+    return sys.faultCanbusDown();
   }
 
-  public int getPDPType() {
-    return pdp.type();
+  public boolean getFaultCanbusUnavail() {
+    return sys.faultCanbusUnavail();
   }
 
-  public int getPDPModuleId() {
-    return pdp.moduleId();
+  public boolean getFaultDisplay() {
+    return sys.faultDisplay();
   }
 
-  public long getPDPFaults() {
-    return pdp.faults();
+  public boolean getFaultIMU() {
+    return sys.faultImu();
   }
 
-  public long getPDPStickyFaults() {
-    return pdp.stickyFaults();
+  public boolean getFaultIO() {
+    return sys.faultIo();
+  }
+
+  public boolean getFaultRSL() {
+    return sys.faultRsl();
+  }
+
+  public boolean getFaultUSB() {
+    return sys.faultUsb();
+  }
+
+  public long getFaultCountBrownout() {
+    return sys.faultCountBrownout();
+  }
+
+  public long getFaultCountCanbusDown() {
+    return sys.faultCountCanbusDown();
+  }
+
+  public long getFaultCountCanbusUnavail() {
+    return sys.faultCountCanbusUnavail();
+  }
+
+  public long getFaultCountDisplay() {
+    return sys.faultCountDisplay();
+  }
+
+  public long getFaultCountIMU() {
+    return sys.faultCountImu();
+  }
+
+  public long getFaultCountIO() {
+    return sys.faultCountIo();
+  }
+
+  public long getFaultCountRSL() {
+    return sys.faultCountRsl();
+  }
+
+  public long getFaultCountUSB() {
+    return sys.faultCountUsb();
+  }
+
+  public NetworkStatus getNetworkEthernet() {
+    return sys.networkEthernet();
+  }
+
+  public NetworkStatus getNetworkWiFi() {
+    return sys.networkWifi();
+  }
+
+  public NetworkStatus getNetworkUSBTether() {
+    return sys.networkUsbTether();
+  }
+
+  public NetworkStatus getNetworkCAN(int bus) {
+    return sys.networkCan(bus);
+  }
+
+  public CANInfo getNetworkCANInfo(int bus) {
+    return sys.networkCanInfo(bus);
+  }
+
+  public double getCPUPercent() {
+    return sys.cpuPercent();
+  }
+
+  public double getCPUTempCelcius() {
+    return sys.cpuTemp();
+  }
+
+  public double getCurrent3V3() {
+    return sys.current3v3();
+  }
+
+  public String getOSHash() {
+    int i;
+    for (i = 0; i < osHashBytes.length; i++) {
+      osHashBytes[i] = (byte) sys.osHash(i);
+      if (osHashBytes[i] == 0) break;
+    }
+    return new String(osHashBytes, 0, i, utf8Charset);
+  }
+
+  public String getOSSlot() {
+    int i;
+    for (i = 0; i < osSlotBytes.length; i++) {
+      osSlotBytes[i] = (byte) sys.osSlot(i);
+      if (osSlotBytes[i] == 0) break;
+    }
+    return new String(osSlotBytes, 0, i, utf8Charset);
+  }
+
+  public String getOSVersion() {
+    int i;
+    for (i = 0; i < osVersionBytes.length; i++) {
+      osVersionBytes[i] = (byte) sys.osVersion(i);
+      if (osVersionBytes[i] == 0) break;
+    }
+    return new String(osVersionBytes, 0, i, utf8Charset);
+  }
+
+  public long getMemoryUsageBytes() {
+    return sys.memoryUsageBytes();
+  }
+
+  public long getMemoryTotalBytes() {
+    return sys.memoryTotalBytes();
+  }
+
+  public double getMemoryPercent() {
+    return sys.memoryPercent();
+  }
+
+  public long getStorageUsageBytes() {
+    return sys.storageUsageBytes();
+  }
+
+  public long getStorageTotalBytes() {
+    return sys.storageTotalBytes();
+  }
+
+  public double getStoragePercent() {
+    return sys.storagePercent();
+  }
+
+  public Vector3 getIMUAccelRaw() {
+    return sys.imuAccelRaw();
+  }
+
+  public Vector3 getIMUGyroRates() {
+    return sys.imuGyroRates();
+  }
+
+  public Vector3 getIMUGyroEulerFlat() {
+    return sys.imuGyroEulerFlat();
+  }
+
+  public Vector3 getIMUGyroEulerLandscape() {
+    return sys.imuGyroEulerLandscape();
+  }
+
+  public Vector3 getIMUGyroEulerPortrait() {
+    return sys.imuGyroEulerPortrait();
+  }
+
+  public Rotation3d getIMUGyroRotation3d() {
+    return new Rotation3d(
+        new Quaternion(
+            sys.imuGyroQuaternion().w(),
+            sys.imuGyroQuaternion().x(),
+            sys.imuGyroQuaternion().y(),
+            sys.imuGyroQuaternion().z()));
+  }
+
+  public Rotation2d getIMUGyroYawFlat() {
+    return new Rotation2d(sys.imuGyroYawFlat());
+  }
+
+  public Rotation2d getIMUGyroYawLandscape() {
+    return new Rotation2d(sys.imuGyroYawLandscape());
+  }
+
+  public Rotation2d getIMUGyroYawPortrait() {
+    return new Rotation2d(sys.imuGyroYawPortrait());
+  }
+
+  private static int availableToCount(long available) {
+    // Top bit has to be set
+    if (available < 0) {
+      return 64;
+    }
+
+    int count = 0;
+
+    // Top bit not set, we will eventually get a 0 bit
+    while ((available & 0x1) != 0) {
+      count++;
+      available >>= 1;
+    }
+    return count;
   }
 }

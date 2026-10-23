@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# ⚙️ SysId Compatibility
+# ⚙️ SysId Compatibility {#sysid-compatibility}
 
 WPILib provides tools to perform [system identification](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/index.html) on robot mechanisms, enabling [feedforward and feedback](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/index.html) controller gains to be calculated based on real-world data. Starting in 2024, identification routines are defined in user code as described [here](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/creating-routine.html). Data is recorded to a WPILOG file for analysis in the SysId application.
 
@@ -12,7 +12,7 @@ Since AdvantageKit already requires subsystems to log relevant sensor data, sett
 Device logging systems like AdvantageScope's [URCL](https://docs.advantagescope.org/more-features/urcl) (Unofficial REV-Compatible Logger) and CTRE's [signal logger](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/signal-logging.html) can be used to collect data instead of AdvantageKit. In this case, please follow the instructions in the corresponding documentation.
 :::
 
-## Code Setup
+## Code Setup {#code-setup}
 
 Create the `SysIdRoutine` based on the template shown below. Note that the test state is logged as an output through AdvantageKit and the log consumer is set to `null`. This configuration can be performed within the subsystem class.
 
@@ -39,7 +39,7 @@ sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse);
 
 Run the SysId routines as normal (described [here](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/running-routine.html)), then download the AdvantageKit log file from the robot.
 
-## Loading Data
+## Loading Data {#loading-data}
 
 :::warning
 AdvantageKit log files **should NOT be used directly with SysId**. Follow the instructions below to convert it to the correct format.

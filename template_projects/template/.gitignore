@@ -170,7 +170,7 @@ out/
 
 # Simulation GUI and other tools window save file
 networktables.json
-simgui*.json
+simgui.json
 *-window.json
 
 # Simulation data log directory
@@ -183,5 +183,8 @@ ctre_sim/
 /.cache
 compile_commands.json
 
+# Eclipse generated file for annotation processors
+.factorypath
+
 # Version file
-src/main/java/frc/robot/BuildConstants.java
+src/main/java/first/robot/BuildConstants.java

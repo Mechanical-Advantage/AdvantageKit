@@ -79,9 +79,9 @@ public class LogFileUtil {
 
     // Prompt on stdin
     System.out.print(
-        "No log provided with the "
+        "[AdvantageKit] No log provided with the "
             + environmentVariable
-            + " environment variable or through AdvantageScope. Enter path to file: ");
+            + " environment variable or through AdvantageScope.\nEnter path to file: ");
     String filename = findReplayLogUser();
     if (filename.charAt(0) == '\'' || filename.charAt(0) == '"') {
       filename = filename.substring(1, filename.length() - 1);

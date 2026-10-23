@@ -5,12 +5,15 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-#include <gtest/gtest.h>
-#include <hal/CAN.h>
-#include <hal/HAL.h>
-#include <hal/Power.h>
-#include <hal/PowerDistribution.h>
-#include <wpi/timestamp.h>
+#include <catch2/catch_test_macros.hpp>
+#include <wpi/hal/CAN.h>
+#include <wpi/hal/DriverStationTypes.h>
+#include <wpi/hal/HAL.h>
+#include <wpi/hal/Power.h>
+#include <wpi/hal/PowerDistribution.h>
+#include <wpi/util/timestamp.h>
+
+#include <wpi/hal/DriverStation.hpp>
 
 #include "conduit_schema_generated.h"
 
@@ -19,172 +22,137 @@ using namespace org::littletonrobotics::conduit;
 // Tests to ensure the sizes of flatbuffer structures match the sizes of their
 // HAL equivalents
 
-TEST(SizeTests, DsDataSizes) {
+TEST_CASE("DsDataSizes", "[SizeTests]") {
 	schema::DSData ds;
-	ASSERT_EQ(sizeof(HAL_AllianceStationID),
+	REQUIRE(sizeof(HAL_AllianceStationID) ==
 			sizeof(decltype(ds.alliance_station())));
 
-	ASSERT_EQ(sizeof(HAL_MatchInfo::eventName), ds.event_name()->size());
-	ASSERT_EQ(sizeof(HAL_MatchInfo::eventName[0]),
+	REQUIRE(sizeof(HAL_MatchInfo::eventName) == ds.event_name()->size());
+	REQUIRE(sizeof(HAL_MatchInfo::eventName[0]) ==
 			sizeof(decltype(ds.event_name()->Get(0))));
+	REQUIRE(sizeof(HAL_GameData) == ds.game_data()->size());
 
-	ASSERT_EQ(sizeof(HAL_MatchInfo::gameSpecificMessageSize),
-			sizeof(decltype(ds.game_specific_message_size())));
-
-	ASSERT_EQ(sizeof(HAL_MatchInfo::gameSpecificMessage),
-			ds.game_specific_message()->size());
-	ASSERT_EQ(sizeof(HAL_MatchInfo::gameSpecificMessage[0]),
-			sizeof(decltype(ds.game_specific_message()->Get(0))));
-
-	ASSERT_EQ(sizeof(HAL_MatchInfo::matchNumber),
+	REQUIRE(sizeof(HAL_MatchInfo::matchNumber) ==
 			sizeof(decltype(ds.match_number())));
-	ASSERT_EQ(sizeof(HAL_MatchInfo::replayNumber),
+	REQUIRE(sizeof(HAL_MatchInfo::replayNumber) ==
 			sizeof(decltype(ds.replay_number())));
-	ASSERT_EQ(sizeof(HAL_MatchInfo::matchType),
+	REQUIRE(sizeof(HAL_MatchInfo::matchType) ==
 			sizeof(decltype(ds.match_type())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetMatchTime(0))),
+	REQUIRE(sizeof(decltype(HAL_GetMatchTime(0))) ==
 			sizeof(decltype(ds.match_time())));
 
-	ASSERT_EQ(sizeof(HAL_ControlWord), sizeof(decltype(ds.control_word())));
+	REQUIRE(sizeof(HAL_ControlWord) == sizeof(decltype(ds.control_word())));
 
 	// Ensure joystick count matches
-	ASSERT_EQ(HAL_kMaxJoysticks, ds.joysticks()->size());
+	REQUIRE(HAL_MAX_JOYSTICKS == ds.joysticks()->size());
 }
 
-TEST(SizeTests, JoystickSizes) {
+TEST_CASE("JoystickSizes", "[SizeTests]") {
 	schema::Joystick joystick;
-	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::name), joystick.name()->size());
-	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::name[0]),
+	REQUIRE(sizeof(HAL_JoystickDescriptor::name) == joystick.name()->size());
+	REQUIRE(sizeof(HAL_JoystickDescriptor::name[0]) ==
 			sizeof(decltype(joystick.name()->Get(0))));
 
-	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::type),
+	REQUIRE(sizeof(HAL_JoystickDescriptor::gamepadType) ==
 			sizeof(decltype(joystick.type())));
 
-	ASSERT_EQ(sizeof(HAL_JoystickAxes::count),
-			sizeof(decltype(joystick.axis_count())));
+	REQUIRE(sizeof(HAL_JoystickDescriptor::supportedOutputs) ==
+			sizeof(decltype(joystick.supported_outputs())));
 
-	ASSERT_EQ(HAL_kMaxJoystickAxes, joystick.axis_types()->size());
-	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::axisTypes[0]),
-			sizeof(decltype(joystick.axis_types()->Get(0))));
+	REQUIRE(sizeof(HAL_JoystickAxes::available) ==
+			sizeof(decltype(joystick.axes_available())));
 
-	ASSERT_EQ(HAL_kMaxJoystickAxes, joystick.axis_values()->size());
-	ASSERT_EQ(sizeof(HAL_JoystickAxes::axes[0]),
+	REQUIRE(HAL_MAX_JOYSTICK_AXES == joystick.axis_values()->size());
+	REQUIRE(sizeof(HAL_JoystickAxes::axes[0]) ==
 			sizeof(decltype(joystick.axis_values()->Get(0))));
 
-	ASSERT_EQ(sizeof(HAL_JoystickButtons::count),
-			sizeof(decltype(joystick.button_count())));
+	REQUIRE(HAL_MAX_JOYSTICK_AXES == joystick.axis_raw()->size());
+	REQUIRE(sizeof(HAL_JoystickAxes::raw[0]) ==
+			sizeof(decltype(joystick.axis_raw()->Get(0))));
 
-	ASSERT_EQ(sizeof(HAL_JoystickButtons::buttons),
+	REQUIRE(sizeof(HAL_JoystickButtons::available) ==
+			sizeof(decltype(joystick.buttons_available())));
+
+	REQUIRE(sizeof(HAL_JoystickButtons::buttons) ==
 			sizeof(decltype(joystick.buttons())));
 
-	ASSERT_EQ(sizeof(HAL_JoystickPOVs::count),
-			sizeof(decltype(joystick.pov_count())));
+	REQUIRE(sizeof(HAL_JoystickPOVs::available) ==
+			sizeof(decltype(joystick.povs_available())));
 
-	ASSERT_EQ(HAL_kMaxJoystickPOVs, joystick.pov_values()->size());
+	REQUIRE(HAL_MAX_JOYSTICK_POVS == joystick.pov_values()->size());
 
-	ASSERT_EQ(sizeof(HAL_JoystickPOVs::povs[0]),
+	REQUIRE(sizeof(HAL_JoystickPOVs::povs[0]) ==
 			sizeof(decltype(joystick.pov_values()->Get(0))));
 
-	ASSERT_EQ(sizeof(HAL_JoystickDescriptor::isXbox),
-			sizeof(decltype(joystick.is_xbox())));
+	REQUIRE(sizeof(HAL_JoystickDescriptor::isGamepad) ==
+			sizeof(decltype(joystick.is_gamepad())));
+
+	REQUIRE(sizeof(HAL_JoystickTouchpads::count) ==
+			sizeof(decltype(joystick.touchpad_count())));
+
+	REQUIRE(HAL_MAX_JOYSTICK_TOUCHPADS == joystick.touchpads()->size());
+	REQUIRE(sizeof(HAL_JoystickTouchpads::touchpads[0]) ==
+			sizeof(decltype(*(joystick.touchpads()->Get(0)))));
+
+	REQUIRE(sizeof(HAL_JoystickTouchpad::count) ==
+			sizeof(decltype(joystick.touchpads()->Get(0)->finger_count())));
+
+	REQUIRE(HAL_MAX_JOYSTICK_TOUCHPAD_FINGERS ==
+			joystick.touchpads()->Get(0)->fingers()->size());
+
+	REQUIRE(
+			sizeof(HAL_JoystickTouchpadFinger) ==
+			sizeof(decltype(*(joystick.touchpads()->Get(0)->fingers()->Get(0)))));
 }
 
-TEST(SizeTests, PDPDataSizes) {
+TEST_CASE("PDPDataSizes", "[SizeTests]") {
 	schema::PDPData pdp;
 
-	ASSERT_EQ(sizeof(decltype(HAL_InitializePowerDistribution(
-									0, HAL_PowerDistributionType_kCTRE, 0, 0))),
+	REQUIRE(sizeof(decltype(HAL_InitializePowerDistribution(
+									0, 0, HAL_POWER_DISTRIBUTION_CTRE, 0, 0))) ==
 			sizeof(decltype(pdp.handle())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0, 0))),
+	REQUIRE(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0, 0))) ==
 			sizeof(decltype(pdp.channel_count())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionType(0, 0))),
+	REQUIRE(sizeof(decltype(HAL_GetPowerDistributionType(0, 0))) ==
 			sizeof(decltype(pdp.type())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionModuleNumber(0, 0))),
+	REQUIRE(sizeof(decltype(HAL_GetPowerDistributionModuleNumber(0, 0))) ==
 			sizeof(decltype(pdp.module_id())));
 
-	ASSERT_EQ(sizeof(HAL_PowerDistributionFaults),
+	REQUIRE(sizeof(HAL_PowerDistributionFaults) ==
 			sizeof(decltype(pdp.faults())));
 
-	ASSERT_EQ(sizeof(HAL_PowerDistributionStickyFaults),
+	REQUIRE(sizeof(HAL_PowerDistributionStickyFaults) ==
 			sizeof(decltype(pdp.sticky_faults())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTemperature(0, 0))),
+	REQUIRE(sizeof(decltype(HAL_GetPowerDistributionTemperature(0, 0))) ==
 			sizeof(decltype(pdp.temperature())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionVoltage(0, 0))),
+	REQUIRE(sizeof(decltype(HAL_GetPowerDistributionVoltage(0, 0))) ==
 			sizeof(decltype(pdp.voltage())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0, 0))),
+	REQUIRE(sizeof(decltype(HAL_GetPowerDistributionNumChannels(0, 0))) ==
 			sizeof(decltype(pdp.channel_count())));
 
-	// Not sure how to test the array size for
-	// HAL_GetPowerDistributionAllChannelCurrents
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalCurrent(0, 0))),
+	REQUIRE(sizeof(decltype(HAL_GetPowerDistributionTotalCurrent(0, 0))) ==
 			sizeof(decltype(pdp.total_current())));
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalPower(0, 0))),
+
+	REQUIRE(sizeof(decltype(HAL_GetPowerDistributionTotalPower(0, 0))) ==
 			sizeof(decltype(pdp.total_power())));
-	ASSERT_EQ(sizeof(decltype(HAL_GetPowerDistributionTotalEnergy(0, 0))),
+
+	REQUIRE(sizeof(decltype(HAL_GetPowerDistributionTotalEnergy(0, 0))) ==
 			sizeof(decltype(pdp.total_energy())));
 }
 
-TEST(SizeTests, SysDataSizes) {
+TEST_CASE("SysDataSizes", "[SizeTests]") {
 	schema::SystemData sys;
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetVinVoltage(0))),
-			sizeof(decltype(sys.voltage_vin())));
+	REQUIRE(sizeof(decltype(HAL_GetVinVoltage(0))) ==
+			sizeof(decltype(sys.battery_voltage())));
 
-	ASSERT_EQ(sizeof(decltype(HAL_GetVinCurrent(0))),
-			sizeof(decltype(sys.current_vin())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserVoltage3V3(0))),
-			sizeof(decltype(sys.user_voltage_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrent3V3(0))),
-			sizeof(decltype(sys.user_current_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserActive3V3(0))),
-			sizeof(decltype(sys.user_active_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrentFaults3V3(0))),
-			sizeof(decltype(sys.user_current_faults_3v3())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserVoltage5V(0))),
-			sizeof(decltype(sys.user_voltage_5v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrent5V(0))),
-			sizeof(decltype(sys.user_current_5v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserActive5V(0))),
-			sizeof(decltype(sys.user_active_5v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrentFaults5V(0))),
-			sizeof(decltype(sys.user_current_faults_5v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserVoltage6V(0))),
-			sizeof(decltype(sys.user_voltage_6v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrent6V(0))),
-			sizeof(decltype(sys.user_current_6v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserActive6V(0))),
-			sizeof(decltype(sys.user_active_6v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetUserCurrentFaults6V(0))),
-			sizeof(decltype(sys.user_current_faults_6v())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetBrownedOut(0))),
-			sizeof(decltype(sys.browned_out())));
-
-	ASSERT_EQ(sizeof(decltype(HAL_GetSystemActive(0))),
-			sizeof(decltype(sys.system_active())));
-
-	// Not sure how to test size for HAL_CAN_GetCANStatus
-
-	ASSERT_EQ(sizeof(decltype(wpi::GetSystemTime())),
+	REQUIRE(sizeof(decltype(WPI_GetSystemTime())) ==
 			sizeof(decltype(sys.epoch_time())));
 }

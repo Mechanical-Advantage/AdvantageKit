@@ -7,67 +7,59 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringArraySubscriber;
-import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.wpilib.util.AlertDataJNI;
 
-@SuppressWarnings("unchecked")
 class AlertLogger {
-  private static Map<String, Object> groups = null;
-  private static Map<String, StringArraySubscriber> errorSubscribers = new HashMap<>();
-  private static Map<String, StringArraySubscriber> warningSubscribers = new HashMap<>();
-  private static Map<String, StringArraySubscriber> infoSubscribers = new HashMap<>();
-
-  static {
-    try {
-      Class<?> sendableAlertsClass = Class.forName("edu.wpi.first.wpilibj.Alert$SendableAlerts");
-      Field groupsField = sendableAlertsClass.getDeclaredField("groups");
-      groupsField.setAccessible(true);
-      groups = (Map<String, Object>) groupsField.get(null);
-    } catch (ClassNotFoundException
-        | IllegalArgumentException
-        | IllegalAccessException
-        | NoSuchFieldException
-        | SecurityException e) {
-      e.printStackTrace();
-    }
-  }
+  private static final Set<String> knownGroups = new HashSet<>();
 
   /** Log the current state of all alerts as outputs. */
   public static void periodic() {
-    if (groups == null) return;
-    for (String group : groups.keySet()) {
-      Logger.recordOutput(group + "/.type", "Alerts");
+    AlertDataJNI.AlertInfo[] allAlerts = AlertDataJNI.getAlerts();
 
-      // Create NetworkTables subscribers
-      if (!errorSubscribers.containsKey(group)) {
-        errorSubscribers.put(
-            group,
-            NetworkTableInstance.getDefault()
-                .getStringArrayTopic("/SmartDashboard/" + group + "/errors")
-                .subscribe(new String[0]));
+    Map<String, List<AlertDataJNI.AlertInfo>> activeByGroup = new HashMap<>();
+
+    for (AlertDataJNI.AlertInfo info : allAlerts) {
+      knownGroups.add(info.group);
+      if (info.activeStartTime != 0) {
+        activeByGroup.computeIfAbsent(info.group, g -> new ArrayList<>()).add(info);
       }
-      if (!warningSubscribers.containsKey(group)) {
-        warningSubscribers.put(
-            group,
-            NetworkTableInstance.getDefault()
-                .getStringArrayTopic("/SmartDashboard/" + group + "/warnings")
-                .subscribe(new String[0]));
-      }
-      if (!infoSubscribers.containsKey(group)) {
-        infoSubscribers.put(
-            group,
-            NetworkTableInstance.getDefault()
-                .getStringArrayTopic("/SmartDashboard/" + group + "/infos")
-                .subscribe(new String[0]));
+    }
+
+    for (String group : knownGroups) {
+      List<AlertDataJNI.AlertInfo> groupAlerts =
+          activeByGroup.getOrDefault(group, Collections.emptyList());
+
+      // Sort by most recent first, then text ascending
+      groupAlerts.sort(
+          Comparator.comparingLong((AlertDataJNI.AlertInfo a) -> a.activeStartTime)
+              .reversed()
+              .thenComparing(a -> a.text));
+
+      List<String> errors = new ArrayList<>();
+      List<String> warnings = new ArrayList<>();
+      List<String> infos = new ArrayList<>();
+
+      for (AlertDataJNI.AlertInfo alert : groupAlerts) {
+        switch (alert.level) {
+          case AlertDataJNI.LEVEL_HIGH -> errors.add(alert.text);
+          case AlertDataJNI.LEVEL_MEDIUM -> warnings.add(alert.text);
+          case AlertDataJNI.LEVEL_LOW -> infos.add(alert.text);
+        }
       }
 
-      // Get values
-      Logger.recordOutput(group + "/errors", errorSubscribers.get(group).get());
-      Logger.recordOutput(group + "/warnings", warningSubscribers.get(group).get());
-      Logger.recordOutput(group + "/infos", infoSubscribers.get(group).get());
+      String table = group.isEmpty() || group.equals("Alerts") ? "Alerts" : "AlertGroups/" + group;
+      Logger.recordOutput(table + "/.type", "Alerts");
+      Logger.recordOutput(table + "/errors", errors.toArray(new String[0]));
+      Logger.recordOutput(table + "/warnings", warnings.toArray(new String[0]));
+      Logger.recordOutput(table + "/infos", infos.toArray(new String[0]));
     }
   }
 }

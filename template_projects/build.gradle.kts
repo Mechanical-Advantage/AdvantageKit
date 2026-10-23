@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.diffplug.spotless") version "8.6.0"
 }
 
 repositories {
@@ -11,7 +11,7 @@ spotless {
     java {
         target("sources/**/*.java")
         toggleOffOn()
-        googleJavaFormat()
+        googleJavaFormat("1.28.0")
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()

@@ -22,5 +22,5 @@ class ConduitJni {
 
   public static native void start();
 
-  public static native void configurePowerDistribution(int moduleID, int moduleType);
+  public static native void configurePowerDistribution(int busID, int moduleID, int moduleType);
 }

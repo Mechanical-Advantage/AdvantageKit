@@ -2,27 +2,35 @@ import org.gradle.internal.os.OperatingSystem
 
 pluginManagement {
     repositories {
-        mavenLocal()
-        gradlePluginPortal()
-        String frcYear = '2026'
-        File frcHome
-        if (OperatingSystem.current().isWindows()) {
+        String wpilibYear = '2027_alpha7'
+        File wpilibHome
+        def os = OperatingSystem.current()
+        if (os.isWindows()) {
             String publicFolder = System.getenv('PUBLIC')
             if (publicFolder == null) {
                 publicFolder = "C:\\Users\\Public"
             }
             def homeRoot = new File(publicFolder, "wpilib")
-            frcHome = new File(homeRoot, frcYear)
+            wpilibHome = new File(homeRoot, wpilibYear)
+        } else if (os.isLinux()) {
+            String xdgDataHome = System.getenv('XDG_DATA_HOME')
+            if (xdgDataHome == null || xdgDataHome.trim().isEmpty() || !new File(xdgDataHome).isAbsolute()) {
+                xdgDataHome = new File(System.getProperty("user.home"), ".local/share").getPath()
+            }
+            def homeRoot = new File(xdgDataHome, "wpilib")
+            wpilibHome = new File(homeRoot, wpilibYear)
         } else {
             def userFolder = System.getProperty("user.home")
-            def homeRoot = new File(userFolder, "wpilib")
-            frcHome = new File(homeRoot, frcYear)
+            def homeRoot = new File(userFolder, ".wpilib")
+            wpilibHome = new File(homeRoot, wpilibYear)
         }
-        def frcHomeMaven = new File(frcHome, 'maven')
+        def wpilibHomeMaven = new File(wpilibHome, 'maven')
         maven {
-            name 'frcHome'
-            url frcHomeMaven
+            name = 'wpilibHome'
+            url = wpilibHomeMaven
         }
+        mavenLocal()
+        gradlePluginPortal()
     }
 }
 

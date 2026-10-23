@@ -10,9 +10,9 @@
 #include "conduit_schema_generated.h"
 using namespace org::littletonrobotics::conduit;
 
-#include <hal/CANAPITypes.h>
-#include <hal/HALBase.h>
-#include <hal/PowerDistribution.h>
+#include <wpi/hal/CANAPITypes.h>
+#include <wpi/hal/HAL.h>
+#include <wpi/hal/PowerDistribution.h>
 #include <jni.h>
 
 #include <atomic>
@@ -29,14 +29,10 @@ using namespace org::littletonrobotics::conduit;
 class PDPReader {
 public:
 	void read(schema::PDPData *pdp_buf);
-	void configure(JNIEnv *env, jint module, jint type,
+	void configure(JNIEnv *env, jint bus, jint module, jint type,
 			schema::PDPData *pdp_buf);
 
 private:
-	void update_ctre_pdp_data(schema::PDPData *pdp_buf);
-	void update_rev_pdh_data(schema::PDPData *pdp_buf);
-	void update_sim_data(schema::PDPData *pdp_buf);
-
 	HAL_PowerDistributionHandle pd_handle;
 	HAL_CANHandle pd_can_handle;
 	HAL_PowerDistributionType pd_type;

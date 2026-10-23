@@ -52,7 +52,7 @@ public class ReplayWatch {
     }
     if (inputLog == null) {
       System.out.println(
-          "No input log available for replay watch, please provide with the \""
+          "[AdvantageKit] No input log available for replay watch, please provide with the \""
               + LogFileUtil.environmentVariable
               + "\" environment variable or through AdvantageScope.");
       System.exit(1);
@@ -153,7 +153,7 @@ public class ReplayWatch {
                 hasSpotless
                     ? new String[] {
                       isWindows ? "gradlew.bat" : "./gradlew",
-                      "simulateJava",
+                      "run",
                       "-x",
                       "test",
                       "-x",
@@ -161,9 +161,7 @@ public class ReplayWatch {
                       "-x",
                       "spotlessCheck"
                     }
-                    : new String[] {
-                      isWindows ? "gradlew.bat" : "./gradlew", "simulateJava", "-x", "test"
-                    })
+                    : new String[] {isWindows ? "gradlew.bat" : "./gradlew", "run", "-x", "test"})
             .inheritIO();
     gradleBuilder.environment().put(LogFileUtil.environmentVariable, inputLog);
     var gradle = gradleBuilder.start();

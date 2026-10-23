@@ -4,13 +4,13 @@ sidebar_position: 2
 
 import Results from "./img/high-freq-odometry-3.webp";
 
-# 📍 High-Frequency Odometry
+# 📍 High-Frequency Odometry {#high-frequency-odometry}
 
 The AdvantageKit swerve templates support high-frequency odometry on both Spark and TalonFX(S) hardware, which means that data from the drive motors, encoders, and gyro are sampled _faster_ than the primary 50 Hz loop cycle. The purpose of high-frequency odometry is to improve the accuracy and consistency of odometry data.
 
 The testing below was conducted by Team 6328 in November 2023 to measure the benefit of high-frequency odometry compared to traditional 50 Hz odometry. Note that this data is broadly applicable to any application of this technique, not just the AdvantageKit templates. This testing builds on the work done by CTRE [here](https://pro.docs.ctr-electronics.com/en/latest/docs/application-notes/update-frequency-impact.html#practical-results), which was performed under inconsistent testing conditions with a very small sample size.
 
-## Setup
+## Setup {#setup}
 
 We focused our testing on the accuracy of odometry during an autonomous path with no vision assistance. This is where the accuracy of wheel odometry is most critical — during teleop, additional sensors like vision will _always_ be necessary to maintain accuracy.
 
@@ -22,7 +22,7 @@ The start location of the auto is marked with the large white cross, and the rob
 
 ![Example measurement](./img/high-freq-odometry-2.jpeg)
 
-## Results
+## Results {#results}
 
 We repeated this auto 16 times — 8 times with 50Hz odometry and 8 times with 250Hz odometry. The ending positions are plotted below in meters, where blue is 50Hz and orange in 250Hz. The dark circles represent the average ending position of each set of samples.
 
@@ -36,7 +36,7 @@ The mean error and standard deviations are shown below. Note that the improvemen
 | 250Hz         | 0.297          | 0.028                  |
 | % Improvement | 23.3%          | 84.4%                  |
 
-## CANivore Timesync
+## CANivore Timesync {#canivore-timesync}
 
 The TalonFX(S) swerve template for AdvantageKit supports [CANivore Timesync](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/status-signals.html#canivore-timesync) for Phoenix Pro subscribers running the drive on a [CANivore](https://pro.docs.ctr-electronics.com/en/latest/docs/canivore/canivore-intro.html). CTRE conducted testing on the impact of timesync on odometry accuracy, which can be found [here](https://pro.docs.ctr-electronics.com/en/latest/docs/application-notes/update-frequency-impact.html#after-test-data). This part of CTRE's testing was based on a more reliable testing methodology than the rest of the linked page, using autonomous driving similar to the approach described here.
 

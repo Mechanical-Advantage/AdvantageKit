@@ -7,34 +7,45 @@
 
 package org.littletonrobotics.junction.wpilog;
 
-import edu.wpi.first.util.datalog.DataLogWriter;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.channels.FileChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.Queue;
 import java.util.Random;
 import org.littletonrobotics.junction.LogDataReceiver;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
 import org.littletonrobotics.junction.Logger;
+import org.wpilib.datalog.DataLogWriter;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.system.RobotController;
+import org.wpilib.util.Alert;
+import org.wpilib.util.Alert.Level;
 
 /** Records log values to a WPILOG file. */
 public class WPILOGWriter implements LogDataReceiver {
-  private static final double timestampUpdateDelay =
-      5.0; // Wait several seconds after DS attached to ensure
-  // timestamp/timezone is updated
-  private static final String defaultPathRio = "/U/logs";
+  // Wait several seconds after DS attached to ensure time is updated
+  private static final double timestampUpdateDelayNs = 5_000_000_000L;
+  private static final long flushPeriodNs = 250_000_000L;
+  private static final long mountCheckPeriodNs = 250_000_000L;
+  private static final long mountTimeoutNs = 15_000_000_000L;
+  private static final String defaultPathRobot = "/U/logs";
   private static final String defaultPathSim = "logs";
   private static final DateTimeFormatter timeFormatter =
       DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss");
@@ -42,8 +53,9 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private String folder;
   private String filename;
+  private final Optional<String> usbPrefix;
   private final String randomIdentifier;
-  private Double dsAttachedTime;
+  private OptionalLong dsAttachedTime;
 
   private boolean autoRename;
   private LocalDateTime logDate;
@@ -51,12 +63,26 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private DataLogWriter log;
   private boolean isOpen = false;
+  private boolean waitingForMount = false;
+  private long mountWaitStartTime = 0;
+  private long lastMountCheckTimestamp = 0;
+  private final Queue<LogTable> pendingTables = new ArrayDeque<>();
+  private FileOutputStream fileOutputStream;
   private final AdvantageScopeOpenBehavior openBehavior;
   private LogTable lastTable;
   private int timestampID;
+  private long lastFlushTimestamp = 0;
   private Map<String, Integer> entryIDs;
   private Map<String, LoggableType> entryTypes;
   private Map<String, String> entryUnits;
+
+  private boolean failedFault = false;
+  private static final Alert failedAlert =
+      new Alert(
+          "AdvantageKit",
+          "wpilog-failed",
+          "Failed to start WPILOG logging, no data will be saved.",
+          Level.MEDIUM);
 
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
@@ -89,6 +115,7 @@ public class WPILOGWriter implements LogDataReceiver {
       filename = "akit_" + randomIdentifier + ".wpilog";
       autoRename = true;
     }
+    usbPrefix = USBDriveUtil.getUSBDrivePrefix(folder);
   }
 
   /**
@@ -104,7 +131,7 @@ public class WPILOGWriter implements LogDataReceiver {
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
-   * <p>The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The filename will be
+   * <p>The logs will be saved to "/U/logs" on the robot and "logs" in sim. The filename will be
    * generated based on the current time and match number (if applicable).
    *
    * @param openBehavior Whether to automatically open the log file in AdvantageScope. See {@link
@@ -112,47 +139,89 @@ public class WPILOGWriter implements LogDataReceiver {
    *     AdvantageScopeOpenBehavior} for details.
    */
   public WPILOGWriter(AdvantageScopeOpenBehavior openBehavior) {
-    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRio, openBehavior);
+    this(RobotBase.isSimulation() ? defaultPathSim : defaultPathRobot, openBehavior);
   }
 
   /**
    * Create a new WPILOGWriter for writing to a ".wpilog" file.
    *
-   * <p>The logs will be saved to "/U/logs" on the RIO and "logs" in sim. The filename will be
+   * <p>The logs will be saved to "/U/logs" on the robot and "logs" in sim. The filename will be
    * generated based on the current time and match number (if applicable).
    */
   public WPILOGWriter() {
     this(
-        RobotBase.isSimulation() ? defaultPathSim : defaultPathRio,
+        RobotBase.isSimulation() ? defaultPathSim : defaultPathRobot,
         AdvantageScopeOpenBehavior.AUTO);
   }
 
+  private static void syncDirectory(String dirPath) {
+    if (dirPath == null) {
+      return;
+    }
+    try (FileChannel dirChannel = FileChannel.open(Path.of(dirPath), StandardOpenOption.READ)) {
+      dirChannel.force(true);
+    } catch (Exception ignored) {
+    }
+  }
+
   public void start() {
+    if (usbPrefix.isPresent()) {
+      if (USBDriveUtil.isUSBMounted(usbPrefix.get())) {
+        openLogFile();
+      } else {
+        waitingForMount = true;
+        mountWaitStartTime = RobotController.getMonotonicTime();
+        lastMountCheckTimestamp = 0;
+        System.out.println(
+            "[AdvantageKit] Waiting for USB drive to mount before opening log at \""
+                + folder
+                + "\"...");
+      }
+    } else {
+      openLogFile();
+    }
+  }
+
+  private void openLogFile() {
     // Create folder if necessary
-    File logFolder = new File(folder);
-    if (!logFolder.exists()) {
-      logFolder.mkdirs();
+    if (folder != null) {
+      File logFolder = new File(folder);
+      if (!logFolder.exists()) {
+        logFolder.mkdirs();
+      }
     }
 
     // Delete log if it already exists
-    File logFile = new File(folder, filename);
+    File logFile = folder == null ? new File(filename) : new File(folder, filename);
     if (logFile.exists()) {
       logFile.delete();
     }
 
     // Create new log
-    String logPath = Path.of(folder, filename).toString();
+    String logPath =
+        folder == null ? filename : FileSystems.getDefault().getPath(folder, filename).toString();
     System.out.println("[AdvantageKit] Logging to \"" + logPath + "\"");
     try {
       log = new DataLogWriter(logPath, WPILOGConstants.extraHeader);
+      if (RobotBase.isReal()) {
+        fileOutputStream = new FileOutputStream(logPath, true);
+        syncDirectory(folder);
+      }
     } catch (IOException e) {
-      DriverStation.reportError("[AdvantageKit] Failed to open output log file.", true);
+      DriverStationErrors.reportError(
+          "[AdvantageKit] Failed to open output log file, no data will be saved.", true);
+      failedFault = true;
+      failedAlert.set(true);
       return;
     }
     isOpen = true;
+    waitingForMount = false;
     timestampID =
         log.start(
-            timestampKey, LoggableType.Integer.getWPILOGType(), WPILOGConstants.entryMetadata, 0);
+            timestampKey,
+            LoggableType.Integer.getWPILOGType(),
+            WPILOGConstants.entryMetadataUnits.replace("$UNITSTR", "nanoseconds"),
+            0);
     lastTable = new LogTable(0);
 
     // Reset data
@@ -164,7 +233,25 @@ public class WPILOGWriter implements LogDataReceiver {
   }
 
   public void end() {
+    if (waitingForMount) {
+      waitingForMount = false;
+      pendingTables.clear();
+      return;
+    }
+
+    if (!isOpen) {
+      return;
+    }
+
     log.close();
+    if (fileOutputStream != null) {
+      try {
+        fileOutputStream.getFD().sync();
+        fileOutputStream.close();
+        syncDirectory(folder);
+      } catch (IOException e) {
+      }
+    }
 
     // Send log path to AdvantageScope
     boolean shouldOpen =
@@ -176,11 +263,13 @@ public class WPILOGWriter implements LogDataReceiver {
     if (shouldOpen) {
       try {
         String fullLogPath =
-            FileSystems.getDefault()
-                .getPath(folder, filename)
-                .normalize()
-                .toAbsolutePath()
-                .toString();
+            folder == null
+                ? FileSystems.getDefault().getPath(filename).normalize().toAbsolutePath().toString()
+                : FileSystems.getDefault()
+                    .getPath(folder, filename)
+                    .normalize()
+                    .toAbsolutePath()
+                    .toString();
         Path advantageScopeTempPath =
             Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
         PrintWriter writer = new PrintWriter(advantageScopeTempPath.toString(), "UTF-8");
@@ -188,27 +277,62 @@ public class WPILOGWriter implements LogDataReceiver {
         writer.close();
         System.out.println("[AdvantageKit] Log sent to AdvantageScope.");
       } catch (Exception e) {
-        DriverStation.reportError("[AdvantageKit] Failed to send log to AdvantageScope.", false);
+        DriverStationErrors.reportError(
+            "[AdvantageKit] Failed to send log to AdvantageScope.", false);
       }
     }
   }
 
   public void putTable(LogTable table) {
+    if (waitingForMount) {
+      pendingTables.add(table);
+      long now = table.getTimestamp();
+      if (now - lastMountCheckTimestamp > mountCheckPeriodNs) {
+        lastMountCheckTimestamp = now;
+        if (USBDriveUtil.isUSBMounted(usbPrefix.get())) {
+          openLogFile();
+          if (isOpen) {
+            while (!pendingTables.isEmpty()) {
+              putTableInternal(pendingTables.poll());
+            }
+          } else {
+            waitingForMount = false;
+            pendingTables.clear();
+          }
+        } else if (RobotController.getMonotonicTime() - mountWaitStartTime > mountTimeoutNs) {
+          waitingForMount = false;
+          pendingTables.clear();
+          DriverStationErrors.reportWarning(
+              "[AdvantageKit] Timed out waiting for USB drive at \""
+                  + folder
+                  + "\", no data will be saved.",
+              false);
+          failedFault = true;
+          failedAlert.set(true);
+        }
+      }
+      return;
+    }
+
     // Exit if log not open
     if (!isOpen) return;
 
+    putTableInternal(table);
+  }
+
+  private void putTableInternal(LogTable table) {
     // Auto rename
     if (autoRename) {
 
       // Update timestamp
       if (logDate == null) {
         if ((table.get("DriverStation/DSAttached", false)
-                && table.get("SystemStats/SystemTimeValid", false))
+                && table.get("SystemStats/EpochTimeValid", false))
             || RobotBase.isSimulation()) {
           if (dsAttachedTime == null) {
-            dsAttachedTime = RobotController.getFPGATime() / 1000000.0;
-          } else if (RobotController.getFPGATime() / 1000000.0 - dsAttachedTime
-                  > timestampUpdateDelay
+            dsAttachedTime = OptionalLong.of(RobotController.getMonotonicTime());
+          } else if (RobotController.getMonotonicTime() - dsAttachedTime.getAsLong()
+                  > timestampUpdateDelayNs
               || RobotBase.isSimulation()) {
             logDate = LocalDateTime.now();
           }
@@ -221,28 +345,28 @@ public class WPILOGWriter implements LogDataReceiver {
       MatchType matchType;
       switch (table.get("DriverStation/MatchType", 0)) {
         case 1:
-          matchType = MatchType.Practice;
+          matchType = MatchType.PRACTICE;
           break;
         case 2:
-          matchType = MatchType.Qualification;
+          matchType = MatchType.QUALIFICATION;
           break;
         case 3:
-          matchType = MatchType.Elimination;
+          matchType = MatchType.ELIMINATION;
           break;
         default:
-          matchType = MatchType.None;
+          matchType = MatchType.NONE;
           break;
       }
-      if (logMatchText == null && matchType != MatchType.None) {
+      if (matchType != MatchType.NONE) {
         logMatchText = "";
         switch (matchType) {
-          case Practice:
+          case PRACTICE:
             logMatchText = "p";
             break;
-          case Qualification:
+          case QUALIFICATION:
             logMatchText = "q";
             break;
-          case Elimination:
+          case ELIMINATION:
             logMatchText = "e";
             break;
           default:
@@ -259,25 +383,47 @@ public class WPILOGWriter implements LogDataReceiver {
       } else {
         newFilenameBuilder.append(timeFormatter.format(logDate));
       }
-      String eventName = table.get("DriverStation/EventName", "").toLowerCase();
-      if (eventName.length() > 0) {
-        newFilenameBuilder.append("_");
-        newFilenameBuilder.append(eventName);
-      }
-      if (logMatchText != null) {
-        newFilenameBuilder.append("_");
-        newFilenameBuilder.append(logMatchText);
+      boolean fmsAttached = table.get("DriverStation/FMSAttached", false);
+      if (fmsAttached) {
+        String eventName = table.get("DriverStation/EventName", "").toLowerCase();
+        if (eventName.length() > 0) {
+          newFilenameBuilder.append("_");
+          newFilenameBuilder.append(eventName);
+        }
+        if (logMatchText != null) {
+          newFilenameBuilder.append("_");
+          newFilenameBuilder.append(logMatchText);
+        }
       }
       newFilenameBuilder.append(".wpilog");
       String newFilename = newFilenameBuilder.toString();
       if (!newFilename.equals(filename)) {
-        String logPath = Path.of(folder, newFilename).toString();
+        String logPath =
+            folder == null
+                ? newFilename
+                : FileSystems.getDefault().getPath(folder, newFilename).toString();
         System.out.println("[AdvantageKit] Renaming log to \"" + logPath + "\"");
 
-        File fileA = new File(folder, filename);
-        File fileB = new File(folder, newFilename);
-        fileA.renameTo(fileB);
-        filename = newFilename;
+        File fileA = folder == null ? new File(filename) : new File(folder, filename);
+        File fileB = folder == null ? new File(newFilename) : new File(folder, newFilename);
+        if (fileA.renameTo(fileB)) {
+          filename = newFilename;
+          if (RobotBase.isReal()) {
+            if (fileOutputStream != null) {
+              try {
+                fileOutputStream.getFD().sync();
+                fileOutputStream.close();
+              } catch (IOException ignored) {
+              }
+            }
+            try {
+              fileOutputStream = new FileOutputStream(logPath, true);
+            } catch (IOException ignored) {
+              fileOutputStream = null;
+            }
+            syncDirectory(folder);
+          }
+        }
       }
     }
 
@@ -367,9 +513,27 @@ public class WPILOGWriter implements LogDataReceiver {
 
     // Flush to disk
     log.flush();
+    if (fileOutputStream != null && table.getTimestamp() - lastFlushTimestamp > flushPeriodNs) {
+      lastFlushTimestamp = table.getTimestamp();
+      try {
+        fileOutputStream.getFD().sync();
+        syncDirectory(folder);
+      } catch (IOException e) {
+      }
+    }
 
     // Update last table
     lastTable = table;
+  }
+
+  /**
+   * Returns the state of the general "failed" fault. This is tripped when the log file fails to
+   * open due to a general IO error or USB timeout.
+   *
+   * @return Whether the fault is active.
+   */
+  public boolean getFailedFault() {
+    return failedFault;
   }
 
   /**

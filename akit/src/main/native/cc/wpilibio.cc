@@ -7,9 +7,9 @@
 
 #include "conduit/wpilibio.h"
 
-#include <hal/DriverStation.h>
-#include <hal/DriverStationTypes.h>
-#include <hal/HALBase.h>
+#include <wpi/hal/DriverStation.h>
+#include <wpi/hal/DriverStationTypes.h>
+#include <wpi/hal/HAL.h>
 #include <jni.h>
 #include <stdlib.h>
 
@@ -38,11 +38,12 @@ PDPReader pdp_reader;
 SystemReader sys_reader;
 
 void start() {
+	sys_reader.start();
 }
 
 void make_buffer() {
 	// Allocate shared buffer
-	shared_buf = malloc(BUF_SIZE);
+	shared_buf = calloc(1, BUF_SIZE);
 
 	// Point view pointers at the buffer at the right offset
 	corein_view = reinterpret_cast<schema::CoreInputs*>(shared_buf);
@@ -52,16 +53,14 @@ void make_buffer() {
 }
 
 void capture_data(void) {
-	std::int32_t status;
-
-	corein_view->mutate_timestamp(HAL_GetFPGATime(&status));
+	corein_view->mutate_timestamp(HAL_GetMonotonicTime());
 	ds_reader.read(ds_view);
 	pdp_reader.read(pdp_view);
 	sys_reader.read(sys_view);
 }
 
-void configurePDP(JNIEnv *env, jint moduleNumber, jint type) {
-	pdp_reader.configure(env, moduleNumber, type, pdp_view);
+void configurePDP(JNIEnv *env, jint busId, jint moduleNumber, jint type) {
+	pdp_reader.configure(env, busId, moduleNumber, type, pdp_view);
 }
 
 }  // namespace wpilibio

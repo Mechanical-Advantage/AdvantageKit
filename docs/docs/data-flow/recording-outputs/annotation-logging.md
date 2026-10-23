@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Annotation Logging
+# Annotation Logging {#annotation-logging}
 
 The `@AutoLogOutput` annotation can also be used to automatically log the value of a field or getter method as an output periodically (including private fields and methods). The key will be selected automatically, or it can be overridden using the `key` parameter. All data types are supported, including arrays and structured data types.
 
@@ -16,9 +16,9 @@ public class Example {
 }
 ```
 
-## Parameters
+## Parameters {#parameters}
 
-### Key
+### Key {#key}
 
 The `key` parameter can reference other fields within the same class using the syntax shown below. This is useful to disambiguate classes with multiple instances, such as swerve modules. The value of the referenced field will not be updated after the first loop cycle. Any data type convertible to a string is supported, including numbers, booleans, and strings.
 
@@ -35,7 +35,7 @@ public class SwerveModule {
 }
 ```
 
-### Unit
+### Unit {#unit}
 
 For double or float fields, the `unit` parameter can be used to provide a unit name that will be stored as metadata. This ensures that AdvantageScope will correctly [visualize unit data](https://docs.advantagescope.org/tab-reference/line-graph/units). Note that `Measure` values can also be logged using `@AutoLogOutput` with full support for unit metadata.
 
@@ -57,7 +57,7 @@ public class Example {
 }
 ```
 
-### Force Serializable
+### Force Serializable {#force-serializable}
 
 The `forceSerializable` parameter can be used to force the use of struct or Protobuf serialization for enum types, as shown in the example below. The class should inherit from [`StructSerializable`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/util/struct/StructSerializable.html), [`ProtobufSerializable`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/util/protobuf/ProtobufSerializable.html), or [`WPISerializable`](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/util/WPISerializable.html).
 
@@ -81,7 +81,7 @@ CustomEnum setpoint = CustomEnum.A; // Logs as an enum
 CustomEnum setpoint = CustomEnum.A; // Logs as a struct
 ```
 
-## Global Configuration
+## Global Configuration {#global-configuration}
 
 By default, the parent class where `@AutoLogOutput` is used must be within the same package as `Robot` (or a subpackage). The following method can be called in the constructor of `Robot` to allow additional packages, such as a "lib" package outside of normal robot code:
 

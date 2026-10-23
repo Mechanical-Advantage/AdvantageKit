@@ -7,35 +7,33 @@
 
 package org.littletonrobotics.junction;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.NotifierJNI;
-import edu.wpi.first.wpilibj.IterativeRobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.util.List;
+import java.lang.reflect.Field;
+import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.framework.IterativeRobotBase;
+import org.wpilib.hardware.hal.NotifierJNI;
+import org.wpilib.system.RobotController;
+import org.wpilib.system.Watchdog;
+import org.wpilib.util.UsageReporting;
+import org.wpilib.util.WPIUtilJNI;
 
 /**
- * LoggedRobot implements the IterativeRobotBase robot program framework.
+ * LoggedRobot is the robot base class for a robot with a single periodic loop (no separate OpMode
+ * classes). It is the equivalent of WPILib's TimedRobot and should be subclassed by the Robot class
+ * in the user program.
  *
- * <p>The LoggedRobot class is intended to be subclassed by a user creating a robot program, and
- * will call all required AdvantageKit periodic methods.
- *
- * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
+ * <p>As with all AdvantageKit robot base classes, custom periodic callbacks are not supported. See
+ * the documentation for more details and recommended alternatives.
  */
 public class LoggedRobot extends IterativeRobotBase {
   /** Default loop period. */
   public static final double defaultPeriodSecs = 0.02;
 
-  private final int notifier = NotifierJNI.initializeNotifier();
-  private final long periodUs;
-  private long nextCycleUs = 0;
-  private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
+  private final int notifier = NotifierJNI.createNotifier();
+  private final long periodNs;
+  private Watchdog watchdog;
+  private long nextCycleNs = 0;
 
   private boolean useTiming = true;
 
@@ -51,18 +49,26 @@ public class LoggedRobot extends IterativeRobotBase {
    */
   protected LoggedRobot(double period) {
     super(period);
-    this.periodUs = (long) (period * 1000000);
+    this.periodNs = (long) (period * 1_000_000_000.0);
     NotifierJNI.setNotifierName(notifier, "LoggedRobot");
 
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_AdvantageKit);
-    HAL.report(
-        tResourceType.kResourceType_LoggingFramework, tInstances.kLoggingFramework_AdvantageKit);
+    try {
+      Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
+      watchdogField.setAccessible(true);
+      watchdog = (Watchdog) watchdogField.get(this);
+    } catch (Exception e) {
+    }
+    if (watchdog != null) {
+      watchdog.setTimeout(1.0e9);
+    }
+
+    UsageReporting.reportUsage("Framework", "AdvantageKit_LoggedRobot");
+    UsageReporting.reportUsage("LoggingFramework", "AdvantageKit");
   }
 
   @Override
   public void close() {
-    NotifierJNI.stopNotifier(notifier);
-    NotifierJNI.cleanNotifier(notifier);
+    NotifierJNI.destroyNotifier(notifier);
     super.close();
   }
 
@@ -72,48 +78,50 @@ public class LoggedRobot extends IterativeRobotBase {
   public void startCompetition() {
     try {
       // Robot init methods
-      robotInit();
+      long initStart = RobotController.getMonotonicTime();
       if (isSimulation()) {
         simulationInit();
       }
-      long initEnd = RobotController.getFPGATime(); // Includes Robot constructor and robotInit
+      long initEnd = RobotController.getMonotonicTime(); // Includes Robot constructor and robotInit
 
       // Register auto logged outputs
       AutoLogOutputManager.addObject(this);
 
       // Save data from init cycle
-      Logger.periodicAfterUser(initEnd, 0);
+      Logger.periodicAfterUser(initEnd - initStart, 0);
 
       // Tell the DS that the robot is ready to be enabled
       System.out.println("********** Robot program startup complete **********");
-      DriverStationJNI.observeUserProgramStarting();
+      DriverStationBackend.observeUserProgramStarting();
 
       // Loop forever, calling the appropriate mode-dependent function
       while (true) {
         if (useTiming) {
-          long currentTimeUs = RobotController.getFPGATime();
-          if (nextCycleUs < currentTimeUs) {
+          long currentTimeNs = RobotController.getMonotonicTime();
+          if (nextCycleNs < currentTimeNs) {
             // Loop overrun, start next cycle immediately
-            nextCycleUs = currentTimeUs;
+            nextCycleNs = currentTimeNs;
           } else {
             // Wait before next cycle
-            NotifierJNI.updateNotifierAlarm(notifier, nextCycleUs);
-            if (NotifierJNI.waitForNotifierAlarm(notifier) == 0L) {
-              // Break the loop if the notifier was stopped
+            NotifierJNI.setNotifierAlarm(notifier, nextCycleNs, 0, true, true);
+
+            try {
+              WPIUtilJNI.waitForObject(notifier);
+            } catch (InterruptedException ex) {
               Logger.end();
+              Thread.currentThread().interrupt();
               break;
             }
           }
-          nextCycleUs += periodUs;
+          nextCycleNs += periodNs;
         }
 
-        long periodicBeforeStart = RobotController.getFPGATime();
+        long periodicBeforeStart = RobotController.getMonotonicTime();
         Logger.periodicBeforeUser();
-        long userCodeStart = RobotController.getFPGATime();
+        long userCodeStart = RobotController.getMonotonicTime();
         loopFunc();
-        long userCodeEnd = RobotController.getFPGATime();
+        long userCodeEnd = RobotController.getMonotonicTime();
 
-        gcStatsCollector.update();
         Logger.periodicAfterUser(userCodeEnd - userCodeStart, userCodeStart - periodicBeforeStart);
       }
     } catch (Exception exception) {
@@ -129,7 +137,18 @@ public class LoggedRobot extends IterativeRobotBase {
   /** Ends the main loop in startCompetition(). */
   @Override
   public void endCompetition() {
-    NotifierJNI.stopNotifier(notifier);
+    NotifierJNI.destroyNotifier(notifier);
+  }
+
+  /**
+   * Return the system clock time in nanoseconds for the start of the current loop cycle. This is
+   * the same as Timer.getTimestamp() and Logger.getTimestamp(), but is stable through a loop. It is
+   * updated at the beginning of every loop cycle.
+   *
+   * @return Robot running time in nanoseconds, as of the start of the current loop cycle.
+   */
+  public long getLoopStartTime() {
+    return Logger.getTimestamp();
   }
 
   /**
@@ -141,26 +160,17 @@ public class LoggedRobot extends IterativeRobotBase {
     this.useTiming = useTiming;
   }
 
-  private static final class GcStatsCollector {
-    private List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
-    private final long[] lastTimes = new long[gcBeans.size()];
-    private final long[] lastCounts = new long[gcBeans.size()];
-
-    public void update() {
-      long accumTime = 0;
-      long accumCounts = 0;
-      for (int i = 0; i < gcBeans.size(); i++) {
-        long gcTime = gcBeans.get(i).getCollectionTime();
-        long gcCount = gcBeans.get(i).getCollectionCount();
-        accumTime += gcTime - lastTimes[i];
-        accumCounts += gcCount - lastCounts[i];
-
-        lastTimes[i] = gcTime;
-        lastCounts[i] = gcCount;
-      }
-
-      Logger.recordOutput("LoggedRobot/GCTimeMS", (double) accumTime);
-      Logger.recordOutput("LoggedRobot/GCCounts", (double) accumCounts);
+  /**
+   * Sets the timeout before a loop overrun warning is printed to the console. By default, loop
+   * overrun warnings are disabled. Loop times are always logged by AdvantageKit under
+   * "/RealOutputs/LoggedRobot".
+   *
+   * @param timeoutSecs The timeout before a loop overrun warning is printed. This value should
+   *     generally be greater than or equal to the loop cycle period.
+   */
+  public void setLoopOverrunWarningTimeout(double timeoutSecs) {
+    if (watchdog != null) {
+      watchdog.setTimeout(timeoutSecs);
     }
   }
 }

@@ -3,7 +3,7 @@
   "name": "AdvantageKit",
   "version": "${version}",
   "uuid": "d820cc26-74e3-11ec-90d6-0242ac120003",
-  "frcYear": "${frcYear}",
+  "wpilibYear": "${wpilibYear}",
   "mavenUrls": [
     "https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release/"
   ],
@@ -23,11 +23,12 @@
       "skipInvalidPlatforms": false,
       "isJar": false,
       "validPlatforms": [
-        "linuxathena",
+        "linuxsystemcore",
         "linuxx86-64",
         "linuxarm64",
         "osxuniversal",
-        "windowsx86-64"
+        "windowsx86-64",
+        "windowsarm64"
       ]
     }
   ],

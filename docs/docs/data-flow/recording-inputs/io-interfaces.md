@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# IO Interfaces
+# IO Interfaces {#io-interfaces}
 
 By necessity, any interaction with external hardware must be isolated such that all input data is logged and can be replayed in the simulator where that hardware is not present. Most hardware interaction occurs in subsystem classes (read [this section](./dashboard-inputs) for information on using NetworkTables as an input). Traditionally, a subsystem has three main components:
 

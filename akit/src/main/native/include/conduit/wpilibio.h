@@ -28,7 +28,7 @@ void make_buffer();
 // Captures data into the shared buffer
 void capture_data();
 
-void configurePDP(JNIEnv *env, jint moduleNumber, jint type);
+void configurePDP(JNIEnv *env, jint busId, jint moduleNumber, jint type);
 
 }  // namespace wpilibio
 }  // namespace conduit

@@ -8,26 +8,26 @@ on:
     types: [published]
 
 jobs:
-  build-athena:
-    name: "Build for Athena"
+  build-systemcore:
+    name: "Build for Systemcore"
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout repository"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: "Setup Java"
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: "temurin"
-          java-version: "17"
-      - name: "Install RoboRIO toolchain"
-        run: ./gradlew :akit:installRoboRioToolchain
+          java-version: "25"
+      - name: "Install Systemcore toolchain"
+        run: ./gradlew :akit:installSystemCoreToolchain
       - name: "Check formatting"
         run: ./gradlew spotlessCheck
       - name: "Build and test"
-        run: ./gradlew :akit:build -Ponlylinuxathena
+        run: ./gradlew :akit:build -Ponlylinuxsystemcore
       - name: "Development: Publish local"
         if: github.event_name != 'release'
-        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponlylinuxathena
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponlylinuxsystemcore
       - name: "Release: Get version number"
         id: get_version
         if: github.event_name == 'release'
@@ -40,7 +40,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
       - name: "Release: Publish remote"
         if: github.event_name == 'release'
-        run: ./gradlew :akit:publish -Ponlylinuxathena "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
+        run: ./gradlew :akit:publish -Ponlylinuxsystemcore "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
         env:
           ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
@@ -57,7 +57,7 @@ jobs:
       - name: "Upload local repo"
         uses: actions/upload-artifact@v7
         with:
-          name: maven_linuxathena
+          name: maven_linuxsystemcore
           path: akit/build/repos/releases
       - name: "Generate template projects"
         working-directory: template_projects
@@ -135,53 +135,99 @@ jobs:
       matrix:
         include:
           - name: "Linux (x64)"
-            runner-image: ubuntu-22.04
+            runner-image: ubuntu-24.04
             classifier: "linuxx86-64"
             container: ""
+            extra-args: ""
           - name: "Linux (arm64)"
-            runner-image: ubuntu-22.04
+            runner-image: ubuntu-24.04
             classifier: "linuxarm64"
-            container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
+            container: wpilib/aarch64-cross-debian:trixie
+            extra-args: ""
           - name: "macOS"
             runner-image: macos-latest
             classifier: "osxuniversal"
             container: ""
-          - name: "Windows"
+            extra-args: ""
+          - name: "Windows (x64)"
             runner-image: windows-latest
             classifier: "windowsx86-64"
             container: ""
+            extra-args: ""
+          - name: "Windows (arm64)"
+            runner-image: windows-latest
+            classifier: "windowsarm64"
+            container: ""
+            extra-args: "-Pbuildwinarm64"
     name: "Build for ${{ matrix.name }}"
     runs-on: ${{ matrix.runner-image }}
     container: ${{ matrix.container }}
+    env:
+      GRADLE_SIGN_ARGS: ""
     steps:
       - name: "Checkout repository"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: "Setup Java"
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         if: matrix.classifier != 'linuxarm64'
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "25"
       - name: "Setup Python"
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       - name: "Install Python dependencies"
-        uses: BSFishy/pip-action@v1
+        run: python -m pip install requests
+      - name: "Load macOS certificate"
+        if: |
+          github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
+          matrix.classifier == 'osxuniversal'
+        uses: apple-actions/import-codesign-certs@v7
         with:
-          packages: requests
+          p12-file-base64: ${{ secrets.APPLE_DEVELOPER_ID }}
+          p12-password: ${{ secrets.APPLE_DEVELOPER_ID_PWD }}
+      - name: "Set macOS signing argument"
+        if: |
+          github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
+          matrix.classifier == 'osxuniversal'
+        shell: bash
+        run: |
+          echo "GRADLE_SIGN_ARGS=-PdeveloperID" >> $GITHUB_ENV
+      - name: "Install Windows signing tool"
+        if: |
+          github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
+          startsWith(matrix.classifier, 'windows')
+        run: dotnet tool install --global sign --prerelease
+      - name: "Load Windows signing credentials"
+        if: |
+          github.repository == 'Mechanical-Advantage/AdvantageKit' &&
+          github.event_name == 'release' &&
+          startsWith(matrix.classifier, 'windows')
+        shell: bash
+        run: |
+          echo "AZURE_TENANT_ID=${{ secrets.AZURE_SIGNING_TENANT_ID }}" >> $GITHUB_ENV
+          echo "AZURE_CLIENT_ID=${{ secrets.AZURE_SIGNING_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "AZURE_CLIENT_SECRET=${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "AZURE_SIGNING_ENDPOINT=${{ vars.AZURE_SIGNING_ENDPOINT }}" >> $GITHUB_ENV
+          echo "AZURE_SIGNING_ACCOUNT_NAME=${{ vars.AZURE_SIGNING_ACCOUNT_NAME }}" >> $GITHUB_ENV
+          echo "AZURE_SIGNING_CERTIFICATE_PROFILE=${{ vars.AZURE_SIGNING_CERTIFICATE_PROFILE }}" >> $GITHUB_ENV
+          echo "GRADLE_SIGN_ARGS=-PazureSign" >> $GITHUB_ENV
       - name: "Build and test"
-        run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1
+        run: ./gradlew :akit:build -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }} ${{ env.GRADLE_SIGN_ARGS }}
       - name: "Development: Publish local"
         if: github.event_name != 'release'
-        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }} ${{ env.GRADLE_SIGN_ARGS }}
       - name: "Release: Get version number"
         id: get_version
         if: github.event_name == 'release'
         uses: battila7/get-version-action@v2
       - name: "Release: Publish local"
         if: github.event_name == 'release'
-        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
+        run: ./gradlew :akit:publishAllPublicationsToMavenRepository -Ponly${{ matrix.classifier }} -PskipJava=1 ${{ matrix.extra-args }} ${{ env.GRADLE_SIGN_ARGS }} "-PpublishingVersion=${{ steps.get_version.outputs.version-without-v }}"
       - name: "Release: Publish zip"
         if: github.event_name == 'release'
         run: |
@@ -195,13 +241,13 @@ jobs:
   combine:
     name: "Combine Maven Offline"
     runs-on: ubuntu-latest
-    needs: [build-athena, build-desktop]
+    needs: [build-systemcore, build-desktop]
     steps:
-      - name: "Download Athena"
+      - name: "Download Systemcore"
         uses: actions/download-artifact@v8
         with:
-          name: maven_linuxathena
-          path: maven_linuxathena
+          name: maven_linuxsystemcore
+          path: maven_linuxsystemcore
       - name: "Download Linux (x64)"
         uses: actions/download-artifact@v8
         with:
@@ -217,18 +263,24 @@ jobs:
         with:
           name: maven_osxuniversal
           path: maven_osxuniversal
-      - name: "Download Windows"
+      - name: "Download Windows (x64)"
         uses: actions/download-artifact@v8
         with:
           name: maven_windowsx86-64
           path: maven_windowsx86-64
+      - name: "Download Windows (arm64)"
+        uses: actions/download-artifact@v8
+        with:
+          name: maven_windowsarm64
+          path: maven_windowsarm64
       - name: "Combine"
         run: |
-          rsync -a maven_linuxathena/* maven_offline
+          rsync -a maven_linuxsystemcore/* maven_offline
           rsync -a maven_linuxx86-64/* maven_offline
           rsync -a maven_linuxarm64/* maven_offline
           rsync -a maven_osxuniversal/* maven_offline
           rsync -a maven_windowsx86-64/* maven_offline
+          rsync -a maven_windowsarm64/* maven_offline
           zip -r maven_offline.zip maven_offline
       - name: "Upload artifact"
         uses: actions/upload-artifact@v7
@@ -257,14 +309,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout repository"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: "Setup Java"
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "25"
       - name: "Setup Node.js"
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "20.x"
           cache: "npm"

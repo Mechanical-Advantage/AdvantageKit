@@ -7,10 +7,6 @@
 
 package org.littletonrobotics.junction.wpilog;
 
-import edu.wpi.first.util.datalog.DataLogIterator;
-import edu.wpi.first.util.datalog.DataLogReader;
-import edu.wpi.first.util.datalog.DataLogRecord;
-import edu.wpi.first.wpilibj.DriverStation;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +15,10 @@ import org.littletonrobotics.junction.LogReplaySource;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.LogTable.LoggableType;
+import org.wpilib.datalog.DataLogIterator;
+import org.wpilib.datalog.DataLogReader;
+import org.wpilib.datalog.DataLogRecord;
+import org.wpilib.driverstation.DriverStationErrors;
 
 /** Replays log values from a WPILOG file. */
 public class WPILOGReader implements LogReplaySource {
@@ -48,15 +48,16 @@ public class WPILOGReader implements LogReplaySource {
     try {
       reader = new DataLogReader(filename);
     } catch (IOException e) {
-      DriverStation.reportError("[AdvantageKit] Failed to open replay log file.", true);
+      DriverStationErrors.reportError("[AdvantageKit] Failed to open replay log file.", true);
     }
 
     // Check validity
     if (!reader.isValid()) {
-      DriverStation.reportError("[AdvantageKit] The replay log is not a valid WPILOG file.", false);
+      DriverStationErrors.reportError(
+          "[AdvantageKit] The replay log is not a valid WPILOG file.", false);
       isValid = false;
     } else if (!reader.getExtraHeader().equals(WPILOGConstants.extraHeader)) {
-      DriverStation.reportError(
+      DriverStationErrors.reportError(
           "[AdvantageKit] The replay log was not produced by AdvantageKit.", true);
       isValid = false;
     } else {
@@ -121,6 +122,14 @@ public class WPILOGReader implements LogReplaySource {
           if (unit != null) {
             entryUnits.put(record.getStartData().entry, unit);
           }
+
+          // Check timestamp unit
+          if (record.getStartData().name.equals(LogDataReceiver.timestampKey)) {
+            if (!"nanoseconds".equals(unit)) {
+              throw new RuntimeException(
+                  "[AdvantageKit] The replay log uses an incompatible timestamp unit. Logs must be recorded and replayed on the same version of AdvantageKit.");
+            }
+          }
         } else if (record.isSetMetadata()) {
           // Handle metadata updates dynamically
           String unit = parseUnit(record.getSetMetadataData().metadata);
@@ -142,7 +151,7 @@ public class WPILOGReader implements LogReplaySource {
               break; // End of cycle
             }
 
-          } else if (timestamp != null && record.getTimestamp() == timestamp) {
+          } else if (timestamp != null) {
             entry = entry.substring(1); // Remove leading slash
             if (entry.startsWith("ReplayOutputs")) {
               // Don't retrieve old replay outputs

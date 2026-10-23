@@ -2,7 +2,7 @@
 sidebar_class_name: hidden
 ---
 
-# Welcome to AdvantageKit
+# Welcome to AdvantageKit {#welcome-to-advantagekit}
 
 AdvantageKit is a logging, telemetry, and replay framework developed by Team 6328. AdvantageKit enables log replay, where the full state of the robot code can be replayed in simulation based on a log file ([What is AdvantageKit?](/getting-started/what-is-advantagekit/)).
 
@@ -14,7 +14,7 @@ AdvantageKit is a logging, telemetry, and replay framework developed by Team 632
 
 :::
 
-## REQUIRED
+## REQUIRED {#required}
 
 **The steps below are required to complete a valid installation of AdvantageKit.**
 

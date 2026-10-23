@@ -5,10 +5,8 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_session.hpp>
 
 int main(int argc, char **argv) {
-	::testing::InitGoogleTest(&argc, argv);
-	int ret = RUN_ALL_TESTS();
-	return ret;
+	return Catch::Session().run(argc, argv);
 }

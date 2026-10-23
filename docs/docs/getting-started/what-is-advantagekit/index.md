@@ -1,4 +1,4 @@
-# 👋 What is AdvantageKit?
+# 👋 What is AdvantageKit? {#what-is-advantagekit}
 
 AdvantageKit is a logging framework. But to understand it, we need to start by looking at FRC robot code in general. Here's what all robot code fundamentally looks like:
 

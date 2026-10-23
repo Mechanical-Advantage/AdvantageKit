@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# 🔭 How To: Replay Watch
+# 🔭 How To: Replay Watch {#how-to-replay-watch}
 
 Some use cases of log replay benefit from rapid iteration, such as tuning pose estimation algorithms. **Replay watch** addresses this use case by automatically updating replayed outputs when the code is modified. An example is shown below, where the replayed output in AdvantageScope updates in real-time as the code is modified:
 
@@ -12,7 +12,7 @@ Some use cases of log replay benefit from rapid iteration, such as tuning pose e
 Check the replay example on [rapid iteration](./what-is-advantagekit/example-rapid-iteration.md) for a more detailed example of this feature in the context of tuning a pose estimation algorithm.
 :::
 
-## Usage
+## Usage {#usage}
 
 Replay watch requires a custom Gradle task defined in `build.gradle`. This task is included in the AdvantageKit template projects and documented in the installation instructions for [existing projects](./installation/existing-projects.md).
 
