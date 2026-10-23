@@ -17,6 +17,7 @@ import org.littletonrobotics.conduit.schema.NetworkStatus;
 import org.littletonrobotics.conduit.schema.Vector3;
 import org.wpilib.networktables.ConnectionInfo;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.system.WPILibVersion;
 
 /** Manages logging general system data. */
 class LoggedSystemStats {
@@ -75,9 +76,11 @@ class LoggedSystemStats {
     table.put("Storage/Utilization", conduit.getStoragePercent(), "percent");
 
     table.put("3v3Current", conduit.getCurrent3V3(), "amps");
-    table.put("OS/Hash", conduit.getOSHash());
-    table.put("OS/Slot", conduit.getOSSlot());
-    table.put("OS/Version", conduit.getOSVersion());
+    table.put("Versions/OS/Hash", conduit.getOSHash());
+    table.put("Versions/OS/Slot", conduit.getOSSlot());
+    table.put("Versions/OS/Version", conduit.getOSVersion());
+    table.put("Versions/WPILib", WPILibVersion.Version);
+    table.put("Versions/AdvantageKit", AdvantageKitVersion.version);
 
     logVector3(table.getSubtable("IMU/AccelRaw"), conduit.getIMUAccelRaw(), "G");
     logVector3(table.getSubtable("IMU/GyroRates"), conduit.getIMUGyroRates(), "radians per second");
