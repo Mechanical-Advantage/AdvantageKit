@@ -400,38 +400,47 @@ public class WPILOGWriter implements LogDataReceiver {
         }
       }
 
-      // Update match
-      MatchType matchType;
-      switch (table.get("DriverStation/MatchType", 0)) {
-        case 1:
-          matchType = MatchType.PRACTICE;
-          break;
-        case 2:
-          matchType = MatchType.QUALIFICATION;
-          break;
-        case 3:
-          matchType = MatchType.ELIMINATION;
-          break;
-        default:
-          matchType = MatchType.NONE;
-          break;
-      }
-      if (matchType != MatchType.NONE) {
-        logMatchText = "";
-        switch (matchType) {
-          case PRACTICE:
-            logMatchText = "p";
+      // Update match text
+      boolean fmsAttached = table.get("DriverStation/FMSAttached", false);
+      if (fmsAttached) {
+        StringBuilder matchTextBuilder = new StringBuilder();
+        String eventName = table.get("DriverStation/EventName", "").toLowerCase();
+        if (eventName.length() > 0) {
+          matchTextBuilder.append("_");
+          matchTextBuilder.append(eventName);
+        }
+        MatchType matchType;
+        switch (table.get("DriverStation/MatchType", 0)) {
+          case 1:
+            matchType = MatchType.PRACTICE;
             break;
-          case QUALIFICATION:
-            logMatchText = "q";
+          case 2:
+            matchType = MatchType.QUALIFICATION;
             break;
-          case ELIMINATION:
-            logMatchText = "e";
+          case 3:
+            matchType = MatchType.ELIMINATION;
             break;
           default:
+            matchType = MatchType.NONE;
             break;
         }
-        logMatchText += Integer.toString(table.get("DriverStation/MatchNumber", 0));
+        if (matchType != MatchType.NONE) {
+          switch (matchType) {
+            case PRACTICE:
+              matchTextBuilder.append("_p");
+              break;
+            case QUALIFICATION:
+              matchTextBuilder.append("_q");
+              break;
+            case ELIMINATION:
+              matchTextBuilder.append("_e");
+              break;
+            default:
+              break;
+          }
+          matchTextBuilder.append(table.get("DriverStation/MatchNumber", 0));
+        }
+        logMatchText = matchTextBuilder.toString();
       }
 
       // Update filename
@@ -443,17 +452,8 @@ public class WPILOGWriter implements LogDataReceiver {
         } else {
           newFilenameBuilder.append(timeFormatter.format(logDate));
         }
-        boolean fmsAttached = table.get("DriverStation/FMSAttached", false);
-        if (fmsAttached) {
-          String eventName = table.get("DriverStation/EventName", "").toLowerCase();
-          if (eventName.length() > 0) {
-            newFilenameBuilder.append("_");
-            newFilenameBuilder.append(eventName);
-          }
-          if (logMatchText != null) {
-            newFilenameBuilder.append("_");
-            newFilenameBuilder.append(logMatchText);
-          }
+        if (logMatchText != null) {
+          newFilenameBuilder.append(logMatchText);
         }
         newFilenameBuilder.append(getExtension());
         String newFilename = newFilenameBuilder.toString();
