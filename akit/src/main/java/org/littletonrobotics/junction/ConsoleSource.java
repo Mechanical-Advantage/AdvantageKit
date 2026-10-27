@@ -75,7 +75,7 @@ public interface ConsoleSource extends AutoCloseable {
     @Override
     public void close() throws Exception {
       System.setOut(originalStdout);
-      System.setOut(originalStderr);
+      System.setErr(originalStderr);
     }
 
     private class SplitStream extends OutputStream {
