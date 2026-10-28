@@ -9,7 +9,6 @@ package org.littletonrobotics.junction;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +19,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
-import java.util.function.Supplier;
 import org.littletonrobotics.conduit.ConduitApi;
-import org.littletonrobotics.junction.LogTable.LogValue;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
@@ -55,7 +52,6 @@ public class Logger {
   private static ConsoleSource console = null;
   private static List<LoggedNetworkInput> dashboardInputs = new ArrayList<>();
   private static final GcStatsCollector gcStatsCollector = new GcStatsCollector();
-  private static Supplier<ByteBuffer[]> urclSupplier = null;
   private static boolean enableConsole = true;
   private static String vendorLogCaptureDirectory = null;
   private static boolean checkRobotBase = true;
@@ -107,22 +103,6 @@ public class Logger {
    */
   public static void registerDashboardInput(LoggedNetworkInput dashboardInput) {
     dashboardInputs.add(dashboardInput);
-  }
-
-  /**
-   * Registers a log supplier for <a
-   * href="https://docs.advantagescope.org/more-features/urcl">URCL</a> (Unofficial REV-Compatible
-   * Logger). This method should be called during setup before starting to log. Example usage shown
-   * below.
-   *
-   * <pre>
-   * <code>Logger.registerURCL(URCL.startExternal());</code>
-   * </pre>
-   *
-   * @param logSupplier The supplier returned from the {@code URCL.startExternal()} method.
-   */
-  public static void registerURCL(Supplier<ByteBuffer[]> logSupplier) {
-    urclSupplier = logSupplier;
   }
 
   /**
@@ -395,27 +375,6 @@ public class Logger {
         LoggedPowerDistribution loggedPowerDistribution = LoggedPowerDistribution.getInstance();
         if (loggedPowerDistribution != null) {
           loggedPowerDistribution.saveToLog(entry.getSubtable("PowerDistribution"));
-        }
-        if (urclSupplier != null && RobotBase.isReal()) {
-          ByteBuffer[] buffers = urclSupplier.get();
-          if (buffers.length == 3) {
-            for (int i = 0; i < 3; i++) {
-              buffers[i].rewind();
-              byte[] bytes = new byte[buffers[i].remaining()];
-              buffers[i].get(bytes);
-              switch (i) {
-                case 0:
-                  entry.put("URCL/Raw/Persistent", new LogValue(bytes, "URCLr3_persistent"));
-                  break;
-                case 1:
-                  entry.put("URCL/Raw/Periodic", new LogValue(bytes, "URCLr3_periodic"));
-                  break;
-                case 2:
-                  entry.put("URCL/Raw/Aliases", new LogValue(bytes, "URCLr3_aliases"));
-                  break;
-              }
-            }
-          }
         }
       }
 
