@@ -29,6 +29,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.system.RobotController;
+import org.wpilib.system.Timer;
 import org.wpilib.units.Measure;
 import org.wpilib.units.Unit;
 import org.wpilib.util.Alert;
@@ -43,6 +44,7 @@ import us.hebi.quickbuf.ProtoMessage;
 /** Central class for recording and replaying log data. */
 public class Logger {
   private static final int receiverQueueCapacity = 2000; // 10s at 200Hz
+  private static final double receiverQueueAlertMinTime = 30.0;
 
   private static boolean running = false;
   private static long cycleCount = 0;
@@ -63,6 +65,7 @@ public class Logger {
       new ArrayBlockingQueue<LogTable>(receiverQueueCapacity);
   private static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
   private static boolean receiverQueueFault = false;
+  private static double lastReceiverQueueFault = Double.NEGATIVE_INFINITY;
   private static final Alert receiverQueueAlert =
       new Alert(
           "AdvantageKit",
@@ -480,15 +483,16 @@ public class Logger {
           receiverQueue.add(LogTable.clone(entry));
         }
         receiverQueueFault = false;
-        receiverQueueAlert.set(false);
       } catch (IllegalStateException exception) {
         receiverQueueFault = true;
-        receiverQueueAlert.set(true);
+        lastReceiverQueueFault = Timer.getMonotonicTimestamp();
         DriverStationErrors.reportError(
             "[AdvantageKit] Capacity of receiver queue exceeded, some data will be lost.", false);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
+      receiverQueueAlert.set(
+          (Timer.getMonotonicTimestamp() - lastReceiverQueueFault) < receiverQueueAlertMinTime);
     }
   }
 

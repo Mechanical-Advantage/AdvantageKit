@@ -30,6 +30,9 @@ public class LoggedRobot extends IterativeRobotBase {
   /** Default loop period. */
   public static final double defaultPeriodSecs = 0.02;
 
+  /** Multiplier from the loop period to the default loop overrun timeout. */
+  private static final double defaultLoopOverrunMultipler = 4.0;
+
   private final int notifier = NotifierJNI.createNotifier();
   private final long periodNs;
   private Watchdog watchdog;
@@ -59,7 +62,7 @@ public class LoggedRobot extends IterativeRobotBase {
     } catch (Exception e) {
     }
     if (watchdog != null) {
-      watchdog.setTimeout(Double.POSITIVE_INFINITY);
+      watchdog.setTimeout(period * defaultLoopOverrunMultipler);
     }
 
     UsageReporting.reportUsage("Framework", "AdvantageKit_LoggedRobot");

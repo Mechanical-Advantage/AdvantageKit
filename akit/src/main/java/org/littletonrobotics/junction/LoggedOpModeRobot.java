@@ -512,6 +512,9 @@ public abstract class LoggedOpModeRobot extends RobotBase {
   /** Default loop period. */
   public static final double DEFAULT_PERIOD = 0.02;
 
+  /** Multiplier from the loop period to the default loop overrun timeout. */
+  private static final double defaultLoopOverrunMultipler = 4.0;
+
   /** Constructor with default period. */
   @SuppressWarnings("this-escape")
   public LoggedOpModeRobot() {
@@ -529,7 +532,7 @@ public abstract class LoggedOpModeRobot extends RobotBase {
     NotifierJNI.setNotifierName(notifier, "LoggedOpModeRobot");
     this.periodNs = (long) (period * 1_000_000_000.0);
 
-    watchdog = new Watchdog(Double.POSITIVE_INFINITY, this::printLoopOverrunMessage);
+    watchdog = new Watchdog(period * defaultLoopOverrunMultipler, this::printLoopOverrunMessage);
 
     // Scan for annotated opmode classes within the derived class's package and
     // subpackages
