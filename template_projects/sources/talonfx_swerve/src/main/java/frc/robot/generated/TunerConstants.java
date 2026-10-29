@@ -2,7 +2,7 @@
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
+// license that can be found in the AdvantageKit-License.md file
 // at the root directory of this project.
 
 package frc.robot.generated;
