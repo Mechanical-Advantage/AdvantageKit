@@ -78,10 +78,10 @@ public class LogFileUtil {
     }
 
     // Prompt on stdin
-    System.out.print(
+    System.out.println(
         "[AdvantageKit] No log provided with the "
             + environmentVariable
-            + " environment variable or through AdvantageScope.\nEnter path to file: ");
+            + " environment variable or through AdvantageScope.");
     String filename = findReplayLogUser();
     if (filename.charAt(0) == '\'' || filename.charAt(0) == '"') {
       filename = filename.substring(1, filename.length() - 1);
@@ -89,13 +89,27 @@ public class LogFileUtil {
     return filename;
   }
 
-  /** Read the replay log from the environment variable. */
-  static String findReplayLogEnvVar() {
+  /**
+   * Get the filepath to a log given by {@link #environmentVariable}.
+   *
+   * <p>Beginners should instead consider {@link #findReplayLog()}, which
+   * searches all possible log file locations.
+   *
+   * @return The path to the log file, or {@code null} if unavailable.
+   */
+  public static String findReplayLogEnvVar() {
     return System.getenv(environmentVariable);
   }
 
-  /** Read the replay log from AdvantageScope. */
-  static String findReplayLogAdvantageScope() {
+  /**
+   * Get a temporary filepath to the log currently open in AdvantageScope.
+   *
+   * <p>Beginners should instead consider {@link #findReplayLog()}, which
+   * searches all possible log file locations.
+   *
+   * @return The path to the log file, or {@code null} if unavailable.
+   */
+  public static String findReplayLogAdvantageScope() {
     Path advantageScopeTempPath =
         Paths.get(System.getProperty("java.io.tmpdir"), advantageScopeFileName);
     String advantageScopeLogPath = null;
@@ -106,8 +120,16 @@ public class LogFileUtil {
     return advantageScopeLogPath;
   }
 
-  /** Read the replay log from the user. */
-  static String findReplayLogUser() {
+  /**
+   * Prompt the user for a log filepath on standard input.
+   *
+   * <p>Beginners should instead consider {@link #findReplayLog()}, which
+   * searches all available log file locations.
+   *
+   * @return The user-provided path to the log file.
+   */
+  public static String findReplayLogUser() {
+    System.out.print("[AdvantageKit] Enter path to log file: ");
     Scanner scanner = new Scanner(System.in);
     String filename = scanner.nextLine();
     scanner.close();
