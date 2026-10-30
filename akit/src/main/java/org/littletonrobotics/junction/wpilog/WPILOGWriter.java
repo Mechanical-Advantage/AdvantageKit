@@ -59,7 +59,7 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private boolean autoRename;
   private LocalDateTime logDate;
-  private String logMatchText;
+  private String logMatchText = "";
 
   private DataLogWriter log;
   private boolean isOpen = false;
@@ -392,16 +392,8 @@ public class WPILOGWriter implements LogDataReceiver {
       } else {
         newFilenameBuilder.append(timeFormatter.format(logDate));
       }
-      boolean fmsAttached = table.get("DriverStation/FMSAttached", false);
-      if (fmsAttached) {
-        String eventName = table.get("DriverStation/EventName", "").toLowerCase();
-        if (eventName.length() > 0) {
-          newFilenameBuilder.append("_");
-          newFilenameBuilder.append(eventName);
-        }
-        if (logMatchText != null) {
-          newFilenameBuilder.append(logMatchText);
-        }
+      if (logMatchText != null) {
+        newFilenameBuilder.append(logMatchText);
       }
       newFilenameBuilder.append(".wpilog");
       String newFilename = newFilenameBuilder.toString();
