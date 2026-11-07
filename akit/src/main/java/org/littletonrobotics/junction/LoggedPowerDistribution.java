@@ -8,22 +8,23 @@
 package org.littletonrobotics.junction;
 
 import org.littletonrobotics.conduit.ConduitApi;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.power.PowerDistribution;
 
 /** Manages logging power distribution data. */
 public class LoggedPowerDistribution {
   private static LoggedPowerDistribution instance;
 
-  private int busID;
+  private CANPort bus;
   private int moduleID;
   private int moduleType;
 
   private LoggedPowerDistribution(
-      int busID, int moduleID, PowerDistribution.ModuleType moduleType) {
-    this.busID = busID;
+      CANPort bus, int moduleID, PowerDistribution.ModuleType moduleType) {
+    this.bus = bus;
     this.moduleID = moduleID;
     this.moduleType = moduleType.value;
-    ConduitApi.getInstance().configurePowerDistribution(busID, moduleID, this.moduleType);
+    ConduitApi.getInstance().configurePowerDistribution(bus.value, moduleID, this.moduleType);
   }
 
   /**
@@ -40,19 +41,19 @@ public class LoggedPowerDistribution {
    * Returns the singleton instance of the power distribution logger, configuring it for the
    * specified module type and ID.
    *
-   * @param busID The CAN bus ID of the power distribution module.
+   * @param bus The CAN bus of the power distribution module.
    * @param moduleID The CAN ID of the power distribution module.
    * @param moduleType The type of the power distribution module.
    * @return The singleton LoggedPowerDistribution instance.
    */
   public static LoggedPowerDistribution getInstance(
-      int busID, int moduleID, PowerDistribution.ModuleType moduleType) {
+      CANPort bus, int moduleID, PowerDistribution.ModuleType moduleType) {
     if (instance == null) {
-      instance = new LoggedPowerDistribution(busID, moduleID, moduleType);
-    } else if (instance.busID != busID
+      instance = new LoggedPowerDistribution(bus, moduleID, moduleType);
+    } else if (instance.bus != bus
         || instance.moduleID != moduleID
         || instance.moduleType != moduleType.value) {
-      instance = new LoggedPowerDistribution(busID, moduleID, moduleType);
+      instance = new LoggedPowerDistribution(bus, moduleID, moduleType);
     }
 
     return instance;
