@@ -5,30 +5,36 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems.drive;
+package first.robot.mechanisms.drive;
+
+import static org.wpilib.units.Units.*;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Voltage;
 
 public interface ModuleIO {
   @AutoLog
   public static class ModuleIOInputs {
     public boolean driveConnected = false;
-    public double drivePositionRad = 0.0;
-    public double driveVelocityRadPerSec = 0.0;
-    public double driveAppliedVolts = 0.0;
-    public double driveCurrentAmps = 0.0;
+    public Angle drivePosition = Radians.of(Double.NaN);
+    public AngularVelocity driveVelocity = RadiansPerSecond.of(Double.NaN);
+    public Voltage driveAppliedVoltage = Volts.of(Double.NaN);
+    public Current driveCurrent = Amps.of(Double.NaN);
 
     public boolean turnConnected = false;
     public boolean turnEncoderConnected = false;
-    public Rotation2d turnAbsolutePosition = Rotation2d.kZero;
-    public Rotation2d turnPosition = Rotation2d.kZero;
-    public double turnVelocityRadPerSec = 0.0;
-    public double turnAppliedVolts = 0.0;
-    public double turnCurrentAmps = 0.0;
+    public Rotation2d turnAbsolutePosition = Rotation2d.ZERO;
+    public Rotation2d turnPosition = Rotation2d.ZERO;
+    public AngularVelocity turnVelocity = RadiansPerSecond.of(Double.NaN);
+    public Voltage turnAppliedVoltage = Volts.of(Double.NaN);
+    public Current turnCurrent = Amps.of(Double.NaN);
 
     public double[] odometryTimestamps = new double[] {};
-    public double[] odometryDrivePositionsRad = new double[] {};
+    public Angle[] odometryDrivePositionsRad = new Angle[] {};
     public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
   }
 
