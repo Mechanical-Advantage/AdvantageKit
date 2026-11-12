@@ -5,9 +5,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot;
+package first;
 
-import org.wpilib.wpilibj.RobotBase;
+import first.robot.Robot;
+import org.wpilib.framework.RobotBase;
 
 /**
  * Do NOT add any static variables to this class, or any initialization at all. Unless you know what
