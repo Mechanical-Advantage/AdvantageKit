@@ -37,7 +37,7 @@ public class SwerveModule {
 
 ### Unit {#unit}
 
-For double or float fields, the `unit` parameter can be used to provide a unit name that will be stored as metadata. This ensures that AdvantageScope will correctly [visualize unit data](https://docs.advantagescope.org/tab-reference/line-graph/units). Note that `Measure` values can also be logged using `@AutoLogOutput` with full support for unit metadata.
+For double or float fields, the `unit` parameter can be used to provide a unit name that will be stored as metadata. This ensures that AdvantageScope will correctly [visualize unit data](https://docs.advantagescope.org/tab-reference/line-graph/units). Note that `Measure` values and arrays can also be logged using `@AutoLogOutput` with full support for unit metadata.
 
 ```java
 public class Example {

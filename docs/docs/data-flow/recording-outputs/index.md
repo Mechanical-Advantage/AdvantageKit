@@ -54,6 +54,7 @@ Double or float fields can be logged with unit metadata in multiple ways. This e
 ```java
 // The unit can be specified as a string (stored as metadata)
 Logger.recordOutput("MyDistance", 3.14, "meters");
+Logger.recordOutput("MyDistanceArray", new double[] { 3.14, 2.72 }, "meters");
 
 // A unit object from the WPILib units library can be used in place of a string
 Logger.recordOutput("MyDistance", 3.14, Meters);
@@ -62,7 +63,18 @@ Logger.recordOutput("MyDistance", 3.14, Meters);
 // (The raw value will use the user-specified unit, not the base unit)
 Logger.recordOutputMeasure("MyDistance", Meters.of(3.14));
 
+// Arrays of measure values can also be logged with unit metadata
+// (For arrays, the raw values will use the base unit, as the array must have consistent units)
+Logger.recordOutput("MyDistanceArray", new Distance[] { Meters.of(3.14), Meters.of(2.72) });
+
 // This works too, but requires adding the unit to the field name
 // (See the AdvantageScope docs linked above for details)
 Logger.recordOutput("MyDistanceMeters", 3.14);
 ```
+
+:::info
+When logging arrays with unit metadata, all values in a given array must have consistent units, this means:
+
+- When logging `double` or `float` values, you must specify the unit to be used for the entire array.
+- When logging `Measure` arrays with the WPILib units library, all logged values will be converted into their base unit.
+:::
