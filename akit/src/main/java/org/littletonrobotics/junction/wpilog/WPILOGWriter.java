@@ -108,7 +108,7 @@ public class WPILOGWriter implements LogDataReceiver {
     // Set up folder, base filename, and default compression
     if (path.endsWith(".wpilog") || path.endsWith(".wpilogxz")) {
       File pathFile = new File(path);
-      folder = pathFile.getParent();
+      folder = USBDriveUtil.normalizeUSBPath(pathFile.getParent());
       String rawFilename = pathFile.getName();
       if (rawFilename.endsWith(".wpilogxz")) {
         baseFilename = rawFilename.substring(0, rawFilename.length() - ".wpilogxz".length());
@@ -118,7 +118,7 @@ public class WPILOGWriter implements LogDataReceiver {
       }
       autoRename = false;
     } else {
-      folder = path;
+      folder = USBDriveUtil.normalizeUSBPath(path);
       baseFilename = "akit_" + randomIdentifier;
       autoRename = true;
     }
