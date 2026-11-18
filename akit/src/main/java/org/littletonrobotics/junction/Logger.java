@@ -127,9 +127,9 @@ public class Logger {
    * Sets the directory for automatic vendor log capture and enables capture. This method only works
    * during setup before starting to log.
    *
-   * <p>You must select an appropriate directory (such as {@code "/U/logs/"}) for temporarily
-   * staging vendor logs during capture. Vendor logging tools must be initialized AFTER the
-   * AdvantageKit logger. Check the AdvantageKit documentation for details.
+   * <p>You must select an appropriate directory (such as {@code "/home/systemcore/logs/"}) for
+   * temporarily staging vendor logs during capture. Vendor logging tools must be initialized AFTER
+   * the AdvantageKit logger. Check the AdvantageKit documentation for details.
    *
    * @param directory The directory path.
    */

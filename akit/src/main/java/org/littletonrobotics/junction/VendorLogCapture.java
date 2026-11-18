@@ -34,9 +34,9 @@ class VendorLogCapture {
   private static Thread shutdownHook;
 
   private static final ByteBuffer readBuffer = ByteBuffer.allocateDirect(65536);
-  private static final Map<Path, TrackedLog> trackedLogs = new ConcurrentHashMap<>();
+  private static final Map<Object, TrackedLog> trackedLogs = new ConcurrentHashMap<>();
   private static final Map<String, Integer> formatCounts = new HashMap<>();
-  private static final Set<Path> ignoredLogs = new HashSet<>();
+  private static final Set<Object> ignoredLogs = new HashSet<>();
 
   private VendorLogCapture() {
     throw new RuntimeException("This class cannot be instantiated.");
@@ -94,9 +94,7 @@ class VendorLogCapture {
       try {
         trackedLog.channel.close();
         Files.deleteIfExists(trackedLog.filePath);
-        Files.deleteIfExists(
-            trackedLog.filePath.resolveSibling(
-                "." + trackedLog.filePath.getFileName().toString() + ".captured"));
+        Files.deleteIfExists(getMarkerPath(trackedLog.filePath));
       } catch (IOException e) {
       }
     }
@@ -123,9 +121,25 @@ class VendorLogCapture {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-              if (isCapturable(file)
-                  && !trackedLogs.containsKey(file)
-                  && !ignoredLogs.contains(file)) {
+              Object fileKey = getFileKey(file, attrs);
+              TrackedLog existing = trackedLogs.get(fileKey);
+              if (existing != null) {
+                if (!existing.filePath.equals(file)) {
+                  // File was renamed, move the marker and update the tracked path
+                  try {
+                    Files.deleteIfExists(getMarkerPath(existing.filePath));
+                  } catch (IOException e) {
+                  }
+                  try {
+                    Files.createFile(getMarkerPath(file));
+                  } catch (IOException e) {
+                  }
+                  existing.filePath = file;
+                }
+                return FileVisitResult.CONTINUE;
+              }
+
+              if (isCapturable(file) && !ignoredLogs.contains(fileKey)) {
                 String extension = getExtension(file);
                 if (extension.isEmpty()) {
                   return FileVisitResult.CONTINUE;
@@ -143,14 +157,12 @@ class VendorLogCapture {
                 try {
                   FileChannel channel = FileChannel.open(file, StandardOpenOption.READ);
                   trackedLogs.put(
-                      file,
+                      fileKey,
                       new TrackedLog(channel, fieldName, "log:" + extension.toLowerCase(), file));
 
                   // Create marker file
-                  Path markerPath =
-                      file.resolveSibling("." + file.getFileName().toString() + ".captured");
                   try {
-                    Files.createFile(markerPath);
+                    Files.createFile(getMarkerPath(file));
                   } catch (IOException e) {
                   }
                 } catch (IOException e) {
@@ -276,6 +288,17 @@ class VendorLogCapture {
     return "";
   }
 
+  /** Returns the platform file key if available, falling back to the path. */
+  private static Object getFileKey(Path file, BasicFileAttributes attrs) {
+    Object fileKey = attrs.fileKey();
+    return fileKey != null ? fileKey : file;
+  }
+
+  /** Returns the capture marker path corresponding to a log file. */
+  private static Path getMarkerPath(Path file) {
+    return file.resolveSibling("." + file.getFileName().toString() + ".captured");
+  }
+
   /** Cleans any capturable log files and subdirectories. */
   private static void cleanCapturableLogs() {
     try {
@@ -296,12 +319,12 @@ class VendorLogCapture {
                 throws IOException {
               String filename = file.getFileName().toString();
               if (isCapturable(file)) {
-                Path markerPath = file.resolveSibling("." + filename + ".captured");
+                Path markerPath = getMarkerPath(file);
                 if (Files.exists(markerPath)) {
                   Files.deleteIfExists(file);
                   Files.deleteIfExists(markerPath);
                 } else {
-                  ignoredLogs.add(file);
+                  ignoredLogs.add(getFileKey(file, attrs));
                 }
               } else if (filename.startsWith(".") && filename.endsWith(".captured")) {
                 String originalName = filename.substring(1, filename.length() - 9);
@@ -333,7 +356,7 @@ class VendorLogCapture {
     final FileChannel channel;
     final String fieldName;
     final String fieldType;
-    final Path filePath;
+    volatile Path filePath;
     long currentOffset;
     final Queue<byte[]> queue = new ConcurrentLinkedQueue<>();
     final AtomicInteger queuedBytes = new AtomicInteger(0);
