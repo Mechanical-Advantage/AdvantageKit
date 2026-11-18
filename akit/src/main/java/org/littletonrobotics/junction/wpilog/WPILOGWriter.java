@@ -68,7 +68,7 @@ public class WPILOGWriter implements LogDataReceiver {
 
   private final boolean autoRename;
   private LocalDateTime logDate;
-  private String logMatchText;
+  private String logMatchText = "";
 
   private boolean isStarted = false;
   private boolean isOpen = false;
