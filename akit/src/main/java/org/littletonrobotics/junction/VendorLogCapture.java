@@ -261,7 +261,9 @@ class VendorLogCapture {
   /** Checks if a file is a capturable log file. Excludes WPILOG and hidden files. */
   private static boolean isCapturable(Path file) {
     String filename = file.getFileName().toString();
-    return !filename.endsWith(".wpilog") && !filename.startsWith(".");
+    return !filename.endsWith(".wpilog")
+        && !filename.endsWith(".wpilogxz")
+        && !filename.startsWith(".");
   }
 
   /** Extracts the file extension from a path. */
