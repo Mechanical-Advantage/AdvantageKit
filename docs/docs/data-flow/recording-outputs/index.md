@@ -58,6 +58,7 @@ Logger.recordOutput("MyDistanceArray", new double[] { 3.14, 2.72 }, "meters");
 
 // A unit object from the WPILib units library can be used in place of a string
 Logger.recordOutput("MyDistance", 3.14, Meters);
+Logger.recordOutput("MyDistanceArray", new double[] { 3.14, 2.72 }, Meters);
 
 // Measure values will also be saved with unit metadata
 // (The raw value will use the user-specified unit, not the base unit)
