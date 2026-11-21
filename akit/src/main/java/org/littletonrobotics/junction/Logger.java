@@ -389,7 +389,7 @@ public class Logger {
       }
       long vendorLogStart = RobotController.getMonotonicTime();
       if (!hasReplaySource() && vendorLogCaptureDirectory != null) {
-        VendorLogCapture.periodic(entry);
+        VendorLogCapture.periodic(entry, receiverQueue.remainingCapacity() > 0);
       }
       long consoleCaptureStart = RobotController.getMonotonicTime();
       if (enableConsole) {
