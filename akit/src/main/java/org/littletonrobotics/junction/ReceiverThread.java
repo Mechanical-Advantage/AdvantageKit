@@ -20,6 +20,7 @@ class ReceiverThread extends Thread {
   private List<String> dataReceiverNames = new ArrayList<>();
   private Map<String, Double> traceTimes = new HashMap<>();
   private Map<String, Double> traceTimesLocal = new HashMap<>();
+  private volatile boolean isStarted = false;
 
   ReceiverThread(BlockingQueue<LogTable> queue) {
     super("AdvantageKit_LogReceiver");
@@ -54,11 +55,28 @@ class ReceiverThread extends Thread {
         });
   }
 
+  /**
+   * Returns whether any registered file-writing data receiver is currently unable to write to its
+   * log file, or if the receiver thread has not yet started the receivers.
+   */
+  public boolean getFileFault() {
+    if (!isStarted) {
+      return true;
+    }
+    for (int i = 0; i < dataReceivers.size(); i++) {
+      if (dataReceivers.get(i).getFileFault()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public void run() {
     // Start data receivers
     for (int i = 0; i < dataReceivers.size(); i++) {
       dataReceivers.get(i).start();
     }
+    isStarted = true;
 
     try {
       while (true) {

@@ -28,8 +28,8 @@ import org.wpilib.system.Notifier;
 /** Captures data from vendor log files into the active AdvantageKit log. */
 class VendorLogCapture {
   private static final int chunkSize = 65536;
-  private static final int maxChunksPerCycle = 6;
-  private static final long maxUncapturedBytes = 1048576; // 1 MB
+  private static final int maxChunksPerCycle = 4;
+  private static final long maxUncapturedBytes = 262144; // 0.25 MB
   private static final int maxQueuedBytes = 10 * 1024 * 1024; // 10 MB queue capacity per log
   private static final byte[] emptyByteArray = new byte[0];
 
@@ -82,6 +82,11 @@ class VendorLogCapture {
     }
 
     for (TrackedLog trackedLog : trackedLogs.values()) {
+      long drainedOffset = trackedLog.drainedOffset;
+      if (drainedOffset != trackedLog.markerOffset) {
+        writeMarkerOffset(trackedLog.filePath, drainedOffset);
+        trackedLog.markerOffset = drainedOffset;
+      }
       try {
         trackedLog.channel.close();
       } catch (IOException e) {
@@ -119,7 +124,9 @@ class VendorLogCapture {
                   } catch (IOException e) {
                   }
                   existing.filePath = file;
-                  writeMarkerOffset(file, existing.drainedOffset);
+                  long drainedOffset = existing.drainedOffset;
+                  writeMarkerOffset(file, drainedOffset);
+                  existing.markerOffset = drainedOffset;
                 }
                 return FileVisitResult.CONTINUE;
               }
@@ -165,11 +172,17 @@ class VendorLogCapture {
     } catch (IOException e) {
     }
 
-    // Capture new data from each log
+    // Capture new data from each log and update marker files
     int totalChunks = 0;
     for (TrackedLog log : trackedLogs.values()) {
-      if (log.queuedBytes.get() >= maxQueuedBytes) {
-        continue; // Queue limit reached, pause reading until main thread drains
+      long drainedOffset = log.drainedOffset;
+      if (drainedOffset != log.markerOffset) {
+        writeMarkerOffset(log.filePath, drainedOffset);
+        log.markerOffset = drainedOffset;
+      }
+
+      if (log.queuedBytes.get() >= maxQueuedBytes || totalChunks >= maxChunksPerCycle) {
+        continue; // Queue or cycle chunk limit reached
       }
 
       try {
@@ -214,10 +227,6 @@ class VendorLogCapture {
       } catch (IOException e) {
         // File may have been temporarily locked; retry next cycle
       }
-
-      if (totalChunks >= maxChunksPerCycle) {
-        break;
-      }
     }
   }
 
@@ -225,7 +234,8 @@ class VendorLogCapture {
    * Called on the main thread every cycle to log queued vendor log data.
    *
    * @param entry The active log table entry.
-   * @param canDrain Whether the receiver queue has space to accept new chunks.
+   * @param canDrain Whether more data can be accepted with a high confidence of being drained
+   *     successfully.
    */
   static void periodic(LogTable entry, boolean canDrain) {
     for (TrackedLog log : trackedLogs.values()) {
@@ -240,28 +250,9 @@ class VendorLogCapture {
         entry.put(log.fieldName, new LogValue(emptyByteArray, log.fieldType));
       } else {
         int drainedBytes = data.length;
-        if (log.queue.isEmpty()) {
-          log.queuedBytes.addAndGet(-drainedBytes);
-          entry.put(log.fieldName, new LogValue(data, log.fieldType));
-        } else {
-          // Multiple chunks were queued, combine them
-          ByteArrayOutputStream combined = new ByteArrayOutputStream();
-          try {
-            combined.write(data);
-            byte[] next;
-            while ((next = log.queue.poll()) != null) {
-              drainedBytes += next.length;
-              combined.write(next);
-            }
-            log.queuedBytes.addAndGet(-drainedBytes);
-            entry.put(log.fieldName, new LogValue(combined.toByteArray(), log.fieldType));
-          } catch (IOException e) {
-            log.queuedBytes.addAndGet(-drainedBytes);
-            entry.put(log.fieldName, new LogValue(data, log.fieldType));
-          }
-        }
+        log.queuedBytes.addAndGet(-drainedBytes);
+        entry.put(log.fieldName, new LogValue(data, log.fieldType));
         log.drainedOffset += drainedBytes;
-        writeMarkerOffset(log.filePath, log.drainedOffset);
       }
     }
   }
@@ -334,18 +325,26 @@ class VendorLogCapture {
             }
 
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
               String filename = file.getFileName().toString();
               if (isCapturable(file)) {
                 Path markerPath = getMarkerPath(file);
                 if (Files.exists(markerPath)) {
                   long capturedOffset = readMarkerOffset(markerPath);
                   long fileSize = attrs.size();
-                  Files.deleteIfExists(markerPath);
-                  if (capturedOffset >= 0 && fileSize - capturedOffset <= maxUncapturedBytes) {
-                    Files.deleteIfExists(file);
+                  if (capturedOffset >= 0
+                      && fileSize >= capturedOffset
+                      && fileSize - capturedOffset <= maxUncapturedBytes) {
+                    try {
+                      Files.deleteIfExists(file);
+                      Files.deleteIfExists(markerPath);
+                    } catch (IOException e) {
+                    }
                   } else {
+                    try {
+                      Files.deleteIfExists(markerPath);
+                    } catch (IOException e) {
+                    }
                     ignoredLogs.add(getFileKey(file, attrs));
                   }
                 } else {
@@ -354,7 +353,10 @@ class VendorLogCapture {
               } else if (filename.startsWith(".") && filename.endsWith(".captured")) {
                 String originalName = filename.substring(1, filename.length() - 9);
                 if (!Files.exists(file.resolveSibling(originalName))) {
-                  Files.deleteIfExists(file);
+                  try {
+                    Files.deleteIfExists(file);
+                  } catch (IOException e) {
+                  }
                 }
               }
               return FileVisitResult.CONTINUE;
@@ -384,6 +386,7 @@ class VendorLogCapture {
     volatile Path filePath;
     long currentOffset;
     volatile long drainedOffset;
+    long markerOffset;
     final Queue<byte[]> queue = new ConcurrentLinkedQueue<>();
     final AtomicInteger queuedBytes = new AtomicInteger(0);
 
@@ -394,6 +397,7 @@ class VendorLogCapture {
       this.filePath = filePath;
       this.currentOffset = 0;
       this.drainedOffset = 0;
+      this.markerOffset = 0;
     }
   }
 }
