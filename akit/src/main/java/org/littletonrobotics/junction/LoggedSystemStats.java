@@ -82,7 +82,7 @@ class LoggedSystemStats {
     table.put("Versions/WPILib", WPILibVersion.Version);
     table.put("Versions/AdvantageKit", AdvantageKitVersion.version);
 
-    logVector3(table.getSubtable("IMU/AccelRaw"), conduit.getIMUAccelRaw(), "G");
+    logVector3(table.getSubtable("IMU/AccelRaw"), conduit.getIMUAccelRaw(), "mps2");
     logVector3(table.getSubtable("IMU/GyroRates"), conduit.getIMUGyroRates(), "radians per second");
     logVector3(table.getSubtable("IMU/GyroEuler/Flat"), conduit.getIMUGyroEulerFlat(), "radians");
     logVector3(
