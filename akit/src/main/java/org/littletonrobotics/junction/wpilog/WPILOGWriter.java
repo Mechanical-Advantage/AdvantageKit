@@ -71,7 +71,7 @@ public class WPILOGWriter implements LogDataReceiver {
   private String logMatchText = "";
 
   private boolean isStarted = false;
-  private boolean isOpen = false;
+  private volatile boolean isOpen = false;
   private boolean waitingForMount = false;
   private long mountWaitStartTime = 0;
   private long lastMountCheckTimestamp = 0;
@@ -82,7 +82,7 @@ public class WPILOGWriter implements LogDataReceiver {
   private Map<String, LoggableType> entryTypes;
   private Map<String, String> entryUnits;
 
-  private boolean failedFault = false;
+  private volatile boolean failedFault = false;
   private static final Alert failedAlert =
       new Alert(
           "AdvantageKit",
@@ -233,6 +233,8 @@ public class WPILOGWriter implements LogDataReceiver {
               0);
     } catch (IOException e) {
       e.printStackTrace();
+      failedFault = true;
+      failedAlert.set(true);
       return;
     }
 
@@ -569,15 +571,16 @@ public class WPILOGWriter implements LogDataReceiver {
       // Flush to disk
       if (isOpen && table.getTimestamp() - lastFlushTimestamp > flushPeriodNs) {
         lastFlushTimestamp = table.getTimestamp();
-        try {
-          wpilogEncoder.flush();
-          fileOutputStream.getFD().sync();
-          syncDirectory(folder);
-        } catch (IOException e) {
-        }
+        wpilogEncoder.flush();
+        fileOutputStream.getFD().sync();
+        syncDirectory(folder);
       }
     } catch (IOException e) {
       e.printStackTrace();
+      isOpen = false;
+      waitingForMount = false;
+      failedFault = true;
+      failedAlert.set(true);
     }
 
     // Update last table
@@ -592,6 +595,11 @@ public class WPILOGWriter implements LogDataReceiver {
    */
   public boolean getFailedFault() {
     return failedFault;
+  }
+
+  @Override
+  public boolean getFileFault() {
+    return !isOpen || failedFault;
   }
 
   /**
