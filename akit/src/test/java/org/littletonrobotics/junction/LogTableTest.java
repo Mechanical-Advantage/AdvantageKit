@@ -7,11 +7,14 @@
 
 package org.littletonrobotics.junction;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.wpilib.units.Units.Rotations;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.units.measure.Angle;
 
 /*
@@ -70,5 +73,25 @@ public class LogTableTest {
 
     // Verify that it is stored as a struct
     assertTrue(table.get("NormalRecord").customTypeStr.startsWith("struct:"));
+  }
+
+  @Test
+  public void TestGetStructWithNullDefault() {
+    LogTable table = new LogTable(0);
+    table.put("Twist", new Twist2d(1.0, 2.0, 3.0)); // real value, as if it came from the log
+
+    Twist2d defaultValue = null; // the @AutoLog field is null
+    assertDoesNotThrow(() -> table.get("Twist", defaultValue));
+    assertNull(table.get("Twist", defaultValue));
+  }
+
+  @Test
+  public void TestGetProtobufWithNullDefault() {
+    LogTable table = new LogTable(0);
+    table.put("Twist", Twist2d.proto, new Twist2d(1.0, 2.0, 3.0)); // stored as "proto:..."
+
+    Twist2d defaultValue = null; // the @AutoLog field is null
+    assertDoesNotThrow(() -> table.get("Twist", defaultValue));
+    assertNull(table.get("Twist", defaultValue));
   }
 }

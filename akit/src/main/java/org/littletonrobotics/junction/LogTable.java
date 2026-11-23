@@ -1468,6 +1468,7 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <T extends WPISerializable> T get(String key, T defaultValue) {
+    if (defaultValue == null) return null;
     if (data.containsKey(prefix + key)) {
       String typeString = data.get(prefix + key).customTypeStr;
       if (typeString.startsWith("struct:")) {
