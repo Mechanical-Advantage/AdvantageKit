@@ -90,10 +90,10 @@ public class LogFileUtil {
   }
 
   /**
-   * Get the filepath to a log given by {@link #environmentVariable}.
+   * Get the filepath to a log given by the "AKIT_LOG_PATH" environment variable.
    *
-   * <p>Beginners should instead consider {@link #findReplayLog()}, which
-   * searches all possible log file locations.
+   * <p>Alternatively, {@link #findReplayLog()} automatically searches all possible log file
+   * locations.
    *
    * @return The path to the log file, or {@code null} if unavailable.
    */
@@ -102,10 +102,10 @@ public class LogFileUtil {
   }
 
   /**
-   * Get a temporary filepath to the log currently open in AdvantageScope.
+   * Get the filepath to the log currently open in AdvantageScope.
    *
-   * <p>Beginners should instead consider {@link #findReplayLog()}, which
-   * searches all possible log file locations.
+   * <p>Alternatively, {@link #findReplayLog()} automatically searches all possible log file
+   * locations.
    *
    * @return The path to the log file, or {@code null} if unavailable.
    */
@@ -123,8 +123,8 @@ public class LogFileUtil {
   /**
    * Prompt the user for a log filepath on standard input.
    *
-   * <p>Beginners should instead consider {@link #findReplayLog()}, which
-   * searches all available log file locations.
+   * <p>Alternatively, {@link #findReplayLog()} automatically searches all possible log file
+   * locations.
    *
    * @return The user-provided path to the log file.
    */
