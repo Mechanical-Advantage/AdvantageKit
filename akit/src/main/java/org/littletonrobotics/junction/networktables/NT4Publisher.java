@@ -44,6 +44,11 @@ public class NT4Publisher implements LogDataReceiver {
 
     // Encode new/changed fields
     for (Map.Entry<String, LogValue> field : newMap.entrySet()) {
+      // Skip publishing child logs
+      if (field.getValue().getNT4Type().startsWith("log:")) {
+        continue;
+      }
+
       // Check if field has changed
       LogValue newValue = field.getValue();
       if (newValue.equals(oldMap.get(field.getKey()))) {

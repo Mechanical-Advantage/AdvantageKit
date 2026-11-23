@@ -32,4 +32,14 @@ public interface LogDataReceiver {
    * @throws InterruptedException If interrupted while processing.
    */
   public void putTable(LogTable table) throws InterruptedException;
+
+  /**
+   * For data receivers that write to a log file on disk, returns whether the receiver is currently
+   * unable to write data to its file.
+   *
+   * @return True if this receiver writes to a log file and is currently unable to do so.
+   */
+  public default boolean getFileFault() {
+    return false;
+  }
 }
