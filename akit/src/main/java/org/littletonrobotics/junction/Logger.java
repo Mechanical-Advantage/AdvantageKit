@@ -940,6 +940,52 @@ public class Logger {
    * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
    * for details.
    *
+   * <p>This method saves the double value with unit metadata that is compatible with
+   * AdvantageScope. The raw value preserves the <b>user-specified unit</b>.
+   *
+   * @param key The name of the field to record. It will be stored under "/RealOutputs" or
+   *     "/ReplayOutputs"
+   * @param value The value of the field.
+   * @param unit The unit to save as metadata.
+   */
+  public static void recordOutput(String key, float[] value, Unit unit) {
+    if (running) {
+      outputTable.put(key, value, unit.name());
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the simulator, use this
+   * method to record extra data based on the original inputs.
+   *
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
+   *
+   * <p>This method saves the double value with unit metadata that is compatible with
+   * AdvantageScope. The raw value preserves the <b>user-specified unit</b>.
+   *
+   * @param key The name of the field to record. It will be stored under "/RealOutputs" or
+   *     "/ReplayOutputs"
+   * @param value The value of the field.
+   * @param unit The unit to save as metadata.
+   */
+  public static void recordOutput(String key, float[] value, String unit) {
+    if (running) {
+      outputTable.put(key, value, unit);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the simulator, use this
+   * method to record extra data based on the original inputs.
+   *
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
+   *
    * @param key The name of the field to record. It will be stored under "/RealOutputs" or
    *     "/ReplayOutputs"
    * @param value The value of the field.
@@ -1010,6 +1056,52 @@ public class Logger {
    * @param unit The unit to save as metadata.
    */
   public static void recordOutput(String key, double value, String unit) {
+    if (running) {
+      outputTable.put(key, value, unit);
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the simulator, use this
+   * method to record extra data based on the original inputs.
+   *
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
+   *
+   * <p>This method saves the double value with unit metadata that is compatible with
+   * AdvantageScope. The raw value preserves the <b>user-specified unit</b>.
+   *
+   * @param key The name of the field to record. It will be stored under "/RealOutputs" or
+   *     "/ReplayOutputs"
+   * @param value The value of the field.
+   * @param unit The unit to save as metadata.
+   */
+  public static void recordOutput(String key, double[] value, Unit unit) {
+    if (running) {
+      outputTable.put(key, value, unit.name());
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the simulator, use this
+   * method to record extra data based on the original inputs.
+   *
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
+   *
+   * <p>This method saves the double value with unit metadata that is compatible with
+   * AdvantageScope. The raw value preserves the <b>user-specified unit</b>.
+   *
+   * @param key The name of the field to record. It will be stored under "/RealOutputs" or
+   *     "/ReplayOutputs"
+   * @param value The value of the field.
+   * @param unit The unit to save as metadata.
+   */
+  public static void recordOutput(String key, double[] value, String unit) {
     if (running) {
       outputTable.put(key, value, unit);
     }
@@ -1212,6 +1304,32 @@ public class Logger {
       // always uses the base unit. Calling the double overload ensures that the
       // user-specified unit is preserved.
       outputTable.put(key, value.magnitude(), value.unit().name());
+    }
+  }
+
+  /**
+   * Records a single output field for easy access when viewing the log. On the simulator, use this
+   * method to record extra data based on the original inputs.
+   *
+   * <p>This method is <b>not thread-safe</b> and should only be called from the main thread. Check
+   * the <a href=
+   * "https://docs.advantagekit.org/getting-started/common-issues/multithreading">documentation</a>
+   * for details.
+   *
+   * <p>This method saves the unit value with metadata that is compatible with AdvantageScope. The
+   * raw value uses the <b>base unit</b> not the user-specified unit, as arrays must all be logged
+   * in the same unit.
+   *
+   * @param <U> The unit type.
+   * @param key The name of the field to record. It will be stored under "/RealOutputs" or
+   *     "/ReplayOutputs"
+   * @param value The value of the field.
+   */
+  public static <U extends Unit> void recordOutputMeasures(String key, Measure<U>[] value) {
+    if (running && value != null) {
+      // Because all array indexes must contain the same unit, we will use the measure
+      // overload of LogTable and log the base unit.
+      outputTable.putMeasures(key, value);
     }
   }
 
@@ -1430,6 +1548,10 @@ public class Logger {
    */
   @SuppressWarnings("unchecked")
   public static <R extends Record> void recordOutput(String key, R... value) {
+    if (value instanceof Measure<?>[] measures) {
+      recordOutputMeasures(key, (Measure<Unit>[]) measures);
+      return;
+    }
     if (running) {
       outputTable.put(key, value);
     }

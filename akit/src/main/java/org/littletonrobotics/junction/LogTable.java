@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.units.Measure;
 import org.wpilib.units.Unit;
+import org.wpilib.units.Units;
 import org.wpilib.util.Color;
 import org.wpilib.util.Color8Bit;
 import org.wpilib.util.WPISerializable;
@@ -43,6 +45,8 @@ public class LogTable {
   private final Map<String, ProtobufBuffer<?, ?>> protoBuffers;
   private final Map<String, Struct<?>> structTypeCache;
   private final Map<String, Protobuf<?, ?>> protoTypeCache;
+
+  private static final Map<String, Unit> unitsByName = new ConcurrentHashMap<>();
 
   /** Timestamp wrapper to enable passing by reference to subtables. */
   private static class SharedTimestamp {
@@ -413,6 +417,21 @@ public class LogTable {
   }
 
   /**
+   * Writes a new FloatArray value to the table with units. Skipped if the key already exists as a
+   * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
+   * @param unit The unit to save as metadata.
+   */
+  public void put(String key, float[] value, String unit) {
+    if (value == null) return;
+    float[] valueClone = new float[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    put(key, new LogValue(valueClone, null, unit));
+  }
+
+  /**
    * Writes a new 2D FloatArray value to the table. Skipped if the key already exists as a different
    * type.
    *
@@ -461,6 +480,21 @@ public class LogTable {
     double[] valueClone = new double[value.length];
     System.arraycopy(value, 0, valueClone, 0, value.length);
     put(key, new LogValue(valueClone, null));
+  }
+
+  /**
+   * Writes a new DoubleArray value to the table with units. Skipped if the key already exists as a
+   * different type.
+   *
+   * @param key The field name.
+   * @param value The field value.
+   * @param unit The unit to save as metadata.
+   */
+  public void put(String key, double[] value, String unit) {
+    if (value == null) return;
+    double[] valueClone = new double[value.length];
+    System.arraycopy(value, 0, valueClone, 0, value.length);
+    put(key, new LogValue(valueClone, null, unit));
   }
 
   /**
@@ -576,6 +610,26 @@ public class LogTable {
   public <U extends Unit> void putMeasure(String key, Measure<U> value) {
     if (value == null) return;
     put(key, new LogValue(value.baseUnitMagnitude(), null, value.baseUnit().name()));
+  }
+
+  /**
+   * Writes a new Measure array value to the table. Skipped if the key already exists as a different
+   * type.
+   *
+   * <p>This overload always records the value in its base unit.
+   *
+   * @param <U> The unit type.
+   * @param key The field name.
+   * @param value The field value.
+   */
+  public <U extends Unit> void putMeasures(String key, Measure<U>[] value) {
+    if (value == null) return;
+    double[] magnitudes = new double[value.length];
+    for (int i = 0; i < value.length; i++) {
+      magnitudes[i] = value[i].baseUnitMagnitude();
+    }
+    String unitName = value.length > 0 ? value[0].baseUnit().name() : null;
+    put(key, magnitudes, unitName);
   }
 
   /**
@@ -871,6 +925,10 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> void put(String key, R... value) {
+    if (value instanceof Measure<?>[] measures) {
+      putMeasures(key, (Measure<Unit>[]) measures);
+      return;
+    }
     if (value == null) return;
     // If struct is supported, write as struct
     Struct<R> struct = (Struct<R>) findRecordStructType(value.getClass().getComponentType());
@@ -1313,20 +1371,76 @@ public class LogTable {
   /**
    * Reads a Measure value from the table.
    *
-   * @param <U> The unit type.
    * @param <M> The measure type.
    * @param key The field name.
    * @param defaultValue The default field value.
    * @return The field value.
    */
   @SuppressWarnings("unchecked")
-  public <U extends Unit, M extends Measure<U>> M getMeasure(String key, M defaultValue) {
+  public <M extends Measure<?>> M getMeasure(String key, M defaultValue) {
     if (data.containsKey(prefix + key)) {
       double value = get(key).getDouble(defaultValue.baseUnitMagnitude());
       return (M) defaultValue.unit().ofBaseUnits(value);
     } else {
       return defaultValue;
     }
+  }
+
+  /**
+   * Looks through the WPILib unit API for a unit of the specified name.
+   *
+   * @param name The name of the unit returned from .unit().name().
+   * @return The unit.
+   */
+  public static Unit findUnitByName(String name) {
+    if (name == null) return null;
+
+    return unitsByName.computeIfAbsent(
+        name,
+        n -> {
+          for (Field unitField : Units.class.getFields()) {
+            if (Unit.class.isAssignableFrom(unitField.getType())) {
+              try {
+                Unit fieldUnit = ((Unit) unitField.get(null)).getBaseUnit();
+                if (fieldUnit.name().equals(n)) {
+                  return fieldUnit;
+                }
+              } catch (IllegalAccessException e) {
+                e.printStackTrace();
+              }
+            }
+          }
+
+          return null;
+        });
+  }
+
+  /**
+   * Reads a Measure array value from the table.
+   *
+   * @param <M> The measure type.
+   * @param key The field name.
+   * @param defaultValue The default field value.
+   * @return The field value.
+   */
+  @SuppressWarnings("unchecked")
+  public <M extends Measure<?>> M[] getMeasures(String key, M[] defaultValue) {
+    LogValue logValue = get(key);
+    double[] magnitudes = logValue.getDoubleArray();
+
+    M[] values =
+        (M[]) Array.newInstance(defaultValue.getClass().componentType(), magnitudes.length);
+    if (magnitudes.length == 0) return values;
+
+    String unitName = logValue.unitStr;
+    Unit unit = findUnitByName(unitName).getBaseUnit();
+    if (unit == null) return defaultValue;
+
+    for (int i = 0; i < magnitudes.length; i++) {
+      values[i] = (M) unit.ofBaseUnits(magnitudes[i]);
+    }
+
+    return values;
   }
 
   /**
@@ -1568,6 +1682,9 @@ public class LogTable {
    */
   @SuppressWarnings("unchecked")
   public <R extends Record> R[] get(String key, R... defaultValue) {
+    if (defaultValue instanceof Measure<?>[] measures) {
+      return (R[]) getMeasures(key, (Measure<?>[]) measures);
+    }
     if (data.containsKey(prefix + key)) {
       String typeString = data.get(prefix + key).customTypeStr;
       if (typeString.startsWith("struct:")) {
@@ -1835,11 +1952,39 @@ public class LogTable {
      *
      * @param value The value.
      * @param typeStr The custom type string, or null for default.
+     * @param unitStr The unit name, or null if unitless.
+     */
+    public LogValue(float[] value, String typeStr, String unitStr) {
+      type = LoggableType.FloatArray;
+      customTypeStr = typeStr;
+      this.unitStr = unitStr;
+      this.value = value;
+    }
+
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
      */
     public LogValue(double[] value, String typeStr) {
       type = LoggableType.DoubleArray;
       customTypeStr = typeStr;
       unitStr = null;
+      this.value = value;
+    }
+
+    /**
+     * Creates a new LogValue.
+     *
+     * @param value The value.
+     * @param typeStr The custom type string, or null for default.
+     * @param unitStr The unit name, or null if unitless.
+     */
+    public LogValue(double[] value, String typeStr, String unitStr) {
+      type = LoggableType.DoubleArray;
+      customTypeStr = typeStr;
+      this.unitStr = unitStr;
       this.value = value;
     }
 

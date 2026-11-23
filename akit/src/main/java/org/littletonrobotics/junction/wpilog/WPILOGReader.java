@@ -227,10 +227,18 @@ public class WPILOGReader implements LogReplaySource {
                 table.put(entry, new LogValue(record.getIntegerArray(), customType));
                 break;
               case FloatArray:
-                table.put(entry, new LogValue(record.getFloatArray(), customType));
+                if (unit != null) {
+                  table.put(entry, new LogValue(record.getFloatArray(), customType, unit));
+                } else {
+                  table.put(entry, new LogValue(record.getFloatArray(), customType));
+                }
                 break;
               case DoubleArray:
-                table.put(entry, new LogValue(record.getDoubleArray(), customType));
+                if (unit != null) {
+                  table.put(entry, new LogValue(record.getDoubleArray(), customType, unit));
+                } else {
+                  table.put(entry, new LogValue(record.getDoubleArray(), customType));
+                }
                 break;
               case StringArray:
                 table.put(entry, new LogValue(record.getStringArray(), customType));
