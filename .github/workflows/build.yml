@@ -8,6 +8,17 @@ on:
     types: [published]
 
 jobs:
+  publish-zip-tests:
+    name: "Maven ZIP Publisher Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: python -m pip install requests
+      - run: python -m unittest discover -s tests -v
+
   build-systemcore:
     name: "Build for Systemcore"
     runs-on: ubuntu-latest

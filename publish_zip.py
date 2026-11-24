@@ -10,6 +10,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import hashlib
 import os
+import sys
 
 # Parse command line arguments
 parser = argparse.ArgumentParser()
@@ -65,29 +66,26 @@ else:
     # Set up auth for the HTTP requests
     auth = HTTPBasicAuth(args.username, args.password)
 
-    # Make the HTTP request to publish the zip file
-    response_zip = requests.put(url, auth=auth, data=zip_data)
+    def publish_file(file_url, content, label):
+        try:
+            response = requests.put(file_url, auth=auth, data=content, timeout=30)
+        except requests.RequestException as exc:
+            print(f"Error uploading {label}: {exc}", file=sys.stderr)
+            return False
 
-    # Check the status code of the response
-    if response_zip.status_code == 200 or response_zip.status_code == 201:
-        print("Zip file published to Maven.")
-    else:
-        print(f"Error: {response_zip.status_code} - {response_zip.content.decode()}")
+        if response.status_code not in (200, 201, 204):
+            message = response.content.decode(errors="replace")
+            print(f"Error uploading {label}: {response.status_code} - {message}", file=sys.stderr)
+            return False
 
-    # Make the HTTP request to publish the sha256 file
-    response_sha256 = requests.put(f"{url}.sha256", auth=auth, data=sha256_content)
+        print(f"{label} published to Maven.")
+        return True
 
-    # Check the status code of the response
-    if response_sha256.status_code == 200 or response_sha256.status_code == 201:
-        print("SHA-256 file published to Maven.")
-    else:
-        print(f"Error: {response_sha256.status_code} - {response_sha256.content.decode()}")
-
-    # Make the HTTP request to publish the md5 file
-    response_md5 = requests.put(f"{url}.md5", auth=auth, data=md5_content)
-
-    # Check the status code of the response
-    if response_md5.status_code == 200 or response_md5.status_code == 201:
-        print("MD5 file published to Maven.")
-    else:
-        print(f"Error: {response_md5.status_code} - {response_md5.content.decode()}")
+    # Only publish checksums after the archive was successfully uploaded. Fail the
+    # publishing process if any request is unsuccessful so CI cannot report success.
+    if not publish_file(url, zip_data, "Zip file"):
+        sys.exit(1)
+    if not publish_file(f"{url}.sha256", sha256_content, "SHA-256 file"):
+        sys.exit(1)
+    if not publish_file(f"{url}.md5", md5_content, "MD5 file"):
+        sys.exit(1)
