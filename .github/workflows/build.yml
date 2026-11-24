@@ -46,7 +46,7 @@ jobs:
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: "Release: Upload vendordep"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -71,7 +71,7 @@ jobs:
           path: template_projects/generated
       - name: "Release: Upload template project (kitbot_2026)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -81,7 +81,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (diff_drive)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -91,7 +91,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (spark_swerve)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -101,7 +101,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (talonfx_swerve)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -111,7 +111,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (vision)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -121,7 +121,7 @@ jobs:
           asset_content_type: application/zip
       - name: "Release: Upload template project (skeleton)"
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -294,7 +294,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: "Release: Upload artifact"
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v3
         if: github.event_name == 'release'
         env:
           GITHUB_TOKEN: ${{ github.token }}
